@@ -409,6 +409,15 @@
     <button type="button" class="active" data-cur="CNY" id="curSetCNY">人民币 (CNY)</button>
     <button type="button" data-cur="JPY" id="curSetJPY">日元 (JPY)</button>
   </div>
+  <div class="field-label" id="backupFieldLabel">云备份（GitHub Gist）</div>
+  <div class="text-row"><input type="password" id="githubTokenInput" autocomplete="off" placeholder="GitHub Token"></div>
+  <div class="text-row"><input type="text" id="gistIdInput" autocomplete="off" placeholder="Gist ID"></div>
+  <div id="backupStatusText" style="font-size:12px;color:var(--ink-soft);margin:-6px 0 14px;"></div>
+  <div class="row2" style="margin-bottom:8px;">
+    <button type="button" class="save-btn" id="backupNowBtn" style="flex:1;margin-top:0;padding:13px 4px;font-size:13.5px;background:var(--jade);"></button>
+    <button type="button" class="save-btn" id="restoreNowBtn" style="flex:1;margin-top:0;padding:13px 4px;font-size:13.5px;background:var(--seal);"></button>
+  </div>
+  <div id="backupHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;"></div>
 </div>
 
 <div class="sheet" id="monthDetailSheet" style="max-height:92vh;">
@@ -452,7 +461,16 @@
       rateTrend12Months:'近12个月走势', rateTrend8Years:'近8年走势',
       granDay:'近30天', granMonth:'近12个月', granYear:'近8年',
       refreshRate:'刷新汇率', loadingRate:'获取中...', neverFetched:'尚未获取汇率',
-      converterTitle:'快速换算', converterCNYLabel:'人民币 (CNY)', converterJPYLabel:'日元 (JPY)'
+      converterTitle:'快速换算', converterCNYLabel:'人民币 (CNY)', converterJPYLabel:'日元 (JPY)',
+      backupFieldLabel:'云备份（GitHub Gist）', tokenPlaceholder:'GitHub Token（仅需 gist 权限）',
+      gistIdPlaceholder:'Gist ID（首次备份自动生成，换设备可手动填入）',
+      backupNowBtn:'立即备份', restoreNowBtn:'从云端恢复',
+      backupStatusNever:'尚未备份', backupStatusSyncing:'备份中...', backupStatusSynced:'上次备份：{time}',
+      backupNeedToken:'请先填写 GitHub Token', backupErrorAuth:'Token 无效或权限不足',
+      backupErrorNetwork:'备份失败，请检查网络', restoreNeedInfo:'请先填写 Token 和 Gist ID',
+      restoreConfirm:'从云端恢复将覆盖本机当前所有记账数据，确定继续吗？', restoreSuccess:'恢复成功',
+      restoreErrorNotFound:'找不到该 Gist，请检查 Token 和 Gist ID', restoreErrorParse:'备份内容已损坏，无法恢复',
+      backupHelpText:'在 GitHub 网页 Settings → Developer settings → Personal access tokens → Tokens (classic) 里新建一个 token，只勾选 gist 权限即可。之后每次记账会自动同步到你自己的私密 Gist；换设备时把 Token 和 Gist ID 填回来即可恢复。'
     },
     ja:{
       appTitle:'家計簿', tabLedger:'家計簿', tabStats:'統計', tabRate:'為替',
@@ -479,7 +497,16 @@
       rateTrend12Months:'過去12か月の推移', rateTrend8Years:'過去8年間の推移',
       granDay:'過去30日', granMonth:'過去12か月', granYear:'過去8年',
       refreshRate:'レートを更新', loadingRate:'取得中...', neverFetched:'レート未取得',
-      converterTitle:'簡易換算', converterCNYLabel:'人民元 (CNY)', converterJPYLabel:'日本円 (JPY)'
+      converterTitle:'簡易換算', converterCNYLabel:'人民元 (CNY)', converterJPYLabel:'日本円 (JPY)',
+      backupFieldLabel:'クラウドバックアップ（GitHub Gist）', tokenPlaceholder:'GitHub トークン（gist 権限のみ必要）',
+      gistIdPlaceholder:'Gist ID（初回バックアップ時に自動生成、機種変更時は手入力で復元可）',
+      backupNowBtn:'今すぐバックアップ', restoreNowBtn:'クラウドから復元',
+      backupStatusNever:'まだバックアップされていません', backupStatusSyncing:'バックアップ中...', backupStatusSynced:'最終バックアップ：{time}',
+      backupNeedToken:'先に GitHub トークンを入力してください', backupErrorAuth:'トークンが無効か権限不足です',
+      backupErrorNetwork:'バックアップに失敗しました。ネットワークをご確認ください', restoreNeedInfo:'先にトークンと Gist ID を入力してください',
+      restoreConfirm:'クラウドから復元すると、この端末の記録がすべて上書きされます。続けますか？', restoreSuccess:'復元しました',
+      restoreErrorNotFound:'Gist が見つかりません。トークンと Gist ID をご確認ください', restoreErrorParse:'バックアップの内容が壊れていて復元できません',
+      backupHelpText:'GitHub の Settings → Developer settings → Personal access tokens → Tokens (classic) で、gist 権限のみを付けた新しいトークンを作成してください。以降は記録するたびに自分専用の非公開 Gist へ自動同期されます。機種変更時はトークンと Gist ID を入力すれば復元できます。'
     }
   };
 
@@ -594,6 +621,8 @@
 
   let entries = [];
   let settings = {lang:'ja', currency:'JPY'};
+  let gistSyncing = false;
+  let gistBackupTimer = null;
   let rateData = null;
   let rateHistory = [];
   let rateHistoryMonthly = [];
@@ -707,8 +736,89 @@
     try{ const res = LocalStore.get('ledger_entries'); entries = res && res.value ? JSON.parse(res.value) : []; }catch(e){ entries=[]; }
   }
   async function saveEntries(){
-    try{ await storageSetSafe('ledger_entries', JSON.stringify(entries), false); }
+    try{ await storageSetSafe('ledger_entries', JSON.stringify(entries), false); scheduleGistBackup(); }
     catch(e){ console.error('保存失败', e); showToast(t('saveFailed')); }
+  }
+
+  // ---------- GitHub Gist 云备份 ----------
+  function scheduleGistBackup(){
+    if(!settings.githubToken) return;
+    clearTimeout(gistBackupTimer);
+    gistBackupTimer = setTimeout(()=> pushBackupToGist(false), 2500);
+  }
+  function buildBackupPayload(){
+    const safeSettings = {lang: settings.lang, currency: settings.currency};
+    return JSON.stringify({version:1, exportedAt: Date.now(), entries, settings: safeSettings, customSubs: customSubsMap}, null, 2);
+  }
+  async function pushBackupToGist(manual){
+    const token = (settings.githubToken||'').trim();
+    if(!token){ if(manual) showToast(t('backupNeedToken')); return; }
+    if(gistSyncing) return;
+    gistSyncing = true; renderBackupStatus();
+    try{
+      const gistId = (settings.gistId||'').trim();
+      const url = gistId ? `https://api.github.com/gists/${gistId}` : 'https://api.github.com/gists';
+      const res = await fetch(url, {
+        method: gistId ? 'PATCH' : 'POST',
+        headers:{ 'Authorization':'Bearer '+token, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
+        body: JSON.stringify({description:'记账本自动备份 - 请勿手动删除', public:false, files:{'accountbook-backup.json':{content: buildBackupPayload()}}})
+      });
+      if(res.status===401 || res.status===403){ if(manual) showToast(t('backupErrorAuth')); return; }
+      if(res.status===404 && gistId){
+        settings.gistId = '';
+        gistSyncing = false;
+        await pushBackupToGist(manual);
+        return;
+      }
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      settings.gistId = data.id;
+      settings.lastSyncAt = Date.now();
+      $('gistIdInput').value = settings.gistId;
+      await storageSetSafe('ledger_settings', JSON.stringify(settings), false);
+    }catch(e){
+      console.error('Gist 备份失败', e);
+      if(manual) showToast(t('backupErrorNetwork'));
+    }finally{
+      gistSyncing = false;
+      renderBackupStatus();
+    }
+  }
+  async function pullBackupFromGist(){
+    const token = (settings.githubToken||'').trim();
+    const gistId = (settings.gistId||'').trim();
+    if(!token || !gistId){ showToast(t('restoreNeedInfo')); return; }
+    if(!confirm(t('restoreConfirm'))) return;
+    gistSyncing = true; renderBackupStatus();
+    try{
+      const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+        headers:{ 'Authorization':'Bearer '+token, 'Accept':'application/vnd.github+json' }
+      });
+      if(res.status===401 || res.status===403){ showToast(t('backupErrorAuth')); return; }
+      if(res.status===404){ showToast(t('restoreErrorNotFound')); return; }
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      const file = data.files && data.files['accountbook-backup.json'];
+      if(!file || !file.content) throw new Error('empty backup');
+      const payload = JSON.parse(file.content);
+      entries = Array.isArray(payload.entries) ? payload.entries : [];
+      customSubsMap = payload.customSubs && typeof payload.customSubs==='object' ? payload.customSubs : {};
+      if(payload.settings){
+        settings.lang = payload.settings.lang || settings.lang;
+        settings.currency = payload.settings.currency || settings.currency;
+      }
+      await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
+      await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false);
+      await storageSetSafe('ledger_settings', JSON.stringify(settings), false);
+      showToast(t('restoreSuccess'));
+      setTimeout(()=> location.reload(), 700);
+    }catch(e){
+      console.error('Gist 恢复失败', e);
+      showToast(t('restoreErrorParse'));
+    }finally{
+      gistSyncing = false;
+      renderBackupStatus();
+    }
   }
 
   async function fetchJsonOrThrow(url){
@@ -949,6 +1059,26 @@
     $('baseCurTag').textContent = '('+symbolFor(settings.currency)+')';
     document.querySelectorAll('#langSegment button').forEach(b=> b.classList.toggle('active', b.getAttribute('data-lang')===settings.lang));
     document.querySelectorAll('#baseCurSegment button').forEach(b=> b.classList.toggle('active', b.getAttribute('data-cur')===settings.currency));
+    $('backupFieldLabel').textContent = t('backupFieldLabel');
+    $('githubTokenInput').placeholder = t('tokenPlaceholder');
+    $('gistIdInput').placeholder = t('gistIdPlaceholder');
+    $('backupNowBtn').textContent = t('backupNowBtn');
+    $('restoreNowBtn').textContent = t('restoreNowBtn');
+    $('backupHelpText').textContent = t('backupHelpText');
+    if(document.activeElement !== $('githubTokenInput')) $('githubTokenInput').value = settings.githubToken || '';
+    if(document.activeElement !== $('gistIdInput')) $('gistIdInput').value = settings.gistId || '';
+    renderBackupStatus();
+  }
+
+  function renderBackupStatus(){
+    if(gistSyncing){ $('backupStatusText').textContent = t('backupStatusSyncing'); return; }
+    if(settings.lastSyncAt){
+      const d = new Date(settings.lastSyncAt);
+      const timeStr = d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+      $('backupStatusText').textContent = t('backupStatusSynced').replace('{time}', timeStr);
+    }else{
+      $('backupStatusText').textContent = t('backupStatusNever');
+    }
   }
 
   function setMonthLabel(){ const d=new Date(); $('monthLabel').textContent = d.getFullYear()+'年'+(d.getMonth()+1)+'月'; }
@@ -1316,7 +1446,7 @@
     });
   }
   async function persistCustomSubs(){
-    try{ await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false); }
+    try{ await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false); scheduleGistBackup(); }
     catch(e){ console.error('自定义分类保存失败', e); showToast(t('saveFailed')); }
   }
   async function addCustomSub(catKey, label){
@@ -1510,6 +1640,16 @@
       applyStaticI18n(); renderAll(); renderRatePage();
     });
   });
+  $('githubTokenInput').addEventListener('change', async ()=>{
+    settings.githubToken = $('githubTokenInput').value.trim();
+    await saveSettings();
+  });
+  $('gistIdInput').addEventListener('change', async ()=>{
+    settings.gistId = $('gistIdInput').value.trim();
+    await saveSettings();
+  });
+  $('backupNowBtn').addEventListener('click', ()=> pushBackupToGist(true));
+  $('restoreNowBtn').addEventListener('click', ()=> pullBackupFromGist());
 
   // ---------- Tabs ----------
   function switchToPage(page){
