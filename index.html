@@ -269,7 +269,6 @@
         <span class="ym-label" id="homeMonthLabel">2026年7月</span>
         <button type="button" class="ym-arrow" id="homeMonthNext">›</button>
       </div>
-      <div class="card-title" style="margin-bottom:6px;"><span id="homeDonutTitle">本月构成</span></div>
       <div class="segment" id="homeTypeSegment" style="margin-bottom:14px;">
         <button type="button" class="active expense" data-type="expense" id="homeTypeExpenseBtn">支出</button>
         <button type="button" class="income" data-type="income" id="homeTypeIncomeBtn">收入</button>
@@ -455,12 +454,12 @@
       statsTitle:'统计', statsSub:'收支分析', dimDay:'按日对比', dimMonth:'按月对比',
       trendDayTitle:'本月每日收支', trendMonthTitle:'本年每月收支',
       typeExpense:'支出构成', typeIncome:'收入构成',
-      homeDonutTitle:'本月构成', homeDonutHint:'点击查看本月明细 ›', monthDetailTitle:'本月明细', detailWord:'明细',
+      homeDonutHint:'点击查看本月明细 ›', monthDetailTitle:'本月明细', detailWord:'明细',
       donutTodayExpense:'今日支出', donutTodayIncome:'今日收入',
       donutMonthExpense:'本月支出', donutMonthIncome:'本月收入',
       emptyChart:'这段时间还没有相关记录', saveFailed:'保存失败,请检查网络后重试',
       compareTemplate:'{cur}{type} · 对比{prev}',
-      sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', segExpense:'支出', segIncome:'收入',
+      sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
       catFieldLabel:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称',
       curCNYLabel:'人民币', curJPYLabel:'日元',
@@ -487,17 +486,17 @@
       balanceLabel:'今月の残高', monthIncome:'今月の収入', monthExpense:'今月の支出',
       emptyLine1:'この家計簿はまだ空です', emptyLine2:'右下のボタンから記録しましょう',
       today:'今日', yesterday:'昨日', thisMonth:'今月', lastMonth:'先月',
-      expenseWord:'支出', incomeWord:'収入', newIncrease:'新規', delete:'削除', edit:'編集', copy:'複製',
+      expenseWord:'支出', incomeWord:'収入', newIncrease:'新規', delete:'削除', edit:'編集', copy:'コピー',
       surplus:'黒字', deficit:'赤字',
       statsTitle:'レポート', statsSub:'収支分析', dimDay:'日別比較', dimMonth:'月別比較',
       trendDayTitle:'今月の日別収支', trendMonthTitle:'今年の月別収支',
       typeExpense:'支出内訳', typeIncome:'収入内訳',
-      homeDonutTitle:'今月の内訳', homeDonutHint:'タップして今月の明細を見る ›', monthDetailTitle:'今月の明細', detailWord:'明細',
+      homeDonutHint:'タップして今月の明細を見る ›', monthDetailTitle:'今月の明細', detailWord:'明細',
       donutTodayExpense:'本日の支出', donutTodayIncome:'本日の収入',
       donutMonthExpense:'今月の支出', donutMonthIncome:'今月の収入',
       emptyChart:'この期間の記録はまだありません', saveFailed:'保存に失敗しました。ネットワークをご確認の上再試行してください',
       compareTemplate:'{cur}の{type}（{prev}比）',
-      sheetAddTitle:'入力', editEntryTitle:'記録を編集', segExpense:'支出', segIncome:'収入',
+      sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
       catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名',
       curCNYLabel:'人民元', curJPYLabel:'日本円',
@@ -1037,7 +1036,6 @@
     $('dimMonthBtn').textContent = t('dimMonth');
     $('trendLegendExpense').textContent = t('expenseWord');
     $('trendLegendIncome').textContent = t('incomeWord');
-    $('homeDonutTitle').textContent = t('homeDonutTitle');
     $('homeDonutHint').textContent = t('homeDonutHint');
     $('homeTypeExpenseBtn').textContent = t('segExpense');
     $('homeTypeIncomeBtn').textContent = t('segIncome');
@@ -1560,7 +1558,7 @@
   function openEntrySheetForCopy(entry){
     editingEntryId = null;
     applyEntryToForm(entry, true);
-    $('sheetTitle').textContent = t('sheetAddTitle');
+    $('sheetTitle').textContent = t('copyEntryTitle');
     $('monthDetailSheet').classList.remove('show');
     $('catPickerSheet').classList.remove('show');
     $('overlay').classList.add('show');
