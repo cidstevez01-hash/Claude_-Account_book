@@ -36,8 +36,10 @@
                 3px 4px 0 rgba(58,47,40,0.16);
   }
   .washi-tape{position:absolute;top:-8px;left:14px;width:56px;height:20px;background:repeating-linear-gradient(-45deg, rgba(227,178,60,0.55) 0 6px, rgba(227,178,60,0.32) 6px 12px);transform:rotate(-5deg);border-radius:2px;opacity:0.9;pointer-events:none;}
-  .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 150px); position:relative; }
-  .page{display:none;} .page.active{display:block;}
+  .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
+  #pageLedger{ padding-bottom:60px; }
+  .page{display:none;}
+  .page.active{display:flex; flex-direction:column; justify-content:center; min-height:calc(100svh - var(--safe-top) - var(--safe-bottom) - 108px);}
   .header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; position:relative;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
   .header .month{font-size:13px; color:var(--ink-soft); margin-top:4px;}
@@ -473,13 +475,13 @@
       backupHelpText:'在 GitHub 网页 Settings → Developer settings → Personal access tokens → Tokens (classic) 里新建一个 token，只勾选 gist 权限即可。之后每次记账会自动同步到你自己的私密 Gist；换设备时把 Token 和 Gist ID 填回来即可恢复。'
     },
     ja:{
-      appTitle:'家計簿', tabLedger:'家計簿', tabStats:'統計', tabRate:'為替',
+      appTitle:'家計簿', tabLedger:'家計簿', tabStats:'レポート', tabRate:'為替',
       balanceLabel:'今月の残高', monthIncome:'今月の収入', monthExpense:'今月の支出',
       emptyLine1:'この家計簿はまだ空です', emptyLine2:'右下のボタンから記録しましょう',
       today:'今日', yesterday:'昨日', thisMonth:'今月', lastMonth:'先月',
       expenseWord:'支出', incomeWord:'収入', newIncrease:'新規', delete:'削除', edit:'編集', copy:'複製',
       surplus:'黒字', deficit:'赤字',
-      statsTitle:'統計', statsSub:'収支分析', dimDay:'日別比較', dimMonth:'月別比較',
+      statsTitle:'レポート', statsSub:'収支分析', dimDay:'日別比較', dimMonth:'月別比較',
       trendDayTitle:'今月の日別収支', trendMonthTitle:'今年の月別収支',
       typeExpense:'支出内訳', typeIncome:'収入内訳',
       homeDonutTitle:'今月の内訳', homeDonutHint:'タップして今月の明細を見る ›', monthDetailTitle:'今月の明細', detailWord:'明細',
