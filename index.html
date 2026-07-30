@@ -1108,9 +1108,9 @@
       dlist.forEach(e=>{
         const cur = e.currency||'CNY';
         const catObj = e.catKey && allCatMap[e.catKey];
-        const label = catObj ? catLabel(catObj) : e.category;
+        const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
         const subObj = catObj && e.subKey ? findSub(catObj, e.subKey) : null;
-        const subTxt = subObj ? subLabel(subObj) : (e.subCategory || '');
+        const subTxt = escapeHtml(subObj ? subLabel(subObj) : (e.subCategory || ''));
         const catLine = subTxt ? `${label} · ${subTxt}` : label;
         const pm = payMethodMap[e.paymentMethod];
         const payBadgeHtml = pm ? `<span class="pay-badge">${pmIconHtml(pm)} ${payLabel(pm)}</span>` : '';
@@ -1213,7 +1213,7 @@
       const key = e.catKey || e.category;
       const v = toBase(e.amount, e.currency||'CNY');
       const catObj = e.catKey && allCatMap[e.catKey];
-      const label = catObj ? catLabel(catObj) : e.category;
+      const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
       if(!groups[key]) groups[key] = {key, label, amount:0};
       groups[key].amount += v;
     });
@@ -1378,12 +1378,12 @@
       const selCls = selectedSub && s.key===selectedSub.key ? 'selected' : '';
       if(s.custom){
         return `<span class="sub-item-wrap">
-          <button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${subLabel(s)}</button>
+          <button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${escapeHtml(subLabel(s))}</button>
           <button type="button" class="sub-mini-btn sub-edit" data-key="${s.key}">${iconSvg('pencil')}</button>
           <button type="button" class="sub-mini-btn sub-del" data-key="${s.key}">✕</button>
         </span>`;
       }
-      return `<button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${subLabel(s)}</button>`;
+      return `<button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${escapeHtml(subLabel(s))}</button>`;
     }).join('');
     html += `<button type="button" class="sub-pill add-sub" id="addSubBtn">＋</button>`;
     $('subGrid').innerHTML = html;
@@ -1789,7 +1789,7 @@
   }
   function labelForKey(key){
     const cat = allCatMap[key];
-    return cat ? catLabel(cat) : key;
+    return escapeHtml(cat ? catLabel(cat) : (key || ''));
   }
 
   function renderTrendChart(){
