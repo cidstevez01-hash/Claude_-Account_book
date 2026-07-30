@@ -479,7 +479,8 @@
       backupErrorNetwork:'备份失败，请检查网络', restoreNeedInfo:'请先填写 Token 和 Gist ID',
       restoreConfirm:'从云端恢复将覆盖本机当前所有记账数据，确定继续吗？', restoreSuccess:'恢复成功',
       restoreErrorNotFound:'找不到该 Gist，请检查 Token 和 Gist ID', restoreErrorParse:'备份内容已损坏，无法恢复',
-      backupHelpText:'在 GitHub 网页 Settings → Developer settings → Personal access tokens → Tokens (classic) 里新建一个 token，只勾选 gist 权限即可。之后每次记账会自动同步到你自己的私密 Gist；换设备时把 Token 和 Gist ID 填回来即可恢复。'
+      backupHelpText:'在 GitHub 网页 Settings → Developer settings → Personal access tokens → Tokens (classic) 里新建一个 token，只勾选 gist 权限即可。之后每次记账会自动同步到你自己的私密 Gist；换设备时把 Token 和 Gist ID 填回来即可恢复。',
+      deleteConfirm:'确定删除「{info}」这条记录吗？删除后无法恢复。'
     },
     ja:{
       appTitle:'家計簿', tabLedger:'家計簿', tabStats:'レポート', tabRate:'為替',
@@ -515,7 +516,8 @@
       backupErrorNetwork:'バックアップに失敗しました。ネットワークをご確認ください', restoreNeedInfo:'先にトークンと Gist ID を入力してください',
       restoreConfirm:'クラウドから復元すると、この端末の記録がすべて上書きされます。続けますか？', restoreSuccess:'復元しました',
       restoreErrorNotFound:'Gist が見つかりません。トークンと Gist ID をご確認ください', restoreErrorParse:'バックアップの内容が壊れていて復元できません',
-      backupHelpText:'GitHub の Settings → Developer settings → Personal access tokens → Tokens (classic) で、gist 権限のみを付けた新しいトークンを作成してください。以降は記録するたびに自分専用の非公開 Gist へ自動同期されます。機種変更時はトークンと Gist ID を入力すれば復元できます。'
+      backupHelpText:'GitHub の Settings → Developer settings → Personal access tokens → Tokens (classic) で、gist 権限のみを付けた新しいトークンを作成してください。以降は記録するたびに自分専用の非公開 Gist へ自動同期されます。機種変更時はトークンと Gist ID を入力すれば復元できます。',
+      deleteConfirm:'「{info}」を削除しますか？削除すると元に戻せません。'
     }
   };
 
@@ -1158,6 +1160,11 @@
         const act = actBtn.getAttribute('data-act');
         const entry = entries.find(e=> String(e.id)===id);
         if(act==='del'){
+          if(!entry) return;
+          const catObj = entry.catKey && allCatMap[entry.catKey];
+          const catTxt = catObj ? catLabel(catObj) : (entry.category||'');
+          const info = `${catTxt} ${fmtCur(entry.amount, entry.currency||'CNY')}`;
+          if(!confirm(t('deleteConfirm').replace('{info}', info))) return;
           entries = entries.filter(e=> String(e.id)!==id);
           saveEntries(); renderAll();
         }else if(act==='edit' && entry){
