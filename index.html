@@ -399,10 +399,10 @@
     ja:{
       appTitle:'家計簿', tabLedger:'家計簿', tabStats:'統計', tabRate:'為替',
       balanceLabel:'今月の残高', monthIncome:'今月の収入', monthExpense:'今月の支出',
-      emptyLine1:'この帳簿はまだ空です', emptyLine2:'右下のボタンから記録しましょう',
+      emptyLine1:'この家計簿はまだ空です', emptyLine2:'右下のボタンから記録しましょう',
       today:'今日', yesterday:'昨日', thisMonth:'今月', lastMonth:'先月',
       expenseWord:'支出', incomeWord:'収入', newIncrease:'新規', delete:'削除', edit:'編集', copy:'複製',
-      surplus:'黒', deficit:'赤',
+      surplus:'黒字', deficit:'赤字',
       statsTitle:'統計', statsSub:'収支分析', dimDay:'日別比較', dimMonth:'月別比較',
       trendDayTitle:'今月の日別収支', trendMonthTitle:'今年の月別収支',
       typeExpense:'支出内訳', typeIncome:'収入内訳',
@@ -411,7 +411,7 @@
       donutMonthExpense:'今月の支出', donutMonthIncome:'今月の収入',
       emptyChart:'この期間の記録はまだありません', saveFailed:'保存に失敗しました。ネットワークをご確認の上再試行してください',
       compareTemplate:'{cur}の{type}（{prev}比）',
-      sheetAddTitle:'記録する', editEntryTitle:'記録を編集', segExpense:'支出', segIncome:'収入',
+      sheetAddTitle:'入力', editEntryTitle:'記録を編集', segExpense:'支出', segIncome:'収入',
       catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名',
       curCNYLabel:'人民元', curJPYLabel:'日本円',
@@ -458,7 +458,7 @@
       {key:'furniture', zh:'家具', ja:'家具'},{key:'appliance', zh:'家电', ja:'家電'},{key:'renovation', zh:'住宅装修', ja:'住宅・リフォーム'},{key:'special_other', zh:'其他特殊支出', ja:'その他特別な支出'}
     ]},
     {key:'cash', zh:'现金取现', ja:'現金・カード', icon:'💳', color:'#3f8a6b', subs:[
-      {key:'cash_w', zh:'现金', ja:'現金'},{key:'atm', zh:'ATM取现', ja:'ATM引き落とし'},{key:'card_pay', zh:'银行卡扣款', ja:'カード引き落とし'}
+      {key:'cash_w', zh:'现金', ja:'現金'},{key:'atm', zh:'ATM取现', ja:'ATM引き出し'},{key:'card_pay', zh:'银行卡扣款', ja:'カード引き落とし'}
     ]},
     {key:'utility', zh:'水电煤气', ja:'水道・光熱費', icon:'💡', color:'#8a3f5b', subs:[
       {key:'electric', zh:'电费', ja:'電気'},{key:'gas_fee', zh:'燃气费', ja:'ガス'},{key:'water', zh:'水费', ja:'水道'}
@@ -521,7 +521,7 @@
     {key:'credit', zh:'信用卡', ja:'クレジットカード', icon:'💳'},
     {key:'merpay', zh:'Merpay', ja:'メルペイ', badge:{bg:'#FF0211', text:'メ'}},
     {key:'rakutenpay', zh:'乐天Pay', ja:'楽天ペイ', badge:{bg:'#BF0000', text:'楽'}},
-    {key:'transfer', zh:'银行转账', ja:'口座振替', icon:'🏦'},
+    {key:'transfer', zh:'银行转账', ja:'銀行振込', icon:'🏦'},
   ];
   const payMethodMap = {};
   paymentMethods.forEach(p=> payMethodMap[p.key]=p);
