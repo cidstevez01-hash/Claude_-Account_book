@@ -356,7 +356,10 @@
 
 <div class="sheet" id="sheet">
   <div class="sheet-handle"></div>
-  <h2 id="sheetTitle">记一笔</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h2 id="sheetTitle" style="margin:0;">记一笔</h2>
+    <button type="button" class="icon-btn" id="sheetCloseBtn">✕</button>
+  </div>
   <div class="segment">
     <button type="button" class="active expense" id="segExpense">支出</button>
     <button type="button" class="income" id="segIncome">收入</button>
@@ -386,6 +389,7 @@
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
     <button type="button" class="icon-btn" id="catPickerBackBtn">‹</button>
     <h2 id="catPickerTitle" style="margin:0;flex:1;">选择分类</h2>
+    <button type="button" class="icon-btn" id="catPickerCloseBtn">✕</button>
   </div>
   <div class="field-label" id="catFieldLabel2">分类</div>
   <div class="cat-grid" id="catGrid"></div>
@@ -400,7 +404,10 @@
 
 <div class="sheet" id="settingsSheet">
   <div class="sheet-handle"></div>
-  <h2 id="settingsTitle">设置</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h2 id="settingsTitle" style="margin:0;">设置</h2>
+    <button type="button" class="icon-btn" id="settingsCloseBtn">✕</button>
+  </div>
   <div class="field-label" id="langFieldLabel">语言</div>
   <div class="segment" id="langSegment">
     <button type="button" class="active" data-lang="zh">中文</button>
@@ -1580,6 +1587,9 @@
   $('fabAdd').addEventListener('click', openSheet);
   $('overlay').addEventListener('click', closeAllSheets);
   $('settingsBtn').addEventListener('click', ()=>{ $('overlay').classList.add('show'); $('settingsSheet').classList.add('show'); });
+  $('sheetCloseBtn').addEventListener('click', closeAllSheets);
+  $('catPickerCloseBtn').addEventListener('click', closeAllSheets);
+  $('settingsCloseBtn').addEventListener('click', closeAllSheets);
 
   $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; updateCatPickerRowDisplay(); });
   $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; updateCatPickerRowDisplay(); });
