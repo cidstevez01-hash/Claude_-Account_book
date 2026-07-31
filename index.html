@@ -457,7 +457,22 @@
     <input type="text" id="setupCodeInput" autocomplete="off" style="flex:1;">
     <button type="button" class="save-btn" id="importSetupCodeBtn" style="margin-top:0;flex-shrink:0;padding:11px 16px;font-size:13px;white-space:nowrap;"></button>
   </div>
-  <div id="setupCodeHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;"></div>
+  <div id="setupCodeHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:18px;"></div>
+
+  <div class="field-label" id="cloudSyncFieldLabel">实时云同步（测试中）</div>
+  <div id="cloudSyncSignedOutBlock">
+    <div class="text-row"><input type="email" id="cloudEmailInput" autocomplete="email" placeholder=""></div>
+    <div class="text-row"><input type="password" id="cloudPasswordInput" autocomplete="current-password" placeholder=""></div>
+    <div class="row2" style="margin-bottom:8px;">
+      <button type="button" class="save-btn" id="cloudSignInBtn" style="flex:1;margin-top:0;padding:11px 4px;font-size:13px;background:var(--jade);"></button>
+      <button type="button" class="save-btn" id="cloudSignUpBtn" style="flex:1;margin-top:0;padding:11px 4px;font-size:13px;background:var(--ink);"></button>
+    </div>
+  </div>
+  <div id="cloudSyncSignedInBlock" style="display:none;">
+    <div id="cloudSyncStatusText" style="font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;"></div>
+    <button type="button" class="save-btn" id="cloudSignOutBtn" style="margin-top:0;padding:11px 4px;font-size:13px;background:var(--seal);"></button>
+  </div>
+  <div id="cloudSyncHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-top:8px;"></div>
 </div>
 
 <div class="sheet" id="monthDetailSheet" style="max-height:92vh;">
@@ -473,6 +488,7 @@
   <div id="monthDetailList"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
   const I18N = {
@@ -516,6 +532,14 @@
       setupCodeCopied:'配置码已复制，去新设备粘贴即可', setupCodeCopyFailed:'复制失败，请检查浏览器权限',
       setupCodeEmpty:'请先填写并成功备份一次，再复制配置码', setupCodeImported:'导入成功，可以点"立即备份"验证',
       setupCodeInvalid:'配置码格式不对，请确认完整复制',
+      cloudSyncFieldLabel:'实时云同步（测试中）', cloudEmailPlaceholder:'邮箱', cloudPasswordPlaceholder:'密码（至少6位）',
+      cloudSignInBtn:'登录', cloudSignUpBtn:'注册新账号', cloudSignOutBtn:'退出登录',
+      cloudSyncHelpText:'注册/登录后，记账数据会自动实时同步到云端，换设备用同一账号登录即可看到最新数据，不用再手动备份/恢复。',
+      cloudSyncStatusSignedIn:'{email} 已登录，自动实时同步中',
+      cloudNeedEmailPass:'请填写邮箱和密码', cloudAuthError:'邮箱或密码不对，或该邮箱尚未注册',
+      cloudSignUpError:'注册失败：{msg}', cloudSignUpNeedConfirm:'注册成功，请去邮箱点确认链接后再登录',
+      cloudSyncError:'同步失败，请检查网络后重试',
+      cloudMergeConfirm:'这个账号在云端已经有数据了，登录后将用云端最新数据覆盖本机当前记录，确定继续吗？',
       deleteConfirm:'确定删除「{info}」这条记录吗？删除后无法恢复。'
     },
     ja:{
@@ -558,6 +582,14 @@
       setupCodeCopied:'コードをコピーしました。新しい端末で貼り付けてください', setupCodeCopyFailed:'コピーに失敗しました。ブラウザの権限をご確認ください',
       setupCodeEmpty:'先にトークンを入力してバックアップを一度成功させてください', setupCodeImported:'読み込みました。「今すぐバックアップ」で確認できます',
       setupCodeInvalid:'コードの形式が正しくありません。全体をコピーできているかご確認ください',
+      cloudSyncFieldLabel:'リアルタイム同期（テスト中）', cloudEmailPlaceholder:'メールアドレス', cloudPasswordPlaceholder:'パスワード（6文字以上）',
+      cloudSignInBtn:'ログイン', cloudSignUpBtn:'新規登録', cloudSignOutBtn:'ログアウト',
+      cloudSyncHelpText:'登録・ログインすると、記録が自動的にクラウドへリアルタイム同期されます。他の端末で同じアカウントにログインすれば最新データがすぐ反映され、手動でのバックアップ・復元は不要です。',
+      cloudSyncStatusSignedIn:'{email} でログイン中・自動同期しています',
+      cloudNeedEmailPass:'メールアドレスとパスワードを入力してください', cloudAuthError:'メールアドレスかパスワードが違うか、未登録です',
+      cloudSignUpError:'登録に失敗しました：{msg}', cloudSignUpNeedConfirm:'登録が完了しました。メール内の確認リンクを開いてからログインしてください',
+      cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
+      cloudMergeConfirm:'このアカウントには既にクラウド上にデータがあります。ログインするとクラウドの最新データでこの端末の記録を上書きします。続けますか？',
       deleteConfirm:'「{info}」を削除しますか？削除すると元に戻せません。'
     }
   };
@@ -834,6 +866,7 @@
     try{
       await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
       scheduleGistBackup();
+      scheduleCloudPush();
       ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
     }
     catch(e){ console.error('保存失败', e); showToast(t('saveFailed')); }
@@ -1178,6 +1211,14 @@
     $('importSetupCodeBtn').textContent = t('importSetupCodeBtn');
     $('setupCodeInput').placeholder = t('setupCodeInputPlaceholder');
     $('setupCodeHelpText').textContent = t('setupCodeHelpText');
+    $('cloudSyncFieldLabel').textContent = t('cloudSyncFieldLabel');
+    $('cloudEmailInput').placeholder = t('cloudEmailPlaceholder');
+    $('cloudPasswordInput').placeholder = t('cloudPasswordPlaceholder');
+    $('cloudSignInBtn').textContent = t('cloudSignInBtn');
+    $('cloudSignUpBtn').textContent = t('cloudSignUpBtn');
+    $('cloudSignOutBtn').textContent = t('cloudSignOutBtn');
+    $('cloudSyncHelpText').textContent = t('cloudSyncHelpText');
+    renderCloudSyncStatus();
     if(document.activeElement !== $('githubTokenInput')) $('githubTokenInput').value = settings.githubToken || '';
     if(document.activeElement !== $('gistIdInput')) $('gistIdInput').value = settings.gistId || '';
     renderBackupStatus();
@@ -1201,6 +1242,126 @@
     $('githubTokenInput').disabled = locked;
     $('gistIdInput').disabled = locked;
     $('tokenEditBtn').style.display = locked ? 'flex' : 'none';
+  }
+
+  // ---------- Supabase 实时云同步 ----------
+  // anon key 是设计给前端公开使用的(配合数据库的 Row Level Security 规则限制每个人只能读写自己那一行),
+  // 不是敏感信息,可以放心写死在这个单文件App里
+  const SUPABASE_URL = 'https://echqjmtouxvwybxdfcqk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjaHFqbXRvdXh2d3lieGRmY3FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0OTE0MzYsImV4cCI6MjEwMTA2NzQzNn0.WQcSC7WcA0yNp43l8EQLYr7-NmxEyuDjvwoUtDYPPTI';
+  let supabaseClient = null;
+  try{
+    if(window.supabase && window.supabase.createClient){
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+  }catch(e){ console.error('Supabase 初始化失败', e); }
+
+  let cloudUser = null;
+  let cloudSyncTimer = null;
+  let cloudRealtimeChannel = null;
+  let applyingRemoteCloudUpdate = false;
+
+  function buildCloudPayload(){
+    return { entries, custom_subs: customSubsMap, settings: {lang: settings.lang, currency: settings.currency}, updated_at: new Date().toISOString() };
+  }
+  function scheduleCloudPush(){
+    if(!supabaseClient || !cloudUser) return;
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(()=> pushCloudData(), 1500);
+  }
+  async function pushCloudData(){
+    if(!supabaseClient || !cloudUser || applyingRemoteCloudUpdate) return;
+    try{
+      const { error } = await supabaseClient.from('user_data').upsert({ user_id: cloudUser.id, ...buildCloudPayload() });
+      if(error) throw error;
+    }catch(e){ console.error('云同步推送失败', e); }
+  }
+  async function pullCloudData(){
+    if(!supabaseClient || !cloudUser) return null;
+    try{
+      const { data, error } = await supabaseClient.from('user_data').select('*').eq('user_id', cloudUser.id).maybeSingle();
+      if(error) throw error;
+      return data;
+    }catch(e){ console.error('云同步拉取失败', e); showToast(t('cloudSyncError')); return null; }
+  }
+  function applyCloudData(row){
+    applyingRemoteCloudUpdate = true;
+    try{
+      entries = Array.isArray(row.entries) ? row.entries : [];
+      customSubsMap = row.custom_subs && typeof row.custom_subs==='object' ? row.custom_subs : {};
+      if(row.settings){
+        settings.lang = row.settings.lang || settings.lang;
+        settings.currency = row.settings.currency || settings.currency;
+      }
+    } finally {
+      applyingRemoteCloudUpdate = false;
+    }
+  }
+  async function saveAppliedCloudData(){
+    await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
+    await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false);
+    await saveSettings();
+    applyStaticI18n();
+    renderAll();
+    renderRatePage();
+  }
+  function startCloudRealtime(){
+    if(!supabaseClient || !cloudUser) return;
+    stopCloudRealtime();
+    cloudRealtimeChannel = supabaseClient.channel('user_data_changes_'+cloudUser.id)
+      .on('postgres_changes', { event:'*', schema:'public', table:'user_data', filter:'user_id=eq.'+cloudUser.id }, async (payload)=>{
+        if(applyingRemoteCloudUpdate || !payload.new) return;
+        // 自己刚推上去的变更也会以事件形式收到回声,内容没变就跳过,避免多余重新渲染
+        const localJson = JSON.stringify({e:entries, c:customSubsMap});
+        const remoteJson = JSON.stringify({e:payload.new.entries, c:payload.new.custom_subs});
+        if(localJson === remoteJson) return;
+        applyCloudData(payload.new);
+        await saveAppliedCloudData();
+      })
+      .subscribe();
+  }
+  function stopCloudRealtime(){
+    if(supabaseClient && cloudRealtimeChannel) supabaseClient.removeChannel(cloudRealtimeChannel);
+    cloudRealtimeChannel = null;
+  }
+  async function handleCloudSignedIn(user){
+    cloudUser = user;
+    const remote = await pullCloudData();
+    const hasRemoteData = remote && ((Array.isArray(remote.entries) && remote.entries.length>0) || (remote.custom_subs && Object.keys(remote.custom_subs).length>0));
+    if(hasRemoteData){
+      if(confirm(t('cloudMergeConfirm'))){
+        applyCloudData(remote);
+        await saveAppliedCloudData();
+      }else{
+        await pushCloudData();
+      }
+    }else{
+      await pushCloudData();
+    }
+    startCloudRealtime();
+    renderCloudSyncStatus();
+  }
+  function renderCloudSyncStatus(){
+    const signedIn = !!cloudUser;
+    $('cloudSyncSignedOutBlock').style.display = signedIn ? 'none' : 'block';
+    $('cloudSyncSignedInBlock').style.display = signedIn ? 'block' : 'none';
+    if(signedIn) $('cloudSyncStatusText').textContent = t('cloudSyncStatusSignedIn').replace('{email}', cloudUser.email||'');
+  }
+  async function initCloudSync(){
+    if(!supabaseClient) return;
+    try{
+      const { data } = await supabaseClient.auth.getSession();
+      if(data && data.session && data.session.user){
+        cloudUser = data.session.user;
+        const remote = await pullCloudData();
+        if(remote){ applyCloudData(remote); await saveAppliedCloudData(); }
+        startCloudRealtime();
+        renderCloudSyncStatus();
+      }
+      supabaseClient.auth.onAuthStateChange((event)=>{
+        if(event==='SIGNED_OUT'){ cloudUser = null; stopCloudRealtime(); renderCloudSyncStatus(); }
+      });
+    }catch(e){ console.error('云同步会话恢复失败', e); }
   }
 
   function setMonthLabel(){ const d=new Date(); $('monthLabel').textContent = d.getFullYear()+'年'+(d.getMonth()+1)+'月'; }
@@ -1577,7 +1738,7 @@
     });
   }
   async function persistCustomSubs(){
-    try{ await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false); scheduleGistBackup(); }
+    try{ await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false); scheduleGistBackup(); scheduleCloudPush(); }
     catch(e){ console.error('自定义分类保存失败', e); showToast(t('saveFailed')); }
   }
   async function addCustomSub(catKey, label){
@@ -1815,6 +1976,46 @@
       console.error('导入配置码失败', e);
       showToast(t('setupCodeInvalid'));
     }
+  });
+  $('cloudSignInBtn').addEventListener('click', async ()=>{
+    if(!supabaseClient) return;
+    const email = $('cloudEmailInput').value.trim();
+    const pass = $('cloudPasswordInput').value;
+    if(!email || !pass){ showToast(t('cloudNeedEmailPass')); return; }
+    try{
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+      if(error) throw error;
+      $('cloudPasswordInput').value = '';
+      await handleCloudSignedIn(data.user);
+    }catch(e){
+      console.error('登录失败', e);
+      showToast(t('cloudAuthError'));
+    }
+  });
+  $('cloudSignUpBtn').addEventListener('click', async ()=>{
+    if(!supabaseClient) return;
+    const email = $('cloudEmailInput').value.trim();
+    const pass = $('cloudPasswordInput').value;
+    if(!email || !pass){ showToast(t('cloudNeedEmailPass')); return; }
+    try{
+      const { data, error } = await supabaseClient.auth.signUp({ email, password: pass });
+      if(error) throw error;
+      $('cloudPasswordInput').value = '';
+      if(data.session && data.user){
+        await handleCloudSignedIn(data.user);
+      }else{
+        showToast(t('cloudSignUpNeedConfirm'));
+      }
+    }catch(e){
+      console.error('注册失败', e);
+      showToast(t('cloudSignUpError').replace('{msg}', (e&&e.message)||''));
+    }
+  });
+  $('cloudSignOutBtn').addEventListener('click', async ()=>{
+    if(supabaseClient){ try{ await supabaseClient.auth.signOut(); }catch(e){ console.error('退出登录失败', e); } }
+    cloudUser = null;
+    stopCloudRealtime();
+    renderCloudSyncStatus();
   });
 
   // ---------- Tabs ----------
@@ -2212,6 +2413,7 @@
     fetchRate(false).catch(e=> console.error('汇率初始拉取失败', e));
     ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
     fetchJpHolidays().catch(e=> console.error('日本の祝日データ取得失敗', e));
+    initCloudSync().catch(e=> console.error('云同步初始化失败', e));
   }
   init();
 })();
