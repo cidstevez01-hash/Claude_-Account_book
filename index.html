@@ -187,8 +187,9 @@
   .ym-select:active{background:var(--card);}
   .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px;}
   .chart-scroll svg{display:block;}
-  .cat-legend-row{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);}
-  .cat-legend-row .item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--ink-soft);}
+  .cat-legend-row{display:flex;flex-direction:column;gap:9px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);}
+  .cat-legend-row .item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft);}
+  .cat-legend-row .item .legend-bar{width:22px;height:10px;border-radius:3px;flex-shrink:0;}
   .rate-point-info{margin-top:10px;padding:10px 12px;background:var(--paper);border-radius:10px;font-size:13px;text-align:center;font-variant-numeric:tabular-nums;}
   .rate-point-dot{cursor:pointer;}
   #homeDonutCard{cursor:pointer;}
@@ -1932,7 +1933,7 @@
     Object.entries(incTotals).forEach(([k,v])=> merged[k]=(merged[k]||0)+v);
     const legendKeys = Object.entries(merged).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k])=>k);
     $('trendCatLegend').innerHTML = legendKeys.map((k,i)=>
-      `<span class="item"><span class="legend-dot" style="background:${colorForKey(k,i)}"></span>${labelForKey(k)}</span>`
+      `<span class="item"><span class="legend-bar" style="background:${colorForKey(k,i)}"></span>${labelForKey(k)}</span>`
     ).join('');
   }
 
