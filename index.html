@@ -55,6 +55,11 @@
     background:var(--card);font-size:17px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
   }
   .icon-btn svg{width:17px;height:17px;}
+  .pw-field-wrap{position:relative;}
+  .pw-field-wrap input{padding-right:44px;}
+  .pw-eye-btn{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:none;background:none;padding:0;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:opacity 0.12s ease;}
+  .pw-eye-btn:active{opacity:0.4;}
+  .pw-eye-btn svg{width:19px;height:19px;}
   .seal{
     width:52px;height:52px;border-radius:60% 40% 55% 45%/45% 55% 40% 60%;background:var(--accent);
     display:flex;align-items:center;justify-content:center;color:#fff;
@@ -443,8 +448,10 @@
   </div>
   <div class="field-label" id="backupFieldLabel">云备份（GitHub Gist）</div>
   <div class="text-row" style="display:flex;gap:8px;align-items:center;">
-    <input type="password" id="githubTokenInput" autocomplete="off" placeholder="GitHub Token" style="flex:1;">
-    <button type="button" class="icon-btn pw-eye-btn" data-target="githubTokenInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+    <div class="pw-field-wrap" style="flex:1;">
+      <input type="password" id="githubTokenInput" autocomplete="off" placeholder="GitHub Token">
+      <button type="button" class="pw-eye-btn" data-target="githubTokenInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+    </div>
     <button type="button" class="icon-btn" id="tokenEditBtn" style="display:none;flex-shrink:0;"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-pencil"/></svg></button>
   </div>
   <div class="text-row"><input type="text" id="gistIdInput" autocomplete="off" placeholder="Gist ID"></div>
@@ -459,22 +466,22 @@
   <div id="cloudSyncSignedOutBlock">
     <div id="cloudSigninModeBlock">
       <div class="text-row"><input type="email" id="cloudEmailInput" autocomplete="email" placeholder=""></div>
-      <div class="text-row" style="display:flex;gap:8px;align-items:center;">
-        <input type="password" id="cloudPasswordInput" autocomplete="current-password" placeholder="" style="flex:1;">
-        <button type="button" class="icon-btn pw-eye-btn" data-target="cloudPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+      <div class="text-row pw-field-wrap">
+        <input type="password" id="cloudPasswordInput" autocomplete="current-password" placeholder="">
+        <button type="button" class="pw-eye-btn" data-target="cloudPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
       </div>
       <button type="button" class="save-btn" id="cloudSignInBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--jade);"></button>
       <button type="button" class="text-link-btn" id="goToSignUpBtn"></button>
     </div>
     <div id="cloudSignupModeBlock" style="display:none;">
       <div class="text-row"><input type="email" id="cloudSignupEmailInput" autocomplete="email" placeholder=""></div>
-      <div class="text-row" style="display:flex;gap:8px;align-items:center;">
-        <input type="password" id="cloudSignupPasswordInput" autocomplete="new-password" placeholder="" style="flex:1;">
-        <button type="button" class="icon-btn pw-eye-btn" data-target="cloudSignupPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+      <div class="text-row pw-field-wrap">
+        <input type="password" id="cloudSignupPasswordInput" autocomplete="new-password" placeholder="">
+        <button type="button" class="pw-eye-btn" data-target="cloudSignupPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
       </div>
-      <div class="text-row" style="display:flex;gap:8px;align-items:center;">
-        <input type="password" id="cloudSignupPassword2Input" autocomplete="new-password" placeholder="" style="flex:1;">
-        <button type="button" class="icon-btn pw-eye-btn" data-target="cloudSignupPassword2Input"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+      <div class="text-row pw-field-wrap">
+        <input type="password" id="cloudSignupPassword2Input" autocomplete="new-password" placeholder="">
+        <button type="button" class="pw-eye-btn" data-target="cloudSignupPassword2Input"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
       </div>
       <button type="button" class="save-btn" id="cloudSignUpBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--ink);"></button>
       <button type="button" class="text-link-btn" id="goToSignInBtn"></button>
@@ -563,6 +570,8 @@
       cloudSyncError:'同步失败，请检查网络后重试',
       cloudMergeConfirm:'这个账号在云端已经有数据了，登录后将用云端最新数据覆盖本机当前记录，确定继续吗？',
       cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
+      cloudCodeSentToast:'验证码已发送至 {email}，请查收邮件',
+      cloudSignInSuccessToast:'登录成功', cloudVerifySuccessToast:'验证成功，欢迎回来',
       deleteConfirm:'确定删除「{info}」这条记录吗？删除后无法恢复。'
     },
     ja:{
@@ -617,6 +626,8 @@
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
       cloudMergeConfirm:'このアカウントには既にクラウド上にデータがあります。ログインするとクラウドの最新データでこの端末の記録を上書きします。続けますか？',
       cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
+      cloudCodeSentToast:'確認コードを {email} に送信しました',
+      cloudSignInSuccessToast:'ログインしました', cloudVerifySuccessToast:'確認できました。おかえりなさい',
       deleteConfirm:'「{info}」を削除しますか？削除すると元に戻せません。'
     }
   };
@@ -1999,6 +2010,7 @@
       if(error) throw error;
       $('cloudPasswordInput').value = '';
       await handleCloudSignedIn(data.user);
+      showToast(t('cloudSignInSuccessToast'));
       // 登录成功后跳回家计簿首页,而不是让用户停在设置页的登录表单上
       closeAllSheets();
       switchToPage('ledger');
@@ -2035,6 +2047,7 @@
         $('cloudSignupEmailInput').value = '';
         renderCloudVerifyHint();
         setCloudAuthMode('verify');
+        showToast(t('cloudCodeSentToast').replace('{email}', pendingVerifyEmail));
         $('cloudVerifyCodeInput').focus();
       }
     }catch(e){
@@ -2052,6 +2065,7 @@
       $('cloudVerifyCodeInput').value = '';
       pendingVerifyEmail = '';
       await handleCloudSignedIn(data.user);
+      showToast(t('cloudVerifySuccessToast'));
       closeAllSheets();
       switchToPage('ledger');
     }catch(e){
