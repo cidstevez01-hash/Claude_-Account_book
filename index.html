@@ -611,6 +611,7 @@
     {key:'merpay', zh:'Merpay', ja:'メルペイ', badge:{bg:'#FF0211', text:'メ'}},
     {key:'rakutenpay', zh:'乐天Pay', ja:'楽天ペイ', badge:{bg:'#BF0000', text:'楽'}},
     {key:'transfer', zh:'银行转账', ja:'銀行振込', icon:'bank'},
+    {key:'paidy', zh:'Paidy', ja:'ペイディ', badge:{bg:'#FF3D71', text:'P'}},
   ];
   const payMethodMap = {};
   paymentMethods.forEach(p=> payMethodMap[p.key]=p);
@@ -2011,18 +2012,27 @@
     return fmtDateObj(d);
   }
 
+  function lastDayOfMonthStr(mk){
+    const [y,m] = mk.split('-').map(Number);
+    return mk+'-'+pad2(new Date(y, m, 0).getDate());
+  }
+
   // 固定每月收支规则:每个月自动补一笔(不会重复生成,也不会补历史月份)
   const RECURRING_RULES = [
     { id:'rule_salary_default', type:'income', amount:289346, currency:'JPY', catKey:'salary', subKey:'salary_base', dayOfMonth:10, paymentMethod:'transfer', bizDayAdjust:'before' },
-    { id:'rule_rent_default', type:'expense', amount:73440, currency:'JPY', catKey:'housing', subKey:'rent', dayOfMonth:26, paymentMethod:'transfer', bizDayAdjust:'after' }
+    { id:'rule_rent_default', type:'expense', amount:73440, currency:'JPY', catKey:'housing', subKey:'rent', dayOfMonth:26, paymentMethod:'transfer', bizDayAdjust:'after' },
+    { id:'rule_paidy_default', type:'expense', amount:5272, currency:'JPY', catKey:'telecom', subKey:'phone', dayOfMonth:'last', paymentMethod:'paidy', bizDayAdjust:'after', note:'iPhone' }
   ];
   async function ensureRecurringEntries(){
     const mk = currentMonthKey();
     let changed = false;
     RECURRING_RULES.forEach(rule=>{
-      let dateStr = mk+'-'+pad2(rule.dayOfMonth);
+      let dateStr = rule.dayOfMonth==='last' ? lastDayOfMonthStr(mk) : mk+'-'+pad2(rule.dayOfMonth);
       if(rule.bizDayAdjust) dateStr = adjustToBizDay(dateStr, rule.bizDayAdjust);
-      const existing = entries.find(e=> e.recurringId===rule.id && e.date.startsWith(mk));
+      // 用固定的 id(而不是日期前缀)判断这个月是否已经生成过,
+      // 因为顺延到营业日之后,日期有可能跨到下个月(比如月底最后一天是周日)
+      const id = 'recur_'+rule.id+'_'+mk;
+      const existing = entries.find(e=> e.id===id);
       if(existing){
         if(existing.date !== dateStr){ existing.date = dateStr; changed = true; }
         return;
@@ -2030,12 +2040,12 @@
       const catObj = allCatMap[rule.catKey];
       const subObj = findSub(catObj, rule.subKey);
       entries.push({
-        id: 'recur_'+rule.id+'_'+mk,
+        id,
         type: rule.type, amount: rule.amount, currency: rule.currency,
         category: catLabel(catObj), catKey: rule.catKey,
         subCategory: subObj? subLabel(subObj) : '', subKey: rule.subKey,
         paymentMethod: rule.paymentMethod || 'cash',
-        icon: catObj.icon, note:'', date: dateStr,
+        icon: catObj.icon, note: rule.note || '', date: dateStr,
         createdAt: Date.now(), recurringId: rule.id
       });
       changed = true;
