@@ -632,7 +632,6 @@
       cloudVerifyNeedCode:'请输入验证码', cloudVerifyError:'验证码不对或已过期，请重新获取',
       cloudResendSuccess:'验证码已重新发送', cloudResendError:'发送失败：{msg}',
       cloudSyncError:'同步失败，请检查网络后重试',
-      cloudMergeConfirm:'这个账号在云端已经有数据了，登录后将用云端最新数据覆盖本机当前记录，确定继续吗？',
       cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
       cloudCodeSentToast:'验证码已发送至 {email}，请查收邮件',
       cloudSignInSuccessToast:'登录成功', cloudVerifySuccessToast:'验证成功，欢迎回来',
@@ -689,7 +688,6 @@
       cloudVerifyNeedCode:'確認コードを入力してください', cloudVerifyError:'コードが正しくないか、期限切れです。再送してください',
       cloudResendSuccess:'確認コードを再送しました', cloudResendError:'送信に失敗しました：{msg}',
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
-      cloudMergeConfirm:'このアカウントには既にクラウド上にデータがあります。ログインするとクラウドの最新データでこの端末の記録を上書きします。続けますか？',
       cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
       cloudCodeSentToast:'確認コードを {email} に送信しました',
       cloudSignInSuccessToast:'ログインしました', cloudVerifySuccessToast:'確認できました。おかえりなさい',
@@ -1428,13 +1426,11 @@
     const remote = await pullCloudData();
     const hasRemoteData = remote && ((Array.isArray(remote.entries) && remote.entries.length>0) || (remote.custom_subs && Object.keys(remote.custom_subs).length>0));
     if(hasRemoteData){
-      if(confirm(t('cloudMergeConfirm'))){
-        applyCloudData(remote);
-        await saveAppliedCloudData();
-      }else{
-        await pushCloudData();
-      }
+      // 数据库是唯一权威数据源:云端已有数据就直接采用,不再弹窗询问是否覆盖本机
+      applyCloudData(remote);
+      await saveAppliedCloudData();
     }else{
+      // 全新账号,云端还没有数据,把本机现有数据推上去作为初始数据
       await pushCloudData();
     }
     startCloudRealtime();
