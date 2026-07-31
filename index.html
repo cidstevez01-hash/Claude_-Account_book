@@ -1977,29 +1977,68 @@
     else $('fromInput').value = (v*rateData.rate).toFixed(0);
   });
 
-  // 固定每月收入规则:每个月自动补一笔工资收入(不会重复生成,也不会补历史月份)
+  // ---------- 日本の祝日(給与日/家賃日の営業日調整に使う) ----------
+  let jpHolidaySet = new Set();
+  async function loadJpHolidayCache(){
+    try{
+      const res = LocalStore.get('ledger_jp_holidays');
+      if(res && res.value) jpHolidaySet = new Set(JSON.parse(res.value));
+    }catch(e){ jpHolidaySet = new Set(); }
+  }
+  async function fetchJpHolidays(){
+    try{
+      const data = await fetchJsonOrThrow('https://holidays-jp.github.io/api/v1/date.json');
+      const dates = Object.keys(data||{});
+      if(dates.length===0) return;
+      jpHolidaySet = new Set(dates);
+      await storageSetSafe('ledger_jp_holidays', JSON.stringify(dates), false);
+      await ensureRecurringEntries();
+      renderAll();
+    }catch(e){ console.error('日本の祝日データ取得失敗', e); }
+  }
+  function isBizDay(dateStr){
+    const d = new Date(dateStr+'T00:00:00');
+    const dow = d.getDay();
+    if(dow===0 || dow===6) return false;
+    if(jpHolidaySet.has(dateStr)) return false;
+    return true;
+  }
+  // direction: 'before' 遇到休日就往前找最近的营业日,'after' 就往后找
+  function adjustToBizDay(dateStr, direction){
+    let d = new Date(dateStr+'T00:00:00');
+    const step = direction==='after' ? 1 : -1;
+    while(!isBizDay(fmtDateObj(d))){ d.setDate(d.getDate()+step); }
+    return fmtDateObj(d);
+  }
+
+  // 固定每月收支规则:每个月自动补一笔(不会重复生成,也不会补历史月份)
   const RECURRING_RULES = [
-    { id:'rule_salary_default', type:'income', amount:289346, currency:'JPY', catKey:'salary', subKey:'salary_base', dayOfMonth:25, paymentMethod:'transfer' }
+    { id:'rule_salary_default', type:'income', amount:289346, currency:'JPY', catKey:'salary', subKey:'salary_base', dayOfMonth:10, paymentMethod:'transfer', bizDayAdjust:'before' },
+    { id:'rule_rent_default', type:'expense', amount:73440, currency:'JPY', catKey:'housing', subKey:'rent', dayOfMonth:26, paymentMethod:'transfer', bizDayAdjust:'after' }
   ];
   async function ensureRecurringEntries(){
     const mk = currentMonthKey();
     let changed = false;
     RECURRING_RULES.forEach(rule=>{
-      const exists = entries.some(e=> e.recurringId===rule.id && e.date.startsWith(mk));
-      if(!exists){
-        const catObj = allCatMap[rule.catKey];
-        const subObj = findSub(catObj, rule.subKey);
-        entries.push({
-          id: 'recur_'+rule.id+'_'+mk,
-          type: rule.type, amount: rule.amount, currency: rule.currency,
-          category: catLabel(catObj), catKey: rule.catKey,
-          subCategory: subObj? subLabel(subObj) : '', subKey: rule.subKey,
-          paymentMethod: rule.paymentMethod || 'cash',
-          icon: catObj.icon, note:'', date: mk+'-'+pad2(rule.dayOfMonth),
-          createdAt: Date.now(), recurringId: rule.id
-        });
-        changed = true;
+      let dateStr = mk+'-'+pad2(rule.dayOfMonth);
+      if(rule.bizDayAdjust) dateStr = adjustToBizDay(dateStr, rule.bizDayAdjust);
+      const existing = entries.find(e=> e.recurringId===rule.id && e.date.startsWith(mk));
+      if(existing){
+        if(existing.date !== dateStr){ existing.date = dateStr; changed = true; }
+        return;
       }
+      const catObj = allCatMap[rule.catKey];
+      const subObj = findSub(catObj, rule.subKey);
+      entries.push({
+        id: 'recur_'+rule.id+'_'+mk,
+        type: rule.type, amount: rule.amount, currency: rule.currency,
+        category: catLabel(catObj), catKey: rule.catKey,
+        subCategory: subObj? subLabel(subObj) : '', subKey: rule.subKey,
+        paymentMethod: rule.paymentMethod || 'cash',
+        icon: catObj.icon, note:'', date: dateStr,
+        createdAt: Date.now(), recurringId: rule.id
+      });
+      changed = true;
     });
     if(changed) await saveEntries();
   }
@@ -2014,12 +2053,14 @@
     await step('applyStaticI18n', applyStaticI18n);
     await step('setMonthLabel', setMonthLabel);
     await step('loadRateCache', loadRateCache);
+    await step('loadJpHolidayCache', loadJpHolidayCache);
     await step('loadEntries', loadEntries);
     await step('ensureRecurringEntries', ensureRecurringEntries);
     await step('renderAll', renderAll);
     await step('renderRatePage', renderRatePage);
     fetchRate(false).catch(e=> console.error('汇率初始拉取失败', e));
     ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
+    fetchJpHolidays().catch(e=> console.error('日本の祝日データ取得失敗', e));
   }
   init();
 })();
