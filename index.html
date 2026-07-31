@@ -42,6 +42,10 @@
   /* +1px 是故意留的:如果内容高度正好等于可视区域高度(完全不能滚动),部分iOS版本
      会把底部的固定导航栏渲染错位、留出一道空白;让页面必定比一屏略高一点点就不会触发这个问题 */
   .page.active{display:flex; flex-direction:column; justify-content:center; min-height:calc(100svh - var(--safe-top) - var(--safe-bottom) - 108px + 1px);}
+  /* 集計页内容本来就比较多,不用居中撑高度,让图表卡片自己长满剩余空间,图表也跟着变高 */
+  #pageStats.active{justify-content:flex-start;}
+  #pageStats .chart-card{flex:1 1 auto; display:flex; flex-direction:column; min-height:0;}
+  #pageStats .chart-scroll{flex:1 1 auto; min-height:140px;}
   .header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; position:relative;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
   .header .month{font-size:13px; color:var(--ink-soft); margin-top:4px;}
@@ -310,7 +314,7 @@
         <span id="trendTitle">本月每日收支</span>
         <span class="chart-legend"><span><span class="legend-dot" style="background:var(--seal)"></span><span id="trendLegendExpense">支出</span></span><span><span class="legend-dot" style="background:var(--jade)"></span><span id="trendLegendIncome">收入</span></span></span>
       </div>
-      <div class="chart-scroll"><svg id="trendChart" style="height:190px;display:block;"></svg></div>
+      <div class="chart-scroll"><svg id="trendChart" style="display:block;"></svg></div>
       <div class="cat-legend-row" id="trendCatLegend"></div>
     </div>
   </div>
@@ -1889,7 +1893,9 @@
     }
     syncStatsYmSelects();
     const maxVal = Math.max(1, ...buckets.map(b=>Math.max(b.income,b.expense)));
-    const top=14, base=150, chartH=190, barW=13, barGap=3, groupPad=13;
+    const scrollElForSize = $('trendChart').parentElement;
+    const chartH = Math.max(160, Math.round(scrollElForSize && scrollElForSize.clientHeight) || 190);
+    const top=14, base=chartH-40, barW=13, barGap=3, groupPad=13;
     const groupW = barW*2+barGap+groupPad;
     const totalW = Math.max(300, buckets.length*groupW+20);
     const svgEl = $('trendChart');
