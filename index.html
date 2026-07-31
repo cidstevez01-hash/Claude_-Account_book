@@ -364,10 +364,6 @@
     <button type="button" class="income" id="segIncome">收入</button>
   </div>
   <div class="amount-input-wrap"><span id="curSymbolDisplay">¥</span><input type="text" inputmode="decimal" id="amountInput" placeholder="0.00"></div>
-  <div class="segment" id="curSegment">
-    <button type="button" class="active" data-cur="CNY" id="curCNY">人民币</button>
-    <button type="button" data-cur="JPY" id="curJPY">日元</button>
-  </div>
   <div class="field-label" id="catFieldLabel">分类</div>
   <button type="button" class="cat-picker-row" id="catPickerRow">
     <span class="cat-picker-icon" id="catPickerIcon"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-bowl"/></svg></span>
@@ -462,7 +458,6 @@
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
       catFieldLabel:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称',
-      curCNYLabel:'人民币', curJPYLabel:'日元',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）',
       curCNYFullLabel:'人民币 (CNY)', curJPYFullLabel:'日元 (JPY)',
       rateTitle:'汇率', rateSub:'人民币 → 日元', rateUpdateLabel:'更新时间', rateTrend30Days:'近30天走势',
@@ -499,7 +494,6 @@
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
       catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名',
-      curCNYLabel:'人民元', curJPYLabel:'日本円',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
@@ -634,6 +628,7 @@
   let gistSyncing = false;
   let gistBackupTimer = null;
   let rateData = null;
+  let dateRateCache = {};
   let rateHistory = [];
   let rateHistoryMonthly = [];
   let rateHistoryYearly = [];
@@ -657,12 +652,45 @@
     const decimals = cur==='JPY' ? 0 : 2;
     return symbolFor(cur) + Number(amount).toFixed(decimals);
   }
-  function toBase(amount, fromCur){
+  // 按记账当天的历史汇率换算(不是用今天的实时汇率),这样切回原币种时才能显示原始数值
+  function rateOnDate(dateStr){
+    if(dateRateCache[dateStr]!=null) return dateRateCache[dateStr];
+    return rateData ? rateData.rate : null;
+  }
+  function toBase(amount, fromCur, dateStr){
     if(fromCur === settings.currency) return amount;
-    if(!rateData) return amount;
-    if(fromCur==='CNY' && settings.currency==='JPY') return amount*rateData.rate;
-    if(fromCur==='JPY' && settings.currency==='CNY') return amount/rateData.rate;
+    const rate = rateOnDate(dateStr);
+    if(!rate) return amount;
+    if(fromCur==='CNY' && settings.currency==='JPY') return amount*rate;
+    if(fromCur==='JPY' && settings.currency==='CNY') return amount/rate;
     return amount;
+  }
+  // 单条记录展示用:币种和当前设置一致就原样显示原始数据,不一致才换算;
+  // 换算所需的当天汇率还没取到时,先如实显示原始金额+原始币种,避免把原始数据误标成本位货币
+  function convForDisplay(entry){
+    const cur = entry.currency || 'CNY';
+    if(cur === settings.currency) return {amount: entry.amount, cur};
+    const rate = rateOnDate(entry.date);
+    if(!rate) return {amount: entry.amount, cur};
+    return {amount: toBase(entry.amount, cur, entry.date), cur: settings.currency};
+  }
+  async function saveDateRateCache(){
+    try{ await storageSetSafe('ledger_rate_by_date', JSON.stringify(dateRateCache), false); }
+    catch(e){ console.error('历史汇率缓存保存失败', e); }
+  }
+  // 只为"币种和当前设置不同"的记录去补齐它们各自记账当天的汇率,补到后重新渲染一次
+  async function ensureRatesForEntries(){
+    const needed = new Set();
+    entries.forEach(e=>{
+      const cur = e.currency || 'CNY';
+      if(cur !== settings.currency && dateRateCache[e.date]==null) needed.add(e.date);
+    });
+    if(needed.size===0) return;
+    const dates = Array.from(needed);
+    const results = await Promise.all(dates.map(d=> fetchOneDayRateFromCdn(d)));
+    let changed = false;
+    dates.forEach((d,i)=>{ if(results[i]){ dateRateCache[d] = results[i].rate; changed = true; } });
+    if(changed){ await saveDateRateCache(); renderAll(); }
   }
   function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
   function currentMonthKey(){ const d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1); }
@@ -738,6 +766,7 @@
   }
   async function loadRateCache(){
     try{ const res = LocalStore.get('ledger_rate'); if(res && res.value) rateData = JSON.parse(res.value); }catch(e){ rateData=null; }
+    try{ const res0 = LocalStore.get('ledger_rate_by_date'); if(res0 && res0.value) dateRateCache = JSON.parse(res0.value); }catch(e){ dateRateCache={}; }
     try{ const res2 = LocalStore.get('ledger_rate_history'); if(res2 && res2.value) rateHistory = JSON.parse(res2.value); }catch(e){ rateHistory=[]; }
     try{ const res3 = LocalStore.get('ledger_rate_history_monthly'); if(res3 && res3.value) rateHistoryMonthly = JSON.parse(res3.value); }catch(e){ rateHistoryMonthly=[]; }
     try{ const res4 = LocalStore.get('ledger_rate_history_yearly'); if(res4 && res4.value) rateHistoryYearly = JSON.parse(res4.value); }catch(e){ rateHistoryYearly=[]; }
@@ -746,7 +775,11 @@
     try{ const res = LocalStore.get('ledger_entries'); entries = res && res.value ? JSON.parse(res.value) : []; }catch(e){ entries=[]; }
   }
   async function saveEntries(){
-    try{ await storageSetSafe('ledger_entries', JSON.stringify(entries), false); scheduleGistBackup(); }
+    try{
+      await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
+      scheduleGistBackup();
+      ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
+    }
     catch(e){ console.error('保存失败', e); showToast(t('saveFailed')); }
   }
 
@@ -1049,8 +1082,6 @@
     $('newSubInput').placeholder = t('newSubPlaceholder');
     $('noteInput').placeholder = t('notePlaceholder');
     $('saveBtn').textContent = t('saveBtn');
-    $('curCNY').textContent = t('curCNYLabel');
-    $('curJPY').textContent = t('curJPYLabel');
     $('settingsTitle').textContent = t('settingsTitle');
     $('langFieldLabel').textContent = t('langFieldLabel');
     $('currencyFieldLabel').textContent = t('currencyFieldLabel');
@@ -1108,11 +1139,11 @@
     let html='';
     Object.keys(groups).forEach(date=>{
       const dlist = groups[date];
-      const dayTotal = dlist.reduce((s,e)=> s + (e.type==='income'?1:-1)*toBase(e.amount, e.currency||'CNY'), 0);
+      const dayTotal = dlist.reduce((s,e)=> s + (e.type==='income'?1:-1)*toBase(e.amount, e.currency||'CNY', e.date), 0);
       const dLabel = date===todayStr() ? t('today')+' · '+date.slice(5) : date;
       html += `<div class="day-group"><div class="day-header"><span>${dLabel}</span><span class="day-total">${dayTotal>=0?'+':'-'}${fmtCur(Math.abs(dayTotal), settings.currency)}</span></div>`;
       dlist.forEach(e=>{
-        const cur = e.currency||'CNY';
+        const disp = convForDisplay(e);
         const catObj = e.catKey && allCatMap[e.catKey];
         const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
         const subObj = catObj && e.subKey ? findSub(catObj, e.subKey) : null;
@@ -1127,7 +1158,7 @@
           <div class="entry-main">
             <div class="icon" style="background:${iconBg};color:${iconColor}">${iconHtml}</div>
             <div class="info"><div class="cat">${catLine}</div><div class="entry-meta">${payBadgeHtml}${e.note? `<span class="note-text">${escapeHtml(e.note)}</span>` : ''}</div></div>
-            <div class="amount">${e.type==='income'?'+':'-'}${fmtCur(e.amount, cur)}</div>
+            <div class="amount">${e.type==='income'?'+':'-'}${fmtCur(disp.amount, disp.cur)}</div>
           </div>
           <div class="entry-actions">
             <button class="action-btn edit" data-act="edit">${iconSvg('pencil')}<span class="lb">${t('edit')}</span></button>
@@ -1160,7 +1191,8 @@
           if(!entry) return;
           const catObj = entry.catKey && allCatMap[entry.catKey];
           const catTxt = catObj ? catLabel(catObj) : (entry.category||'');
-          const info = `${catTxt} ${fmtCur(entry.amount, entry.currency||'CNY')}`;
+          const dispDel = convForDisplay(entry);
+          const info = `${catTxt} ${fmtCur(dispDel.amount, dispDel.cur)}`;
           if(!confirm(t('deleteConfirm').replace('{info}', info))) return;
           entries = entries.filter(e=> String(e.id)!==id);
           saveEntries(); renderAll();
@@ -1179,7 +1211,7 @@
     let income=0, expense=0;
     entries.forEach(e=>{
       if(e.date.startsWith(mk)){
-        const v = toBase(e.amount, e.currency||'CNY');
+        const v = toBase(e.amount, e.currency||'CNY', e.date);
         if(e.type==='income') income+=v; else expense+=v;
       }
     });
@@ -1187,7 +1219,7 @@
     $('monthExpense').textContent = fmtCur(expense, settings.currency);
     $('balanceAmount').textContent = fmtCur(income-expense, settings.currency);
 
-    const total = entries.reduce((s,e)=> s + (e.type==='income'?1:-1)*toBase(e.amount, e.currency||'CNY'), 0);
+    const total = entries.reduce((s,e)=> s + (e.type==='income'?1:-1)*toBase(e.amount, e.currency||'CNY', e.date), 0);
     $('sealBadge').textContent = total>=0 ? t('surplus') : t('deficit');
 
     const listArea = $('listArea');
@@ -1222,7 +1254,7 @@
     const groups = {};
     periodEntries.forEach(e=>{
       const key = e.catKey || e.category;
-      const v = toBase(e.amount, e.currency||'CNY');
+      const v = toBase(e.amount, e.currency||'CNY', e.date);
       const catObj = e.catKey && allCatMap[e.catKey];
       const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
       if(!groups[key]) groups[key] = {key, label, amount:0};
@@ -1537,7 +1569,7 @@
     selectedPayMethod = payMethodMap[entry.paymentMethod] || paymentMethods[0];
     $('segExpense').classList.toggle('active', currentType==='expense');
     $('segIncome').classList.toggle('active', currentType==='income');
-    $('curSegment').querySelectorAll('button').forEach(b=> b.classList.toggle('active', b.getAttribute('data-cur')===currentCurrency));
+    $('curSymbolDisplay').textContent = symbolFor(currentCurrency);
     $('amountInput').value = entry.amount;
     $('noteInput').value = entry.note || '';
     $('dateInput').value = useToday ? todayStr() : entry.date;
@@ -1569,7 +1601,7 @@
     resetEntryFormFields();
     currentCurrency = settings.currency;
     selectedPayMethod = paymentMethods[0];
-    $('curSegment').querySelectorAll('button').forEach(b=> b.classList.toggle('active', b.getAttribute('data-cur')===currentCurrency));
+    $('curSymbolDisplay').textContent = symbolFor(currentCurrency);
     $('sheetTitle').textContent = t('sheetAddTitle');
     updateCatPickerRowDisplay();
     renderPayGrid();
@@ -1597,14 +1629,6 @@
 
   $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; updateCatPickerRowDisplay(); });
   $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; updateCatPickerRowDisplay(); });
-  $('curSegment').querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      $('curSegment').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCurrency = btn.getAttribute('data-cur');
-      $('curSymbolDisplay').textContent = currentCurrency==='JPY' ? '¥' : '¥';
-    });
-  });
 
   $('saveBtn').addEventListener('click', async ()=>{
     const amt = parseFloat($('amountInput').value);
@@ -1654,6 +1678,7 @@
       settings.currency = btn.getAttribute('data-cur');
       await saveSettings();
       applyStaticI18n(); renderAll(); renderRatePage();
+      ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
     });
   });
   $('githubTokenInput').addEventListener('change', async ()=>{
@@ -1711,7 +1736,7 @@
       arr.push({key, label:String(d.getDate()), income:0, expense:0});
     }
     const map={}; arr.forEach(x=>map[x.key]=x);
-    entries.forEach(e=>{ if(map[e.date]){ const v=toBase(e.amount, e.currency||'CNY'); if(e.type==='income') map[e.date].income+=v; else map[e.date].expense+=v; } });
+    entries.forEach(e=>{ if(map[e.date]){ const v=toBase(e.amount, e.currency||'CNY', e.date); if(e.type==='income') map[e.date].income+=v; else map[e.date].expense+=v; } });
     return arr;
   }
   function getMonthlyBuckets(n){
@@ -1722,7 +1747,7 @@
       arr.push({key, label:(d.getMonth()+1)+'月', income:0, expense:0});
     }
     const map={}; arr.forEach(x=>map[x.key]=x);
-    entries.forEach(e=>{ const mk=e.date.slice(0,7); if(map[mk]){ const v=toBase(e.amount, e.currency||'CNY'); if(e.type==='income') map[mk].income+=v; else map[mk].expense+=v; } });
+    entries.forEach(e=>{ const mk=e.date.slice(0,7); if(map[mk]){ const v=toBase(e.amount, e.currency||'CNY', e.date); if(e.type==='income') map[mk].income+=v; else map[mk].expense+=v; } });
     return arr;
   }
 
@@ -1737,7 +1762,7 @@
     entries.forEach(e=>{
       const b = map[e.date];
       if(!b) return;
-      const v = toBase(e.amount, e.currency||'CNY');
+      const v = toBase(e.amount, e.currency||'CNY', e.date);
       const k = e.catKey || e.category;
       if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
@@ -1754,7 +1779,7 @@
       const mk = e.date.slice(0,7);
       const b = map[mk];
       if(!b) return;
-      const v = toBase(e.amount, e.currency||'CNY');
+      const v = toBase(e.amount, e.currency||'CNY', e.date);
       const k = e.catKey || e.category;
       if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
@@ -1991,6 +2016,7 @@
     await step('renderAll', renderAll);
     await step('renderRatePage', renderRatePage);
     fetchRate(false).catch(e=> console.error('汇率初始拉取失败', e));
+    ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
   }
   init();
 })();
