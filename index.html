@@ -774,7 +774,14 @@
     try{ const res = LocalStore.get('ledger_settings'); if(res && res.value) settings = JSON.parse(res.value); }catch(e){}
   }
   async function saveSettings(){
-    try{ await storageSetSafe('ledger_settings', JSON.stringify(settings), false); }
+    try{
+      // 写之前先跟磁盘上最新的设置合并,避免"这个标签页从加载起就不知道 token/gistId"
+      // 的情况下,随手改个语言之类的操作把磁盘上已经存的 token 覆盖冲掉
+      let onDisk = {};
+      try{ const res = LocalStore.get('ledger_settings'); if(res && res.value) onDisk = JSON.parse(res.value); }catch(e){}
+      settings = Object.assign({}, onDisk, settings);
+      await storageSetSafe('ledger_settings', JSON.stringify(settings), false);
+    }
     catch(e){ console.error('设置保存失败', e); showToast(t('saveFailed')); }
   }
   async function loadRateCache(){
