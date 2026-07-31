@@ -449,15 +449,6 @@
     <button type="button" class="save-btn" id="restoreNowBtn" style="flex:1;margin-top:0;padding:13px 4px;font-size:13.5px;background:var(--seal);"></button>
   </div>
   <div id="backupHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:18px;"></div>
-  <div class="field-label" id="setupCodeFieldLabel">换设备同步（配置码）</div>
-  <div class="row2" style="margin-bottom:8px;">
-    <button type="button" class="save-btn" id="copySetupCodeBtn" style="flex:1;margin-top:0;padding:11px 4px;font-size:13px;background:var(--ink);"></button>
-  </div>
-  <div class="text-row" style="display:flex;gap:8px;align-items:center;">
-    <input type="text" id="setupCodeInput" autocomplete="off" style="flex:1;">
-    <button type="button" class="save-btn" id="importSetupCodeBtn" style="margin-top:0;flex-shrink:0;padding:11px 16px;font-size:13px;white-space:nowrap;"></button>
-  </div>
-  <div id="setupCodeHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:18px;"></div>
 
   <div class="field-label" id="cloudSyncFieldLabel">实时云同步（测试中）</div>
   <div id="cloudSyncSignedOutBlock">
@@ -526,12 +517,6 @@
       restoreConfirm:'从云端恢复将覆盖本机当前所有记账数据，确定继续吗？', restoreSuccess:'恢复成功',
       restoreErrorNotFound:'找不到该 Gist，请检查 Token 和 Gist ID', restoreErrorParse:'备份内容已损坏，无法恢复',
       backupHelpText:'在 GitHub 网页 Settings → Developer settings → Personal access tokens → Tokens (classic) 里新建一个 token，只勾选 gist 权限即可。之后每次记账会自动同步到你自己的私密 Gist；换设备时把 Token 和 Gist ID 填回来即可恢复。',
-      setupCodeFieldLabel:'换设备同步（配置码）', copySetupCodeBtn:'复制配置码', importSetupCodeBtn:'导入',
-      setupCodeInputPlaceholder:'粘贴从其他设备复制的配置码',
-      setupCodeHelpText:'配置码里打包了 Token 和 Gist ID，不用两个分开抄。在这台设备点"复制配置码"，到新设备粘贴进输入框再点"导入"即可，不用重新生成 Token。',
-      setupCodeCopied:'配置码已复制，去新设备粘贴即可', setupCodeCopyFailed:'复制失败，请检查浏览器权限',
-      setupCodeEmpty:'请先填写并成功备份一次，再复制配置码', setupCodeImported:'导入成功，可以点"立即备份"验证',
-      setupCodeInvalid:'配置码格式不对，请确认完整复制',
       cloudSyncFieldLabel:'实时云同步（测试中）', cloudEmailPlaceholder:'邮箱', cloudPasswordPlaceholder:'密码（至少6位）',
       cloudSignInBtn:'登录', cloudSignUpBtn:'注册新账号', cloudSignOutBtn:'退出登录',
       cloudSyncHelpText:'注册/登录后，记账数据会自动实时同步到云端，换设备用同一账号登录即可看到最新数据，不用再手动备份/恢复。',
@@ -540,6 +525,7 @@
       cloudSignUpError:'注册失败：{msg}', cloudSignUpNeedConfirm:'注册成功，请去邮箱点确认链接后再登录',
       cloudSyncError:'同步失败，请检查网络后重试',
       cloudMergeConfirm:'这个账号在云端已经有数据了，登录后将用云端最新数据覆盖本机当前记录，确定继续吗？',
+      cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
       deleteConfirm:'确定删除「{info}」这条记录吗？删除后无法恢复。'
     },
     ja:{
@@ -576,12 +562,6 @@
       restoreConfirm:'クラウドから復元すると、この端末の記録がすべて上書きされます。続けますか？', restoreSuccess:'復元しました',
       restoreErrorNotFound:'Gist が見つかりません。トークンと Gist ID をご確認ください', restoreErrorParse:'バックアップの内容が壊れていて復元できません',
       backupHelpText:'GitHub の Settings → Developer settings → Personal access tokens → Tokens (classic) で、gist 権限のみを付けた新しいトークンを作成してください。以降は記録するたびに自分専用の非公開 Gist へ自動同期されます。機種変更時はトークンと Gist ID を入力すれば復元できます。',
-      setupCodeFieldLabel:'機種変更用の同期コード', copySetupCodeBtn:'コードをコピー', importSetupCodeBtn:'読み込む',
-      setupCodeInputPlaceholder:'他の端末でコピーしたコードを貼り付け',
-      setupCodeHelpText:'このコードにはトークンと Gist ID がまとめて入っています。この端末で「コードをコピー」を押し、新しい端末に貼り付けて「読み込む」を押すだけで、トークンを作り直さずに復元できます。',
-      setupCodeCopied:'コードをコピーしました。新しい端末で貼り付けてください', setupCodeCopyFailed:'コピーに失敗しました。ブラウザの権限をご確認ください',
-      setupCodeEmpty:'先にトークンを入力してバックアップを一度成功させてください', setupCodeImported:'読み込みました。「今すぐバックアップ」で確認できます',
-      setupCodeInvalid:'コードの形式が正しくありません。全体をコピーできているかご確認ください',
       cloudSyncFieldLabel:'リアルタイム同期（テスト中）', cloudEmailPlaceholder:'メールアドレス', cloudPasswordPlaceholder:'パスワード（6文字以上）',
       cloudSignInBtn:'ログイン', cloudSignUpBtn:'新規登録', cloudSignOutBtn:'ログアウト',
       cloudSyncHelpText:'登録・ログインすると、記録が自動的にクラウドへリアルタイム同期されます。他の端末で同じアカウントにログインすれば最新データがすぐ反映され、手動でのバックアップ・復元は不要です。',
@@ -590,6 +570,7 @@
       cloudSignUpError:'登録に失敗しました：{msg}', cloudSignUpNeedConfirm:'登録が完了しました。メール内の確認リンクを開いてからログインしてください',
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
       cloudMergeConfirm:'このアカウントには既にクラウド上にデータがあります。ログインするとクラウドの最新データでこの端末の記録を上書きします。続けますか？',
+      cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
       deleteConfirm:'「{info}」を削除しますか？削除すると元に戻せません。'
     }
   };
@@ -881,17 +862,6 @@
   function buildBackupPayload(){
     const safeSettings = {lang: settings.lang, currency: settings.currency};
     return JSON.stringify({version:1, exportedAt: Date.now(), entries, settings: safeSettings, customSubs: customSubsMap}, null, 2);
-  }
-  // Token/Gist ID 换设备同步:故意不放进 Gist 备份内容里(那会把开门的钥匙锁进保险箱本身),
-  // 而是打包成一段本机复制、到新设备粘贴的配置码,只在这台设备和用户的剪贴板之间走
-  function buildSetupCode(){
-    return btoa(unescape(encodeURIComponent((settings.githubToken||'')+'|'+(settings.gistId||''))));
-  }
-  function parseSetupCode(code){
-    const decoded = decodeURIComponent(escape(atob(code.trim())));
-    const idx = decoded.indexOf('|');
-    if(idx<0) throw new Error('bad format');
-    return { token: decoded.slice(0,idx), gistId: decoded.slice(idx+1) };
   }
   async function pushBackupToGist(manual){
     const token = (settings.githubToken||'').trim();
@@ -1206,11 +1176,6 @@
     $('backupNowBtn').textContent = t('backupNowBtn');
     $('restoreNowBtn').textContent = t('restoreNowBtn');
     $('backupHelpText').textContent = t('backupHelpText');
-    $('setupCodeFieldLabel').textContent = t('setupCodeFieldLabel');
-    $('copySetupCodeBtn').textContent = t('copySetupCodeBtn');
-    $('importSetupCodeBtn').textContent = t('importSetupCodeBtn');
-    $('setupCodeInput').placeholder = t('setupCodeInputPlaceholder');
-    $('setupCodeHelpText').textContent = t('setupCodeHelpText');
     $('cloudSyncFieldLabel').textContent = t('cloudSyncFieldLabel');
     $('cloudEmailInput').placeholder = t('cloudEmailPlaceholder');
     $('cloudPasswordInput').placeholder = t('cloudPasswordPlaceholder');
@@ -1947,38 +1912,8 @@
     renderBackupLockState();
     $('githubTokenInput').focus();
   });
-  $('copySetupCodeBtn').addEventListener('click', async ()=>{
-    if(!(settings.githubToken||'').trim()){ showToast(t('setupCodeEmpty')); return; }
-    try{
-      await navigator.clipboard.writeText(buildSetupCode());
-      showToast(t('setupCodeCopied'));
-    }catch(e){
-      console.error('复制配置码失败', e);
-      showToast(t('setupCodeCopyFailed'));
-    }
-  });
-  $('importSetupCodeBtn').addEventListener('click', async ()=>{
-    const code = $('setupCodeInput').value.trim();
-    if(!code) return;
-    try{
-      const { token, gistId } = parseSetupCode(code);
-      if(!token) throw new Error('empty token');
-      settings.githubToken = token;
-      settings.gistId = gistId || '';
-      settings.tokenLocked = false;
-      await saveSettings();
-      $('githubTokenInput').value = settings.githubToken;
-      $('gistIdInput').value = settings.gistId;
-      $('setupCodeInput').value = '';
-      renderBackupLockState();
-      showToast(t('setupCodeImported'));
-    }catch(e){
-      console.error('导入配置码失败', e);
-      showToast(t('setupCodeInvalid'));
-    }
-  });
   $('cloudSignInBtn').addEventListener('click', async ()=>{
-    if(!supabaseClient) return;
+    if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
     const email = $('cloudEmailInput').value.trim();
     const pass = $('cloudPasswordInput').value;
     if(!email || !pass){ showToast(t('cloudNeedEmailPass')); return; }
@@ -1993,7 +1928,7 @@
     }
   });
   $('cloudSignUpBtn').addEventListener('click', async ()=>{
-    if(!supabaseClient) return;
+    if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
     const email = $('cloudEmailInput').value.trim();
     const pass = $('cloudPasswordInput').value;
     if(!email || !pass){ showToast(t('cloudNeedEmailPass')); return; }
