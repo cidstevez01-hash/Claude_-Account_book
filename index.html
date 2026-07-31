@@ -143,6 +143,7 @@
   .sub-mini-btn.sub-del{color:var(--seal);}
   .text-row{margin-bottom:14px;}
   .text-row input{width:100%;height:46px;padding:0 14px;border:1px solid var(--grid);border-radius:12px;background:var(--card);font-family:'Noto Sans SC',sans-serif;font-size:15px;color:var(--ink);outline:none;box-sizing:border-box;-webkit-appearance:none;appearance:none;}
+  .text-row input:disabled{background:var(--grid);color:var(--ink-soft);opacity:0.85;}
   .row2{display:flex;gap:12px;align-items:stretch;} .row2 .text-row{flex:1;margin-bottom:14px;}
   .row2 .text-row input[type="date"]{width:100%;}
   .save-btn{width:100%;padding:15px;border:none;border-radius:14px;background:var(--ink);color:#FFFDF8;font-size:16px;font-weight:600;font-family:'Noto Sans SC',sans-serif;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform 0.12s ease, opacity 0.12s ease;}
@@ -426,7 +427,10 @@
     <button type="button" data-cur="JPY" id="curSetJPY">日元 (JPY)</button>
   </div>
   <div class="field-label" id="backupFieldLabel">云备份（GitHub Gist）</div>
-  <div class="text-row"><input type="password" id="githubTokenInput" autocomplete="off" placeholder="GitHub Token"></div>
+  <div class="text-row" style="display:flex;gap:8px;align-items:center;">
+    <input type="password" id="githubTokenInput" autocomplete="off" placeholder="GitHub Token" style="flex:1;">
+    <button type="button" class="icon-btn" id="tokenEditBtn" style="display:none;flex-shrink:0;"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-pencil"/></svg></button>
+  </div>
   <div class="text-row"><input type="text" id="gistIdInput" autocomplete="off" placeholder="Gist ID"></div>
   <div id="backupStatusText" style="font-size:12px;color:var(--ink-soft);margin:-6px 0 14px;"></div>
   <div class="row2" style="margin-bottom:8px;">
@@ -837,8 +841,9 @@
       const data = await res.json();
       settings.gistId = data.id;
       settings.lastSyncAt = Date.now();
+      settings.tokenLocked = true;
       $('gistIdInput').value = settings.gistId;
-      await storageSetSafe('ledger_settings', JSON.stringify(settings), false);
+      await saveSettings();
     }catch(e){
       console.error('Gist 备份失败', e);
       if(manual) showToast(t('backupErrorNetwork'));
@@ -870,9 +875,10 @@
         settings.lang = payload.settings.lang || settings.lang;
         settings.currency = payload.settings.currency || settings.currency;
       }
+      settings.tokenLocked = true;
       await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
       await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false);
-      await storageSetSafe('ledger_settings', JSON.stringify(settings), false);
+      await saveSettings();
       showToast(t('restoreSuccess'));
       setTimeout(()=> location.reload(), 700);
     }catch(e){
@@ -1138,6 +1144,15 @@
     }else{
       $('backupStatusText').textContent = t('backupStatusNever');
     }
+    renderBackupLockState();
+  }
+  // 备份/恢复成功过一次之后,把 token 和 Gist ID 输入框锁成灰色只读,
+  // 避免误触改动已经验证过能用的凭据;点编辑图标才能重新改
+  function renderBackupLockState(){
+    const locked = !!settings.tokenLocked && !!(settings.githubToken||'').trim();
+    $('githubTokenInput').disabled = locked;
+    $('gistIdInput').disabled = locked;
+    $('tokenEditBtn').style.display = locked ? 'flex' : 'none';
   }
 
   function setMonthLabel(){ const d=new Date(); $('monthLabel').textContent = d.getFullYear()+'年'+(d.getMonth()+1)+'月'; }
@@ -1717,6 +1732,12 @@
   });
   $('backupNowBtn').addEventListener('click', ()=> pushBackupToGist(true));
   $('restoreNowBtn').addEventListener('click', ()=> pullBackupFromGist());
+  $('tokenEditBtn').addEventListener('click', async ()=>{
+    settings.tokenLocked = false;
+    await saveSettings();
+    renderBackupLockState();
+    $('githubTokenInput').focus();
+  });
 
   // ---------- Tabs ----------
   function switchToPage(page){
