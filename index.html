@@ -142,14 +142,20 @@
   .cat-picker-text{flex:1;text-align:left;font-size:15px;color:var(--ink);}
   .cat-picker-chevron{color:var(--ink-soft);font-size:18px;}
   .sub-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
-  .sub-pill{padding:8px 14px;border-radius:20px;border:1.5px solid var(--grid);background:var(--card);font-size:13px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;}
+  .sub-pill{padding:8px 14px;border-radius:20px;border:1.5px solid var(--grid);background:var(--card);font-size:13px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;transition:transform 0.1s ease,opacity 0.1s ease;}
+  .sub-pill:active{transform:scale(0.95);opacity:0.8;}
   .sub-pill .hd-icon{width:14px;height:14px;vertical-align:-2px;}
   .sub-pill.selected{border-color:var(--seal);background:#f7ded9;color:var(--seal);font-weight:600;}
   .sub-pill.add-sub{border-style:dashed;color:var(--ink-soft);}
-  .sub-item-wrap{display:inline-flex;align-items:center;gap:3px;}
-  .sub-mini-btn{border:1px solid var(--grid);background:var(--card);border-radius:50%;width:22px;height:22px;font-size:10px;color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;}
+  .sub-item-wrap{display:inline-flex;align-items:center;gap:5px;}
+  .sub-pill-box{position:relative;display:inline-flex;}
+  .sub-del-x{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--seal);color:#fff;font-size:10px;line-height:1;border:2px solid var(--paper);display:flex;align-items:center;justify-content:center;padding:0;z-index:2;transition:transform 0.1s ease;}
+  .sub-del-x:active{transform:scale(0.85);}
+  .sub-mini-btn{border:1px solid var(--grid);background:var(--card);border-radius:50%;width:22px;height:22px;font-size:10px;color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;transition:transform 0.1s ease,opacity 0.1s ease;}
+  .sub-mini-btn:active{transform:scale(0.88);opacity:0.7;}
   .sub-mini-btn .hd-icon{width:11px;height:11px;}
-  .sub-mini-btn.sub-del{color:var(--seal);}
+  .sub-mini-btn.sub-confirm{background:var(--jade);border-color:var(--jade);color:#fff;}
+  .sub-inline-input{padding:8px 12px;border:1.5px solid var(--seal);border-radius:20px;background:var(--card);font-size:13px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);outline:none;width:118px;box-sizing:border-box;}
   .text-row{margin-bottom:14px;}
   .text-row input{width:100%;height:46px;padding:0 14px;border:1px solid var(--grid);border-radius:12px;background:var(--card);font-family:'Noto Sans SC',sans-serif;font-size:15px;color:var(--ink);outline:none;box-sizing:border-box;-webkit-appearance:none;appearance:none;}
   .text-row input:disabled{background:var(--grid);color:var(--ink-soft);opacity:0.85;}
@@ -186,11 +192,32 @@
   .legend-row .amt{font-size:13px;width:82px;text-align:right;font-variant-numeric:tabular-nums;}
   .empty-chart{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0;}
   .ym-picker{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
-  .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;}
+  .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:opacity 0.12s ease;}
   .ym-arrow:active{background:var(--card);}
+  .ym-arrow:disabled{opacity:0.32;}
   .ym-label{font-family:'Noto Serif SC',serif;font-weight:600;font-size:14px;min-width:96px;text-align:center;}
-  .ym-select{border:1.5px solid var(--grid);background:var(--paper);border-radius:10px;padding:8px 10px;font-family:'Noto Serif SC',serif;font-weight:600;font-size:14px;color:var(--ink);-webkit-appearance:none;appearance:none;}
-  .ym-select:active{background:var(--card);}
+  .ym-select{
+    border:1.5px solid var(--grid);background:var(--card);border-radius:14px;
+    padding:9px 30px 9px 16px;font-family:'Noto Serif SC',serif;font-weight:700;font-size:15px;color:var(--ink);
+    -webkit-appearance:none;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a99c86' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 11px center;background-size:13px;
+    box-shadow:0 2px 0 rgba(58,47,40,0.06);
+    transition:transform 0.12s ease, border-color 0.15s ease, box-shadow 0.12s ease;
+    cursor:pointer;
+  }
+  .ym-select:active{transform:translateY(1px) scale(0.97);border-color:var(--seal);box-shadow:0 1px 0 rgba(58,47,40,0.06);}
+  .type-select{
+    padding:6px 27px 6px 13px;font-family:'Noto Sans SC',sans-serif;font-weight:700;font-size:12.5px;
+    border-radius:20px;background-size:11px;background-position:right 9px center;
+    border-color:var(--seal-soft);color:var(--seal);background-color:#f7ded9;box-shadow:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d1665a' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  }
+  .type-select.income{
+    border-color:var(--jade);color:var(--jade);background-color:#e3ecdf;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a9b6e' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  }
+  .type-select:active{transform:scale(0.94);}
   .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px;}
   .chart-scroll svg{display:block;}
   .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);}
@@ -226,6 +253,7 @@
   <symbol id="ic-pencil" viewBox="0 0 24 24"><path d="M4 20l1-4.4L15.6 5 19 8.4 8.4 19z"/><path d="M13 7 17 10.5"/></symbol>
   <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="ic-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M6.6 6.7C4 8.3 2 12 2 12s4 7 10 7c1.8 0 3.4-.5 4.8-1.3M17.4 17.3C19.9 15.7 22 12 22 12s-2.1-3.8-5.4-5.7"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
   <symbol id="ic-copy" viewBox="0 0 24 24"><rect x="4" y="6" width="12" height="14" rx="2.5"/><path d="M8 6V4.5A2 2 0 0 1 10 2.5h8A2 2 0 0 1 20 4.5v12A2 2 0 0 1 18 18.5h-1.6"/></symbol>
   <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9.5 7V4.6h5V7"/><path d="M6.5 7 7.3 20h9.4l0.8-13"/></symbol>
   <symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 0 1 12.6-5.5"/><path d="M17.5 3.5v4h-4"/><path d="M19.5 12a7.5 7.5 0 0 1-12.6 5.5"/><path d="M6.5 20.5v-4h4"/></symbol>
@@ -325,7 +353,7 @@
       </div>
       <div class="card-title">
         <span id="trendTitle">本月每日收支</span>
-        <select class="ym-select" id="trendTypeSelect" style="padding:5px 8px;font-size:12.5px;">
+        <select class="ym-select type-select" id="trendTypeSelect">
           <option value="expense" id="trendTypeExpenseOpt">支出</option>
           <option value="income" id="trendTypeIncomeOpt">收入</option>
         </select>
@@ -424,9 +452,6 @@
   <div id="subFieldWrap">
     <div class="field-label" id="subFieldLabel">细分</div>
     <div class="sub-wrap" id="subGrid"></div>
-    <div id="newSubRow" style="display:none;margin:-8px 0 18px;">
-      <input type="text" id="newSubInput" placeholder="新中项目名称" style="width:100%;padding:11px 14px;border:1px solid var(--grid);border-radius:10px;background:var(--card);font-size:14px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);outline:none;">
-    </div>
   </div>
 </div>
 
@@ -641,7 +666,7 @@
       {key:'daily_goods', zh:'日用品', ja:'日用品'},{key:'drugstore', zh:'药妆店', ja:'ドラッグストア'},{key:'pet', zh:'宠物用品', ja:'ペット用品'},{key:'tobacco', zh:'香烟', ja:'たばこ'},{key:'childcare', zh:'育儿用品', ja:'子育て用品'}
     ]},
     {key:'hobby', zh:'趣味娱乐', ja:'趣味・娯楽', icon:'controller', color:'#d3cd17', subs:[
-      {key:'outdoor', zh:'户外', ja:'アウトドア'},{key:'sports', zh:'运动', ja:'スポーツ'},{key:'media', zh:'影音游戏', ja:'映画・音楽・ゲーム'},{key:'books', zh:'书籍', ja:'本'},{key:'travel', zh:'旅行', ja:'旅行'}
+      {key:'outdoor', zh:'户外', ja:'アウトドア'},{key:'sports', zh:'运动', ja:'スポーツ'},{key:'media', zh:'影音游戏', ja:'映画・音楽・ゲーム'},{key:'video', zh:'视频', ja:'動画'},{key:'books', zh:'书籍', ja:'本'},{key:'travel', zh:'旅行', ja:'旅行'}
     ]},
     {key:'social', zh:'交际费', ja:'交際費', icon:'gift', color:'#17d39a', subs:[
       {key:'party', zh:'聚餐应酬', ja:'飲み会'},{key:'present', zh:'礼物', ja:'プレゼント'},{key:'ceremony', zh:'婚丧嫁娶', ja:'冠婚葬祭'}
@@ -730,6 +755,7 @@
     {key:'rakutenpay', zh:'乐天Pay', ja:'楽天ペイ', badge:{bg:'#BF0000', text:'楽'}},
     {key:'transfer', zh:'银行转账', ja:'銀行振込', icon:'bank'},
     {key:'paidy', zh:'Paidy', ja:'ペイディ', badge:{bg:'#FF3D71', text:'P'}},
+    {key:'amazon', zh:'Amazon', ja:'Amazon', badge:{bg:'#FF9900', text:'a'}},
   ];
   const payMethodMap = {};
   paymentMethods.forEach(p=> payMethodMap[p.key]=p);
@@ -1208,7 +1234,6 @@
     $('subFieldLabel').textContent = t('subFieldLabel');
     $('payFieldLabel').textContent = t('payFieldLabel');
     renderPayGrid();
-    $('newSubInput').placeholder = t('newSubPlaceholder');
     $('noteInput').placeholder = t('notePlaceholder');
     $('saveBtn').textContent = t('saveBtn');
     $('settingsTitle').textContent = t('settingsTitle');
@@ -1516,18 +1541,23 @@
   let monthDetailMonthKey = null;
 
   let homeDonutMonthOffset = 0;
-  function getHomeDonutMonthKey(){
-    const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+homeDonutMonthOffset);
+  function getHomeDonutMonthKey(offset){
+    const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+(offset!==undefined ? offset : homeDonutMonthOffset));
     return d.getFullYear()+'-'+pad2(d.getMonth()+1);
   }
   function getHomeDonutMonthLabel(){
     const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+homeDonutMonthOffset);
     return d.getFullYear()+'年'+(d.getMonth()+1)+'月';
   }
+  function monthHasAnyEntries(offset){
+    const mk = getHomeDonutMonthKey(offset);
+    return entries.some(e=> e.date.startsWith(mk));
+  }
   function renderHomeDonut(){
     const mk = getHomeDonutMonthKey();
     $('homeMonthLabel').textContent = getHomeDonutMonthLabel();
-    $('homeMonthNext').disabled = homeDonutMonthOffset>=0;
+    $('homeMonthPrev').disabled = !monthHasAnyEntries(homeDonutMonthOffset-1);
+    $('homeMonthNext').disabled = !monthHasAnyEntries(homeDonutMonthOffset+1);
     const periodEntries = entries.filter(e=> e.date.startsWith(mk) && e.type===homeDonutType);
     $('homeDonutCenterLabel').textContent = homeDonutType==='expense' ? t('donutMonthExpense') : t('donutMonthIncome');
     const groups = {};
@@ -1568,10 +1598,13 @@
       });
     });
   }
-  $('homeMonthPrev').addEventListener('click', (ev)=>{ ev.stopPropagation(); homeDonutMonthOffset--; renderHomeDonut(); });
+  $('homeMonthPrev').addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    if(monthHasAnyEntries(homeDonutMonthOffset-1)){ homeDonutMonthOffset--; renderHomeDonut(); }
+  });
   $('homeMonthNext').addEventListener('click', (ev)=>{
     ev.stopPropagation();
-    if(homeDonutMonthOffset<0){ homeDonutMonthOffset++; renderHomeDonut(); }
+    if(monthHasAnyEntries(homeDonutMonthOffset+1)){ homeDonutMonthOffset++; renderHomeDonut(); }
   });
   (function wireHomeDonutSwipe(){
     let startX = null, swiped = false;
@@ -1583,7 +1616,7 @@
       startX = null;
       if(Math.abs(dx) > 40){
         swiped = true;
-        if(dx<0){ if(homeDonutMonthOffset<0) homeDonutMonthOffset++; } else { homeDonutMonthOffset--; }
+        if(dx<0){ if(monthHasAnyEntries(homeDonutMonthOffset+1)) homeDonutMonthOffset++; } else { if(monthHasAnyEntries(homeDonutMonthOffset-1)) homeDonutMonthOffset--; }
         renderHomeDonut();
       }
     });
@@ -1691,23 +1724,38 @@
     renderSubGrid();
   }
 
-  let editingSubKey = null;
+  let editingSubKey = null; // 具体sub的key = 编辑该项;'__new__' = 正在新增;null = 都没有
 
   function renderSubGrid(){
     const subs = (selectedCat && selectedCat.subs) || [];
     if(!selectedSub || !subs.find(s=>s.key===selectedSub.key)) selectedSub = subs[0] || null;
     let html = subs.map(s=>{
+      if(editingSubKey === s.key){
+        return `<span class="sub-item-wrap">
+          <input type="text" class="sub-inline-input" data-editing-key="${s.key}" value="${escapeHtml(s.label)}">
+          <button type="button" class="sub-mini-btn sub-confirm" data-editing-key="${s.key}">${iconSvg('check')}</button>
+        </span>`;
+      }
       const selCls = selectedSub && s.key===selectedSub.key ? 'selected' : '';
       if(s.custom){
         return `<span class="sub-item-wrap">
-          <button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${escapeHtml(subLabel(s))}</button>
+          <span class="sub-pill-box">
+            <button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${escapeHtml(subLabel(s))}</button>
+            <button type="button" class="sub-del-x" data-key="${s.key}">✕</button>
+          </span>
           <button type="button" class="sub-mini-btn sub-edit" data-key="${s.key}">${iconSvg('pencil')}</button>
-          <button type="button" class="sub-mini-btn sub-del" data-key="${s.key}">✕</button>
         </span>`;
       }
       return `<button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${escapeHtml(subLabel(s))}</button>`;
     }).join('');
-    html += `<button type="button" class="sub-pill add-sub" id="addSubBtn">＋</button>`;
+    if(editingSubKey === '__new__'){
+      html += `<span class="sub-item-wrap">
+        <input type="text" class="sub-inline-input" data-editing-key="__new__" placeholder="${t('newSubPlaceholder')}">
+        <button type="button" class="sub-mini-btn sub-confirm" data-editing-key="__new__">${iconSvg('check')}</button>
+      </span>`;
+    }else{
+      html += `<button type="button" class="sub-pill add-sub" id="addSubBtn">＋</button>`;
+    }
     $('subGrid').innerHTML = html;
     $('subGrid').querySelectorAll('.sub-pill:not(.add-sub)').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -1724,31 +1772,68 @@
         if(sub) openEditSubInput(sub);
       });
     });
-    $('subGrid').querySelectorAll('.sub-del').forEach(btn=>{
+    $('subGrid').querySelectorAll('.sub-del-x').forEach(btn=>{
       btn.addEventListener('click', async (ev)=>{
         ev.stopPropagation();
         const key = btn.getAttribute('data-key');
         await deleteCustomSub(selectedCat.key, key);
         if(selectedSub && selectedSub.key===key) selectedSub = null;
-        if(editingSubKey===key){ editingSubKey=null; $('newSubRow').style.display='none'; }
+        if(editingSubKey===key) editingSubKey=null;
         renderSubGrid();
         updateCatPickerRowDisplay();
       });
     });
-    $('addSubBtn').addEventListener('click', openAddSubInput);
+    const addBtn = $('addSubBtn');
+    if(addBtn) addBtn.addEventListener('click', openAddSubInput);
+    const inlineInput = $('subGrid').querySelector('.sub-inline-input');
+    if(inlineInput) bindInlineSubInput(inlineInput);
+  }
+
+  // 新增/编辑子分类都直接变成小框内的输入框(不再另起一行),
+  // 输入完成靠对勾按钮/回车确认保存,不再只靠"点别处自动保存"这种看不出反馈的方式(用户明确反馈过点不出保存在哪)
+  function bindInlineSubInput(inputEl){
+    const key = inputEl.getAttribute('data-editing-key');
+    let settled = false;
+    async function commit(){
+      if(settled) return;
+      settled = true;
+      const label = inputEl.value.trim();
+      if(label && selectedCat){
+        if(key && key !== '__new__'){
+          await updateCustomSub(selectedCat.key, key, label);
+          if(selectedSub && selectedSub.key===key) selectedSub.label = label;
+        }else{
+          selectedSub = await addCustomSub(selectedCat.key, label);
+        }
+      }
+      if(editingSubKey === key){ editingSubKey = null; renderSubGrid(); updateCatPickerRowDisplay(); }
+    }
+    function cancel(){
+      if(settled) return;
+      settled = true;
+      if(editingSubKey === key){ editingSubKey = null; renderSubGrid(); }
+    }
+    inputEl.addEventListener('keydown', (ev)=>{
+      if(ev.key==='Enter'){ ev.preventDefault(); commit(); }
+      if(ev.key==='Escape'){ ev.preventDefault(); cancel(); }
+    });
+    inputEl.addEventListener('blur', ()=> commit());
+    const confirmBtn = $('subGrid').querySelector(`.sub-confirm[data-editing-key="${key}"]`);
+    if(confirmBtn){
+      confirmBtn.addEventListener('mousedown', (ev)=> ev.preventDefault());
+      confirmBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); commit(); });
+    }
+    inputEl.focus();
+    inputEl.select();
   }
 
   function openAddSubInput(){
-    editingSubKey = null;
-    $('newSubRow').style.display = 'flex';
-    $('newSubInput').value = '';
-    $('newSubInput').focus();
+    editingSubKey = '__new__';
+    renderSubGrid();
   }
   function openEditSubInput(sub){
     editingSubKey = sub.key;
-    $('newSubRow').style.display = 'flex';
-    $('newSubInput').value = sub.label;
-    $('newSubInput').focus();
+    renderSubGrid();
   }
 
   async function loadCustomSubs(){
@@ -1796,28 +1881,6 @@
     if(customSubsMap[catKey]) customSubsMap[catKey] = customSubsMap[catKey].filter(s=>s.key!==subKey);
     await persistCustomSubs();
   }
-  let subInputCommitting = false;
-  async function commitSubInput(){
-    if($('newSubRow').style.display==='none') return;
-    if(subInputCommitting) return;
-    const label = $('newSubInput').value.trim();
-    $('newSubRow').style.display = 'none';
-    if(!label || !selectedCat){ editingSubKey = null; return; }
-    subInputCommitting = true;
-    if(editingSubKey){
-      await updateCustomSub(selectedCat.key, editingSubKey, label);
-      if(selectedSub && selectedSub.key===editingSubKey) selectedSub.label = label;
-    }else{
-      selectedSub = await addCustomSub(selectedCat.key, label);
-    }
-    editingSubKey = null;
-    subInputCommitting = false;
-    renderSubGrid();
-    updateCatPickerRowDisplay();
-  }
-  $('newSubInput').addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); $('newSubInput').blur(); } });
-  $('newSubInput').addEventListener('blur', ()=>{ commitSubInput(); });
-
   function openCatPicker(){
     renderCatGrid();
     $('catPickerSheet').classList.add('show');
@@ -1837,7 +1900,7 @@
     $('dateInput').value = todayStr();
     $('amountInput').value = '';
     $('noteInput').value = '';
-    $('newSubRow').style.display = 'none';
+    editingSubKey = null;
   }
   function applyEntryToForm(entry, useToday){
     currentType = entry.type;
@@ -1852,7 +1915,7 @@
     $('amountInput').value = entry.amount;
     $('noteInput').value = entry.note || '';
     $('dateInput').value = useToday ? todayStr() : entry.date;
-    $('newSubRow').style.display = 'none';
+    editingSubKey = null;
     updateCatPickerRowDisplay();
     renderPayGrid();
   }
@@ -1894,7 +1957,6 @@
     $('catPickerSheet').classList.remove('show');
     $('settingsSheet').classList.remove('show');
     $('monthDetailSheet').classList.remove('show');
-    $('newSubRow').style.display = 'none';
     editingEntryId = null;
     editingSubKey = null;
   }
@@ -2246,6 +2308,7 @@
     // 支出/收入不再同屏堆一起,靠下拉切换,各自用自己的最大值算刻度,
     // 不然工资这种大额收入一出现,日常小额支出的柱子就会被压成看不见的细线
     const isIncome = trendChartType==='income';
+    $('trendTypeSelect').classList.toggle('income', isIncome);
     const valField = isIncome ? 'income' : 'expense';
     const catField = isIncome ? 'catIncome' : 'catExpense';
     const maxVal = Math.max(1, ...buckets.map(b=> b[valField]));
@@ -2437,7 +2500,8 @@
   const RECURRING_RULES = [
     { id:'rule_salary_default', type:'income', amount:289346, currency:'JPY', catKey:'salary', subKey:'salary_base', dayOfMonth:10, paymentMethod:'transfer', bizDayAdjust:'before' },
     { id:'rule_rent_default', type:'expense', amount:73440, currency:'JPY', catKey:'housing', subKey:'rent', dayOfMonth:26, paymentMethod:'transfer', bizDayAdjust:'after' },
-    { id:'rule_paidy_default', type:'expense', amount:5272, currency:'JPY', catKey:'telecom', subKey:'phone', dayOfMonth:'last', paymentMethod:'paidy', bizDayAdjust:'after', note:'iPhone' }
+    { id:'rule_paidy_default', type:'expense', amount:5272, currency:'JPY', catKey:'telecom', subKey:'phone', dayOfMonth:'last', paymentMethod:'paidy', bizDayAdjust:'after', note:'iPhone' },
+    { id:'rule_amazon_prime', type:'expense', amount:600, currency:'JPY', catKey:'hobby', subKey:'video', dayOfMonth:'last', paymentMethod:'amazon', bizDayAdjust:'after', note:'Amazon Prime' }
   ];
   async function ensureRecurringEntries(){
     const mk = currentMonthKey();
@@ -2469,6 +2533,39 @@
     if(changed) await saveEntries();
   }
 
+  // 固定隔周收支规则:从 anchorDate 起,每隔 intervalDays 天补一笔,补到今天为止(不含 anchorDate 之前)
+  const RECURRING_BIWEEKLY_RULES = [
+    { id:'rule_pili_video', type:'expense', amount:300, currency:'JPY', catKey:'hobby', subKey:'video', paymentMethod:'merpay', note:'pili', anchorDate:'2026-08-14', intervalDays:14 }
+  ];
+  async function ensureBiweeklyRecurringEntries(){
+    const today = todayStr();
+    let changed = false;
+    RECURRING_BIWEEKLY_RULES.forEach(rule=>{
+      let d = new Date(rule.anchorDate+'T00:00:00');
+      const todayD = new Date(today+'T00:00:00');
+      while(d <= todayD){
+        const dateStr = fmtDateObj(d);
+        const id = 'recur_'+rule.id+'_'+dateStr;
+        if(!entries.find(e=> e.id===id)){
+          const catObj = allCatMap[rule.catKey];
+          const subObj = findSub(catObj, rule.subKey);
+          entries.push({
+            id,
+            type: rule.type, amount: rule.amount, currency: rule.currency,
+            category: catLabel(catObj), catKey: rule.catKey,
+            subCategory: subObj? subLabel(subObj) : '', subKey: rule.subKey,
+            paymentMethod: rule.paymentMethod || 'cash',
+            icon: catObj.icon, note: rule.note || '', date: dateStr,
+            createdAt: Date.now(), recurringId: rule.id
+          });
+          changed = true;
+        }
+        d.setDate(d.getDate() + rule.intervalDays);
+      }
+    });
+    if(changed) await saveEntries();
+  }
+
   async function init(){
     const step = async (name, fn) => {
       try{ await fn(); }
@@ -2482,6 +2579,7 @@
     await step('loadJpHolidayCache', loadJpHolidayCache);
     await step('loadEntries', loadEntries);
     await step('ensureRecurringEntries', ensureRecurringEntries);
+    await step('ensureBiweeklyRecurringEntries', ensureBiweeklyRecurringEntries);
     await step('renderAll', renderAll);
     await step('renderRatePage', renderRatePage);
     fetchRate(false).catch(e=> console.error('汇率初始拉取失败', e));
