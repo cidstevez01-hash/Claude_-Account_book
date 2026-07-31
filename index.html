@@ -167,7 +167,6 @@
   .chart-card{background:var(--card);border:2px solid var(--grid);border-radius:22px 10px 20px 10px;padding:18px 16px;margin-bottom:18px;}
   .card-title{font-size:13px;color:var(--ink-soft);letter-spacing:1px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
   .legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;}
-  .chart-legend{display:flex;gap:14px;font-size:11px;color:var(--ink-soft);align-items:center;}
   .donut-wrap{position:relative;width:150px;height:150px;margin:4px auto 18px;}
   .donut-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
   .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
@@ -312,7 +311,10 @@
       </div>
       <div class="card-title">
         <span id="trendTitle">本月每日收支</span>
-        <span class="chart-legend"><span><span class="legend-dot" style="background:var(--seal)"></span><span id="trendLegendExpense">支出</span></span><span><span class="legend-dot" style="background:var(--jade)"></span><span id="trendLegendIncome">收入</span></span></span>
+        <select class="ym-select" id="trendTypeSelect" style="padding:5px 8px;font-size:12.5px;">
+          <option value="expense" id="trendTypeExpenseOpt">支出</option>
+          <option value="income" id="trendTypeIncomeOpt">收入</option>
+        </select>
       </div>
       <div class="chart-scroll"><svg id="trendChart" style="display:block;"></svg></div>
       <div class="cat-legend-row" id="trendCatLegend"></div>
@@ -1096,8 +1098,8 @@
     $('rateSubLabel').textContent = t('rateSub');
     $('dimDayBtn').textContent = t('dimDay');
     $('dimMonthBtn').textContent = t('dimMonth');
-    $('trendLegendExpense').textContent = t('expenseWord');
-    $('trendLegendIncome').textContent = t('incomeWord');
+    $('trendTypeExpenseOpt').textContent = t('expenseWord');
+    $('trendTypeIncomeOpt').textContent = t('incomeWord');
     $('homeDonutHint').textContent = t('homeDonutHint');
     $('homeTypeExpenseBtn').textContent = t('segExpense');
     $('homeTypeIncomeBtn').textContent = t('segIncome');
@@ -1882,6 +1884,7 @@
     return escapeHtml(cat ? catLabel(cat) : (key || ''));
   }
 
+  let trendChartType = 'expense';
   function renderTrendChart(){
     let buckets;
     if(currentDim==='day'){
@@ -1892,11 +1895,17 @@
       $('trendTitle').textContent = t('trendMonthTitle');
     }
     syncStatsYmSelects();
-    const maxVal = Math.max(1, ...buckets.map(b=>Math.max(b.income,b.expense)));
+    $('trendTypeSelect').value = trendChartType;
+    // 支出/收入各自独立算刻度(不共用一把尺子),不然工资这种大额收入一出现,
+    // 日常小额支出的柱子就被压成看不见的细线;每种只显示一条柱,可以画得更粗
+    const isIncome = trendChartType==='income';
+    const valField = isIncome ? 'income' : 'expense';
+    const catField = isIncome ? 'catIncome' : 'catExpense';
+    const maxVal = Math.max(1, ...buckets.map(b=> b[valField]));
     const scrollElForSize = $('trendChart').parentElement;
     const chartH = Math.max(160, Math.round(scrollElForSize && scrollElForSize.clientHeight) || 190);
-    const top=14, base=chartH-40, barW=13, barGap=3, groupPad=13;
-    const groupW = barW*2+barGap+groupPad;
+    const top=14, base=chartH-40, barW=20, barGap=10;
+    const groupW = barW+barGap;
     const totalW = Math.max(300, buckets.length*groupW+20);
     const svgEl = $('trendChart');
     svgEl.setAttribute('viewBox', `0 0 ${totalW} ${chartH}`);
@@ -1904,33 +1913,34 @@
     svgEl.style.width = totalW+'px';
 
     let svg = `<line x1="8" y1="${base}" x2="${totalW-8}" y2="${base}" stroke="var(--grid)" stroke-width="1"/>`;
-    const expTotals={}, incTotals={};
+    const totals = {};
     buckets.forEach((b,i)=>{
       const x0 = 10 + i*groupW;
       let y = base;
-      Object.entries(b.catExpense).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
-        expTotals[k]=(expTotals[k]||0)+v;
+      Object.entries(b[catField]).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
+        totals[k]=(totals[k]||0)+v;
         const h = (v/maxVal)*(base-top);
-        svg += `<rect x="${x0}" y="${(y-h).toFixed(1)}" width="${barW}" height="${h.toFixed(1)}" fill="${colorForKey(k,0)}"/>`;
+        svg += `<rect x="${x0}" y="${(y-h).toFixed(1)}" width="${barW}" height="${h.toFixed(1)}" rx="4" fill="${colorForKey(k, isIncome?1:0)}"/>`;
         y -= h;
       });
-      let y2 = base;
-      Object.entries(b.catIncome).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
-        incTotals[k]=(incTotals[k]||0)+v;
-        const h = (v/maxVal)*(base-top);
-        svg += `<rect x="${x0+barW+barGap}" y="${(y2-h).toFixed(1)}" width="${barW}" height="${h.toFixed(1)}" fill="${colorForKey(k,1)}"/>`;
-        y2 -= h;
-      });
-      svg += `<text x="${x0+barW+barGap/2}" y="${base+16}" font-size="9" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
+      svg += `<text x="${x0+barW/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
     });
     svgEl.innerHTML = svg;
-    // 默认横向滚到最新一段(今天/今年最近的柱子),不然数据都在右边、左边一长串空白看着像是坏了
+    // 滚到"当前选中类型"最后一笔有数据的那一段,而不是无脑滚到最右边——
+    // 比如切到"收入"看,发薪日往往在月中,滚到月末反而看不到工资那根柱子
     const scrollEl = svgEl.parentElement;
-    if(scrollEl) scrollEl.scrollLeft = scrollEl.scrollWidth;
+    if(scrollEl){
+      let lastNonZeroIdx = -1;
+      buckets.forEach((b,i)=>{ if(b[valField] > 0) lastNonZeroIdx = i; });
+      if(lastNonZeroIdx >= 0){
+        const groupRight = 10 + (lastNonZeroIdx+1)*groupW;
+        scrollEl.scrollLeft = Math.max(0, groupRight - scrollEl.clientWidth + 24);
+      }else{
+        scrollEl.scrollLeft = scrollEl.scrollWidth;
+      }
+    }
 
-    const merged = {...expTotals};
-    Object.entries(incTotals).forEach(([k,v])=> merged[k]=(merged[k]||0)+v);
-    const legendKeys = Object.entries(merged).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k])=>k);
+    const legendKeys = Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k])=>k);
     $('trendCatLegend').innerHTML = legendKeys.map((k,i)=>
       `<span class="item"><span class="legend-dot" style="background:${colorForKey(k,i)}"></span>${labelForKey(k)}</span>`
     ).join('');
@@ -1965,6 +1975,10 @@
   });
   $('trendMonthSelect').addEventListener('change', ()=>{
     statsDayMonth = parseInt($('trendMonthSelect').value, 10);
+    renderTrendChart();
+  });
+  $('trendTypeSelect').addEventListener('change', ()=>{
+    trendChartType = $('trendTypeSelect').value;
     renderTrendChart();
   });
 
