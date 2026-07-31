@@ -288,7 +288,12 @@
 
   <div class="page" id="pageStats">
     <div class="header">
+      <div class="washi-tape"></div>
       <div><h1 id="statsTitleText" class="papercut">统计</h1></div>
+      <div class="header-right">
+        <button type="button" class="icon-btn" id="settingsBtn2"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
+        <div class="seal" id="sealBadge2">总</div>
+      </div>
     </div>
     <div class="segment" id="dimSegment">
       <button type="button" class="active" data-dim="day" id="dimDayBtn">按日对比</button>
@@ -311,7 +316,12 @@
 
   <div class="page" id="pageRate">
     <div class="header">
+      <div class="washi-tape"></div>
       <div><h1 id="rateTitleText" class="papercut">汇率</h1><div class="month" id="rateSubLabel">人民币 → 日元</div></div>
+      <div class="header-right">
+        <button type="button" class="icon-btn" id="settingsBtn3"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
+        <div class="seal" id="sealBadge3">总</div>
+      </div>
     </div>
     <div class="segment" id="rateDirSegment">
       <button type="button" class="active" data-dir="CNY_JPY" id="dirCnyJpyBtn">人民币→日元</button>
@@ -1223,7 +1233,10 @@
     $('balanceAmount').textContent = fmtCur(income-expense, settings.currency);
 
     const total = entries.reduce((s,e)=> s + (e.type==='income'?1:-1)*toBase(e.amount, e.currency||'CNY', e.date), 0);
-    $('sealBadge').textContent = total>=0 ? t('surplus') : t('deficit');
+    const sealText = total>=0 ? t('surplus') : t('deficit');
+    $('sealBadge').textContent = sealText;
+    $('sealBadge2').textContent = sealText;
+    $('sealBadge3').textContent = sealText;
 
     const listArea = $('listArea');
     if(entries.length===0){
@@ -1625,7 +1638,10 @@
 
   $('fabAdd').addEventListener('click', openSheet);
   $('overlay').addEventListener('click', closeAllSheets);
-  $('settingsBtn').addEventListener('click', ()=>{ $('overlay').classList.add('show'); $('settingsSheet').classList.add('show'); });
+  function openSettingsSheet(){ $('overlay').classList.add('show'); $('settingsSheet').classList.add('show'); }
+  $('settingsBtn').addEventListener('click', openSettingsSheet);
+  $('settingsBtn2').addEventListener('click', openSettingsSheet);
+  $('settingsBtn3').addEventListener('click', openSettingsSheet);
   $('sheetCloseBtn').addEventListener('click', closeAllSheets);
   $('catPickerCloseBtn').addEventListener('click', closeAllSheets);
   $('settingsCloseBtn').addEventListener('click', closeAllSheets);
