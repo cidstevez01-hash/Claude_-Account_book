@@ -1871,6 +1871,9 @@
       svg += `<text x="${x0+barW+barGap/2}" y="${base+16}" font-size="9" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
     });
     svgEl.innerHTML = svg;
+    // 默认横向滚到最新一段(今天/今年最近的柱子),不然数据都在右边、左边一长串空白看着像是坏了
+    const scrollEl = svgEl.parentElement;
+    if(scrollEl) scrollEl.scrollLeft = scrollEl.scrollWidth;
 
     const merged = {...expTotals};
     Object.entries(incTotals).forEach(([k,v])=> merged[k]=(merged[k]||0)+v);
