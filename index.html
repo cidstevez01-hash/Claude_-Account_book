@@ -152,6 +152,7 @@
   .row2 .text-row input[type="date"]{width:100%;}
   .save-btn{width:100%;padding:15px;border:none;border-radius:14px;background:var(--ink);color:#FFFDF8;font-size:16px;font-weight:600;font-family:'Noto Sans SC',sans-serif;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform 0.12s ease, opacity 0.12s ease;}
   .save-btn .hd-icon{width:18px;height:18px;}
+  .text-link-btn{display:block;width:100%;background:none;border:none;padding:10px 4px 2px;font-size:12.5px;color:var(--seal);font-family:'Noto Sans SC',sans-serif;text-align:center;}
   .save-btn:active{opacity:0.85;transform:scale(0.98);} .save-btn:disabled{opacity:0.5;}
   @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
   .spin-icon{display:inline-block;animation:spin 0.8s linear infinite;}
@@ -452,11 +453,18 @@
 
   <div class="field-label" id="cloudSyncFieldLabel">实时云同步（测试中）</div>
   <div id="cloudSyncSignedOutBlock">
-    <div class="text-row"><input type="email" id="cloudEmailInput" autocomplete="email" placeholder=""></div>
-    <div class="text-row"><input type="password" id="cloudPasswordInput" autocomplete="current-password" placeholder=""></div>
-    <div class="row2" style="margin-bottom:8px;">
-      <button type="button" class="save-btn" id="cloudSignInBtn" style="flex:1;margin-top:0;padding:11px 4px;font-size:13px;background:var(--jade);"></button>
-      <button type="button" class="save-btn" id="cloudSignUpBtn" style="flex:1;margin-top:0;padding:11px 4px;font-size:13px;background:var(--ink);"></button>
+    <div id="cloudSigninModeBlock">
+      <div class="text-row"><input type="email" id="cloudEmailInput" autocomplete="email" placeholder=""></div>
+      <div class="text-row"><input type="password" id="cloudPasswordInput" autocomplete="current-password" placeholder=""></div>
+      <button type="button" class="save-btn" id="cloudSignInBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--jade);"></button>
+      <button type="button" class="text-link-btn" id="goToSignUpBtn"></button>
+    </div>
+    <div id="cloudSignupModeBlock" style="display:none;">
+      <div class="text-row"><input type="email" id="cloudSignupEmailInput" autocomplete="email" placeholder=""></div>
+      <div class="text-row"><input type="password" id="cloudSignupPasswordInput" autocomplete="new-password" placeholder=""></div>
+      <div class="text-row"><input type="password" id="cloudSignupPassword2Input" autocomplete="new-password" placeholder=""></div>
+      <button type="button" class="save-btn" id="cloudSignUpBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--ink);"></button>
+      <button type="button" class="text-link-btn" id="goToSignInBtn"></button>
     </div>
   </div>
   <div id="cloudSyncSignedInBlock" style="display:none;">
@@ -517,12 +525,16 @@
       restoreConfirm:'从云端恢复将覆盖本机当前所有记账数据，确定继续吗？', restoreSuccess:'恢复成功',
       restoreErrorNotFound:'找不到该 Gist，请检查 Token 和 Gist ID', restoreErrorParse:'备份内容已损坏，无法恢复',
       backupHelpText:'在 GitHub 网页 Settings → Developer settings → Personal access tokens → Tokens (classic) 里新建一个 token，只勾选 gist 权限即可。之后每次记账会自动同步到你自己的私密 Gist；换设备时把 Token 和 Gist ID 填回来即可恢复。',
-      cloudSyncFieldLabel:'实时云同步（测试中）', cloudEmailPlaceholder:'邮箱', cloudPasswordPlaceholder:'密码（至少6位）',
-      cloudSignInBtn:'登录', cloudSignUpBtn:'注册新账号', cloudSignOutBtn:'退出登录',
+      cloudSyncFieldLabel:'实时云同步（测试中）', cloudEmailPlaceholder:'邮箱', cloudPasswordPlaceholder:'密码',
+      cloudSignupPasswordPlaceholder:'设置密码（至少6位）', cloudSignupPassword2Placeholder:'再次输入密码',
+      cloudSignInBtn:'登录', cloudSignUpBtn:'注册', cloudSignOutBtn:'退出登录',
+      goToSignUpBtn:'没有账号？去注册', goToSignInBtn:'已有账号？去登录',
       cloudSyncHelpText:'注册/登录后，记账数据会自动实时同步到云端，换设备用同一账号登录即可看到最新数据，不用再手动备份/恢复。',
       cloudSyncStatusSignedIn:'{email} 已登录，自动实时同步中',
       cloudNeedEmailPass:'请填写邮箱和密码', cloudAuthError:'邮箱或密码不对，或该邮箱尚未注册',
       cloudSignUpError:'注册失败：{msg}', cloudSignUpNeedConfirm:'注册成功，请去邮箱点确认链接后再登录',
+      cloudSignUpSuccessGoLogin:'注册成功，请用刚才的邮箱和密码登录',
+      cloudPasswordMismatch:'两次输入的密码不一致', cloudPasswordTooShort:'密码至少需要6位',
       cloudSyncError:'同步失败，请检查网络后重试',
       cloudMergeConfirm:'这个账号在云端已经有数据了，登录后将用云端最新数据覆盖本机当前记录，确定继续吗？',
       cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
@@ -562,12 +574,16 @@
       restoreConfirm:'クラウドから復元すると、この端末の記録がすべて上書きされます。続けますか？', restoreSuccess:'復元しました',
       restoreErrorNotFound:'Gist が見つかりません。トークンと Gist ID をご確認ください', restoreErrorParse:'バックアップの内容が壊れていて復元できません',
       backupHelpText:'GitHub の Settings → Developer settings → Personal access tokens → Tokens (classic) で、gist 権限のみを付けた新しいトークンを作成してください。以降は記録するたびに自分専用の非公開 Gist へ自動同期されます。機種変更時はトークンと Gist ID を入力すれば復元できます。',
-      cloudSyncFieldLabel:'リアルタイム同期（テスト中）', cloudEmailPlaceholder:'メールアドレス', cloudPasswordPlaceholder:'パスワード（6文字以上）',
-      cloudSignInBtn:'ログイン', cloudSignUpBtn:'新規登録', cloudSignOutBtn:'ログアウト',
+      cloudSyncFieldLabel:'リアルタイム同期（テスト中）', cloudEmailPlaceholder:'メールアドレス', cloudPasswordPlaceholder:'パスワード',
+      cloudSignupPasswordPlaceholder:'パスワードを設定（6文字以上）', cloudSignupPassword2Placeholder:'パスワード（確認用）',
+      cloudSignInBtn:'ログイン', cloudSignUpBtn:'登録', cloudSignOutBtn:'ログアウト',
+      goToSignUpBtn:'アカウントをお持ちでないですか？新規登録', goToSignInBtn:'すでにアカウントをお持ちですか？ログイン',
       cloudSyncHelpText:'登録・ログインすると、記録が自動的にクラウドへリアルタイム同期されます。他の端末で同じアカウントにログインすれば最新データがすぐ反映され、手動でのバックアップ・復元は不要です。',
       cloudSyncStatusSignedIn:'{email} でログイン中・自動同期しています',
       cloudNeedEmailPass:'メールアドレスとパスワードを入力してください', cloudAuthError:'メールアドレスかパスワードが違うか、未登録です',
       cloudSignUpError:'登録に失敗しました：{msg}', cloudSignUpNeedConfirm:'登録が完了しました。メール内の確認リンクを開いてからログインしてください',
+      cloudSignUpSuccessGoLogin:'登録が完了しました。今のメールアドレスとパスワードでログインしてください',
+      cloudPasswordMismatch:'入力したパスワードが一致しません', cloudPasswordTooShort:'パスワードは6文字以上にしてください',
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
       cloudMergeConfirm:'このアカウントには既にクラウド上にデータがあります。ログインするとクラウドの最新データでこの端末の記録を上書きします。続けますか？',
       cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
@@ -1179,9 +1195,14 @@
     $('cloudSyncFieldLabel').textContent = t('cloudSyncFieldLabel');
     $('cloudEmailInput').placeholder = t('cloudEmailPlaceholder');
     $('cloudPasswordInput').placeholder = t('cloudPasswordPlaceholder');
+    $('cloudSignupEmailInput').placeholder = t('cloudEmailPlaceholder');
+    $('cloudSignupPasswordInput').placeholder = t('cloudSignupPasswordPlaceholder');
+    $('cloudSignupPassword2Input').placeholder = t('cloudSignupPassword2Placeholder');
     $('cloudSignInBtn').textContent = t('cloudSignInBtn');
     $('cloudSignUpBtn').textContent = t('cloudSignUpBtn');
     $('cloudSignOutBtn').textContent = t('cloudSignOutBtn');
+    $('goToSignUpBtn').textContent = t('goToSignUpBtn');
+    $('goToSignInBtn').textContent = t('goToSignInBtn');
     $('cloudSyncHelpText').textContent = t('cloudSyncHelpText');
     renderCloudSyncStatus();
     if(document.activeElement !== $('githubTokenInput')) $('githubTokenInput').value = settings.githubToken || '';
@@ -1912,6 +1933,13 @@
     renderBackupLockState();
     $('githubTokenInput').focus();
   });
+  function setCloudAuthMode(mode){
+    $('cloudSigninModeBlock').style.display = mode==='signup' ? 'none' : 'block';
+    $('cloudSignupModeBlock').style.display = mode==='signup' ? 'block' : 'none';
+  }
+  $('goToSignUpBtn').addEventListener('click', ()=> setCloudAuthMode('signup'));
+  $('goToSignInBtn').addEventListener('click', ()=> setCloudAuthMode('signin'));
+
   $('cloudSignInBtn').addEventListener('click', async ()=>{
     if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
     const email = $('cloudEmailInput').value.trim();
@@ -1922,6 +1950,9 @@
       if(error) throw error;
       $('cloudPasswordInput').value = '';
       await handleCloudSignedIn(data.user);
+      // 登录成功后跳回家计簿首页,而不是让用户停在设置页的登录表单上
+      closeAllSheets();
+      switchToPage('ledger');
     }catch(e){
       console.error('登录失败', e);
       showToast(t('cloudAuthError'));
@@ -1929,18 +1960,31 @@
   });
   $('cloudSignUpBtn').addEventListener('click', async ()=>{
     if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
-    const email = $('cloudEmailInput').value.trim();
-    const pass = $('cloudPasswordInput').value;
-    if(!email || !pass){ showToast(t('cloudNeedEmailPass')); return; }
+    const email = $('cloudSignupEmailInput').value.trim();
+    const pass = $('cloudSignupPasswordInput').value;
+    const pass2 = $('cloudSignupPassword2Input').value;
+    if(!email || !pass || !pass2){ showToast(t('cloudNeedEmailPass')); return; }
+    if(pass.length < 6){ showToast(t('cloudPasswordTooShort')); return; }
+    if(pass !== pass2){ showToast(t('cloudPasswordMismatch')); return; }
     try{
       const { data, error } = await supabaseClient.auth.signUp({ email, password: pass });
       if(error) throw error;
-      $('cloudPasswordInput').value = '';
-      if(data.session && data.user){
-        await handleCloudSignedIn(data.user);
-      }else{
-        showToast(t('cloudSignUpNeedConfirm'));
+      $('cloudSignupPasswordInput').value = '';
+      $('cloudSignupPassword2Input').value = '';
+      if(data.session){
+        // 邮箱确认已关闭时 Supabase 会直接返回一个已登录的会话,
+        // 但按需求这里要求用户重新手动登录一次确认账号密码没问题,而不是静默直接进入
+        try{ await supabaseClient.auth.signOut(); }catch(e){}
       }
+      if(data.user && !data.user.confirmed_at && !data.session){
+        showToast(t('cloudSignUpNeedConfirm'));
+      }else{
+        showToast(t('cloudSignUpSuccessGoLogin'));
+      }
+      $('cloudEmailInput').value = email;
+      $('cloudSignupEmailInput').value = '';
+      setCloudAuthMode('signin');
+      $('cloudPasswordInput').focus();
     }catch(e){
       console.error('注册失败', e);
       showToast(t('cloudSignUpError').replace('{msg}', (e&&e.message)||''));
@@ -1950,6 +1994,7 @@
     if(supabaseClient){ try{ await supabaseClient.auth.signOut(); }catch(e){ console.error('退出登录失败', e); } }
     cloudUser = null;
     stopCloudRealtime();
+    setCloudAuthMode('signin');
     renderCloudSyncStatus();
   });
 
