@@ -509,25 +509,29 @@
   <div class="field-label" id="cloudSyncFieldLabel">实时云同步（测试中）</div>
   <div id="cloudSyncSignedOutBlock">
     <div id="cloudSigninModeBlock">
-      <div class="text-row"><input type="email" id="cloudEmailInput" autocomplete="email" placeholder=""></div>
-      <div class="text-row pw-field-wrap">
-        <input type="password" id="cloudPasswordInput" autocomplete="current-password" placeholder="">
-        <button type="button" class="pw-eye-btn" data-target="cloudPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
-      </div>
-      <button type="button" class="save-btn" id="cloudSignInBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--jade);"></button>
+      <form id="cloudSigninForm">
+        <div class="text-row"><input type="email" id="cloudEmailInput" autocomplete="email" placeholder=""></div>
+        <div class="text-row pw-field-wrap">
+          <input type="password" id="cloudPasswordInput" autocomplete="current-password" placeholder="">
+          <button type="button" class="pw-eye-btn" data-target="cloudPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+        </div>
+        <button type="submit" class="save-btn" id="cloudSignInBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--jade);"></button>
+      </form>
       <button type="button" class="text-link-btn" id="goToSignUpBtn"></button>
     </div>
     <div id="cloudSignupModeBlock" style="display:none;">
-      <div class="text-row"><input type="email" id="cloudSignupEmailInput" autocomplete="email" placeholder=""></div>
-      <div class="text-row pw-field-wrap">
-        <input type="password" id="cloudSignupPasswordInput" autocomplete="new-password" placeholder="">
-        <button type="button" class="pw-eye-btn" data-target="cloudSignupPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
-      </div>
-      <div class="text-row pw-field-wrap">
-        <input type="password" id="cloudSignupPassword2Input" autocomplete="new-password" placeholder="">
-        <button type="button" class="pw-eye-btn" data-target="cloudSignupPassword2Input"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
-      </div>
-      <button type="button" class="save-btn" id="cloudSignUpBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--ink);"></button>
+      <form id="cloudSignupForm">
+        <div class="text-row"><input type="email" id="cloudSignupEmailInput" autocomplete="email" placeholder=""></div>
+        <div class="text-row pw-field-wrap">
+          <input type="password" id="cloudSignupPasswordInput" autocomplete="new-password" placeholder="">
+          <button type="button" class="pw-eye-btn" data-target="cloudSignupPasswordInput"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+        </div>
+        <div class="text-row pw-field-wrap">
+          <input type="password" id="cloudSignupPassword2Input" autocomplete="new-password" placeholder="">
+          <button type="button" class="pw-eye-btn" data-target="cloudSignupPassword2Input"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-eye"/></svg></button>
+        </div>
+        <button type="submit" class="save-btn" id="cloudSignUpBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--ink);"></button>
+      </form>
       <button type="button" class="text-link-btn" id="goToSignInBtn"></button>
     </div>
     <div id="cloudVerifyModeBlock" style="display:none;">
@@ -2120,7 +2124,8 @@
   $('goToSignInBtn').addEventListener('click', ()=> setCloudAuthMode('signin'));
   $('cloudBackToSignupBtn').addEventListener('click', ()=>{ pendingVerifyEmail=''; setCloudAuthMode('signup'); });
 
-  $('cloudSignInBtn').addEventListener('click', async ()=>{
+  $('cloudSigninForm').addEventListener('submit', async (ev)=>{
+    ev.preventDefault();
     if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
     const email = $('cloudEmailInput').value.trim();
     const pass = $('cloudPasswordInput').value;
@@ -2139,7 +2144,8 @@
       showToast(t('cloudAuthError'));
     }
   });
-  $('cloudSignUpBtn').addEventListener('click', async ()=>{
+  $('cloudSignupForm').addEventListener('submit', async (ev)=>{
+    ev.preventDefault();
     if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
     const email = $('cloudSignupEmailInput').value.trim();
     const pass = $('cloudSignupPasswordInput').value;
