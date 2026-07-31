@@ -286,7 +286,7 @@
 
   <div class="page" id="pageStats">
     <div class="header">
-      <div><h1 id="statsTitleText" class="papercut">统计</h1><div class="month" id="statsSubLabel">收支分析</div></div>
+      <div><h1 id="statsTitleText" class="papercut">统计</h1></div>
     </div>
     <div class="segment" id="dimSegment">
       <button type="button" class="active" data-dim="day" id="dimDayBtn">按日对比</button>
@@ -451,7 +451,7 @@
       today:'今天', yesterday:'昨天', thisMonth:'本月', lastMonth:'上月',
       expenseWord:'支出', incomeWord:'收入', newIncrease:'新增', delete:'删除', edit:'编辑', copy:'复制',
       surplus:'盈', deficit:'亏',
-      statsTitle:'统计', statsSub:'收支分析', dimDay:'按日对比', dimMonth:'按月对比',
+      statsTitle:'统计', dimDay:'按日对比', dimMonth:'按月对比',
       trendDayTitle:'本月每日收支', trendMonthTitle:'本年每月收支',
       typeExpense:'支出构成', typeIncome:'收入构成',
       homeDonutHint:'点击查看本月明细 ›', monthDetailTitle:'本月明细', detailWord:'明细',
@@ -482,13 +482,13 @@
       deleteConfirm:'确定删除「{info}」这条记录吗？删除后无法恢复。'
     },
     ja:{
-      appTitle:'家計簿', tabLedger:'家計簿', tabStats:'レポート', tabRate:'為替',
+      appTitle:'家計簿', tabLedger:'家計簿', tabStats:'集計', tabRate:'為替',
       balanceLabel:'今月の残高', monthIncome:'今月の収入', monthExpense:'今月の支出',
       emptyLine1:'この家計簿はまだ空です', emptyLine2:'右下のボタンから記録しましょう',
       today:'今日', yesterday:'昨日', thisMonth:'今月', lastMonth:'先月',
       expenseWord:'支出', incomeWord:'収入', newIncrease:'新規', delete:'削除', edit:'編集', copy:'コピー',
       surplus:'黒字', deficit:'赤字',
-      statsTitle:'レポート', statsSub:'収支分析', dimDay:'日別比較', dimMonth:'月別比較',
+      statsTitle:'集計', dimDay:'日別比較', dimMonth:'月別比較',
       trendDayTitle:'今月の日別収支', trendMonthTitle:'今年の月別収支',
       typeExpense:'支出内訳', typeIncome:'収入内訳',
       homeDonutHint:'タップして今月の明細を見る ›', monthDetailTitle:'今月の明細', detailWord:'明細',
@@ -1029,7 +1029,6 @@
     $('tabStatsLabel').textContent = t('tabStats');
     $('tabRateLabel').textContent = t('tabRate');
     $('statsTitleText').textContent = t('statsTitle');
-    $('statsSubLabel').textContent = t('statsSub');
     $('rateTitleText').textContent = t('rateTitle');
     $('rateSubLabel').textContent = t('rateSub');
     $('dimDayBtn').textContent = t('dimDay');
