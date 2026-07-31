@@ -39,7 +39,9 @@
   .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
   #pageLedger{ padding-bottom:60px; }
   .page{display:none;}
-  .page.active{display:flex; flex-direction:column; justify-content:center; min-height:calc(100svh - var(--safe-top) - var(--safe-bottom) - 108px);}
+  /* +1px 是故意留的:如果内容高度正好等于可视区域高度(完全不能滚动),部分iOS版本
+     会把底部的固定导航栏渲染错位、留出一道空白;让页面必定比一屏略高一点点就不会触发这个问题 */
+  .page.active{display:flex; flex-direction:column; justify-content:center; min-height:calc(100svh - var(--safe-top) - var(--safe-bottom) - 108px + 1px);}
   .header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; position:relative;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
   .header .month{font-size:13px; color:var(--ink-soft); margin-top:4px;}
@@ -93,10 +95,10 @@
   .action-btn:active{opacity:0.7;}
   .empty{text-align:center;padding:60px 20px;color:var(--ink-soft);}
   .empty .big{margin-bottom:10px;} .empty .big .hd-icon{width:40px;height:40px;color:var(--ink-faint);} .empty p{font-size:14px;line-height:1.6;margin:0;}
-  .fab{position:fixed;right: max(20px, calc(50% - 240px + 20px));bottom: calc(var(--safe-bottom) + 78px);width:58px;height:58px;border-radius:50%;background:var(--seal);color:#fff;border:none;font-size:28px;box-shadow:0 4px 0 var(--seal-soft), 0 6px 16px rgba(58,47,40,0.28);display:flex;align-items:center;justify-content:center;z-index:20;}
+  .fab{position:fixed;right: max(20px, calc(50% - 240px + 20px));bottom: calc(var(--safe-bottom) + 78px);width:58px;height:58px;border-radius:50%;background:var(--seal);color:#fff;border:none;font-size:28px;box-shadow:0 4px 0 var(--seal-soft), 0 6px 16px rgba(58,47,40,0.28);display:flex;align-items:center;justify-content:center;z-index:20;transform:translateZ(0);-webkit-transform:translateZ(0);}
   .fab .hd-icon{width:24px;height:24px;}
-  .fab:active{transform:scale(0.94);}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:var(--card);border-top:2px dashed var(--grid);display:flex;padding:6px 6px calc(var(--safe-bottom));gap:6px;z-index:15;}
+  .fab:active{transform:scale(0.94) translateZ(0);}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:var(--card);border-top:2px dashed var(--grid);display:flex;padding:6px 6px calc(var(--safe-bottom));gap:6px;z-index:15;transform:translateZ(0);-webkit-transform:translateZ(0);}
   .tab-btn{flex:1;background:none;border:none;padding:8px 0 6px;margin:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;position:relative;transition:background 0.2s ease, color 0.2s ease;}
   .tab-btn .hd-icon{width:20px;height:20px;display:inline-block;transition:transform 0.22s cubic-bezier(.34,1.56,.64,1);}
   .tab-btn.active{background:rgba(209,102,90,0.16);color:var(--seal);}
