@@ -448,7 +448,16 @@
     <button type="button" class="save-btn" id="backupNowBtn" style="flex:1;margin-top:0;padding:13px 4px;font-size:13.5px;background:var(--jade);"></button>
     <button type="button" class="save-btn" id="restoreNowBtn" style="flex:1;margin-top:0;padding:13px 4px;font-size:13.5px;background:var(--seal);"></button>
   </div>
-  <div id="backupHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;"></div>
+  <div id="backupHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:18px;"></div>
+  <div class="field-label" id="setupCodeFieldLabel">换设备同步（配置码）</div>
+  <div class="row2" style="margin-bottom:8px;">
+    <button type="button" class="save-btn" id="copySetupCodeBtn" style="flex:1;margin-top:0;padding:11px 4px;font-size:13px;background:var(--ink);"></button>
+  </div>
+  <div class="text-row" style="display:flex;gap:8px;align-items:center;">
+    <input type="text" id="setupCodeInput" autocomplete="off" style="flex:1;">
+    <button type="button" class="save-btn" id="importSetupCodeBtn" style="margin-top:0;flex-shrink:0;padding:11px 16px;font-size:13px;white-space:nowrap;"></button>
+  </div>
+  <div id="setupCodeHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;"></div>
 </div>
 
 <div class="sheet" id="monthDetailSheet" style="max-height:92vh;">
@@ -501,6 +510,12 @@
       restoreConfirm:'从云端恢复将覆盖本机当前所有记账数据，确定继续吗？', restoreSuccess:'恢复成功',
       restoreErrorNotFound:'找不到该 Gist，请检查 Token 和 Gist ID', restoreErrorParse:'备份内容已损坏，无法恢复',
       backupHelpText:'在 GitHub 网页 Settings → Developer settings → Personal access tokens → Tokens (classic) 里新建一个 token，只勾选 gist 权限即可。之后每次记账会自动同步到你自己的私密 Gist；换设备时把 Token 和 Gist ID 填回来即可恢复。',
+      setupCodeFieldLabel:'换设备同步（配置码）', copySetupCodeBtn:'复制配置码', importSetupCodeBtn:'导入',
+      setupCodeInputPlaceholder:'粘贴从其他设备复制的配置码',
+      setupCodeHelpText:'配置码里打包了 Token 和 Gist ID，不用两个分开抄。在这台设备点"复制配置码"，到新设备粘贴进输入框再点"导入"即可，不用重新生成 Token。',
+      setupCodeCopied:'配置码已复制，去新设备粘贴即可', setupCodeCopyFailed:'复制失败，请检查浏览器权限',
+      setupCodeEmpty:'请先填写并成功备份一次，再复制配置码', setupCodeImported:'导入成功，可以点"立即备份"验证',
+      setupCodeInvalid:'配置码格式不对，请确认完整复制',
       deleteConfirm:'确定删除「{info}」这条记录吗？删除后无法恢复。'
     },
     ja:{
@@ -537,6 +552,12 @@
       restoreConfirm:'クラウドから復元すると、この端末の記録がすべて上書きされます。続けますか？', restoreSuccess:'復元しました',
       restoreErrorNotFound:'Gist が見つかりません。トークンと Gist ID をご確認ください', restoreErrorParse:'バックアップの内容が壊れていて復元できません',
       backupHelpText:'GitHub の Settings → Developer settings → Personal access tokens → Tokens (classic) で、gist 権限のみを付けた新しいトークンを作成してください。以降は記録するたびに自分専用の非公開 Gist へ自動同期されます。機種変更時はトークンと Gist ID を入力すれば復元できます。',
+      setupCodeFieldLabel:'機種変更用の同期コード', copySetupCodeBtn:'コードをコピー', importSetupCodeBtn:'読み込む',
+      setupCodeInputPlaceholder:'他の端末でコピーしたコードを貼り付け',
+      setupCodeHelpText:'このコードにはトークンと Gist ID がまとめて入っています。この端末で「コードをコピー」を押し、新しい端末に貼り付けて「読み込む」を押すだけで、トークンを作り直さずに復元できます。',
+      setupCodeCopied:'コードをコピーしました。新しい端末で貼り付けてください', setupCodeCopyFailed:'コピーに失敗しました。ブラウザの権限をご確認ください',
+      setupCodeEmpty:'先にトークンを入力してバックアップを一度成功させてください', setupCodeImported:'読み込みました。「今すぐバックアップ」で確認できます',
+      setupCodeInvalid:'コードの形式が正しくありません。全体をコピーできているかご確認ください',
       deleteConfirm:'「{info}」を削除しますか？削除すると元に戻せません。'
     }
   };
@@ -827,6 +848,17 @@
   function buildBackupPayload(){
     const safeSettings = {lang: settings.lang, currency: settings.currency};
     return JSON.stringify({version:1, exportedAt: Date.now(), entries, settings: safeSettings, customSubs: customSubsMap}, null, 2);
+  }
+  // Token/Gist ID 换设备同步:故意不放进 Gist 备份内容里(那会把开门的钥匙锁进保险箱本身),
+  // 而是打包成一段本机复制、到新设备粘贴的配置码,只在这台设备和用户的剪贴板之间走
+  function buildSetupCode(){
+    return btoa(unescape(encodeURIComponent((settings.githubToken||'')+'|'+(settings.gistId||''))));
+  }
+  function parseSetupCode(code){
+    const decoded = decodeURIComponent(escape(atob(code.trim())));
+    const idx = decoded.indexOf('|');
+    if(idx<0) throw new Error('bad format');
+    return { token: decoded.slice(0,idx), gistId: decoded.slice(idx+1) };
   }
   async function pushBackupToGist(manual){
     const token = (settings.githubToken||'').trim();
@@ -1141,6 +1173,11 @@
     $('backupNowBtn').textContent = t('backupNowBtn');
     $('restoreNowBtn').textContent = t('restoreNowBtn');
     $('backupHelpText').textContent = t('backupHelpText');
+    $('setupCodeFieldLabel').textContent = t('setupCodeFieldLabel');
+    $('copySetupCodeBtn').textContent = t('copySetupCodeBtn');
+    $('importSetupCodeBtn').textContent = t('importSetupCodeBtn');
+    $('setupCodeInput').placeholder = t('setupCodeInputPlaceholder');
+    $('setupCodeHelpText').textContent = t('setupCodeHelpText');
     if(document.activeElement !== $('githubTokenInput')) $('githubTokenInput').value = settings.githubToken || '';
     if(document.activeElement !== $('gistIdInput')) $('gistIdInput').value = settings.gistId || '';
     renderBackupStatus();
@@ -1748,6 +1785,36 @@
     await saveSettings();
     renderBackupLockState();
     $('githubTokenInput').focus();
+  });
+  $('copySetupCodeBtn').addEventListener('click', async ()=>{
+    if(!(settings.githubToken||'').trim()){ showToast(t('setupCodeEmpty')); return; }
+    try{
+      await navigator.clipboard.writeText(buildSetupCode());
+      showToast(t('setupCodeCopied'));
+    }catch(e){
+      console.error('复制配置码失败', e);
+      showToast(t('setupCodeCopyFailed'));
+    }
+  });
+  $('importSetupCodeBtn').addEventListener('click', async ()=>{
+    const code = $('setupCodeInput').value.trim();
+    if(!code) return;
+    try{
+      const { token, gistId } = parseSetupCode(code);
+      if(!token) throw new Error('empty token');
+      settings.githubToken = token;
+      settings.gistId = gistId || '';
+      settings.tokenLocked = false;
+      await saveSettings();
+      $('githubTokenInput').value = settings.githubToken;
+      $('gistIdInput').value = settings.gistId;
+      $('setupCodeInput').value = '';
+      renderBackupLockState();
+      showToast(t('setupCodeImported'));
+    }catch(e){
+      console.error('导入配置码失败', e);
+      showToast(t('setupCodeInvalid'));
+    }
   });
 
   // ---------- Tabs ----------
