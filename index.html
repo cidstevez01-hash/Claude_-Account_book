@@ -2657,6 +2657,12 @@
     await step('loadRateCache', loadRateCache);
     await step('loadJpHolidayCache', loadJpHolidayCache);
     await step('loadEntries', loadEntries);
+    // initCloudSync 必须放在生成固定收支之前:
+    // 如果先生成本月固定收支再等云端同步,云端此时还没有这条新记录、cloudUser 也还没设好,
+    // scheduleCloudPush() 会静默跳过推送,随后 initCloudSync 拉回旧的云端数据又会把刚生成的这条覆盖掉,
+    // 等于这条固定收支既没推上数据库、本机也丢了。先同步好云端最新状态,再在这个基础上生成本月还缺的固定收支,
+    // 这样生成出来的新记录才能正常推送到数据库。
+    await step('initCloudSync', initCloudSync);
     await step('ensureRecurringEntries', ensureRecurringEntries);
     await step('ensureBiweeklyRecurringEntries', ensureBiweeklyRecurringEntries);
     await step('renderAll', renderAll);
@@ -2664,7 +2670,6 @@
     fetchRate(false).catch(e=> console.error('汇率初始拉取失败', e));
     ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
     fetchJpHolidays().catch(e=> console.error('日本の祝日データ取得失敗', e));
-    initCloudSync().catch(e=> console.error('云同步初始化失败', e));
   }
   // iOS Safari 下 :active 伪类默认不会在点按时触发(除非页面上有个触摸事件监听器),
   // 加这一行是让所有按钮的按压反馈(变暗/缩放)在真机上真的生效,而不是只在桌面浏览器里好使
