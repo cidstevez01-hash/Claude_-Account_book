@@ -518,55 +518,55 @@
 
   // 分类体系参考 Money Forward ME 的18个支出大项+中项目、9个收入大项+中项目(二级分类)
   const expenseCats = [
-    {key:'food', zh:'食费', ja:'食費', icon:'bowl', color:'#d11a1a', subs:[
+    {key:'food', zh:'食费', ja:'食費', icon:'bowl', color:'#d31717', subs:[
       {key:'grocery', zh:'食材', ja:'食料品'},{key:'eatout', zh:'外食', ja:'外食'},{key:'cafe', zh:'咖啡', ja:'カフェ'},{key:'breakfast', zh:'早餐', ja:'朝ご飯'},{key:'food_other', zh:'其他食费', ja:'その他食費'}
     ]},
-    {key:'daily', zh:'日用品', ja:'日用品', icon:'basket', color:'#d36745', subs:[
+    {key:'daily', zh:'日用品', ja:'日用品', icon:'basket', color:'#4157d8', subs:[
       {key:'daily_goods', zh:'日用品', ja:'日用品'},{key:'drugstore', zh:'药妆店', ja:'ドラッグストア'},{key:'pet', zh:'宠物用品', ja:'ペット用品'},{key:'tobacco', zh:'香烟', ja:'たばこ'},{key:'childcare', zh:'育儿用品', ja:'子育て用品'}
     ]},
-    {key:'hobby', zh:'趣味娱乐', ja:'趣味・娯楽', icon:'controller', color:'#d3ac45', subs:[
+    {key:'hobby', zh:'趣味娱乐', ja:'趣味・娯楽', icon:'controller', color:'#d3a117', subs:[
       {key:'outdoor', zh:'户外', ja:'アウトドア'},{key:'sports', zh:'运动', ja:'スポーツ'},{key:'media', zh:'影音游戏', ja:'映画・音楽・ゲーム'},{key:'books', zh:'书籍', ja:'本'},{key:'travel', zh:'旅行', ja:'旅行'}
     ]},
-    {key:'social', zh:'交际费', ja:'交際費', icon:'gift', color:'#45d35c', subs:[
+    {key:'social', zh:'交际费', ja:'交際費', icon:'gift', color:'#17d33d', subs:[
       {key:'party', zh:'聚餐应酬', ja:'飲み会'},{key:'present', zh:'礼物', ja:'プレゼント'},{key:'ceremony', zh:'婚丧嫁娶', ja:'冠婚葬祭'}
     ]},
-    {key:'transport', zh:'交通费', ja:'交通費', icon:'bus', color:'#d1721a', subs:[
+    {key:'transport', zh:'交通费', ja:'交通費', icon:'bus', color:'#d89441', subs:[
       {key:'train', zh:'电车', ja:'電車'},{key:'bus', zh:'公交', ja:'バス'},{key:'taxi', zh:'出租车', ja:'タクシー'},{key:'flight', zh:'飞机', ja:'飛行機'}
     ]},
-    {key:'fashion', zh:'服装美容', ja:'衣服・美容', icon:'shirt', color:'#d1c91a', subs:[
+    {key:'fashion', zh:'服装美容', ja:'衣服・美容', icon:'shirt', color:'#c0d317', subs:[
       {key:'clothes', zh:'服装', ja:'衣服'},{key:'laundry', zh:'干洗', ja:'クリーニング'},{key:'salon', zh:'美容美发', ja:'美容院・理髪代'},{key:'cosmetics', zh:'化妆品', ja:'化粧品'},{key:'accessory', zh:'饰品', ja:'アクセサリー'}
     ]},
-    {key:'medical', zh:'健康医疗', ja:'健康・医療', icon:'cross', color:'#1ad163', subs:[
+    {key:'medical', zh:'健康医疗', ja:'健康・医療', icon:'cross', color:'#41d87b', subs:[
       {key:'med_fee', zh:'医疗费', ja:'医療費'},{key:'medicine', zh:'药品', ja:'薬'},{key:'fitness', zh:'健身', ja:'フィットネス'},{key:'bodycare', zh:'美体保养', ja:'ボディケア'}
     ]},
-    {key:'car', zh:'汽车', ja:'自動車', icon:'car', color:'#80d11a', subs:[
+    {key:'car', zh:'汽车', ja:'自動車', icon:'car', color:'#76d841', subs:[
       {key:'gas', zh:'汽油费', ja:'ガソリン代'},{key:'carloan', zh:'汽车贷款', ja:'自動車ローン'},{key:'parking', zh:'停车费', ja:'駐車場料金'},{key:'toll', zh:'高速费', ja:'高速料金'},{key:'carinsurance', zh:'车险', ja:'自動車保険'}
     ]},
-    {key:'edu', zh:'教育培训', ja:'教養・教育', icon:'cap', color:'#1a8fd1', subs:[
+    {key:'edu', zh:'教育培训', ja:'教養・教育', icon:'cap', color:'#179bd3', subs:[
       {key:'tuition', zh:'学费', ja:'学費'},{key:'lesson', zh:'兴趣班', ja:'習い事'},{key:'cram', zh:'补习班', ja:'塾代'},{key:'childedu', zh:'育儿杂费', ja:'子育て雑費'},{key:'book', zh:'图书', ja:'書籍'}
     ]},
-    {key:'special', zh:'特殊支出', ja:'特別な支出', icon:'box', color:'#45d3a0', subs:[
+    {key:'special', zh:'特殊支出', ja:'特別な支出', icon:'box', color:'#41d8b2', subs:[
       {key:'furniture', zh:'家具', ja:'家具'},{key:'appliance', zh:'家电', ja:'家電'},{key:'renovation', zh:'住宅装修', ja:'住宅・リフォーム'},{key:'special_other', zh:'其他特殊支出', ja:'その他特別な支出'}
     ]},
-    {key:'cash', zh:'现金取现', ja:'現金・カード', icon:'wallet', color:'#28d11a', subs:[
+    {key:'cash', zh:'现金取现', ja:'現金・カード', icon:'wallet', color:'#37d317', subs:[
       {key:'cash_w', zh:'现金', ja:'現金'},{key:'atm', zh:'ATM取现', ja:'ATM引き出し'},{key:'card_pay', zh:'银行卡扣款', ja:'カード引き落とし'}
     ]},
-    {key:'utility', zh:'水电煤气', ja:'水道・光熱費', icon:'bulb', color:'#1ad1bb', subs:[
+    {key:'utility', zh:'水电煤气', ja:'水道・光熱費', icon:'bulb', color:'#17d3c7', subs:[
       {key:'electric', zh:'电费', ja:'電気'},{key:'gas_fee', zh:'燃气费', ja:'ガス'},{key:'water', zh:'水费', ja:'水道'}
     ]},
-    {key:'telecom', zh:'通讯费', ja:'通信費', icon:'wifi', color:'#b7d345', subs:[
+    {key:'telecom', zh:'通讯费', ja:'通信費', icon:'wifi', color:'#add841', subs:[
       {key:'phone', zh:'话费', ja:'携帯電話代'},{key:'internet', zh:'网费', ja:'インターネット代'}
     ]},
-    {key:'housing', zh:'住房', ja:'住宅', icon:'house', color:'#457ed3', subs:[
+    {key:'housing', zh:'住房', ja:'住宅', icon:'house', color:'#d85c41', subs:[
       {key:'rent', zh:'房租', ja:'家賃'},{key:'mortgage', zh:'房贷', ja:'住宅ローン'},{key:'mgmt_fee', zh:'管理费', ja:'管理費・積立金'},{key:'fire_ins', zh:'火灾保险', ja:'火災保険'},{key:'quake_ins', zh:'地震保险', ja:'地震保険'}
     ]},
-    {key:'tax', zh:'税金社保', ja:'税・社会保障', icon:'doc', color:'#73d345', subs:[
+    {key:'tax', zh:'税金社保', ja:'税・社会保障', icon:'doc', color:'#418fd8', subs:[
       {key:'income_tax', zh:'所得税', ja:'所得税'},{key:'resident_tax', zh:'居民税', ja:'住民税'},{key:'pension_ins', zh:'养老保险', ja:'年金保険料'},{key:'health_ins', zh:'医疗保险', ja:'健康保険'}
     ]},
-    {key:'insurance', zh:'保险', ja:'保険', icon:'shield', color:'#45c2d3', subs:[
+    {key:'insurance', zh:'保险', ja:'保険', icon:'shield', color:'#d3173a', subs:[
       {key:'life_ins', zh:'人寿保险', ja:'生命保険'},{key:'medical_ins', zh:'医疗保险', ja:'医療保険'}
     ]},
-    {key:'other_e', zh:'其他', ja:'その他', icon:'star', color:'#1a37d1', subs:[
+    {key:'other_e', zh:'其他', ja:'その他', icon:'star', color:'#1e17d3', subs:[
       {key:'other_e_sub', zh:'其他', ja:'その他'}
     ]},
     {key:'uncat_e', zh:'未分类', ja:'未分類', icon:'question', color:'#4a4a4a', subs:[
@@ -574,28 +574,28 @@
     ]},
   ];
   const incomeCats = [
-    {key:'salary', zh:'工资', ja:'給与', icon:'coin', color:'#5045d3', subs:[
+    {key:'salary', zh:'工资', ja:'給与', icon:'coin', color:'#d35c17', subs:[
       {key:'salary_base', zh:'工资', ja:'給与'},{key:'bonus', zh:'奖金', ja:'賞与'}
     ]},
-    {key:'onetime', zh:'一次性所得', ja:'一時所得', icon:'party', color:'#d11a9e', subs:[
+    {key:'onetime', zh:'一次性所得', ja:'一時所得', icon:'party', color:'#41c6d8', subs:[
       {key:'prize', zh:'中奖', ja:'懸賞・当選金'},{key:'insurance_payout', zh:'保险赔付', ja:'保険金'}
     ]},
-    {key:'sidejob', zh:'事业副业', ja:'事業・副業', icon:'briefcase', color:'#541ad1', subs:[
+    {key:'sidejob', zh:'事业副业', ja:'事業・副業', icon:'briefcase', color:'#d8cb41', subs:[
       {key:'business', zh:'事业收入', ja:'事業収入'},{key:'side_income', zh:'副业收入', ja:'副業収入'}
     ]},
-    {key:'pension', zh:'养老金', ja:'年金', icon:'bank', color:'#ac1ad1', subs:[
+    {key:'pension', zh:'养老金', ja:'年金', icon:'bank', color:'#41d843', subs:[
       {key:'pension_income', zh:'养老金', ja:'年金'}
     ]},
-    {key:'dividend', zh:'股息所得', ja:'配当所得', icon:'trend', color:'#9545d3', subs:[
+    {key:'dividend', zh:'股息所得', ja:'配当所得', icon:'trend', color:'#7cd317', subs:[
       {key:'stock_dividend', zh:'股息', ja:'配当金'},{key:'interest', zh:'利息', ja:'利子'}
     ]},
-    {key:'realestate', zh:'不动产收入', ja:'不動産所得', icon:'building', color:'#d345ce', subs:[
+    {key:'realestate', zh:'不动产收入', ja:'不動産所得', icon:'building', color:'#17d382', subs:[
       {key:'rent_income', zh:'租金收入', ja:'家賃収入'}
     ]},
-    {key:'unknown_i', zh:'不明入账', ja:'不明な入金', icon:'question', color:'#d34589', subs:[
+    {key:'unknown_i', zh:'不明入账', ja:'不明な入金', icon:'question', color:'#1756d3', subs:[
       {key:'unknown_i_sub', zh:'不明入账', ja:'不明な入金'}
     ]},
-    {key:'other_i', zh:'其他入账', ja:'その他入金', icon:'envelope', color:'#d11a46', subs:[
+    {key:'other_i', zh:'其他入账', ja:'その他入金', icon:'envelope', color:'#d84178', subs:[
       {key:'other_i_sub', zh:'其他', ja:'その他'}
     ]},
     {key:'uncat_i', zh:'未分类', ja:'未分類', icon:'question', color:'#2f2f2f', subs:[
