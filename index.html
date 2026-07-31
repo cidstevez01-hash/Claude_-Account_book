@@ -466,6 +466,13 @@
       <button type="button" class="save-btn" id="cloudSignUpBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--ink);"></button>
       <button type="button" class="text-link-btn" id="goToSignInBtn"></button>
     </div>
+    <div id="cloudVerifyModeBlock" style="display:none;">
+      <div id="cloudVerifyHintText" style="font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:10px;"></div>
+      <div class="text-row"><input type="text" inputmode="numeric" id="cloudVerifyCodeInput" autocomplete="one-time-code" placeholder=""></div>
+      <button type="button" class="save-btn" id="cloudVerifyBtn" style="margin-top:0;padding:12px 4px;font-size:13.5px;background:var(--jade);"></button>
+      <button type="button" class="text-link-btn" id="cloudResendCodeBtn"></button>
+      <button type="button" class="text-link-btn" id="cloudBackToSignupBtn"></button>
+    </div>
   </div>
   <div id="cloudSyncSignedInBlock" style="display:none;">
     <div id="cloudSyncStatusText" style="font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;"></div>
@@ -535,6 +542,11 @@
       cloudSignUpError:'注册失败：{msg}', cloudSignUpNeedConfirm:'注册成功，请去邮箱点确认链接后再登录',
       cloudSignUpSuccessGoLogin:'注册成功，请用刚才的邮箱和密码登录',
       cloudPasswordMismatch:'两次输入的密码不一致', cloudPasswordTooShort:'密码至少需要6位',
+      cloudVerifyHintText:'验证码已发送到 {email}，请查收邮件并输入6位数字验证码（注意查看垃圾邮件文件夹）。',
+      cloudVerifyCodePlaceholder:'6位验证码', cloudVerifyBtn:'验证并登录',
+      cloudResendCodeBtn:'没收到？重新发送', cloudBackToSignupBtn:'邮箱填错了？返回重新注册',
+      cloudVerifyNeedCode:'请输入验证码', cloudVerifyError:'验证码不对或已过期，请重新获取',
+      cloudResendSuccess:'验证码已重新发送', cloudResendError:'发送失败：{msg}',
       cloudSyncError:'同步失败，请检查网络后重试',
       cloudMergeConfirm:'这个账号在云端已经有数据了，登录后将用云端最新数据覆盖本机当前记录，确定继续吗？',
       cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
@@ -584,6 +596,11 @@
       cloudSignUpError:'登録に失敗しました：{msg}', cloudSignUpNeedConfirm:'登録が完了しました。メール内の確認リンクを開いてからログインしてください',
       cloudSignUpSuccessGoLogin:'登録が完了しました。今のメールアドレスとパスワードでログインしてください',
       cloudPasswordMismatch:'入力したパスワードが一致しません', cloudPasswordTooShort:'パスワードは6文字以上にしてください',
+      cloudVerifyHintText:'{email} 宛てに確認コードを送信しました。メールを確認し、6桁のコードを入力してください（迷惑メールフォルダもご確認ください）。',
+      cloudVerifyCodePlaceholder:'6桁の確認コード', cloudVerifyBtn:'確認してログイン',
+      cloudResendCodeBtn:'届きませんか？再送する', cloudBackToSignupBtn:'メールアドレスが違う場合は登録し直す',
+      cloudVerifyNeedCode:'確認コードを入力してください', cloudVerifyError:'コードが正しくないか、期限切れです。再送してください',
+      cloudResendSuccess:'確認コードを再送しました', cloudResendError:'送信に失敗しました：{msg}',
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
       cloudMergeConfirm:'このアカウントには既にクラウド上にデータがあります。ログインするとクラウドの最新データでこの端末の記録を上書きします。続けますか？',
       cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
@@ -1203,6 +1220,11 @@
     $('cloudSignOutBtn').textContent = t('cloudSignOutBtn');
     $('goToSignUpBtn').textContent = t('goToSignUpBtn');
     $('goToSignInBtn').textContent = t('goToSignInBtn');
+    $('cloudVerifyCodeInput').placeholder = t('cloudVerifyCodePlaceholder');
+    $('cloudVerifyBtn').textContent = t('cloudVerifyBtn');
+    $('cloudResendCodeBtn').textContent = t('cloudResendCodeBtn');
+    $('cloudBackToSignupBtn').textContent = t('cloudBackToSignupBtn');
+    renderCloudVerifyHint();
     $('cloudSyncHelpText').textContent = t('cloudSyncHelpText');
     renderCloudSyncStatus();
     if(document.activeElement !== $('githubTokenInput')) $('githubTokenInput').value = settings.githubToken || '';
@@ -1933,12 +1955,18 @@
     renderBackupLockState();
     $('githubTokenInput').focus();
   });
+  let pendingVerifyEmail = '';
   function setCloudAuthMode(mode){
-    $('cloudSigninModeBlock').style.display = mode==='signup' ? 'none' : 'block';
+    $('cloudSigninModeBlock').style.display = mode==='signin' ? 'block' : 'none';
     $('cloudSignupModeBlock').style.display = mode==='signup' ? 'block' : 'none';
+    $('cloudVerifyModeBlock').style.display = mode==='verify' ? 'block' : 'none';
+  }
+  function renderCloudVerifyHint(){
+    if(pendingVerifyEmail) $('cloudVerifyHintText').textContent = t('cloudVerifyHintText').replace('{email}', pendingVerifyEmail);
   }
   $('goToSignUpBtn').addEventListener('click', ()=> setCloudAuthMode('signup'));
   $('goToSignInBtn').addEventListener('click', ()=> setCloudAuthMode('signin'));
+  $('cloudBackToSignupBtn').addEventListener('click', ()=>{ pendingVerifyEmail=''; setCloudAuthMode('signup'); });
 
   $('cloudSignInBtn').addEventListener('click', async ()=>{
     if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
@@ -1972,22 +2000,53 @@
       $('cloudSignupPasswordInput').value = '';
       $('cloudSignupPassword2Input').value = '';
       if(data.session){
-        // 邮箱确认已关闭时 Supabase 会直接返回一个已登录的会话,
-        // 但按需求这里要求用户重新手动登录一次确认账号密码没问题,而不是静默直接进入
+        // 项目那边如果关闭了邮箱确认,Supabase 会直接返回已登录的会话;
+        // 这种情况就不需要走验证码那一步了,但仍要求用户重新手动登录一次确认账号密码没问题
         try{ await supabaseClient.auth.signOut(); }catch(e){}
-      }
-      if(data.user && !data.user.confirmed_at && !data.session){
-        showToast(t('cloudSignUpNeedConfirm'));
-      }else{
         showToast(t('cloudSignUpSuccessGoLogin'));
+        $('cloudEmailInput').value = email;
+        $('cloudSignupEmailInput').value = '';
+        setCloudAuthMode('signin');
+        $('cloudPasswordInput').focus();
+      }else{
+        // 正常情况(邮箱确认已开启):进入"输入验证码"步骤,而不是让用户自己去邮箱点链接
+        pendingVerifyEmail = email;
+        $('cloudSignupEmailInput').value = '';
+        renderCloudVerifyHint();
+        setCloudAuthMode('verify');
+        $('cloudVerifyCodeInput').focus();
       }
-      $('cloudEmailInput').value = email;
-      $('cloudSignupEmailInput').value = '';
-      setCloudAuthMode('signin');
-      $('cloudPasswordInput').focus();
     }catch(e){
       console.error('注册失败', e);
       showToast(t('cloudSignUpError').replace('{msg}', (e&&e.message)||''));
+    }
+  });
+  $('cloudVerifyBtn').addEventListener('click', async ()=>{
+    if(!supabaseClient){ showToast(t('cloudSyncNotReady')); return; }
+    const code = $('cloudVerifyCodeInput').value.trim();
+    if(!code){ showToast(t('cloudVerifyNeedCode')); return; }
+    try{
+      const { data, error } = await supabaseClient.auth.verifyOtp({ email: pendingVerifyEmail, token: code, type: 'signup' });
+      if(error) throw error;
+      $('cloudVerifyCodeInput').value = '';
+      pendingVerifyEmail = '';
+      await handleCloudSignedIn(data.user);
+      closeAllSheets();
+      switchToPage('ledger');
+    }catch(e){
+      console.error('验证码验证失败', e);
+      showToast(t('cloudVerifyError'));
+    }
+  });
+  $('cloudResendCodeBtn').addEventListener('click', async ()=>{
+    if(!supabaseClient || !pendingVerifyEmail) return;
+    try{
+      const { error } = await supabaseClient.auth.resend({ type: 'signup', email: pendingVerifyEmail });
+      if(error) throw error;
+      showToast(t('cloudResendSuccess'));
+    }catch(e){
+      console.error('重新发送验证码失败', e);
+      showToast(t('cloudResendError').replace('{msg}', (e&&e.message)||''));
     }
   });
   $('cloudSignOutBtn').addEventListener('click', async ()=>{
