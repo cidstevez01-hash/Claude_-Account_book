@@ -256,6 +256,9 @@
   .app-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .app-toast-text{flex:1;}
   .app-toast-close{border:none;background:rgba(255,255,255,0.16);color:var(--paper);width:20px;height:20px;border-radius:50%;font-size:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;}
+  .update-banner{position:fixed;top:0;left:0;right:0;background:var(--jade);color:#fff;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));font-size:13px;display:flex;align-items:center;justify-content:center;gap:12px;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+  .update-banner-btn{border:none;background:#fff;color:var(--jade);font-weight:600;font-size:12.5px;padding:6px 14px;border-radius:999px;flex-shrink:0;}
+  .update-banner-btn:active{opacity:0.7;}
 </style>
 </head>
 <body>
@@ -564,6 +567,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
+  // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
+  const APP_BUILD = '20260801a';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -596,6 +601,7 @@
       cloudSignInBtn:'登录', cloudSignUpBtn:'注册', cloudSignOutBtn:'退出登录',
       goToSignUpBtn:'没有账号？去注册', goToSignInBtn:'已有账号？去登录',
       cloudSyncHelpText:'注册/登录后，账目、分类、设置都会自动实时同步到数据库；换设备用同一账号登录，就能看到最新数据。',
+      updateAvailable:'有新版本可用', updateNowBtn:'立即刷新',
       cloudSyncStatusSignedIn:'{email} 已登录，自动实时同步中',
       cloudNeedEmailPass:'请填写邮箱和密码', cloudAuthError:'邮箱或密码不对，或该邮箱尚未注册',
       cloudSignUpError:'注册失败：{msg}', cloudSignUpNeedConfirm:'注册成功，请去邮箱点确认链接后再登录',
@@ -644,6 +650,7 @@
       cloudSignInBtn:'ログイン', cloudSignUpBtn:'新規登録', cloudSignOutBtn:'ログアウト',
       goToSignUpBtn:'アカウントをお持ちでないですか？新規登録', goToSignInBtn:'すでにアカウントをお持ちですか？ログイン',
       cloudSyncHelpText:'登録・ログインすると、記録・カテゴリ・設定がすべて自動的にデータベースへリアルタイム同期されます。他の端末で同じアカウントにログインすれば最新データがすぐ反映されます。',
+      updateAvailable:'新しいバージョンがあります', updateNowBtn:'今すぐ更新',
       cloudSyncStatusSignedIn:'{email} でログイン中・自動同期しています',
       cloudNeedEmailPass:'メールアドレスとパスワードを入力してください', cloudAuthError:'メールアドレスかパスワードが違うか、未登録です',
       cloudSignUpError:'登録に失敗しました：{msg}', cloudSignUpNeedConfirm:'登録が完了しました。メール内の確認リンクを開いてからログインしてください',
@@ -1356,8 +1363,34 @@
     }catch(e){ console.error('前台恢复时重新同步失败', e); }
     finally{ resumeSyncing = false; }
   }
-  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') resyncCloudOnResume(); });
-  window.addEventListener('pageshow', (ev)=>{ if(ev.persisted) resyncCloudOnResume(); });
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible'){ resyncCloudOnResume(); checkForAppUpdate(); } });
+  window.addEventListener('pageshow', (ev)=>{ if(ev.persisted){ resyncCloudOnResume(); checkForAppUpdate(); } });
+
+  // GitHub Pages部署后CDN缓存要过一阵子才会真正刷新,App开着不关的话不会自己知道有新版本。
+  // 定期悄悄拉一次自己这个页面(带时间戳绕过缓存),比对页面里写的版本号,不一样就提示用户手动点刷新
+  // (不做成自动刷新,避免正在填账目填到一半被强制刷掉)
+  let updateBannerShown = false;
+  async function checkForAppUpdate(){
+    if(updateBannerShown) return;
+    try{
+      const res = await fetch(location.pathname + '?_v=' + Date.now(), {cache:'no-store'});
+      if(!res.ok) return;
+      const text = await res.text();
+      const m = text.match(/const APP_BUILD\s*=\s*'([^']+)'/);
+      if(m && m[1] && m[1] !== APP_BUILD) showUpdateBanner();
+    }catch(e){}
+  }
+  function showUpdateBanner(){
+    if(updateBannerShown) return;
+    updateBannerShown = true;
+    const el = document.createElement('div');
+    el.id = 'updateBanner';
+    el.className = 'update-banner';
+    el.innerHTML = `<span>${t('updateAvailable')}</span><button type="button" class="update-banner-btn">${t('updateNowBtn')}</button>`;
+    el.querySelector('.update-banner-btn').addEventListener('click', ()=> location.reload());
+    document.body.appendChild(el);
+  }
+  setInterval(checkForAppUpdate, 3*60*1000);
 
   function setMonthLabel(){ const d=new Date(); $('monthLabel').textContent = d.getFullYear()+'年'+(d.getMonth()+1)+'月'; }
 
