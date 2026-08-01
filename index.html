@@ -264,9 +264,38 @@
   .app-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .app-toast-text{flex:1;}
   .app-toast-close{border:none;background:rgba(255,255,255,0.16);color:var(--paper);width:20px;height:20px;border-radius:50%;font-size:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;}
-  .update-banner{position:fixed;top:0;left:0;right:0;background:var(--jade);color:#fff;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));font-size:13px;display:flex;align-items:center;justify-content:center;gap:12px;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
-  .update-banner-btn{border:none;background:#fff;color:var(--jade);font-weight:600;font-size:12.5px;padding:6px 14px;border-radius:999px;flex-shrink:0;}
-  .update-banner-btn:active{opacity:0.7;}
+  .update-edge-tab{position:fixed;top:calc(env(safe-area-inset-top) + 104px);right:0;width:26px;height:41px;
+    background:rgba(209,102,90,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.35);border-right:none;border-radius:12px 0 0 12px;z-index:60;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#fff;
+    box-shadow:-2px 2px 10px rgba(0,0,0,0.18);padding:0;cursor:pointer;transition:transform 0.15s ease;}
+  .update-edge-tab:active{transform:scale(0.94);}
+  .update-edge-tab .dot{width:6px;height:6px;border-radius:50%;background:#fff;position:relative;}
+  .update-edge-tab .dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid #fff;opacity:0.8;animation:updatePulse 1.8s ease-out infinite;}
+  .update-edge-tab .chevron{font-size:12px;line-height:1;}
+  @keyframes updatePulse{0%{transform:scale(0.6);opacity:0.7;}100%{transform:scale(2.2);opacity:0;}}
+  @media (prefers-reduced-motion: reduce){ .update-edge-tab .dot::after{ animation:none; } }
+  .update-edge-tab.is-hidden{opacity:0;pointer-events:none;transform:translateX(6px);}
+  .update-edge-tab.is-gone{display:none;}
+  .update-expand-wrap{position:fixed;top:calc(env(safe-area-inset-top) + 104px);right:0;z-index:59;
+    display:flex;align-items:center;gap:20px;transform:translateX(16px);opacity:0;pointer-events:none;
+    transition:transform 0.22s cubic-bezier(.32,1.4,.5,1), opacity 0.18s ease;}
+  .update-expand-wrap.is-open{transform:translateX(0);opacity:1;pointer-events:auto;}
+  .update-collapse-handle{width:26px;height:41px;flex-shrink:0;border:none;padding:0;cursor:pointer;
+    background:rgba(209,102,90,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.35);border-right:none;color:#fff;border-radius:12px 0 0 12px;font-size:12px;
+    display:flex;align-items:center;justify-content:center;box-shadow:-2px 2px 10px rgba(0,0,0,0.18);}
+  .update-collapse-handle:active{transform:scale(0.94);}
+  .update-card{width:auto;max-width:175px;background:rgba(255,253,248,0.20);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.4);border-left:none;border-radius:0 12px 12px 0;padding:9px 11px;
+    box-shadow:0 10px 26px rgba(0,0,0,0.2);}
+  .update-card .title-row{display:flex;align-items:center;gap:20px;margin:0 0 3px;}
+  .update-card .title{font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;}
+  .update-card p{font-size:10.5px;color:var(--ink-soft);line-height:1.4;margin:0;}
+  .update-card button.update-refresh-btn{flex-shrink:0;border:none;background:var(--seal);color:#fff;font-weight:600;font-size:10.5px;
+    padding:2px 8px;border-radius:999px;cursor:pointer;}
+  .update-card button.update-refresh-btn:active{opacity:0.85;}
+  .update-card .updating-row{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink);}
 </style>
 </head>
 <body>
@@ -585,7 +614,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801b';
+  const APP_BUILD = '20260801c';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -618,7 +647,8 @@
       cloudSignInBtn:'登录', cloudSignUpBtn:'注册', cloudSignOutBtn:'退出登录',
       goToSignUpBtn:'没有账号？去注册', goToSignInBtn:'已有账号？去登录',
       cloudSyncHelpText:'注册/登录后，账目、分类、设置都会自动实时同步到数据库；换设备用同一账号登录，就能看到最新数据。',
-      updateAvailable:'有新版本可用', updateNowBtn:'立即刷新',
+      updateTitle:'新版本可用', updateBtn:'更新', updateDesc:'点击更新即可更新到最新<br>版本',
+      updating:'更新中...', updateDone:'更新完毕',
       cloudSyncStatusSignedIn:'{email} 已登录，自动实时同步中',
       cloudNeedEmailPass:'请填写邮箱和密码', cloudAuthError:'邮箱或密码不对，或该邮箱尚未注册',
       cloudSignUpError:'注册失败：{msg}', cloudSignUpNeedConfirm:'注册成功，请去邮箱点确认链接后再登录',
@@ -667,7 +697,8 @@
       cloudSignInBtn:'ログイン', cloudSignUpBtn:'新規登録', cloudSignOutBtn:'ログアウト',
       goToSignUpBtn:'アカウントをお持ちでないですか？新規登録', goToSignInBtn:'すでにアカウントをお持ちですか？ログイン',
       cloudSyncHelpText:'登録・ログインすると、記録・カテゴリ・設定がすべて自動的にデータベースへリアルタイム同期されます。他の端末で同じアカウントにログインすれば最新データがすぐ反映されます。',
-      updateAvailable:'新しいバージョンがあります', updateNowBtn:'今すぐ更新',
+      updateTitle:'新バージョンあり', updateBtn:'更新', updateDesc:'クリックして最新版に更新します',
+      updating:'更新中...', updateDone:'更新が完了しました',
       cloudSyncStatusSignedIn:'{email} でログイン中・自動同期しています',
       cloudNeedEmailPass:'メールアドレスとパスワードを入力してください', cloudAuthError:'メールアドレスかパスワードが違うか、未登録です',
       cloudSignUpError:'登録に失敗しました：{msg}', cloudSignUpNeedConfirm:'登録が完了しました。メール内の確認リンクを開いてからログインしてください',
@@ -842,7 +873,7 @@
   function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   const sleep = ms => new Promise(r=> setTimeout(r, ms));
 
-  function showToast(msg){
+  function showToast(msg, duration){
     let el = $('appToast');
     if(!el){
       el = document.createElement('div');
@@ -863,7 +894,7 @@
     el.querySelector('.app-toast-text').textContent = msg;
     el.classList.add('show');
     clearTimeout(el._hideTimer);
-    el._hideTimer = setTimeout(()=> el.classList.remove('show'), 5000);
+    el._hideTimer = setTimeout(()=> el.classList.remove('show'), duration || 5000);
   }
 
   // 本地存储封装:这个文件是下载后独立使用的(添加到主屏幕/直接用Safari打开),
@@ -1308,9 +1339,12 @@
   async function handleCloudSignedIn(user){
     cloudUser = user;
     // 登录后这个人自己的自定义细分也能从数据库里读到了(RLS允许读自己的行),重新拉一次分类数据
-    await fetchCatalogFromCloud();
-    const remoteEntries = await pullAllEntriesFromCloud();
-    const remoteSettings = await pullSettingsFromCloud();
+    // 三个请求互不依赖,并行拉取而不是依次等待,减少总耗时
+    const [, remoteEntries, remoteSettings] = await Promise.all([
+      fetchCatalogFromCloud(),
+      pullAllEntriesFromCloud(),
+      pullSettingsFromCloud(),
+    ]);
     if(remoteEntries && remoteEntries.length > 0){
       // 数据库是唯一权威数据源:云端已有账目就直接采用,不再弹窗询问是否覆盖本机
       entries = remoteEntries;
@@ -1344,10 +1378,13 @@
       const { data } = await supabaseClient.auth.getSession();
       if(data && data.session && data.session.user){
         cloudUser = data.session.user;
-        await fetchCatalogFromCloud();
-        const remoteEntries = await pullAllEntriesFromCloud();
+        // 三个请求互不依赖,并行拉取而不是依次等待,减少App打开时的等待时间
+        const [, remoteEntries, remoteSettings] = await Promise.all([
+          fetchCatalogFromCloud(),
+          pullAllEntriesFromCloud(),
+          pullSettingsFromCloud(),
+        ]);
         if(remoteEntries){ entries = remoteEntries; await saveEntriesLocalOnly(); }
-        const remoteSettings = await pullSettingsFromCloud();
         if(remoteSettings){
           settings.lang = remoteSettings.lang || settings.lang;
           settings.currency = remoteSettings.currency || settings.currency;
@@ -1385,29 +1422,66 @@
   window.addEventListener('pageshow', (ev)=>{ if(ev.persisted){ resyncCloudOnResume(); checkForAppUpdate(); } });
 
   // GitHub Pages部署后CDN缓存要过一阵子才会真正刷新,App开着不关的话不会自己知道有新版本。
-  // 定期悄悄拉一次自己这个页面(带时间戳绕过缓存),比对页面里写的版本号,不一样就提示用户手动点刷新
+  // 定期悄悄拉一次自己这个页面(带时间戳绕过缓存),比对页面里写的版本号,不一样就在右边缘弹出一个可折叠的小标签
   // (不做成自动刷新,避免正在填账目填到一半被强制刷掉)
-  let updateBannerShown = false;
+  let updateTabShown = false;
   async function checkForAppUpdate(){
-    if(updateBannerShown) return;
+    if(updateTabShown) return;
     try{
       const res = await fetch(location.pathname + '?_v=' + Date.now(), {cache:'no-store'});
       if(!res.ok) return;
       const text = await res.text();
       const m = text.match(/const APP_BUILD\s*=\s*'([^']+)'/);
-      if(m && m[1] && m[1] !== APP_BUILD) showUpdateBanner();
+      if(m && m[1] && m[1] !== APP_BUILD) showUpdateTab();
     }catch(e){}
   }
-  function showUpdateBanner(){
-    if(updateBannerShown) return;
-    updateBannerShown = true;
-    const el = document.createElement('div');
-    el.id = 'updateBanner';
-    el.className = 'update-banner';
-    el.innerHTML = `<span>${t('updateAvailable')}</span><button type="button" class="update-banner-btn">${t('updateNowBtn')}</button>`;
-    el.querySelector('.update-banner-btn').addEventListener('click', ()=> location.reload());
-    document.body.appendChild(el);
+  function showUpdateTab(){
+    if(updateTabShown) return;
+    updateTabShown = true;
+
+    const edgeTab = document.createElement('button');
+    edgeTab.type = 'button';
+    edgeTab.id = 'updateEdgeTab';
+    edgeTab.className = 'update-edge-tab';
+    edgeTab.setAttribute('aria-label', t('updateTitle'));
+    edgeTab.innerHTML = `<span class="dot"></span><span class="chevron">‹</span>`;
+
+    const expandWrap = document.createElement('div');
+    expandWrap.id = 'updateExpandWrap';
+    expandWrap.className = 'update-expand-wrap';
+    expandWrap.innerHTML = `
+      <button type="button" class="update-collapse-handle" aria-label="收起">›</button>
+      <div class="update-card">
+        <div class="title-row">
+          <span class="title">${t('updateTitle')}</span>
+          <button type="button" class="update-refresh-btn">${t('updateBtn')}</button>
+        </div>
+        <p>${t('updateDesc')}</p>
+      </div>
+    `;
+
+    function expand(){ edgeTab.classList.add('is-hidden'); expandWrap.classList.add('is-open'); }
+    function collapse(){ expandWrap.classList.remove('is-open'); edgeTab.classList.remove('is-hidden'); }
+    edgeTab.addEventListener('click', expand);
+    expandWrap.querySelector('.update-collapse-handle').addEventListener('click', collapse);
+    expandWrap.querySelector('.update-refresh-btn').addEventListener('click', performUpdate);
+
+    document.body.appendChild(edgeTab);
+    document.body.appendChild(expandWrap);
   }
+  function performUpdate(){
+    const card = document.querySelector('#updateExpandWrap .update-card');
+    if(card) card.innerHTML = `<div class="updating-row"><span class="spin-icon">${iconSvg('refresh')}</span>${t('updating')}</div>`;
+    try{ sessionStorage.setItem('pendingUpdateNotice', '1'); }catch(e){}
+    setTimeout(()=> location.reload(), 400);
+  }
+  // 上次点了"更新"触发的刷新,这次重新加载完成后提示一下"更新完毕",3秒自动消失
+  try{
+    if(sessionStorage.getItem('pendingUpdateNotice')){
+      sessionStorage.removeItem('pendingUpdateNotice');
+      setTimeout(()=> showToast(t('updateDone'), 3000), 300);
+    }
+  }catch(e){}
   setInterval(checkForAppUpdate, 3*60*1000);
 
   function setMonthLabel(){ const d=new Date(); $('monthLabel').textContent = d.getFullYear()+'年'+(d.getMonth()+1)+'月'; }
@@ -2601,6 +2675,10 @@
     await step('loadRateCache', loadRateCache);
     await step('loadJpHolidayCache', loadJpHolidayCache);
     await step('loadEntries', loadEntries);
+    // 先用本机缓存数据渲染一次首屏,不等云端同步完成才出现内容——云同步走网络,可能要一两秒,
+    // 首屏用本机数据先出来,同步完成/生成固定收支后下面还会再正确渲染一次
+    await step('renderAll(本机数据优先渲染)', renderAll);
+    await step('renderRatePage(本机数据优先渲染)', renderRatePage);
     // initCloudSync 必须放在生成固定收支之前:
     // 如果先生成本月固定收支再等云端同步,云端此时还没有这条新记录、cloudUser 也还没设好,
     // pushEntriesBulkUpsert() 会因为 cloudUser 还是空的而静默跳过推送,随后 initCloudSync 拉回旧的云端账目又会把本机整个替换掉,
