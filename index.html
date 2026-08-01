@@ -760,9 +760,12 @@
   }
   async function loadCatalogData(){
     const hasCache = loadCatalogCacheFromLocal();
-    const fetched = await fetchCatalogFromCloud();
-    if(!fetched && !hasCache){
-      console.error('分类数据既没有云端也没有本机缓存,分类列表暂时为空,需要联网后重新打开App');
+    if(hasCache){
+      // 本机已经有缓存,先用它立即渲染,不要卡住首屏等网络请求;云端刷新放到后台悄悄做
+      fetchCatalogFromCloud().then(()=>{ applyStaticI18n(); renderAll(); }).catch(()=>{});
+    }else{
+      const fetched = await fetchCatalogFromCloud();
+      if(!fetched) console.error('分类数据既没有云端也没有本机缓存,分类列表暂时为空,需要联网后重新打开App');
     }
   }
   function subLabel(sub){ if(!sub) return ''; return sub[settings.lang] || sub.zh || sub.label || ''; }
