@@ -42,12 +42,16 @@
   .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
   #pageLedger{ padding-bottom:60px; }
   .page{display:none;}
-  /* +1px 是故意留的:如果内容高度正好等于可视区域高度(完全不能滚动),部分iOS版本
-     会把底部的固定导航栏渲染错位、留出一道空白;让页面必定比一屏略高一点点就不会触发这个问题 */
-  .page.active{display:flex; flex-direction:column; justify-content:center; min-height:calc(100svh - var(--safe-top) - var(--safe-bottom) - 108px + 1px);}
+  /* 留一点余量是故意的:如果内容高度正好等于可视区域高度(完全不能滚动),部分iOS版本
+     会把底部的固定导航栏渲染错位、留出一道空白;让页面必定比一屏高出一截就不会触发这个问题。
+     之前只留1px余量,在"内容很短"(比如某个分类只有一条记录、图例只有一行)的情况下这道余量
+     可能不够(flex拉伸的取整/重排时机在部分iOS上不够可靠),这次加大到24px留足安全空间 */
+  .page.active{display:flex; flex-direction:column; justify-content:center; min-height:calc(100svh - var(--safe-top) - var(--safe-bottom) - 108px + 24px);}
   /* 集計页内容本来就比较多,不用居中撑高度,让图表卡片自己长满剩余空间,图表也跟着变高 */
   #pageStats.active{justify-content:flex-start;}
-  #pageStats .chart-card{flex:1 1 auto; display:flex; flex-direction:column; min-height:0;}
+  /* min-height给个保底值,不完全依赖flex-grow的实时计算——内容很短(比如只有一个分类)时
+     也能保证图表卡片本身不会缩得太小,配合上面.page.active的min-height双重保险撑满一屏 */
+  #pageStats .chart-card{flex:1 1 auto; display:flex; flex-direction:column; min-height:380px;}
   #pageStats .chart-scroll{flex:1 1 auto; min-height:140px;}
   .header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; position:relative;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
@@ -613,7 +617,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801d';
+  const APP_BUILD = '20260801e';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
