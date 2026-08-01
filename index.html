@@ -616,7 +616,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801h';
+  const APP_BUILD = '20260801i';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1687,7 +1687,7 @@
     });
     el.addEventListener('click', (ev)=>{
       if(swiped){ swiped=false; return; }
-      if(ev.target.closest('#homeTypeSegment') || ev.target.closest('.ym-arrow') || ev.target.closest('.clickable-legend')) return;
+      if(ev.target.closest('#homeTypeSegment') || ev.target.closest('.ym-picker') || ev.target.closest('.clickable-legend')) return;
       openMonthDetail(null, getHomeDonutMonthKey());
     });
   })();
