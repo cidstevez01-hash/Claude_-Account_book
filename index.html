@@ -626,7 +626,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801k';
+  const APP_BUILD = '20260801l';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -810,7 +810,7 @@
   function pmIconHtml(p){
     if(!p) return '';
     if(p.badge) return `<span class="pm-badge-icon" style="background:${p.badge.bg};">${p.badge.text}</span>`;
-    if(BRAND_LOGO_COLORS[p.icon]) return `<span><svg class="hd-icon" viewBox="0 0 24 24" style="fill:${BRAND_LOGO_COLORS[p.icon]};stroke:none;"><use href="#ic-${p.icon}"/></svg></span>`;
+    if(BRAND_LOGO_COLORS[p.icon]) return `<span><svg class="hd-icon" viewBox="0 0 24 24" style="fill:${BRAND_LOGO_COLORS[p.icon]};stroke:none;transform:translateY(-2px);"><use href="#ic-${p.icon}"/></svg></span>`;
     return `<span>${iconSvg(p.icon)}</span>`;
   }
   function payLabel(p){ return p ? (p[settings.lang] || p.zh) : ''; }
