@@ -516,7 +516,6 @@
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
     <button type="button" class="icon-btn" id="catPickerBackBtn">‹</button>
     <h2 id="catPickerTitle" style="margin:0;flex:1;">选择分类</h2>
-    <button type="button" class="icon-btn" id="catPickerCloseBtn">✕</button>
   </div>
   <div class="field-label" id="catFieldLabel2">分类</div>
   <div class="cat-grid" id="catGrid"></div>
@@ -617,7 +616,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801e';
+  const APP_BUILD = '20260801f';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2024,6 +2023,10 @@
     $('ymPickerSheet').classList.remove('show');
     editingEntryId = null;
     editingSubKey = null;
+    // 点空白处/关闭按钮退出整个记账流程时清空已选的分类,下次新建从默认分类重新开始;
+    // 分类选择页里点‹返回按钮走的是closeCatPicker(),不经过这里,所以那条路径分类会保留
+    selectedCat = null;
+    selectedSub = null;
   }
 
   $('fabAdd').addEventListener('click', openSheet);
@@ -2033,7 +2036,6 @@
   $('settingsBtn2').addEventListener('click', openSettingsSheet);
   $('settingsBtn3').addEventListener('click', openSettingsSheet);
   $('sheetCloseBtn').addEventListener('click', closeAllSheets);
-  $('catPickerCloseBtn').addEventListener('click', closeAllSheets);
   $('settingsCloseBtn').addEventListener('click', closeAllSheets);
 
   $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; updateCatPickerRowDisplay(); });
