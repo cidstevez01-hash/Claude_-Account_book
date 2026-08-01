@@ -2596,9 +2596,20 @@
       if(dates.length===0) return;
       jpHolidaySet = new Set(dates);
       await storageSetSafe('ledger_jp_holidays', JSON.stringify(dates), false);
+      pushJpHolidaysToCloud(dates);
       await ensureRecurringEntries();
       renderAll();
     }catch(e){ console.error('日本の祝日データ取得失敗', e); }
+  }
+  // 顺便把祝日数据同步一份到数据库,让服务器端的定时任务(generate_recurring_entries)也能判断休日,
+  // 不需要数据库自己再发一次HTTP请求(pg_net在部分Supabase实例上不稳定/被废弃)
+  async function pushJpHolidaysToCloud(dates){
+    if(!supabaseClient || !cloudUser) return;
+    try{
+      const rows = dates.map(d=>({ holiday_date: d }));
+      const { error } = await supabaseClient.from('jp_holidays').upsert(rows, { ignoreDuplicates: true });
+      if(error) throw error;
+    }catch(e){ console.error('祝日数据同步到数据库失败', e); }
   }
   function isBizDay(dateStr){
     const d = new Date(dateStr+'T00:00:00');
