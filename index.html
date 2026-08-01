@@ -806,7 +806,8 @@
   function symbolFor(cur){ return cur==='JPY' ? 'JP¥' : 'CN¥'; }
   function fmtCur(amount, cur){
     const decimals = cur==='JPY' ? 0 : 2;
-    return symbolFor(cur) + Number(amount).toFixed(decimals);
+    const numStr = Number(amount).toLocaleString('en-US', {minimumFractionDigits:decimals, maximumFractionDigits:decimals});
+    return symbolFor(cur) + numStr;
   }
   // 按记账当天的历史汇率换算(不是用今天的实时汇率),这样切回原币种时才能显示原始数值
   function rateOnDate(dateStr){
