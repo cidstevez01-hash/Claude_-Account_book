@@ -100,6 +100,13 @@
   .note-text{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .entry .amount{font-family:'Noto Serif SC', serif;font-weight:600;font-size:16px;font-variant-numeric: tabular-nums;flex-shrink:0;}
   .entry.expense .amount{color:var(--seal);} .entry.income .amount{color:var(--jade);}
+  .amount-wrap{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+  .sign-badge{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sign-badge svg{width:11px;height:11px;}
+  .entry.expense .sign-badge{background:rgba(209,102,90,0.16);}
+  .entry.income .sign-badge{background:rgba(122,155,110,0.18);}
+  .entry.expense .sign-badge svg{stroke:var(--seal);}
+  .entry.income .sign-badge svg{stroke:var(--jade);}
   .entry-actions{display:flex;gap:8px;margin-top:0;padding-top:0;border-top:2px dotted var(--grid);max-height:0;opacity:0;overflow:hidden;transition:max-height 0.22s ease, opacity 0.18s ease, margin-top 0.22s ease, padding-top 0.22s ease;}
   .entry-actions.open{max-height:70px;opacity:1;margin-top:10px;padding-top:10px;}
   .action-btn{flex:1;border:none;background:var(--paper);border-radius:10px;padding:9px 0;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Noto Sans SC',sans-serif;}
@@ -616,7 +623,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801i';
+  const APP_BUILD = '20260801j';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -801,6 +808,13 @@
     return `<span>${iconSvg(p.icon)}</span>`;
   }
   function payLabel(p){ return p ? (p[settings.lang] || p.zh) : ''; }
+  // 账目明细里+/-号的圆形徽标,用SVG描边画粗符号而不是文字字符,保证清晰度不受字体渲染影响
+  function signBadgeHtml(type){
+    const bar = '<line x1="4" y1="12" x2="20" y2="12"/>';
+    const vBar = '<line x1="12" y1="4" x2="12" y2="20"/>';
+    const lines = type==='income' ? bar+vBar : bar;
+    return `<span class="sign-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="4" stroke-linecap="round">${lines}</svg></span>`;
+  }
 
   let entries = [];
   let settings = {lang:'ja', currency:'JPY'};
@@ -1523,7 +1537,7 @@
           <div class="entry-main">
             <div class="icon" style="background:${iconBg};color:${iconColor}">${iconHtml}</div>
             <div class="info"><div class="cat">${catLine}</div><div class="entry-meta">${payBadgeHtml}${e.note? `<span class="note-text">${escapeHtml(e.note)}</span>` : ''}</div></div>
-            <div class="amount">${e.type==='income'?'+':'-'}${fmtCur(disp.amount, disp.cur)}</div>
+            <div class="amount-wrap">${signBadgeHtml(e.type)}<span class="amount">${fmtCur(disp.amount, disp.cur)}</span></div>
           </div>
           <div class="entry-actions">
             <button class="action-btn edit" data-act="edit">${iconSvg('pencil')}<span class="lb">${t('edit')}</span></button>
