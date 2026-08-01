@@ -633,6 +633,7 @@
       cloudResendSuccess:'验证码已重新发送', cloudResendError:'发送失败：{msg}',
       cloudSyncError:'同步失败，请检查网络后重试',
       cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
+      catalogEmptyHint:'分类数据加载中，请联网后重新打开App',
       cloudCodeSentToast:'验证码已发送至 {email}，请查收邮件',
       cloudSignInSuccessToast:'登录成功', cloudVerifySuccessToast:'验证成功，欢迎回来',
       deleteConfirm:'确定删除「{info}」这条记录吗？删除后无法恢复。'
@@ -689,114 +690,83 @@
       cloudResendSuccess:'確認コードを再送しました', cloudResendError:'送信に失敗しました：{msg}',
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
       cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
+      catalogEmptyHint:'カテゴリデータを読み込み中です。ネットワークに接続してからAppを開き直してください',
       cloudCodeSentToast:'確認コードを {email} に送信しました',
       cloudSignInSuccessToast:'ログインしました', cloudVerifySuccessToast:'確認できました。おかえりなさい',
       deleteConfirm:'「{info}」を削除しますか？削除すると元に戻せません。'
     }
   };
 
-  // 分类体系参考 Money Forward ME 的18个支出大项+中项目、9个收入大项+中项目(二级分类)
-  const expenseCats = [
-    {key:'food', zh:'食费', ja:'食費', icon:'bowl', color:'#d36f17', subs:[
-      {key:'grocery', zh:'食材', ja:'食料品'},{key:'eatout', zh:'外食', ja:'外食'},{key:'cafe', zh:'咖啡', ja:'カフェ'},{key:'breakfast', zh:'早餐', ja:'朝ご飯'},{key:'food_other', zh:'其他食费', ja:'その他食費'}
-    ]},
-    {key:'daily', zh:'日用品', ja:'日用品', icon:'basket', color:'#415cd8', subs:[
-      {key:'daily_goods', zh:'日用品', ja:'日用品'},{key:'drugstore', zh:'药妆店', ja:'ドラッグストア'},{key:'pet', zh:'宠物用品', ja:'ペット用品'},{key:'tobacco', zh:'香烟', ja:'たばこ'},{key:'childcare', zh:'育儿用品', ja:'子育て用品'}
-    ]},
-    {key:'hobby', zh:'趣味娱乐', ja:'趣味・娯楽', icon:'controller', color:'#d3cd17', subs:[
-      {key:'outdoor', zh:'户外', ja:'アウトドア'},{key:'sports', zh:'运动', ja:'スポーツ'},{key:'media', zh:'影音游戏', ja:'映画・音楽・ゲーム'},{key:'video', zh:'视频', ja:'動画'},{key:'books', zh:'书籍', ja:'本'},{key:'travel', zh:'旅行', ja:'旅行'}
-    ]},
-    {key:'social', zh:'交际费', ja:'交際費', icon:'gift', color:'#17d39a', subs:[
-      {key:'party', zh:'聚餐应酬', ja:'飲み会'},{key:'present', zh:'礼物', ja:'プレゼント'},{key:'ceremony', zh:'婚丧嫁娶', ja:'冠婚葬祭'}
-    ]},
-    {key:'transport', zh:'交通费', ja:'交通費', icon:'bus', color:'#d8c041', subs:[
-      {key:'train', zh:'电车', ja:'電車'},{key:'bus', zh:'公交', ja:'バス'},{key:'taxi', zh:'出租车', ja:'タクシー'},{key:'flight', zh:'飞机', ja:'飛行機'}
-    ]},
-    {key:'fashion', zh:'服装美容', ja:'衣服・美容', icon:'shirt', color:'#abd317', subs:[
-      {key:'clothes', zh:'服装', ja:'衣服'},{key:'laundry', zh:'干洗', ja:'クリーニング'},{key:'salon', zh:'美容美发', ja:'美容院・理髪代'},{key:'cosmetics', zh:'化妆品', ja:'化粧品'},{key:'accessory', zh:'饰品', ja:'アクセサリー'}
-    ]},
-    {key:'medical', zh:'健康医疗', ja:'健康・医療', icon:'cross', color:'#41d8bd', subs:[
-      {key:'med_fee', zh:'医疗费', ja:'医療費'},{key:'medicine', zh:'药品', ja:'薬'},{key:'fitness', zh:'健身', ja:'フィットネス'},{key:'bodycare', zh:'美体保养', ja:'ボディケア'}
-    ]},
-    {key:'car', zh:'汽车', ja:'自動車', icon:'car', color:'#41d871', subs:[
-      {key:'gas', zh:'汽油费', ja:'ガソリン代'},{key:'carloan', zh:'汽车贷款', ja:'自動車ローン'},{key:'parking', zh:'停车费', ja:'駐車場料金'},{key:'toll', zh:'高速费', ja:'高速料金'},{key:'carinsurance', zh:'车险', ja:'自動車保険'}
-    ]},
-    {key:'edu', zh:'教育培训', ja:'教養・教育', icon:'cap', color:'#1780d3', subs:[
-      {key:'tuition', zh:'学费', ja:'学費'},{key:'lesson', zh:'兴趣班', ja:'習い事'},{key:'cram', zh:'补习班', ja:'塾代'},{key:'childedu', zh:'育儿杂费', ja:'子育て雑費'},{key:'book', zh:'图书', ja:'書籍'}
-    ]},
-    {key:'special', zh:'特殊支出', ja:'特別な支出', icon:'box', color:'#41cdd8', subs:[
-      {key:'furniture', zh:'家具', ja:'家具'},{key:'appliance', zh:'家电', ja:'家電'},{key:'renovation', zh:'住宅装修', ja:'住宅・リフォーム'},{key:'special_other', zh:'其他特殊支出', ja:'その他特別な支出'}
-    ]},
-    {key:'cash', zh:'现金取现', ja:'現金・カード', icon:'wallet', color:'#17d36b', subs:[
-      {key:'cash_w', zh:'现金', ja:'現金'},{key:'atm', zh:'ATM取现', ja:'ATM引き出し'},{key:'card_pay', zh:'银行卡扣款', ja:'カード引き落とし'}
-    ]},
-    {key:'utility', zh:'水电煤气', ja:'水道・光熱費', icon:'bulb', color:'#17afd3', subs:[
-      {key:'electric', zh:'电费', ja:'電気'},{key:'gas_fee', zh:'燃气费', ja:'ガス'},{key:'water', zh:'水费', ja:'水道'}
-    ]},
-    {key:'telecom', zh:'通讯费', ja:'通信費', icon:'wifi', color:'#a5d841', subs:[
-      {key:'phone', zh:'话费', ja:'携帯電話代'},{key:'internet', zh:'网费', ja:'インターネット代'}
-    ]},
-    {key:'housing', zh:'住房', ja:'住宅', icon:'house', color:'#d89a41', subs:[
-      {key:'rent', zh:'房租', ja:'家賃'},{key:'mortgage', zh:'房贷', ja:'住宅ローン'},{key:'mgmt_fee', zh:'管理费', ja:'管理費・積立金'},{key:'fire_ins', zh:'火灾保险', ja:'火災保険'},{key:'quake_ins', zh:'地震保险', ja:'地震保険'}
-    ]},
-    {key:'tax', zh:'税金社保', ja:'税・社会保障', icon:'doc', color:'#4182d8', subs:[
-      {key:'income_tax', zh:'所得税', ja:'所得税'},{key:'resident_tax', zh:'居民税', ja:'住民税'},{key:'pension_ins', zh:'养老保险', ja:'年金保険料'},{key:'health_ins', zh:'医疗保险', ja:'健康保険'}
-    ]},
-    {key:'insurance', zh:'保险', ja:'保険', icon:'shield', color:'#d31761', subs:[
-      {key:'life_ins', zh:'人寿保险', ja:'生命保険'},{key:'medical_ins', zh:'医疗保险', ja:'医療保険'}
-    ]},
-    {key:'other_e', zh:'其他', ja:'その他', icon:'star', color:'#1722d3', subs:[
-      {key:'other_e_sub', zh:'其他', ja:'その他'}
-    ]},
-    {key:'uncat_e', zh:'未分类', ja:'未分類', icon:'question', color:'#4a4a4a', subs:[
-      {key:'uncat_e_sub', zh:'未分类', ja:'未分類'}
-    ]},
-  ];
-  const incomeCats = [
-    {key:'salary', zh:'工资', ja:'給与', icon:'coin', color:'#d39e17', subs:[
-      {key:'salary_base', zh:'工资', ja:'給与'},{key:'bonus', zh:'奖金', ja:'賞与'}
-    ]},
-    {key:'onetime', zh:'一次性所得', ja:'一時所得', icon:'party', color:'#41a8d8', subs:[
-      {key:'prize', zh:'中奖', ja:'懸賞・当選金'},{key:'insurance_payout', zh:'保险赔付', ja:'保険金'}
-    ]},
-    {key:'sidejob', zh:'事业副业', ja:'事業・副業', icon:'briefcase', color:'#cad841', subs:[
-      {key:'business', zh:'事业收入', ja:'事業収入'},{key:'side_income', zh:'副业收入', ja:'副業収入'}
-    ]},
-    {key:'pension', zh:'养老金', ja:'年金', icon:'bank', color:'#41d897', subs:[
-      {key:'pension_income', zh:'养老金', ja:'年金'}
-    ]},
-    {key:'dividend', zh:'股息所得', ja:'配当所得', icon:'trend', color:'#17d33c', subs:[
-      {key:'stock_dividend', zh:'股息', ja:'配当金'},{key:'interest', zh:'利息', ja:'利子'}
-    ]},
-    {key:'realestate', zh:'不动产收入', ja:'不動産所得', icon:'building', color:'#17d3c9', subs:[
-      {key:'rent_income', zh:'租金收入', ja:'家賃収入'}
-    ]},
-    {key:'unknown_i', zh:'不明入账', ja:'不明な入金', icon:'question', color:'#1751d3', subs:[
-      {key:'unknown_i_sub', zh:'不明入账', ja:'不明な入金'}
-    ]},
-    {key:'other_i', zh:'其他入账', ja:'その他入金', icon:'envelope', color:'#4b41d8', subs:[
-      {key:'other_i_sub', zh:'其他', ja:'その他'}
-    ]},
-    {key:'uncat_i', zh:'未分类', ja:'未分類', icon:'question', color:'#2f2f2f', subs:[
-      {key:'uncat_i_sub', zh:'未分类', ja:'未分類'}
-    ]},
-  ];
+  // 大类/细分/支付方式不再写死在代码里,改成从数据库拉取(预设数据所有人都能读,不要求登录)+本机缓存兜底离线使用。
+  // 见 loadCatalogData()/fetchCatalogFromCloud()——App 启动时调用。
+  let expenseCats = [];
+  let incomeCats = [];
+  let paymentMethods = [];
   const allCatMap = {};
-  expenseCats.concat(incomeCats).forEach(c=> allCatMap[c.key]=c);
-  function subLabel(sub){ if(!sub) return ''; if(sub.custom) return sub.label || ''; return sub[settings.lang] || sub.zh || ''; }
-  function findSub(catObj, subKey){ return catObj && catObj.subs && catObj.subs.find(s=>s.key===subKey); }
-
-  const paymentMethods = [
-    {key:'cash', zh:'现金', ja:'現金', icon:'bill'},
-    {key:'credit', zh:'信用卡', ja:'クレジットカード', icon:'card'},
-    {key:'merpay', zh:'Merpay', ja:'メルペイ', badge:{bg:'#FF0211', text:'メ'}},
-    {key:'rakutenpay', zh:'乐天Pay', ja:'楽天ペイ', badge:{bg:'#BF0000', text:'楽'}},
-    {key:'transfer', zh:'银行转账', ja:'銀行振込', icon:'bank'},
-    {key:'paidy', zh:'Paidy', ja:'ペイディ', badge:{bg:'#FF3D71', text:'P'}},
-    {key:'amazon', zh:'Amazon', ja:'Amazon', badge:{bg:'#FF9900', text:'a'}},
-  ];
   const payMethodMap = {};
-  paymentMethods.forEach(p=> payMethodMap[p.key]=p);
+
+  function rebuildCatalogMaps(){
+    Object.keys(allCatMap).forEach(k=> delete allCatMap[k]);
+    expenseCats.concat(incomeCats).forEach(c=> allCatMap[c.key]=c);
+    Object.keys(payMethodMap).forEach(k=> delete payMethodMap[k]);
+    paymentMethods.forEach(p=> payMethodMap[p.key]=p);
+  }
+  function saveCatalogCache(){
+    storageSetSafe('ledger_catalog_cache', JSON.stringify({expenseCats, incomeCats, paymentMethods}), false).catch(e=> console.error('分类缓存保存失败', e));
+  }
+  function loadCatalogCacheFromLocal(){
+    try{
+      const res = LocalStore.get('ledger_catalog_cache');
+      if(res && res.value){
+        const data = JSON.parse(res.value);
+        expenseCats = data.expenseCats || [];
+        incomeCats = data.incomeCats || [];
+        paymentMethods = data.paymentMethods || [];
+        rebuildCatalogMaps();
+        return true;
+      }
+    }catch(e){ console.error('读取本机分类缓存失败', e); }
+    return false;
+  }
+  function rowsToCatArray(catRows, subRows, type){
+    return catRows.filter(c=>c.type===type).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(c=>({
+      key:c.key, zh:c.zh, ja:c.ja, icon:c.icon, color:c.color,
+      subs: subRows.filter(s=>s.cat_key===c.key).map(s=>({key:s.key, zh:s.zh, ja:s.ja, custom: !s.is_preset}))
+    }));
+  }
+  async function fetchCatalogFromCloud(){
+    if(!supabaseClient) return false;
+    try{
+      const [catRes, subRes, payRes] = await Promise.all([
+        supabaseClient.from('categories').select('*'),
+        supabaseClient.from('subcategories').select('*'),
+        supabaseClient.from('payment_methods').select('*'),
+      ]);
+      if(catRes.error) throw catRes.error;
+      if(subRes.error) throw subRes.error;
+      if(payRes.error) throw payRes.error;
+      const catRows = catRes.data||[], subRows = subRes.data||[], payRows = payRes.data||[];
+      if(!catRows.length) return false;
+      expenseCats = rowsToCatArray(catRows, subRows, 'expense');
+      incomeCats = rowsToCatArray(catRows, subRows, 'income');
+      paymentMethods = payRows.slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(p=>({
+        key:p.key, zh:p.zh, ja:p.ja, icon:p.icon||undefined,
+        badge: p.badge_bg ? {bg:p.badge_bg, text:p.badge_text} : undefined
+      }));
+      rebuildCatalogMaps();
+      saveCatalogCache();
+      return true;
+    }catch(e){ console.error('拉取分类/支付方式失败,使用本机缓存', e); return false; }
+  }
+  async function loadCatalogData(){
+    const hasCache = loadCatalogCacheFromLocal();
+    const fetched = await fetchCatalogFromCloud();
+    if(!fetched && !hasCache){
+      console.error('分类数据既没有云端也没有本机缓存,分类列表暂时为空,需要联网后重新打开App');
+    }
+  }
+  function subLabel(sub){ if(!sub) return ''; return sub[settings.lang] || sub.zh || sub.label || ''; }
+  function findSub(catObj, subKey){ return catObj && catObj.subs && catObj.subs.find(s=>s.key===subKey); }
   function iconSvg(iconId){ return `<svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-${iconId}"/></svg>`; }
   function catIconHtml(cat){ return cat ? `<span style="color:${cat.color}">${iconSvg(cat.icon)}</span>` : ''; }
   function pmIconHtml(p){
@@ -951,6 +921,7 @@
       try{ const res = LocalStore.get('ledger_settings'); if(res && res.value) onDisk = JSON.parse(res.value); }catch(e){}
       settings = Object.assign({}, onDisk, settings);
       await storageSetSafe('ledger_settings', JSON.stringify(settings), false);
+      pushSettingsUpsert();
     }
     catch(e){ console.error('设置保存失败', e); showToast(t('saveFailed')); }
   }
@@ -968,7 +939,6 @@
     try{
       await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
       scheduleGistBackup();
-      scheduleCloudPush();
       ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
     }
     catch(e){ console.error('保存失败', e); showToast(t('saveFailed')); }
@@ -980,9 +950,17 @@
     clearTimeout(gistBackupTimer);
     gistBackupTimer = setTimeout(()=> pushBackupToGist(false), 2500);
   }
+  function extractCustomSubsForBackup(){
+    const map = {};
+    expenseCats.concat(incomeCats).forEach(c=>{
+      const customs = c.subs.filter(s=>s.custom);
+      if(customs.length) map[c.key] = customs.map(s=>({key:s.key, custom:true, label: subLabel(s)}));
+    });
+    return map;
+  }
   function buildBackupPayload(){
     const safeSettings = {lang: settings.lang, currency: settings.currency};
-    return JSON.stringify({version:1, exportedAt: Date.now(), entries, settings: safeSettings, customSubs: customSubsMap}, null, 2);
+    return JSON.stringify({version:1, exportedAt: Date.now(), entries, settings: safeSettings, customSubs: extractCustomSubsForBackup()}, null, 2);
   }
   async function pushBackupToGist(manual){
     const token = (settings.githubToken||'').trim();
@@ -1037,14 +1015,22 @@
       if(!file || !file.content) throw new Error('empty backup');
       const payload = JSON.parse(file.content);
       entries = Array.isArray(payload.entries) ? payload.entries : [];
-      customSubsMap = payload.customSubs && typeof payload.customSubs==='object' ? payload.customSubs : {};
+      if(payload.customSubs && typeof payload.customSubs==='object'){
+        Object.keys(payload.customSubs).forEach(catKey=>{
+          const cat = allCatMap[catKey];
+          if(!cat) return;
+          payload.customSubs[catKey].forEach(sub=>{
+            if(!cat.subs.find(s=>s.key===sub.key)) cat.subs.push({key:sub.key, zh:sub.label, ja:sub.label, custom:true});
+          });
+        });
+        saveCatalogCache();
+      }
       if(payload.settings){
         settings.lang = payload.settings.lang || settings.lang;
         settings.currency = payload.settings.currency || settings.currency;
       }
       settings.tokenLocked = true;
       await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
-      await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false);
       await saveSettings();
       showToast(t('restoreSuccess'));
       setTimeout(()=> location.reload(), 700);
@@ -1341,7 +1327,7 @@
     $('tokenEditBtn').style.display = locked ? 'flex' : 'none';
   }
 
-  // ---------- Supabase 实时云同步 ----------
+  // ---------- Supabase 实时云同步(改成规范多表,不再是单行大JSON) ----------
   // anon key 是设计给前端公开使用的(配合数据库的 Row Level Security 规则限制每个人只能读写自己那一行),
   // 不是敏感信息,可以放心写死在这个单文件App里
   const SUPABASE_URL = 'https://echqjmtouxvwybxdfcqk.supabase.co';
@@ -1354,66 +1340,101 @@
   }catch(e){ console.error('Supabase 初始化失败', e); }
 
   let cloudUser = null;
-  let cloudSyncTimer = null;
   let cloudRealtimeChannel = null;
-  let applyingRemoteCloudUpdate = false;
 
-  function buildCloudPayload(){
-    return { entries, custom_subs: customSubsMap, settings: {lang: settings.lang, currency: settings.currency}, updated_at: new Date().toISOString() };
+  function entryToDbRow(entry){
+    return {
+      id: String(entry.id),
+      user_id: cloudUser.id,
+      type: entry.type,
+      amount: entry.amount,
+      currency: entry.currency,
+      cat_key: entry.catKey,
+      sub_key: entry.subKey,
+      payment_method: entry.paymentMethod,
+      note: entry.note || null,
+      entry_date: entry.date,
+      recurring_id: entry.recurringId || null,
+    };
   }
-  function scheduleCloudPush(){
-    if(!supabaseClient || !cloudUser) return;
-    clearTimeout(cloudSyncTimer);
-    cloudSyncTimer = setTimeout(()=> pushCloudData(), 1500);
+  function dbRowToEntry(row){
+    const catObj = allCatMap[row.cat_key];
+    const subObj = catObj ? findSub(catObj, row.sub_key) : null;
+    return {
+      id: row.id, type: row.type, amount: row.amount, currency: row.currency,
+      catKey: row.cat_key, category: catObj ? catLabel(catObj) : '',
+      subKey: row.sub_key, subCategory: subObj ? subLabel(subObj) : '',
+      paymentMethod: row.payment_method,
+      icon: catObj ? catObj.icon : '',
+      note: row.note || '', date: row.entry_date,
+      createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
+      recurringId: row.recurring_id || undefined,
+    };
   }
-  async function pushCloudData(){
-    if(!supabaseClient || !cloudUser || applyingRemoteCloudUpdate) return;
+  async function pushEntriesBulkUpsert(list){
+    if(!supabaseClient || !cloudUser || !list.length) return;
     try{
-      const { error } = await supabaseClient.from('user_data').upsert({ user_id: cloudUser.id, ...buildCloudPayload() });
+      const { error } = await supabaseClient.from('entries').upsert(list.map(entryToDbRow));
       if(error) throw error;
-    }catch(e){ console.error('云同步推送失败', e); }
+    }catch(e){ console.error('账目同步到数据库失败', e); }
   }
-  async function pullCloudData(){
+  function pushEntryUpsert(entry){ return pushEntriesBulkUpsert([entry]); }
+  async function pushEntryDelete(id){
+    if(!supabaseClient || !cloudUser) return;
+    try{
+      const { error } = await supabaseClient.from('entries').delete().eq('id', String(id)).eq('user_id', cloudUser.id);
+      if(error) throw error;
+    }catch(e){ console.error('账目删除同步失败', e); }
+  }
+  async function pullAllEntriesFromCloud(){
     if(!supabaseClient || !cloudUser) return null;
     try{
-      const { data, error } = await supabaseClient.from('user_data').select('*').eq('user_id', cloudUser.id).maybeSingle();
+      const { data, error } = await supabaseClient.from('entries').select('*').eq('user_id', cloudUser.id);
+      if(error) throw error;
+      return (data||[]).map(dbRowToEntry);
+    }catch(e){ console.error('拉取账目失败', e); showToast(t('cloudSyncError')); return null; }
+  }
+  async function pushSettingsUpsert(){
+    if(!supabaseClient || !cloudUser) return;
+    try{
+      const { error } = await supabaseClient.from('user_settings').upsert({ user_id: cloudUser.id, lang: settings.lang, currency: settings.currency, updated_at: new Date().toISOString() });
+      if(error) throw error;
+    }catch(e){ console.error('设置同步失败', e); }
+  }
+  async function pullSettingsFromCloud(){
+    if(!supabaseClient || !cloudUser) return null;
+    try{
+      const { data, error } = await supabaseClient.from('user_settings').select('*').eq('user_id', cloudUser.id).maybeSingle();
       if(error) throw error;
       return data;
-    }catch(e){ console.error('云同步拉取失败', e); showToast(t('cloudSyncError')); return null; }
+    }catch(e){ console.error('拉取设置失败', e); return null; }
   }
-  function applyCloudData(row){
-    applyingRemoteCloudUpdate = true;
-    try{
-      entries = Array.isArray(row.entries) ? row.entries : [];
-      customSubsMap = row.custom_subs && typeof row.custom_subs==='object' ? row.custom_subs : {};
-      if(row.settings){
-        settings.lang = row.settings.lang || settings.lang;
-        settings.currency = row.settings.currency || settings.currency;
-      }
-    } finally {
-      applyingRemoteCloudUpdate = false;
-    }
+  async function saveEntriesLocalOnly(){
+    try{ await storageSetSafe('ledger_entries', JSON.stringify(entries), false); }
+    catch(e){ console.error('本机账目保存失败', e); }
   }
-  async function saveAppliedCloudData(){
-    await storageSetSafe('ledger_entries', JSON.stringify(entries), false);
-    await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false);
-    await saveSettings();
-    applyStaticI18n();
-    renderAll();
-    renderRatePage();
-  }
+
   function startCloudRealtime(){
     if(!supabaseClient || !cloudUser) return;
     stopCloudRealtime();
-    cloudRealtimeChannel = supabaseClient.channel('user_data_changes_'+cloudUser.id)
-      .on('postgres_changes', { event:'*', schema:'public', table:'user_data', filter:'user_id=eq.'+cloudUser.id }, async (payload)=>{
-        if(applyingRemoteCloudUpdate || !payload.new) return;
-        // 自己刚推上去的变更也会以事件形式收到回声,内容没变就跳过,避免多余重新渲染
-        const localJson = JSON.stringify({e:entries, c:customSubsMap});
-        const remoteJson = JSON.stringify({e:payload.new.entries, c:payload.new.custom_subs});
-        if(localJson === remoteJson) return;
-        applyCloudData(payload.new);
-        await saveAppliedCloudData();
+    cloudRealtimeChannel = supabaseClient.channel('entries_changes_'+cloudUser.id)
+      .on('postgres_changes', { event:'*', schema:'public', table:'entries', filter:'user_id=eq.'+cloudUser.id }, async (payload)=>{
+        if(payload.eventType === 'DELETE'){
+          const delId = payload.old && payload.old.id;
+          if(delId == null) return;
+          const before = entries.length;
+          entries = entries.filter(e=> String(e.id) !== String(delId));
+          if(entries.length !== before){ await saveEntriesLocalOnly(); renderAll(); }
+          return;
+        }
+        if(!payload.new) return;
+        const entry = dbRowToEntry(payload.new);
+        const idx = entries.findIndex(e=> String(e.id) === String(entry.id));
+        // 跟自己刚推上去的回声比对,内容没变就跳过,避免多余重新渲染
+        if(idx >= 0 && JSON.stringify(entries[idx]) === JSON.stringify(entry)) return;
+        if(idx >= 0) entries[idx] = entry; else entries.push(entry);
+        await saveEntriesLocalOnly();
+        renderAll();
       })
       .subscribe();
   }
@@ -1423,16 +1444,28 @@
   }
   async function handleCloudSignedIn(user){
     cloudUser = user;
-    const remote = await pullCloudData();
-    const hasRemoteData = remote && ((Array.isArray(remote.entries) && remote.entries.length>0) || (remote.custom_subs && Object.keys(remote.custom_subs).length>0));
-    if(hasRemoteData){
-      // 数据库是唯一权威数据源:云端已有数据就直接采用,不再弹窗询问是否覆盖本机
-      applyCloudData(remote);
-      await saveAppliedCloudData();
+    // 登录后这个人自己的自定义细分也能从数据库里读到了(RLS允许读自己的行),重新拉一次分类数据
+    await fetchCatalogFromCloud();
+    const remoteEntries = await pullAllEntriesFromCloud();
+    const remoteSettings = await pullSettingsFromCloud();
+    if(remoteEntries && remoteEntries.length > 0){
+      // 数据库是唯一权威数据源:云端已有账目就直接采用,不再弹窗询问是否覆盖本机
+      entries = remoteEntries;
+      await saveEntriesLocalOnly();
     }else{
-      // 全新账号,云端还没有数据,把本机现有数据推上去作为初始数据
-      await pushCloudData();
+      // 全新账号,云端还没有账目,把本机现有的推上去作为初始数据
+      await pushEntriesBulkUpsert(entries);
     }
+    if(remoteSettings){
+      settings.lang = remoteSettings.lang || settings.lang;
+      settings.currency = remoteSettings.currency || settings.currency;
+      await saveSettings();
+    }else{
+      await pushSettingsUpsert();
+    }
+    applyStaticI18n();
+    renderAll();
+    renderRatePage();
     startCloudRealtime();
     renderCloudSyncStatus();
   }
@@ -1448,8 +1481,15 @@
       const { data } = await supabaseClient.auth.getSession();
       if(data && data.session && data.session.user){
         cloudUser = data.session.user;
-        const remote = await pullCloudData();
-        if(remote){ applyCloudData(remote); await saveAppliedCloudData(); }
+        await fetchCatalogFromCloud();
+        const remoteEntries = await pullAllEntriesFromCloud();
+        if(remoteEntries){ entries = remoteEntries; await saveEntriesLocalOnly(); }
+        const remoteSettings = await pullSettingsFromCloud();
+        if(remoteSettings){
+          settings.lang = remoteSettings.lang || settings.lang;
+          settings.currency = remoteSettings.currency || settings.currency;
+          await saveSettings();
+        }
         startCloudRealtime();
         renderCloudSyncStatus();
       }
@@ -1467,11 +1507,11 @@
     if(!supabaseClient || !cloudUser || resumeSyncing) return;
     resumeSyncing = true;
     try{
-      const remote = await pullCloudData();
-      if(remote){
-        const localJson = JSON.stringify({e:entries, c:customSubsMap});
-        const remoteJson = JSON.stringify({e:remote.entries, c:remote.custom_subs});
-        if(localJson !== remoteJson){ applyCloudData(remote); await saveAppliedCloudData(); }
+      const remoteEntries = await pullAllEntriesFromCloud();
+      if(remoteEntries && JSON.stringify(remoteEntries) !== JSON.stringify(entries)){
+        entries = remoteEntries;
+        await saveEntriesLocalOnly();
+        renderAll();
       }
       startCloudRealtime();
     }catch(e){ console.error('前台恢复时重新同步失败', e); }
@@ -1556,6 +1596,7 @@
           if(!confirm(t('deleteConfirm').replace('{info}', info))) return;
           entries = entries.filter(e=> String(e.id)!==id);
           saveEntries(); renderAll();
+          pushEntryDelete(id);
         }else if(act==='edit' && entry){
           openEntrySheetForEdit(entry);
         }else if(act==='copy' && entry){
@@ -1739,13 +1780,20 @@
 
   function ensureSelectedCat(){
     const cats = currentType==='expense' ? expenseCats : incomeCats;
-    if(!selectedCat || !cats.find(c=>c.key===selectedCat.key)){ selectedCat = cats[0]; selectedSub = null; }
-    const subs = selectedCat.subs || [];
+    if(!selectedCat || !cats.find(c=>c.key===selectedCat.key)){ selectedCat = cats[0] || null; selectedSub = null; }
+    const subs = (selectedCat && selectedCat.subs) || [];
     if(!selectedSub || !subs.find(s=>s.key===selectedSub.key)) selectedSub = subs[0] || null;
   }
 
   function updateCatPickerRowDisplay(){
     ensureSelectedCat();
+    // 分类数据还没加载好(比如首次打开且当时没网,本机也还没有缓存)时 selectedCat 会是 null,
+    // 这种情况下只能等联网后重新打开App,先不崩不闪退
+    if(!selectedCat){
+      $('catPickerIcon').innerHTML = '';
+      $('catPickerText').textContent = t('catalogEmptyHint');
+      return;
+    }
     $('catPickerIcon').innerHTML = iconSvg(selectedCat.icon);
     $('catPickerIcon').style.background = tintColor(selectedCat.color, 0.85);
     $('catPickerIcon').style.color = selectedCat.color;
@@ -1791,7 +1839,7 @@
     let html = subs.map(s=>{
       if(editingSubKey === s.key){
         return `<span class="sub-item-wrap">
-          <input type="text" class="sub-inline-input" data-editing-key="${s.key}" value="${escapeHtml(s.label)}">
+          <input type="text" class="sub-inline-input" data-editing-key="${s.key}" value="${escapeHtml(subLabel(s))}">
           <button type="button" class="sub-mini-btn sub-confirm" data-editing-key="${s.key}">${iconSvg('check')}</button>
         </span>`;
       }
@@ -1858,7 +1906,7 @@
       if(label && selectedCat){
         if(key && key !== '__new__'){
           await updateCustomSub(selectedCat.key, key, label);
-          if(selectedSub && selectedSub.key===key) selectedSub.label = label;
+          if(selectedSub && selectedSub.key===key){ selectedSub.zh = label; selectedSub.ja = label; }
         }else{
           selectedSub = await addCustomSub(selectedCat.key, label);
         }
@@ -1893,50 +1941,43 @@
     renderSubGrid();
   }
 
-  async function loadCustomSubs(){
-    try{
-      const res = LocalStore.get('ledger_custom_subs');
-      return res && res.value ? JSON.parse(res.value) : {};
-    }catch(e){ return {}; }
-  }
-  let customSubsMap = {};
-  async function initCustomSubs(){
-    customSubsMap = await loadCustomSubs();
-    Object.keys(customSubsMap).forEach(catKey=>{
-      const cat = allCatMap[catKey];
-      if(cat){
-        customSubsMap[catKey].forEach(sub=>{
-          if(!cat.subs.find(s=>s.key===sub.key)) cat.subs.push(sub);
-        });
-      }
-    });
-  }
-  async function persistCustomSubs(){
-    try{ await storageSetSafe('ledger_custom_subs', JSON.stringify(customSubsMap), false); scheduleGistBackup(); scheduleCloudPush(); }
-    catch(e){ console.error('自定义分类保存失败', e); showToast(t('saveFailed')); }
-  }
+  // 自定义细分现在直接是 expenseCats/incomeCats 里 subs 数组的一部分(custom:true 标记),
+  // 不再单独存一份 customSubsMap——本机缓存靠 saveCatalogCache() 统一存;登录状态下再额外写库。
   async function addCustomSub(catKey, label){
-    const sub = {key:'custom_'+Date.now(), custom:true, label:label};
+    const sub = {key:'custom_'+Date.now(), custom:true, zh:label, ja:label};
     const cat = allCatMap[catKey];
     if(cat) cat.subs.push(sub);
-    if(!customSubsMap[catKey]) customSubsMap[catKey] = [];
-    customSubsMap[catKey].push(sub);
-    await persistCustomSubs();
+    saveCatalogCache();
+    if(cloudUser && supabaseClient){
+      try{
+        const { error } = await supabaseClient.from('subcategories').insert({ key:sub.key, cat_key:catKey, zh:label, ja:label, is_preset:false, user_id:cloudUser.id });
+        if(error) throw error;
+      }catch(e){ console.error('自定义细分同步失败', e); showToast(t('cloudSyncError')); }
+    }
     return sub;
   }
   async function updateCustomSub(catKey, subKey, newLabel){
     const cat = allCatMap[catKey];
     const sub = cat && cat.subs.find(s=>s.key===subKey);
-    if(sub) sub.label = newLabel;
-    const stored = (customSubsMap[catKey]||[]).find(s=>s.key===subKey);
-    if(stored) stored.label = newLabel;
-    await persistCustomSubs();
+    if(sub){ sub.zh = newLabel; sub.ja = newLabel; }
+    saveCatalogCache();
+    if(cloudUser && supabaseClient){
+      try{
+        const { error } = await supabaseClient.from('subcategories').update({zh:newLabel, ja:newLabel}).eq('key', subKey).eq('user_id', cloudUser.id);
+        if(error) throw error;
+      }catch(e){ console.error('自定义细分更新失败', e); showToast(t('cloudSyncError')); }
+    }
   }
   async function deleteCustomSub(catKey, subKey){
     const cat = allCatMap[catKey];
     if(cat) cat.subs = cat.subs.filter(s=>s.key!==subKey);
-    if(customSubsMap[catKey]) customSubsMap[catKey] = customSubsMap[catKey].filter(s=>s.key!==subKey);
-    await persistCustomSubs();
+    saveCatalogCache();
+    if(cloudUser && supabaseClient){
+      try{
+        const { error } = await supabaseClient.from('subcategories').delete().eq('key', subKey).eq('user_id', cloudUser.id);
+        if(error) throw error;
+      }catch(e){ console.error('自定义细分删除失败', e); showToast(t('cloudSyncError')); }
+    }
   }
   function openCatPicker(){
     renderCatGrid();
@@ -2037,6 +2078,7 @@
     if(!amt || amt<=0){ $('amountInput').focus(); return; }
     const date = $('dateInput').value || todayStr();
     const note = $('noteInput').value.trim();
+    let savedEntry;
     if(editingEntryId){
       const idx = entries.findIndex(e=> e.id===editingEntryId);
       if(idx>-1){
@@ -2048,20 +2090,23 @@
           paymentMethod: selectedPayMethod ? selectedPayMethod.key : 'cash',
           note: note, date: date
         };
+        savedEntry = entries[idx];
       }
     }else{
-      entries.push({
+      savedEntry = {
         id: Date.now()+Math.random().toString(16).slice(2),
         type: currentType, amount: amt, currency: currentCurrency,
         category: catLabel(selectedCat), catKey: selectedCat.key, icon: selectedCat.icon,
         subCategory: selectedSub? subLabel(selectedSub) : '', subKey: selectedSub? selectedSub.key : '',
         paymentMethod: selectedPayMethod ? selectedPayMethod.key : 'cash',
         note: note, date: date, createdAt: Date.now()
-      });
+      };
+      entries.push(savedEntry);
     }
     await saveEntries();
     renderAll();
     closeAllSheets();
+    if(savedEntry) pushEntryUpsert(savedEntry);
   });
 
   $('langSegment').querySelectorAll('button').forEach(btn=>{
@@ -2585,6 +2630,7 @@
   async function ensureRecurringEntries(){
     const mk = currentMonthKey();
     let changed = false;
+    const touched = [];
     RECURRING_RULES.forEach(rule=>{
       let dateStr = rule.dayOfMonth==='last' ? lastDayOfMonthStr(mk) : mk+'-'+pad2(rule.dayOfMonth);
       if(rule.bizDayAdjust) dateStr = adjustToBizDay(dateStr, rule.bizDayAdjust);
@@ -2593,12 +2639,13 @@
       const id = 'recur_'+rule.id+'_'+mk;
       const existing = entries.find(e=> e.id===id);
       if(existing){
-        if(existing.date !== dateStr){ existing.date = dateStr; changed = true; }
+        if(existing.date !== dateStr){ existing.date = dateStr; changed = true; touched.push(existing); }
         return;
       }
       const catObj = allCatMap[rule.catKey];
+      if(!catObj) return; // 分类数据还没加载好(比如离线且没缓存),先跳过,下次App启动再补
       const subObj = findSub(catObj, rule.subKey);
-      entries.push({
+      const newEntry = {
         id,
         type: rule.type, amount: rule.amount, currency: rule.currency,
         category: catLabel(catObj), catKey: rule.catKey,
@@ -2606,10 +2653,13 @@
         paymentMethod: rule.paymentMethod || 'cash',
         icon: catObj.icon, note: rule.note || '', date: dateStr,
         createdAt: Date.now(), recurringId: rule.id
-      });
+      };
+      entries.push(newEntry);
       changed = true;
+      touched.push(newEntry);
     });
     if(changed) await saveEntries();
+    if(touched.length) pushEntriesBulkUpsert(touched);
   }
 
   // 固定隔周收支规则:从 anchorDate 起,每隔 intervalDays 天补一笔,补到今天为止(不含 anchorDate 之前)
@@ -2619,16 +2669,18 @@
   async function ensureBiweeklyRecurringEntries(){
     const today = todayStr();
     let changed = false;
+    const touched = [];
     RECURRING_BIWEEKLY_RULES.forEach(rule=>{
       let d = new Date(rule.anchorDate+'T00:00:00');
       const todayD = new Date(today+'T00:00:00');
+      const catObj = allCatMap[rule.catKey];
+      if(!catObj) return; // 分类数据还没加载好(比如离线且没缓存),先跳过,下次App启动再补
       while(d <= todayD){
         const dateStr = fmtDateObj(d);
         const id = 'recur_'+rule.id+'_'+dateStr;
         if(!entries.find(e=> e.id===id)){
-          const catObj = allCatMap[rule.catKey];
           const subObj = findSub(catObj, rule.subKey);
-          entries.push({
+          const newEntry = {
             id,
             type: rule.type, amount: rule.amount, currency: rule.currency,
             category: catLabel(catObj), catKey: rule.catKey,
@@ -2636,13 +2688,16 @@
             paymentMethod: rule.paymentMethod || 'cash',
             icon: catObj.icon, note: rule.note || '', date: dateStr,
             createdAt: Date.now(), recurringId: rule.id
-          });
+          };
+          entries.push(newEntry);
           changed = true;
+          touched.push(newEntry);
         }
         d.setDate(d.getDate() + rule.intervalDays);
       }
     });
     if(changed) await saveEntries();
+    if(touched.length) pushEntriesBulkUpsert(touched);
   }
 
   async function init(){
@@ -2651,7 +2706,7 @@
       catch(e){ console.error('初始化步骤失败: '+name, e); }
     };
     await step('loadSettings', loadSettings);
-    await step('initCustomSubs', initCustomSubs);
+    await step('loadCatalogData', loadCatalogData);
     await step('applyStaticI18n', applyStaticI18n);
     await step('setMonthLabel', setMonthLabel);
     await step('loadRateCache', loadRateCache);
@@ -2659,7 +2714,7 @@
     await step('loadEntries', loadEntries);
     // initCloudSync 必须放在生成固定收支之前:
     // 如果先生成本月固定收支再等云端同步,云端此时还没有这条新记录、cloudUser 也还没设好,
-    // scheduleCloudPush() 会静默跳过推送,随后 initCloudSync 拉回旧的云端数据又会把刚生成的这条覆盖掉,
+    // pushEntriesBulkUpsert() 会因为 cloudUser 还是空的而静默跳过推送,随后 initCloudSync 拉回旧的云端账目又会把本机整个替换掉,
     // 等于这条固定收支既没推上数据库、本机也丢了。先同步好云端最新状态,再在这个基础上生成本月还缺的固定收支,
     // 这样生成出来的新记录才能正常推送到数据库。
     await step('initCloudSync', initCloudSync);
