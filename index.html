@@ -421,10 +421,6 @@
         <div class="seal" id="sealBadge2">总</div>
       </div>
     </div>
-    <div class="segment" id="dimSegment">
-      <button type="button" class="active" data-dim="day" id="dimDayBtn">按日对比</button>
-      <button type="button" data-dim="month" id="dimMonthBtn">按月对比</button>
-    </div>
     <div class="cumulative-range-card">
       <div class="card-title"><span id="cumRangeTitle">区间累计结余</span></div>
       <div class="range-picker-row">
@@ -437,6 +433,10 @@
         <div class="stat income"><div class="lbl" id="cumRangeIncomeLabel">区间总收入</div><div class="val" id="cumRangeIncome">¥0</div></div>
         <div class="stat expense"><div class="lbl" id="cumRangeExpenseLabel">区间总支出</div><div class="val" id="cumRangeExpense">¥0</div></div>
       </div>
+    </div>
+    <div class="segment" id="dimSegment">
+      <button type="button" class="active" data-dim="day" id="dimDayBtn">按日对比</button>
+      <button type="button" data-dim="month" id="dimMonthBtn">按月对比</button>
     </div>
     <div class="compare-row" id="compareRow"></div>
     <div class="chart-card">
@@ -667,7 +667,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801q';
+  const APP_BUILD = '20260801r';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
