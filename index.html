@@ -422,7 +422,7 @@
       </div>
     </div>
     <div class="cumulative-range-card">
-      <div class="card-title"><span id="cumRangeTitle">区间累计结余</span></div>
+      <div class="card-title"><span id="cumRangeTitle">累计结余</span></div>
       <div class="range-picker-row">
         <button type="button" class="range-pill" id="cumRangeStartBtn">2025年1月</button>
         <span class="range-arrow">→</span>
@@ -430,8 +430,8 @@
       </div>
       <div class="cr-amount" id="cumRangeAmount">¥0</div>
       <div class="stats-row" style="margin-top:2px;">
-        <div class="stat income"><div class="lbl" id="cumRangeIncomeLabel">区间总收入</div><div class="val" id="cumRangeIncome">¥0</div></div>
-        <div class="stat expense"><div class="lbl" id="cumRangeExpenseLabel">区间总支出</div><div class="val" id="cumRangeExpense">¥0</div></div>
+        <div class="stat income"><div class="lbl" id="cumRangeIncomeLabel">累计收入</div><div class="val" id="cumRangeIncome">¥0</div></div>
+        <div class="stat expense"><div class="lbl" id="cumRangeExpenseLabel">累计支出</div><div class="val" id="cumRangeExpense">¥0</div></div>
       </div>
     </div>
     <div class="segment" id="dimSegment">
@@ -667,7 +667,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801r';
+  const APP_BUILD = '20260801s';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -679,7 +679,7 @@
       statsTitle:'统计', dimDay:'按日对比', dimMonth:'按月对比',
       trendDayTitle:'本月每日收支', trendMonthTitle:'本年每月收支',
       ymPickerTitle:'选择年月', ymPickerDoneBtn:'完成',
-      cumRangeTitle:'区间累计结余', cumRangeIncomeLabel:'区间总收入', cumRangeExpenseLabel:'区间总支出',
+      cumRangeTitle:'累计结余', cumRangeIncomeLabel:'累计收入', cumRangeExpenseLabel:'累计支出',
       cumRangeSheetTitle:'选择起止年月', cumRangeStartMode:'起始', cumRangeEndMode:'截止',
       typeExpense:'支出构成', typeIncome:'收入构成',
       homeDonutHint:'点击查看本月明细 ›', monthDetailTitle:'本月明细', detailWord:'明细',
@@ -731,7 +731,7 @@
       statsTitle:'集計', dimDay:'日別比較', dimMonth:'月別比較',
       trendDayTitle:'今月の日別収支', trendMonthTitle:'今年の月別収支',
       ymPickerTitle:'年月を選択', ymPickerDoneBtn:'完了',
-      cumRangeTitle:'期間累計残高', cumRangeIncomeLabel:'期間の総収入', cumRangeExpenseLabel:'期間の総支出',
+      cumRangeTitle:'累計残高', cumRangeIncomeLabel:'累計収入', cumRangeExpenseLabel:'累計支出',
       cumRangeSheetTitle:'開始・終了年月を選択', cumRangeStartMode:'開始', cumRangeEndMode:'終了',
       typeExpense:'支出内訳', typeIncome:'収入内訳',
       homeDonutHint:'タップして今月の明細を見る ›', monthDetailTitle:'今月の明細', detailWord:'明細',
