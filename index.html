@@ -667,7 +667,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801s';
+  const APP_BUILD = '20260801t';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2475,14 +2475,20 @@
       svg += `<text x="${x0+barW/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
     });
     svgEl.innerHTML = svg;
-    // 滚到"当前选中类型"最后一笔有数据的那一段,而不是无脑滚到最右边——
-    // 比如切到"收入"看,发薪日往往在月中,滚到月末反而看不到工资那根柱子
     const scrollEl = svgEl.parentElement;
     if(scrollEl){
-      let lastNonZeroIdx = -1;
-      buckets.forEach((b,i)=>{ if(b[valField] > 0) lastNonZeroIdx = i; });
-      if(lastNonZeroIdx >= 0){
-        const groupRight = 10 + (lastNonZeroIdx+1)*groupW;
+      // 按日对比且看的正是当前这个月:默认定位到"今天"这一根柱子,不用靠数据推算
+      let targetIdx = -1;
+      if(currentDim==='day'){
+        targetIdx = buckets.findIndex(b=> b.key===todayStr());
+      }
+      if(targetIdx < 0){
+        // 不是当前月(浏览过去的月份)或按月对比:退回"当前选中类型最后一笔有数据的那一段"——
+        // 比如切到"收入"看,发薪日往往在月中,滚到月末反而看不到工资那根柱子
+        buckets.forEach((b,i)=>{ if(b[valField] > 0) targetIdx = i; });
+      }
+      if(targetIdx >= 0){
+        const groupRight = 10 + (targetIdx+1)*groupW;
         scrollEl.scrollLeft = Math.max(0, groupRight - scrollEl.clientWidth + 24);
       }else{
         scrollEl.scrollLeft = scrollEl.scrollWidth;
