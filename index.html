@@ -678,7 +678,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801u';
+  const APP_BUILD = '20260801v';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2466,18 +2466,27 @@
     const chartH = Math.max(160, Math.round(scrollElForSize && scrollElForSize.clientHeight) || 190);
     const top=14, base=chartH-40, barW=20, barGap=10;
     const groupW = barW+barGap;
-    const totalW = Math.max(300, buckets.length*groupW+20);
+    const leftPad = 34; // 给左边纵轴数值刻度留出的空间
+    const totalW = Math.max(300, leftPad + buckets.length*groupW+20);
     const svgEl = $('trendChart');
     svgEl.setAttribute('viewBox', `0 0 ${totalW} ${chartH}`);
     svgEl.setAttribute('width', totalW);
     svgEl.style.width = totalW+'px';
 
-    let svg = `<line x1="8" y1="${base}" x2="${totalW-8}" y2="${base}" stroke="var(--grid)" stroke-width="1"/>`;
+    // 横向网格线+纵轴数值刻度,从0到本次最大值分4档(0号刻度线兼作原来的底部基准线)
+    let svg = '';
+    const gridSteps = 4;
+    for(let s=0; s<=gridSteps; s++){
+      const gy = base - (s/gridSteps)*(base-top);
+      const gv = Math.round((s/gridSteps)*maxVal);
+      svg += `<line x1="${leftPad}" y1="${gy.toFixed(1)}" x2="${totalW-8}" y2="${gy.toFixed(1)}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="2,3"/>`;
+      svg += `<text x="${leftPad-6}" y="${(gy+3).toFixed(1)}" font-size="9" fill="var(--ink-soft)" text-anchor="end">${gv>=1000 ? (gv/1000).toFixed(1)+'k' : gv}</text>`;
+    }
     svg += `<rect id="trendSelHighlight" x="0" y="2" width="${barW+8}" height="${base-2}" rx="6" fill="var(--seal)" opacity="0.12" style="display:none;pointer-events:none;"/>`;
     const totals = {};
     let hitRects = '';
     buckets.forEach((b,i)=>{
-      const x0 = 10 + i*groupW;
+      const x0 = leftPad + 10 + i*groupW;
       let y = base;
       Object.entries(b[catField]).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
         totals[k]=(totals[k]||0)+v;
@@ -2495,7 +2504,7 @@
     svgEl.querySelectorAll('.trend-bar-hit').forEach(hit=>{
       hit.addEventListener('click', ()=>{
         const idx = parseInt(hit.getAttribute('data-idx'), 10);
-        showTrendPointInfo(buckets[idx], idx, valField, catField, isIncome, groupW);
+        showTrendPointInfo(buckets[idx], idx, valField, catField, isIncome, groupW, leftPad);
       });
     });
     const scrollEl = svgEl.parentElement;
@@ -2511,7 +2520,7 @@
         buckets.forEach((b,i)=>{ if(b[valField] > 0) targetIdx = i; });
       }
       if(targetIdx >= 0){
-        const groupRight = 10 + (targetIdx+1)*groupW;
+        const groupRight = leftPad + 10 + (targetIdx+1)*groupW;
         scrollEl.scrollLeft = Math.max(0, groupRight - scrollEl.clientWidth + 24);
       }else{
         scrollEl.scrollLeft = scrollEl.scrollWidth;
@@ -2528,11 +2537,11 @@
   }
 
   // 点某根柱子:高亮那一列 + 弹出这天/这个月的金额和分类颜色图例
-  function showTrendPointInfo(bucket, idx, valField, catField, isIncome, groupW){
+  function showTrendPointInfo(bucket, idx, valField, catField, isIncome, groupW, leftPad){
     if(!bucket) return;
     const highlight = $('trendChart').querySelector('#trendSelHighlight');
     if(highlight){
-      highlight.setAttribute('x', 10 + idx*groupW - 4);
+      highlight.setAttribute('x', leftPad + 10 + idx*groupW - 4);
       highlight.style.display = 'block';
     }
     const dateLabel = currentDim==='day' ? bucket.key : bucket.label;
