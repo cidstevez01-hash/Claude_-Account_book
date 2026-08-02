@@ -678,7 +678,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801w';
+  const APP_BUILD = '20260801x';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2336,7 +2336,10 @@
   $('dimSegment').querySelectorAll('button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       $('dimSegment').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active'); currentDim = btn.getAttribute('data-dim'); renderStats();
+      btn.classList.add('active'); currentDim = btn.getAttribute('data-dim');
+      // 日别/月别的支出收入下拉框互不影响,每次切换维度都恢复默认"支出",不带着上一个维度选的类型过来
+      trendChartType = 'expense';
+      renderStats();
     });
   });
 
