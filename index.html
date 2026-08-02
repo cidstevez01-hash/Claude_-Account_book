@@ -678,7 +678,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801v';
+  const APP_BUILD = '20260801w';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2495,12 +2495,17 @@
         y -= h;
       });
       svg += `<text x="${x0+barW/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
-      hitRects += `<rect class="trend-bar-hit" data-idx="${i}" x="${x0-4}" y="0" width="${barW+8}" height="${chartH}" fill="transparent"/>`;
+      // 这一天/这个月没有数据就不给它加点击热区,点了也没反应(不能选中)
+      if(b[valField] > 0){
+        hitRects += `<rect class="trend-bar-hit" data-idx="${i}" x="${x0-4}" y="0" width="${barW+8}" height="${chartH}" fill="transparent"/>`;
+      }
     });
     svg += hitRects;
     svgEl.innerHTML = svg;
-    // 点某一根柱子(整列都能点,不用非得点中色块本身)弹出当天/当月的金额明细+颜色图例
+    // 点某一根柱子(整列都能点,不用非得点中色块本身)弹出当天/当月的金额明细+颜色图例,
+    // 同时把下面"整段时间汇总"的图例先收起来,避免和刚点开的单日明细同时出现看着重复
     $('trendPointInfo').style.display = 'none';
+    $('trendCatLegend').style.display = '';
     svgEl.querySelectorAll('.trend-bar-hit').forEach(hit=>{
       hit.addEventListener('click', ()=>{
         const idx = parseInt(hit.getAttribute('data-idx'), 10);
@@ -2557,6 +2562,8 @@
       <div class="tpi-list">${listHtml}</div>
     `;
     $('trendPointInfo').style.display = 'block';
+    // 只显示这一天/这个月自己的明细,收起下面整段时间汇总的图例,避免两份数字同时出现
+    $('trendCatLegend').style.display = 'none';
   }
 
   function syncStatsYmSelects(){
