@@ -200,6 +200,12 @@
   .delta{font-size:12px;display:inline-flex;align-items:center;gap:3px;}
   .delta.up{color:var(--seal);} .delta.down{color:var(--jade);} .delta.flat{color:var(--ink-soft);}
   .chart-card{background:var(--card);border:2px solid var(--grid);border-radius:22px 10px 20px 10px;padding:18px 16px;margin-bottom:18px;}
+  .cumulative-range-card{background:var(--card);border:2px dashed var(--seal);border-radius:26px 12px 24px 12px/12px 24px 12px 26px;padding:18px 18px 20px;margin-bottom:18px;box-shadow:0 2px 0 rgba(58,47,40,0.05);}
+  .range-picker-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .range-pill{flex:1;padding:9px 12px;border-radius:14px;border:1.5px solid var(--grid);background:var(--paper);font-size:13.5px;color:var(--ink);font-family:'Noto Sans SC',sans-serif;text-align:center;transition:opacity 0.12s ease;}
+  .range-pill:active{opacity:0.6;}
+  .range-arrow{color:var(--ink-soft);font-size:13px;flex-shrink:0;}
+  .cr-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:32px;text-align:center;margin:4px 0 14px;font-variant-numeric: tabular-nums;}
   .card-title{font-size:13px;color:var(--ink-soft);letter-spacing:1px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
   .legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;}
   .donut-wrap{position:relative;width:150px;height:150px;margin:4px auto 18px;}
@@ -419,6 +425,19 @@
       <button type="button" class="active" data-dim="day" id="dimDayBtn">按日对比</button>
       <button type="button" data-dim="month" id="dimMonthBtn">按月对比</button>
     </div>
+    <div class="cumulative-range-card">
+      <div class="card-title"><span id="cumRangeTitle">区间累计结余</span></div>
+      <div class="range-picker-row">
+        <button type="button" class="range-pill" id="cumRangeStartBtn">2025年1月</button>
+        <span class="range-arrow">→</span>
+        <button type="button" class="range-pill" id="cumRangeEndBtn">2026年8月</button>
+      </div>
+      <div class="cr-amount" id="cumRangeAmount">¥0</div>
+      <div class="stats-row" style="margin-top:2px;">
+        <div class="stat income"><div class="lbl" id="cumRangeIncomeLabel">区间总收入</div><div class="val" id="cumRangeIncome">¥0</div></div>
+        <div class="stat expense"><div class="lbl" id="cumRangeExpenseLabel">区间总支出</div><div class="val" id="cumRangeExpense">¥0</div></div>
+      </div>
+    </div>
     <div class="compare-row" id="compareRow"></div>
     <div class="chart-card">
       <div class="ym-picker">
@@ -625,11 +644,30 @@
   <button type="button" class="save-btn" id="ymPickerDoneBtn" style="margin-top:14px;"></button>
 </div>
 
+<div class="sheet" id="cumRangeSheet" style="max-width:420px;">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h2 id="cumRangeSheetTitle" style="margin:0;">选择起止年月</h2>
+    <button type="button" class="icon-btn" id="cumRangeCloseBtn">✕</button>
+  </div>
+  <div class="segment" id="cumRangeModeSegment">
+    <button type="button" class="active" data-mode="start" id="cumRangeStartModeBtn">起始</button>
+    <button type="button" data-mode="end" id="cumRangeEndModeBtn">截止</button>
+  </div>
+  <div class="year-stepper">
+    <button type="button" class="ym-arrow" id="cumRangeYearPrev">‹</button>
+    <span class="year-stepper-label" id="cumRangeYearLabel">2025年</span>
+    <button type="button" class="ym-arrow" id="cumRangeYearNext">›</button>
+  </div>
+  <div class="month-grid" id="cumRangeMonthGrid"></div>
+  <button type="button" class="save-btn" id="cumRangeDoneBtn" style="margin-top:14px;"></button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801p';
+  const APP_BUILD = '20260801q';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -641,6 +679,8 @@
       statsTitle:'统计', dimDay:'按日对比', dimMonth:'按月对比',
       trendDayTitle:'本月每日收支', trendMonthTitle:'本年每月收支',
       ymPickerTitle:'选择年月', ymPickerDoneBtn:'完成',
+      cumRangeTitle:'区间累计结余', cumRangeIncomeLabel:'区间总收入', cumRangeExpenseLabel:'区间总支出',
+      cumRangeSheetTitle:'选择起止年月', cumRangeStartMode:'起始', cumRangeEndMode:'截止',
       typeExpense:'支出构成', typeIncome:'收入构成',
       homeDonutHint:'点击查看本月明细 ›', monthDetailTitle:'本月明细', detailWord:'明细',
       donutTodayExpense:'今日支出', donutTodayIncome:'今日收入',
@@ -691,6 +731,8 @@
       statsTitle:'集計', dimDay:'日別比較', dimMonth:'月別比較',
       trendDayTitle:'今月の日別収支', trendMonthTitle:'今年の月別収支',
       ymPickerTitle:'年月を選択', ymPickerDoneBtn:'完了',
+      cumRangeTitle:'期間累計残高', cumRangeIncomeLabel:'期間の総収入', cumRangeExpenseLabel:'期間の総支出',
+      cumRangeSheetTitle:'開始・終了年月を選択', cumRangeStartMode:'開始', cumRangeEndMode:'終了',
       typeExpense:'支出内訳', typeIncome:'収入内訳',
       homeDonutHint:'タップして今月の明細を見る ›', monthDetailTitle:'今月の明細', detailWord:'明細',
       donutTodayExpense:'本日の支出', donutTodayIncome:'本日の収入',
@@ -1203,6 +1245,13 @@
     $('ymPickerDoneBtn').textContent = t('ymPickerDoneBtn');
     $('dimDayBtn').textContent = t('dimDay');
     $('dimMonthBtn').textContent = t('dimMonth');
+    $('cumRangeTitle').textContent = t('cumRangeTitle');
+    $('cumRangeIncomeLabel').textContent = t('cumRangeIncomeLabel');
+    $('cumRangeExpenseLabel').textContent = t('cumRangeExpenseLabel');
+    $('cumRangeSheetTitle').textContent = t('cumRangeSheetTitle');
+    $('cumRangeStartModeBtn').textContent = t('cumRangeStartMode');
+    $('cumRangeEndModeBtn').textContent = t('cumRangeEndMode');
+    $('cumRangeDoneBtn').textContent = t('ymPickerDoneBtn');
     $('trendTypeExpenseOpt').textContent = t('expenseWord');
     $('trendTypeIncomeOpt').textContent = t('incomeWord');
     $('homeDonutHint').textContent = t('homeDonutHint');
@@ -2053,6 +2102,7 @@
     $('settingsSheet').classList.remove('show');
     $('monthDetailSheet').classList.remove('show');
     $('ymPickerSheet').classList.remove('show');
+    $('cumRangeSheet').classList.remove('show');
     editingEntryId = null;
     editingSubKey = null;
     // 点空白处/关闭按钮退出整个记账流程时清空已选的分类,下次新建从默认分类重新开始;
@@ -2503,7 +2553,91 @@
     renderTrendChart();
   });
 
-  function renderStats(){ renderCompare(); renderTrendChart(); }
+  // ---------- 集計页:区间累计结余 ----------
+  // 区间起止默认值:截止=当前年月,起始=有记录以来最早一笔的年月(而不是随便写死一个日期)
+  let cumRangeStart = null, cumRangeEnd = null;
+  function ymKey(ym){ return ym.year+'-'+String(ym.month).padStart(2,'0'); }
+  function earliestEntryYM(){
+    if(!entries.length) return null;
+    let minDate = entries[0].date;
+    entries.forEach(e=>{ if(e.date < minDate) minDate = e.date; });
+    const [y,m] = minDate.split('-');
+    return {year: parseInt(y,10), month: parseInt(m,10)};
+  }
+  function ensureCumRangeDefaults(){
+    if(!cumRangeEnd){ const now=new Date(); cumRangeEnd = {year: now.getFullYear(), month: now.getMonth()+1}; }
+    if(!cumRangeStart){ cumRangeStart = earliestEntryYM() || {...cumRangeEnd}; }
+  }
+  function renderCumulativeRangeCard(){
+    ensureCumRangeDefaults();
+    $('cumRangeStartBtn').textContent = cumRangeStart.year+'年'+cumRangeStart.month+'月';
+    $('cumRangeEndBtn').textContent = cumRangeEnd.year+'年'+cumRangeEnd.month+'月';
+    const startKey = ymKey(cumRangeStart), endKey = ymKey(cumRangeEnd);
+    let income=0, expense=0;
+    entries.forEach(e=>{
+      const mk = e.date.slice(0,7);
+      if(mk>=startKey && mk<=endKey){
+        const v = toBase(e.amount, e.currency||'CNY', e.date);
+        if(e.type==='income') income+=v; else expense+=v;
+      }
+    });
+    $('cumRangeAmount').textContent = fmtCur(income-expense, settings.currency);
+    $('cumRangeIncome').textContent = fmtCur(income, settings.currency);
+    $('cumRangeExpense').textContent = fmtCur(expense, settings.currency);
+  }
+  let cumRangeDraft = {start:null, end:null}, cumRangeEditMode = 'start';
+  function openCumRangeSheet(mode){
+    ensureCumRangeDefaults();
+    cumRangeDraft.start = {...cumRangeStart};
+    cumRangeDraft.end = {...cumRangeEnd};
+    cumRangeEditMode = mode;
+    renderCumRangeSheet();
+    $('overlay').classList.add('show');
+    $('cumRangeSheet').classList.add('show');
+  }
+  function closeCumRangeSheet(){
+    $('overlay').classList.remove('show');
+    $('cumRangeSheet').classList.remove('show');
+  }
+  function renderCumRangeSheet(){
+    $('cumRangeStartModeBtn').classList.toggle('active', cumRangeEditMode==='start');
+    $('cumRangeEndModeBtn').classList.toggle('active', cumRangeEditMode==='end');
+    const draft = cumRangeDraft[cumRangeEditMode];
+    $('cumRangeYearLabel').textContent = draft.year+'年';
+    $('cumRangeYearPrev').disabled = draft.year<=YM_PICKER_MIN_YEAR;
+    $('cumRangeYearNext').disabled = draft.year>=YM_PICKER_MAX_YEAR;
+    const grid = $('cumRangeMonthGrid');
+    grid.innerHTML = Array.from({length:12}, (_,i)=>{
+      const m = i+1;
+      return `<button type="button" class="${m===draft.month?'selected':''}" data-m="${m}">${m}月</button>`;
+    }).join('');
+    grid.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ draft.month = parseInt(btn.getAttribute('data-m'), 10); renderCumRangeSheet(); });
+    });
+  }
+  $('cumRangeStartBtn').addEventListener('click', ()=> openCumRangeSheet('start'));
+  $('cumRangeEndBtn').addEventListener('click', ()=> openCumRangeSheet('end'));
+  $('cumRangeCloseBtn').addEventListener('click', closeCumRangeSheet);
+  $('cumRangeStartModeBtn').addEventListener('click', ()=>{ cumRangeEditMode='start'; renderCumRangeSheet(); });
+  $('cumRangeEndModeBtn').addEventListener('click', ()=>{ cumRangeEditMode='end'; renderCumRangeSheet(); });
+  $('cumRangeYearPrev').addEventListener('click', ()=>{
+    const draft = cumRangeDraft[cumRangeEditMode];
+    if(draft.year>YM_PICKER_MIN_YEAR){ draft.year--; renderCumRangeSheet(); }
+  });
+  $('cumRangeYearNext').addEventListener('click', ()=>{
+    const draft = cumRangeDraft[cumRangeEditMode];
+    if(draft.year<YM_PICKER_MAX_YEAR){ draft.year++; renderCumRangeSheet(); }
+  });
+  $('cumRangeDoneBtn').addEventListener('click', ()=>{
+    let {start, end} = cumRangeDraft;
+    // 起始晚于截止就自动交换,保证区间始终有效,不用额外校验报错打断用户
+    if(ymKey(start) > ymKey(end)){ const tmp=start; start=end; end=tmp; }
+    cumRangeStart = start; cumRangeEnd = end;
+    closeCumRangeSheet();
+    renderCumulativeRangeCard();
+  });
+
+  function renderStats(){ renderCompare(); renderTrendChart(); renderCumulativeRangeCard(); }
 
   // ---------- Rate page ----------
   function renderRatePage(){
