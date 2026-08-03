@@ -166,6 +166,9 @@
   .sub-pill-box{position:relative;display:inline-flex;}
   .sub-menu-btn{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--ink-soft);color:#fff;font-size:11px;font-weight:700;line-height:1;border:2px solid var(--paper);display:flex;align-items:center;justify-content:center;padding:0;z-index:2;transition:transform 0.1s ease;}
   .sub-menu-btn:active{transform:scale(0.85);}
+  /* 系统预设标签角标:纯展示,不可点(不加button/事件),标记"不可编辑删除" */
+  .lock-badge{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--ink-faint);color:#fff;display:flex;align-items:center;justify-content:center;pointer-events:none;border:2px solid var(--paper);}
+  .lock-badge .hd-icon{width:9px;height:9px;}
   .sub-menu-popover{position:absolute;top:22px;right:-7px;background:var(--card);border:1px solid var(--grid);border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,0.15);overflow:hidden;z-index:5;min-width:92px;}
   .sub-menu-popover.flip-up{top:auto;bottom:22px;}
   .sub-menu-popover .sub-menu-item{display:flex;align-items:center;gap:6px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--ink);background:none;border:none;white-space:nowrap;font-family:'Noto Sans SC',sans-serif;}
@@ -215,7 +218,19 @@
   .cr-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:32px;text-align:center;margin:4px 0 14px;font-variant-numeric: tabular-nums;}
   .card-title{font-size:13px;color:var(--ink-soft);letter-spacing:1px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
   .legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;}
+  .donut-row{position:relative;}
   .donut-wrap{position:relative;width:150px;height:150px;margin:4px auto 18px;}
+  /* 维度切换(分类/标签)浮在donut右侧本来就空着的地方,donut本身还是居中不动,
+     层级上明确跟在"支出/收入"分段下面(donut这一层),不会有"在收支上层"的问题 */
+  .donut-row .dim-select{
+    position:absolute;top:6px;right:0;z-index:1;
+    border:1.5px solid var(--grid);background:var(--card);border-radius:12px;
+    padding:6px 22px 6px 11px;font-family:'Noto Sans SC',sans-serif;font-weight:700;font-size:11px;color:var(--ink-soft);
+    -webkit-appearance:none;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a99c86' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 6px center;background-size:9px;
+    cursor:pointer;
+  }
   .donut-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
   .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
   .donut-total{font-family:'Noto Serif SC',serif;font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;}
@@ -359,6 +374,8 @@
   <symbol id="ic-copy" viewBox="0 0 24 24"><rect x="4" y="6" width="12" height="14" rx="2.5"/><path d="M8 6V4.5A2 2 0 0 1 10 2.5h8A2 2 0 0 1 20 4.5v12A2 2 0 0 1 18 18.5h-1.6"/></symbol>
   <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9.5 7V4.6h5V7"/><path d="M6.5 7 7.3 20h9.4l0.8-13"/></symbol>
   <symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 0 1 12.6-5.5"/><path d="M17.5 3.5v4h-4"/><path d="M19.5 12a7.5 7.5 0 0 1-12.6 5.5"/><path d="M6.5 20.5v-4h4"/></symbol>
+  <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></symbol>
+  <symbol id="ic-tag" viewBox="0 0 24 24"><path d="M4 12 12 4h7v7l-8 8z"/><circle cx="15.2" cy="8.8" r="1.3" fill="currentColor" stroke="none"/></symbol>
   <!-- 以下两个是真实品牌Logo(不是线条图标),来源:Simple Icons(CC0)/Font Awesome Free(CC BY 4.0),渲染时走fill而不是stroke -->
   <symbol id="ic-pm-amazon" viewBox="0 0 448 512"><path d="M257.2 162.7c-48.7 1.8-169.5 15.5-169.5 117.5 0 109.5 138.3 114 183.5 43.2 6.5 10.2 35.4 37.5 45.3 46.8l56.8-56S341 288.9 341 261.4V114.3C341 89 316.5 32 228.7 32 140.7 32 94 87 94 136.3l73.5 6.8c16.3-49.5 54.2-49.5 54.2-49.5 40.7-.1 35.5 29.8 35.5 69.1zm0 86.8c0 80-84.2 68-84.2 17.2 0-47.2 50.5-56.7 84.2-57.8v40.6zm136 163.5c-7.7 10-70 67-174.5 67S34.2 408.5 9.7 379c-6.8-7.7 1-11.3 5.5-8.3C88.5 415.2 203 488.5 387.7 401c7.5-3.7 13.3 2 5.5 12zm39.8 2.2c-6.5 15.8-16 26.8-21.2 31-5.5 4.5-9.5 2.7-6.5-3.8s19.3-46.5 12.7-55c-6.5-8.3-37-4.3-48-3.2-10.8 1-13 2-14-.3-2.3-5.7 21.7-15.5 37.5-17.5 15.7-1.8 41-.8 46 5.7 3.7 5.1 0 27.1-6.5 43.1z"/></symbol>
   <symbol id="ic-pm-rakuten" viewBox="0 0 24 24"><path d="M23.277 21.3L3.939 24 .722 21.3h22.555zM7.6 19.276H3.939V0h6.052a6.653 6.653 0 0 1 6.65 6.646c0 2.234-1.108 4.204-2.799 5.418l5.418 7.211h-4.585l-4.486-5.979H7.6v5.98zm0-9.64h2.392a2.992 2.992 0 0 0 2.989-2.989 2.994 2.994 0 0 0-2.989-2.986H7.6v5.975z"/></symbol>
@@ -429,9 +446,15 @@
         <button type="button" class="active expense" data-type="expense" id="homeTypeExpenseBtn">支出</button>
         <button type="button" class="income" data-type="income" id="homeTypeIncomeBtn">收入</button>
       </div>
-      <div class="donut-wrap" id="homeDonutWrap">
-        <svg id="homeDonutChart" viewBox="0 0 140 140"></svg>
-        <div class="donut-center"><div class="donut-total" id="homeDonutTotal">¥0</div><div class="donut-label" id="homeDonutCenterLabel">支出</div></div>
+      <div class="donut-row">
+        <select class="dim-select" id="homeDonutDimSelect">
+          <option value="category" id="homeDonutDimCatOpt">分类</option>
+          <option value="tag" id="homeDonutDimTagOpt">标签</option>
+        </select>
+        <div class="donut-wrap" id="homeDonutWrap">
+          <svg id="homeDonutChart" viewBox="0 0 140 140"></svg>
+          <div class="donut-center"><div class="donut-total" id="homeDonutTotal">¥0</div><div class="donut-label" id="homeDonutCenterLabel">支出</div></div>
+        </div>
       </div>
       <div id="homeLegendList"></div>
       <div class="donut-hint" id="homeDonutHint">点击查看本月明细 ›</div>
@@ -568,6 +591,8 @@
   </button>
   <div class="field-label" id="payFieldLabel">支付方式</div>
   <div class="sub-wrap" id="payGrid" style="margin-bottom:18px;"></div>
+  <div class="field-label" id="tagFieldLabel">标签</div>
+  <div class="sub-wrap" id="tagGrid" style="margin-bottom:18px;"></div>
   <div class="row2">
     <div class="text-row"><input type="text" id="noteInput" placeholder="备注(可选)"></div>
     <div class="text-row" style="max-width:150px;"><input type="date" id="dateInput"></div>
@@ -698,7 +723,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802k';
+  const APP_BUILD = '20260803a';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -719,8 +744,9 @@
       emptyChart:'这段时间还没有相关记录', saveFailed:'保存失败,请检查网络后重试',
       compareTemplate:'{cur}{type} · 对比{prev}',
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
-      catFieldLabel:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', notePlaceholder:'备注(可选)', saveBtn:'保存',
-      newSubPlaceholder:'新中项目名称',
+      catFieldLabel:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
+      newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
+      tagDefault:'默认', dimCategory:'分类', dimTag:'标签',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）',
       curCNYFullLabel:'人民币 (CNY)', curJPYFullLabel:'日元 (JPY)',
       rateTitle:'汇率', rateSub:'人民币 → 日元', rateSubReverse:'日元 → 人民币', rateUpdateLabel:'更新时间', rateTrend30Days:'近30天走势',
@@ -771,8 +797,9 @@
       emptyChart:'この期間の記録はまだありません', saveFailed:'保存に失敗しました。ネットワークをご確認の上再試行してください',
       compareTemplate:'{cur}の{type}（{prev}比）',
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
-      catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', notePlaceholder:'メモ(任意)', saveBtn:'保存',
-      newSubPlaceholder:'新しい中項目名',
+      catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
+      newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
+      tagDefault:'デフォルト', dimCategory:'分類', dimTag:'タグ',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateSubReverse:'日本円 → 人民元', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
@@ -808,20 +835,26 @@
 
   // 大类/细分/支付方式不再写死在代码里,改成从数据库拉取(预设数据所有人都能读,不要求登录)+本机缓存兜底离线使用。
   // 见 loadCatalogData()/fetchCatalogFromCloud()——App 启动时调用。
+  // 标签(tags)是后加的独立维度,不挂在某个分类下面,直接按type(支出/收入)分两个扁平列表,结构照抄细分。
   let expenseCats = [];
   let incomeCats = [];
   let paymentMethods = [];
+  let expenseTags = [];
+  let incomeTags = [];
   const allCatMap = {};
   const payMethodMap = {};
+  const allTagMap = {};
 
   function rebuildCatalogMaps(){
     Object.keys(allCatMap).forEach(k=> delete allCatMap[k]);
     expenseCats.concat(incomeCats).forEach(c=> allCatMap[c.key]=c);
     Object.keys(payMethodMap).forEach(k=> delete payMethodMap[k]);
     paymentMethods.forEach(p=> payMethodMap[p.key]=p);
+    Object.keys(allTagMap).forEach(k=> delete allTagMap[k]);
+    expenseTags.concat(incomeTags).forEach(tg=> allTagMap[tg.code]=tg);
   }
   function saveCatalogCache(){
-    storageSetSafe('ledger_catalog_cache', JSON.stringify({expenseCats, incomeCats, paymentMethods}), false).catch(e=> console.error('分类缓存保存失败', e));
+    storageSetSafe('ledger_catalog_cache', JSON.stringify({expenseCats, incomeCats, paymentMethods, expenseTags, incomeTags}), false).catch(e=> console.error('分类缓存保存失败', e));
   }
   function loadCatalogCacheFromLocal(){
     try{
@@ -831,6 +864,8 @@
         expenseCats = data.expenseCats || [];
         incomeCats = data.incomeCats || [];
         paymentMethods = data.paymentMethods || [];
+        expenseTags = data.expenseTags || [];
+        incomeTags = data.incomeTags || [];
         rebuildCatalogMaps();
         return true;
       }
@@ -841,6 +876,11 @@
     return catRows.filter(c=>c.type===type).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(c=>({
       key:c.key, zh:c.zh, ja:c.ja, icon:c.icon, color:c.color,
       subs: subRows.filter(s=>s.cat_key===c.key).map(s=>({key:s.key, zh:s.zh, ja:s.ja, custom: !s.is_preset}))
+    }));
+  }
+  function rowsToTagArray(tagRows, type){
+    return tagRows.filter(tg=>tg.type===type).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(tg=>({
+      id:tg.id, code:tg.code, zh:tg.zh, ja:tg.ja, custom: !tg.is_preset
     }));
   }
   async function fetchCatalogFromCloud(){
@@ -862,6 +902,14 @@
         key:p.key, zh:p.zh, ja:p.ja, icon:p.icon||undefined,
         badge: p.badge_bg ? {bg:p.badge_bg, text:p.badge_text} : undefined
       }));
+      // tags表是后加的,万一还没跑迁移SQL/建表,不能让它拖累分类/支付方式一起加载失败——单独try,失败就标签列表留空
+      try{
+        const tagRes = await supabaseClient.from('tags').select('*');
+        if(tagRes.error) throw tagRes.error;
+        const tagRows = tagRes.data||[];
+        expenseTags = rowsToTagArray(tagRows, 'expense');
+        incomeTags = rowsToTagArray(tagRows, 'income');
+      }catch(e){ console.error('拉取标签失败,标签列表暂时为空', e); }
       rebuildCatalogMaps();
       saveCatalogCache();
       return true;
@@ -879,6 +927,7 @@
   }
   function subLabel(sub){ if(!sub) return ''; return sub[settings.lang] || sub.zh || sub.label || ''; }
   function findSub(catObj, subKey){ return catObj && catObj.subs && catObj.subs.find(s=>s.key===subKey); }
+  function tagLabel(tag){ if(!tag) return ''; return tag[settings.lang] || tag.zh || tag.label || ''; }
   function iconSvg(iconId){ return `<svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-${iconId}"/></svg>`; }
   function catIconHtml(cat){ return cat ? `<span style="color:${cat.color}">${iconSvg(cat.icon)}</span>` : ''; }
   // 少数支付方式用的是真实品牌Logo(填色图形)而不是本App自己的线条图标,渲染方式不一样(fill而不是stroke描边)
@@ -1286,6 +1335,8 @@
     $('trendTypeExpenseOpt').textContent = t('expenseWord');
     $('trendTypeIncomeOpt').textContent = t('incomeWord');
     $('homeDonutHint').textContent = t('homeDonutHint');
+    $('homeDonutDimCatOpt').textContent = t('dimCategory');
+    $('homeDonutDimTagOpt').textContent = t('dimTag');
     $('homeTypeExpenseBtn').textContent = t('segExpense');
     $('homeTypeIncomeBtn').textContent = t('segIncome');
     $('monthDetailTitle').textContent = t('monthDetailTitle');
@@ -1295,6 +1346,7 @@
     $('catFieldLabel').textContent = t('catFieldLabel');
     $('subFieldLabel').textContent = t('subFieldLabel');
     $('payFieldLabel').textContent = t('payFieldLabel');
+    $('tagFieldLabel').textContent = t('tagFieldLabel');
     renderPayGrid();
     $('noteInput').placeholder = t('notePlaceholder');
     $('saveBtn').textContent = t('saveBtn');
@@ -1359,6 +1411,7 @@
       cat_key: entry.catKey,
       sub_key: entry.subKey,
       payment_method: entry.paymentMethod,
+      tag_code: entry.tagCode || null,
       note: entry.note || null,
       entry_date: entry.date,
       recurring_id: entry.recurringId || null,
@@ -1367,11 +1420,13 @@
   function dbRowToEntry(row){
     const catObj = allCatMap[row.cat_key];
     const subObj = catObj ? findSub(catObj, row.sub_key) : null;
+    const tagObj = row.tag_code ? allTagMap[row.tag_code] : null;
     return {
       id: row.id, type: row.type, amount: row.amount, currency: row.currency,
       catKey: row.cat_key, category: catObj ? catLabel(catObj) : '',
       subKey: row.sub_key, subCategory: subObj ? subLabel(subObj) : '',
       paymentMethod: row.payment_method,
+      tagCode: row.tag_code || null, tag: tagObj ? tagLabel(tagObj) : '',
       icon: catObj ? catObj.icon : '',
       note: row.note || '', date: row.entry_date,
       createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
@@ -1722,7 +1777,7 @@
 
   // ---------- Home donut + month detail ----------
   let homeDonutType = 'expense';
-  let monthDetailFilterCatKey = null;
+  let monthDetailFilter = null; // {dim:'category'|'tag', key} | null
   let monthDetailMonthKey = null;
 
   let homeDonutMonthOffset = 0;
@@ -1738,6 +1793,10 @@
     const mk = getHomeDonutMonthKey(offset);
     return entries.some(e=> e.date.startsWith(mk));
   }
+  // 环状图默认按分类统计,也可以切到按标签统计(见homeDonutDimSelect)——没打标签的账目
+  // 统一归到"默认"这一档,并且用一个调淡的灰色跟真正打了标签的部分区分开,不会显得太抢眼
+  let homeDonutDim = 'category';
+  const TAG_DEFAULT_COLOR = '#c2b8a3';
   function renderHomeDonut(){
     const mk = getHomeDonutMonthKey();
     $('homeMonthLabel').textContent = getHomeDonutMonthLabel();
@@ -1745,12 +1804,20 @@
     $('homeMonthNext').disabled = !monthHasAnyEntries(homeDonutMonthOffset+1);
     const periodEntries = entries.filter(e=> e.date.startsWith(mk) && e.type===homeDonutType);
     $('homeDonutCenterLabel').textContent = homeDonutType==='expense' ? t('donutMonthExpense') : t('donutMonthIncome');
+    const byTag = homeDonutDim === 'tag';
     const groups = {};
     periodEntries.forEach(e=>{
-      const key = e.catKey || e.category;
+      let key, label;
+      if(byTag){
+        key = e.tagCode || '__default__';
+        const tagObj = e.tagCode && allTagMap[e.tagCode];
+        label = tagObj ? escapeHtml(tagLabel(tagObj)) : t('tagDefault');
+      }else{
+        key = e.catKey || e.category;
+        const catObj = e.catKey && allCatMap[e.catKey];
+        label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
+      }
       const v = toBase(e.amount, e.currency||'CNY', e.date);
-      const catObj = e.catKey && allCatMap[e.catKey];
-      const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
       if(!groups[key]) groups[key] = {key, label, amount:0};
       groups[key].amount += v;
     });
@@ -1770,21 +1837,28 @@
     let offsetAcc=0, svg=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--grid)" stroke-width="18"/>`, legendHtml='';
     list.forEach((g,i)=>{
       const pct=g.amount/total*100;
-      const color=(allCatMap[g.key]&&allCatMap[g.key].color)||palette[i%palette.length];
+      let color;
+      if(byTag) color = g.key==='__default__' ? TAG_DEFAULT_COLOR : palette[i%palette.length];
+      else color = (allCatMap[g.key]&&allCatMap[g.key].color)||palette[i%palette.length];
       const dash=(pct/100)*circ;
       svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="18" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offsetAcc}" stroke-linecap="butt"/>`;
       offsetAcc += dash;
-      legendHtml += `<div class="legend-row clickable-legend" data-catkey="${g.key}" style="--legend-bg:${tintColor(color,0.82)};"><span class="name"><span class="legend-dot" style="background:${color}"></span>${g.label}</span><span class="pct">${pct.toFixed(1)}%</span><span class="amt">${fmtCur(g.amount, settings.currency)}</span></div>`;
+      legendHtml += `<div class="legend-row clickable-legend" data-key="${g.key}" style="--legend-bg:${tintColor(color,0.82)};"><span class="name"><span class="legend-dot" style="background:${color}"></span>${g.label}</span><span class="pct">${pct.toFixed(1)}%</span><span class="amt">${fmtCur(g.amount, settings.currency)}</span></div>`;
     });
     donutEl.innerHTML = svg;
     legendEl.innerHTML = legendHtml;
     legendEl.querySelectorAll('.clickable-legend').forEach(row=>{
       row.addEventListener('click', (ev)=>{
         ev.stopPropagation();
-        openMonthDetail(row.getAttribute('data-catkey'), getHomeDonutMonthKey());
+        openMonthDetail({dim: homeDonutDim, key: row.getAttribute('data-key')}, getHomeDonutMonthKey());
       });
     });
   }
+  $('homeDonutDimSelect').addEventListener('change', (ev)=>{
+    ev.stopPropagation();
+    homeDonutDim = $('homeDonutDimSelect').value;
+    renderHomeDonut();
+  });
   $('homeMonthPrev').addEventListener('click', (ev)=>{
     ev.stopPropagation();
     if(monthHasAnyEntries(homeDonutMonthOffset-1)){ homeDonutMonthOffset--; renderHomeDonut(); }
@@ -1809,7 +1883,7 @@
     });
     el.addEventListener('click', (ev)=>{
       if(swiped){ swiped=false; return; }
-      if(ev.target.closest('#homeTypeSegment') || ev.target.closest('.ym-picker') || ev.target.closest('.clickable-legend')) return;
+      if(ev.target.closest('#homeTypeSegment') || ev.target.closest('.ym-picker') || ev.target.closest('.clickable-legend') || ev.target.closest('#homeDonutDimSelect')) return;
       openMonthDetail(null, getHomeDonutMonthKey());
     });
   })();
@@ -1828,8 +1902,9 @@
     const parts = mk.split('-');
     return parts[0]+'年'+parseInt(parts[1],10)+'月';
   }
-  function openMonthDetail(catKeyFilter, monthKey){
-    monthDetailFilterCatKey = catKeyFilter || null;
+  function openMonthDetail(filter, monthKey){
+    // filter: null(不筛选) | {dim:'category', key:catKey} | {dim:'tag', key:tagCode|'__default__'}
+    monthDetailFilter = filter || null;
     monthDetailMonthKey = monthKey || currentMonthKey();
     renderMonthDetailList();
     $('overlay').classList.add('show');
@@ -1839,17 +1914,34 @@
     const mk = monthDetailMonthKey || currentMonthKey();
     $('monthDetailTitle').textContent = monthKeyLabel(mk) + ' ' + t('detailWord');
     let list = entries.filter(e=> e.date.startsWith(mk));
-    if(monthDetailFilterCatKey) list = list.filter(e=> e.catKey===monthDetailFilterCatKey);
-    if(monthDetailFilterCatKey){
-      const cat = allCatMap[monthDetailFilterCatKey];
+    if(monthDetailFilter && monthDetailFilter.dim==='tag'){
+      list = monthDetailFilter.key==='__default__' ? list.filter(e=> !e.tagCode) : list.filter(e=> e.tagCode===monthDetailFilter.key);
+    }else if(monthDetailFilter && monthDetailFilter.dim==='category'){
+      list = list.filter(e=> e.catKey===monthDetailFilter.key);
+    }
+    if(monthDetailFilter && monthDetailFilter.dim==='category'){
+      const cat = allCatMap[monthDetailFilter.key];
       if(!cat){
-        monthDetailFilterCatKey = null;
+        monthDetailFilter = null;
         $('monthDetailFilterChip').style.display = 'none';
       }else{
         $('monthDetailFilterChip').style.display = 'inline-flex';
         $('monthDetailFilterChip').style.background = tintColor(cat.color, 0.82);
         $('monthDetailFilterChip').style.color = cat.color;
         $('monthDetailFilterChipText').innerHTML = iconSvg(cat.icon)+' '+catLabel(cat);
+      }
+    }else if(monthDetailFilter && monthDetailFilter.dim==='tag'){
+      const isDefault = monthDetailFilter.key==='__default__';
+      const tagObj = isDefault ? null : allTagMap[monthDetailFilter.key];
+      if(!isDefault && !tagObj){
+        monthDetailFilter = null;
+        $('monthDetailFilterChip').style.display = 'none';
+      }else{
+        const label = isDefault ? t('tagDefault') : tagLabel(tagObj);
+        $('monthDetailFilterChip').style.display = 'inline-flex';
+        $('monthDetailFilterChip').style.background = '#efe4df';
+        $('monthDetailFilterChip').style.color = '#8a6a4e';
+        $('monthDetailFilterChipText').innerHTML = iconSvg('tag')+' '+escapeHtml(label);
       }
     }else{
       $('monthDetailFilterChip').style.display = 'none';
@@ -2061,10 +2153,155 @@
     renderSubGrid();
   }
 
+  // ---------- 记账表单的"标签"字段 ----------
+  // 标签直接嵌在记账表单里(不像分类/细分要跳转到单独的选择页面),是个可选的单选胶囊组:
+  // 不选不强制(对应"默认"),再点一下已选中的会取消选中。预设标签(比如"固定支出")右上角是
+  // 不可点的锁标,自定义标签沿用细分那一套"⋯"菜单(编辑/删除),交互上完全照抄细分的写法。
+  let selectedTag = null;
+  let editingTagCode = null;
+  let openTagMenuCode = null;
+
+  function renderTagGrid(){
+    const tags = currentType==='expense' ? expenseTags : incomeTags;
+    if(selectedTag && !tags.find(tg=>tg.code===selectedTag.code)) selectedTag = null;
+    let html = tags.map(tg=>{
+      if(editingTagCode === tg.code){
+        return `<span class="sub-item-wrap">
+          <input type="text" class="sub-inline-input" data-editing-code="${tg.code}" value="${escapeHtml(tagLabel(tg))}">
+          <button type="button" class="sub-mini-btn sub-confirm" data-editing-code="${tg.code}">${iconSvg('check')}</button>
+        </span>`;
+      }
+      const selCls = selectedTag && tg.code===selectedTag.code ? 'selected' : '';
+      if(tg.custom){
+        const menuOpen = openTagMenuCode === tg.code;
+        return `<span class="sub-item-wrap">
+          <span class="sub-pill-box">
+            <button type="button" class="sub-pill ${selCls}" data-code="${tg.code}">${escapeHtml(tagLabel(tg))}</button>
+            <button type="button" class="sub-menu-btn" data-code="${tg.code}">⋯</button>
+            ${menuOpen ? `<div class="sub-menu-popover" data-code="${tg.code}">
+              <button type="button" class="sub-menu-item" data-action="edit" data-code="${tg.code}">${iconSvg('pencil')}<span>${t('edit')}</span></button>
+              <button type="button" class="sub-menu-item danger" data-action="delete" data-code="${tg.code}">${iconSvg('trash')}<span>${t('delete')}</span></button>
+            </div>` : ''}
+          </span>
+        </span>`;
+      }
+      return `<span class="sub-item-wrap">
+        <span class="sub-pill-box">
+          <button type="button" class="sub-pill ${selCls}" data-code="${tg.code}">${escapeHtml(tagLabel(tg))}</button>
+          <span class="lock-badge">${iconSvg('lock')}</span>
+        </span>
+      </span>`;
+    }).join('');
+    if(editingTagCode === '__new__'){
+      html += `<span class="sub-item-wrap">
+        <input type="text" class="sub-inline-input" data-editing-code="__new__" placeholder="${t('newTagPlaceholder')}">
+        <button type="button" class="sub-mini-btn sub-confirm" data-editing-code="__new__">${iconSvg('check')}</button>
+      </span>`;
+    }else{
+      html += `<button type="button" class="sub-pill add-sub" id="addTagBtn">＋</button>`;
+    }
+    $('tagGrid').innerHTML = html;
+    $('tagGrid').querySelectorAll('.sub-pill:not(.add-sub)').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        openTagMenuCode = null;
+        const code = btn.getAttribute('data-code');
+        // 标签允许"不选":再点一下已选中的胶囊,取消选中变回没有标签
+        selectedTag = (selectedTag && selectedTag.code===code) ? null : tags.find(tg=>tg.code===code);
+        renderTagGrid();
+      });
+    });
+    $('tagGrid').querySelectorAll('.sub-menu-btn').forEach(btn=>{
+      btn.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        const code = btn.getAttribute('data-code');
+        openTagMenuCode = (openTagMenuCode===code) ? null : code;
+        renderTagGrid();
+      });
+    });
+    $('tagGrid').querySelectorAll('.sub-menu-item').forEach(btn=>{
+      btn.addEventListener('click', async (ev)=>{
+        ev.stopPropagation();
+        const code = btn.getAttribute('data-code');
+        const action = btn.getAttribute('data-action');
+        openTagMenuCode = null;
+        if(action==='edit'){
+          const tg = tags.find(t=>t.code===code);
+          if(tg) openEditTagInput(tg);
+          return;
+        }
+        await deleteCustomTag(currentType, code);
+        if(selectedTag && selectedTag.code===code) selectedTag = null;
+        if(editingTagCode===code) editingTagCode=null;
+        renderTagGrid();
+      });
+    });
+    const addBtn = $('addTagBtn');
+    if(addBtn) addBtn.addEventListener('click', openAddTagInput);
+    const inlineInput = $('tagGrid').querySelector('.sub-inline-input');
+    if(inlineInput) bindInlineTagInput(inlineInput);
+    const openPop = $('tagGrid').querySelector('.sub-menu-popover');
+    if(openPop){
+      const rect = openPop.getBoundingClientRect();
+      if(rect.bottom > window.innerHeight) openPop.classList.add('flip-up');
+    }
+  }
+  document.addEventListener('click', (ev)=>{
+    if(!openTagMenuCode) return;
+    if(ev.target.closest('#tagGrid .sub-menu-btn') || ev.target.closest('#tagGrid .sub-menu-popover')) return;
+    openTagMenuCode = null;
+    renderTagGrid();
+  });
+  function bindInlineTagInput(inputEl){
+    const code = inputEl.getAttribute('data-editing-code');
+    let settled = false;
+    async function commit(){
+      if(settled) return;
+      settled = true;
+      const label = inputEl.value.trim();
+      if(label){
+        if(code && code !== '__new__'){
+          await updateCustomTag(currentType, code, label);
+          if(selectedTag && selectedTag.code===code){ selectedTag.zh = label; selectedTag.ja = label; }
+        }else{
+          selectedTag = await addCustomTag(currentType, label);
+        }
+      }
+      if(editingTagCode === code){ editingTagCode = null; renderTagGrid(); }
+    }
+    function cancel(){
+      if(settled) return;
+      settled = true;
+      if(editingTagCode === code){ editingTagCode = null; renderTagGrid(); }
+    }
+    inputEl.addEventListener('keydown', (ev)=>{
+      if(ev.key==='Enter'){ ev.preventDefault(); commit(); }
+      if(ev.key==='Escape'){ ev.preventDefault(); cancel(); }
+    });
+    inputEl.addEventListener('blur', ()=> commit());
+    const confirmBtn = $('tagGrid').querySelector(`.sub-confirm[data-editing-code="${code}"]`);
+    if(confirmBtn){
+      confirmBtn.addEventListener('mousedown', (ev)=> ev.preventDefault());
+      confirmBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); commit(); });
+    }
+    inputEl.focus();
+    inputEl.select();
+  }
+  function openAddTagInput(){
+    editingTagCode = '__new__';
+    renderTagGrid();
+  }
+  function openEditTagInput(tag){
+    editingTagCode = tag.code;
+    renderTagGrid();
+  }
+
+  // 自定义key统一走这个生成器——纯时间戳理论上同一毫秒内连点两次会撞key,加个随机后缀更保险
+  function genCustomKey(){ return 'custom_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
+
   // 自定义细分现在直接是 expenseCats/incomeCats 里 subs 数组的一部分(custom:true 标记),
   // 不再单独存一份 customSubsMap——本机缓存靠 saveCatalogCache() 统一存;登录状态下再额外写库。
   async function addCustomSub(catKey, label){
-    const sub = {key:'custom_'+Date.now(), custom:true, zh:label, ja:label};
+    const sub = {key:genCustomKey(), custom:true, zh:label, ja:label};
     const cat = allCatMap[catKey];
     if(cat) cat.subs.push(sub);
     saveCatalogCache();
@@ -2099,6 +2336,50 @@
       }catch(e){ console.error('自定义细分删除失败', e); showToast(t('cloudSyncError')); }
     }
   }
+
+  // 标签是扁平的(不挂在分类下面),按type('expense'/'income')区分两个列表,操作逻辑照抄自定义细分。
+  // 跟自定义细分不同的是:标签表主键是id(不叫key,避免跟"主键"这个概念混淆,业务侧稳定标识改叫code),
+  // 数据库层面的改/删都按id匹配——id由客户端在创建时就地生成(crypto.randomUUID()),不用等insert
+  // 返回再回填,不会有"刚建完标签就立刻改名/删除,这时候还不知道id"这种时序问题
+  function tagListForType(type){ return type==='expense' ? expenseTags : incomeTags; }
+  function genUuid(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : genCustomKey(); }
+  async function addCustomTag(type, label){
+    const tag = {id:genUuid(), code:genCustomKey(), custom:true, zh:label, ja:label};
+    tagListForType(type).push(tag);
+    allTagMap[tag.code] = tag;
+    saveCatalogCache();
+    if(cloudUser && supabaseClient){
+      try{
+        const { error } = await supabaseClient.from('tags').insert({ id:tag.id, code:tag.code, type, zh:label, ja:label, is_preset:false, user_id:cloudUser.id });
+        if(error) throw error;
+      }catch(e){ console.error('自定义标签同步失败', e); showToast(t('cloudSyncError')); }
+    }
+    return tag;
+  }
+  async function updateCustomTag(type, tagCode, newLabel){
+    const tag = tagListForType(type).find(tg=>tg.code===tagCode);
+    if(tag){ tag.zh = newLabel; tag.ja = newLabel; }
+    saveCatalogCache();
+    if(cloudUser && supabaseClient && tag){
+      try{
+        const { error } = await supabaseClient.from('tags').update({zh:newLabel, ja:newLabel}).eq('id', tag.id);
+        if(error) throw error;
+      }catch(e){ console.error('自定义标签更新失败', e); showToast(t('cloudSyncError')); }
+    }
+  }
+  async function deleteCustomTag(type, tagCode){
+    const tag = tagListForType(type).find(tg=>tg.code===tagCode);
+    if(type==='expense') expenseTags = expenseTags.filter(tg=>tg.code!==tagCode);
+    else incomeTags = incomeTags.filter(tg=>tg.code!==tagCode);
+    delete allTagMap[tagCode];
+    saveCatalogCache();
+    if(cloudUser && supabaseClient && tag){
+      try{
+        const { error } = await supabaseClient.from('tags').delete().eq('id', tag.id);
+        if(error) throw error;
+      }catch(e){ console.error('自定义标签删除失败', e); showToast(t('cloudSyncError')); }
+    }
+  }
   function openCatPicker(){
     renderCatGrid();
     $('catPickerSheet').classList.add('show');
@@ -2119,6 +2400,8 @@
     $('amountInput').value = '';
     $('noteInput').value = '';
     editingSubKey = null;
+    editingTagCode = null;
+    openTagMenuCode = null;
   }
   function applyEntryToForm(entry, useToday){
     currentType = entry.type;
@@ -2127,6 +2410,8 @@
     selectedCat = cats.find(c=>c.key===entry.catKey) || cats[0];
     selectedSub = (selectedCat.subs||[]).find(s=>s.key===entry.subKey) || null;
     selectedPayMethod = payMethodMap[entry.paymentMethod] || paymentMethods[0];
+    const tags = currentType==='expense' ? expenseTags : incomeTags;
+    selectedTag = entry.tagCode ? (tags.find(tg=>tg.code===entry.tagCode) || null) : null;
     $('segExpense').classList.toggle('active', currentType==='expense');
     $('segIncome').classList.toggle('active', currentType==='income');
     $('curSymbolDisplay').textContent = symbolFor(currentCurrency);
@@ -2134,8 +2419,11 @@
     $('noteInput').value = entry.note || '';
     $('dateInput').value = useToday ? todayStr() : entry.date;
     editingSubKey = null;
+    editingTagCode = null;
+    openTagMenuCode = null;
     updateCatPickerRowDisplay();
     renderPayGrid();
+    renderTagGrid();
   }
   function openEntrySheetForEdit(entry){
     editingEntryId = entry.id;
@@ -2161,10 +2449,12 @@
     resetEntryFormFields();
     currentCurrency = settings.currency;
     selectedPayMethod = paymentMethods[0];
+    selectedTag = null;
     $('curSymbolDisplay').textContent = symbolFor(currentCurrency);
     $('sheetTitle').textContent = t('sheetAddTitle');
     updateCatPickerRowDisplay();
     renderPayGrid();
+    renderTagGrid();
     $('catPickerSheet').classList.remove('show');
     $('overlay').classList.add('show');
     $('sheet').classList.add('show');
@@ -2179,10 +2469,13 @@
     $('cumRangeSheet').classList.remove('show');
     editingEntryId = null;
     editingSubKey = null;
+    editingTagCode = null;
+    openTagMenuCode = null;
     // 点空白处/关闭按钮退出整个记账流程时清空已选的分类,下次新建从默认分类重新开始;
     // 分类选择页里点‹返回按钮走的是closeCatPicker(),不经过这里,所以那条路径分类会保留
     selectedCat = null;
     selectedSub = null;
+    selectedTag = null;
   }
 
   $('fabAdd').addEventListener('click', openSheet);
@@ -2194,8 +2487,8 @@
   $('sheetCloseBtn').addEventListener('click', closeAllSheets);
   $('settingsCloseBtn').addEventListener('click', closeAllSheets);
 
-  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; updateCatPickerRowDisplay(); });
-  $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; updateCatPickerRowDisplay(); });
+  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
+  $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
 
   $('saveBtn').addEventListener('click', async ()=>{
     const amt = parseFloat($('amountInput').value);
@@ -2212,6 +2505,7 @@
           category: catLabel(selectedCat), catKey: selectedCat.key, icon: selectedCat.icon,
           subCategory: selectedSub? subLabel(selectedSub) : '', subKey: selectedSub? selectedSub.key : '',
           paymentMethod: selectedPayMethod ? selectedPayMethod.key : 'cash',
+          tag: selectedTag? tagLabel(selectedTag) : '', tagCode: selectedTag? selectedTag.code : null,
           note: note, date: date
         };
         savedEntry = entries[idx];
@@ -2223,6 +2517,7 @@
         category: catLabel(selectedCat), catKey: selectedCat.key, icon: selectedCat.icon,
         subCategory: selectedSub? subLabel(selectedSub) : '', subKey: selectedSub? selectedSub.key : '',
         paymentMethod: selectedPayMethod ? selectedPayMethod.key : 'cash',
+        tag: selectedTag? tagLabel(selectedTag) : '', tagCode: selectedTag? selectedTag.code : null,
         note: note, date: date, createdAt: Date.now()
       };
       entries.push(savedEntry);
