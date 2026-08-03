@@ -263,6 +263,11 @@
   .month-grid button.selected{border-color:var(--seal);background:#f7ded9;color:var(--seal);font-weight:700;}
   .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px;}
   .chart-scroll svg{display:block;}
+  /* 滚动切换到不同数据量级的区间时,纵轴刻度/柱子改的是同一批元素的属性而不是重建,
+     这里给个过渡动画,刻度变大/变小时是逐步平滑地长/缩,不是瞬间跳变 */
+  #trendChart .trend-bar-seg{transition:y 0.35s ease, height 0.35s ease;}
+  #trendChart .trend-grid-line{transition:y1 0.35s ease, y2 0.35s ease;}
+  #trendChart .trend-grid-label{transition:y 0.35s ease;}
   .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
   .cat-legend-row .item .legend-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
@@ -680,7 +685,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260801z';
+  const APP_BUILD = '20260802a';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2503,42 +2508,63 @@
       return maxV;
     }
 
-    function drawBars(maxVal){
-      let svg = '';
-      const gridSteps = 4;
-      for(let s=0; s<=gridSteps; s++){
+    // 柱子/网格线只建一次DOM元素,重新算刻度时改的是同一批元素的y/height属性(不是整个重建),
+    // 这样配合CSS的transition才能有"刻度逐步变大/变小"的过渡动画,而不是瞬间跳变
+    const gridSteps = 4;
+    let svg = '';
+    for(let s=0; s<=gridSteps; s++){
+      svg += `<line class="trend-grid-line" data-s="${s}" x1="${leftPad}" y1="${base}" x2="${totalW-8}" y2="${base}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="2,3"/>`;
+      svg += `<text class="trend-grid-label" data-s="${s}" x="${leftPad-6}" y="${base+3}" font-size="9" fill="var(--ink-soft)" text-anchor="end">0</text>`;
+    }
+    svg += `<rect id="trendSelHighlight" x="0" y="2" width="${barW+8}" height="${base-2}" rx="6" fill="var(--seal)" opacity="0.12" style="display:none;pointer-events:none;"/>`;
+    let hitRects = '';
+    buckets.forEach((b,i)=>{
+      const x0 = leftPad + 10 + i*groupW;
+      Object.entries(b[catField]).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
+        svg += `<rect class="trend-bar-seg" data-b="${i}" data-v="${v}" x="${x0}" y="${base}" width="${barW}" height="0" rx="4" fill="${colorForKey(k, isIncome?1:0)}"/>`;
+      });
+      svg += `<text x="${x0+barW/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
+      // 这一天/这个月没有数据就不给它加点击热区,点了也没反应(不能选中)
+      if(b[valField] > 0){
+        hitRects += `<rect class="trend-bar-hit" data-idx="${i}" x="${x0-4}" y="0" width="${barW+8}" height="${chartH}" fill="transparent"/>`;
+      }
+    });
+    svg += hitRects;
+    svgEl.innerHTML = svg;
+    // 点某一根柱子(整列都能点,不用非得点中色块本身)弹出当天/当月的金额明细+颜色图例,
+    // 同时把上面"整段时间汇总"的图例先收起来,避免和刚点开的单日明细同时出现看着重复
+    $('trendPointInfo').style.display = 'none';
+    $('trendCatLegend').style.display = '';
+    svgEl.querySelectorAll('.trend-bar-hit').forEach(hit=>{
+      hit.addEventListener('click', ()=>{
+        const idx = parseInt(hit.getAttribute('data-idx'), 10);
+        showTrendPointInfo(buckets[idx], idx, valField, catField, isIncome, groupW, leftPad);
+      });
+    });
+    const gridLineEls = Array.from({length:gridSteps+1}, (_,s)=>({
+      line: svgEl.querySelector(`.trend-grid-line[data-s="${s}"]`),
+      text: svgEl.querySelector(`.trend-grid-label[data-s="${s}"]`),
+    }));
+    const barEls = Array.from(svgEl.querySelectorAll('.trend-bar-seg'));
+
+    function applyScale(maxVal){
+      gridLineEls.forEach(({line,text}, s)=>{
         const gy = base - (s/gridSteps)*(base-top);
         const gv = Math.round((s/gridSteps)*maxVal);
-        svg += `<line x1="${leftPad}" y1="${gy.toFixed(1)}" x2="${totalW-8}" y2="${gy.toFixed(1)}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="2,3"/>`;
-        svg += `<text x="${leftPad-6}" y="${(gy+3).toFixed(1)}" font-size="9" fill="var(--ink-soft)" text-anchor="end">${gv>=1000 ? (gv/1000).toFixed(1)+'k' : gv}</text>`;
-      }
-      svg += `<rect id="trendSelHighlight" x="0" y="2" width="${barW+8}" height="${base-2}" rx="6" fill="var(--seal)" opacity="0.12" style="display:none;pointer-events:none;"/>`;
-      let hitRects = '';
-      buckets.forEach((b,i)=>{
-        const x0 = leftPad + 10 + i*groupW;
-        let y = base;
-        Object.entries(b[catField]).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
-          const h = Math.min((v/maxVal)*(base-top), base-top);
-          svg += `<rect x="${x0}" y="${(y-h).toFixed(1)}" width="${barW}" height="${h.toFixed(1)}" rx="4" fill="${colorForKey(k, isIncome?1:0)}"/>`;
-          y -= h;
-        });
-        svg += `<text x="${x0+barW/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
-        // 这一天/这个月没有数据就不给它加点击热区,点了也没反应(不能选中)
-        if(b[valField] > 0){
-          hitRects += `<rect class="trend-bar-hit" data-idx="${i}" x="${x0-4}" y="0" width="${barW+8}" height="${chartH}" fill="transparent"/>`;
-        }
+        line.setAttribute('y1', gy.toFixed(1)); line.setAttribute('y2', gy.toFixed(1));
+        text.setAttribute('y', (gy+3).toFixed(1));
+        text.textContent = gv>=1000 ? (gv/1000).toFixed(1)+'k' : gv;
       });
-      svg += hitRects;
-      svgEl.innerHTML = svg;
-      // 点某一根柱子(整列都能点,不用非得点中色块本身)弹出当天/当月的金额明细+颜色图例,
-      // 同时把上面"整段时间汇总"的图例先收起来,避免和刚点开的单日明细同时出现看着重复
-      $('trendPointInfo').style.display = 'none';
-      $('trendCatLegend').style.display = '';
-      svgEl.querySelectorAll('.trend-bar-hit').forEach(hit=>{
-        hit.addEventListener('click', ()=>{
-          const idx = parseInt(hit.getAttribute('data-idx'), 10);
-          showTrendPointInfo(buckets[idx], idx, valField, catField, isIncome, groupW, leftPad);
-        });
+      const stackTop = {};
+      buckets.forEach((b,i)=>{ stackTop[i] = base; });
+      barEls.forEach(rect=>{
+        const bIdx = parseInt(rect.getAttribute('data-b'), 10);
+        const v = parseFloat(rect.getAttribute('data-v'));
+        const h = Math.min((v/maxVal)*(base-top), base-top);
+        const yTop = stackTop[bIdx] - h;
+        rect.setAttribute('y', yTop.toFixed(1));
+        rect.setAttribute('height', h.toFixed(1));
+        stackTop[bIdx] = yTop;
       });
     }
 
@@ -2556,11 +2582,12 @@
       initialScrollLeft = totalW;
     }
     let currentMaxVal = visibleMaxVal(initialScrollLeft, clientW);
-    drawBars(currentMaxVal);
+    applyScale(currentMaxVal);
     if(scrollEl) scrollEl.scrollLeft = initialScrollLeft;
 
-    // 横向滚动停下来之后(防抖150ms,避免滚动过程中柱子一直跳动重画),
-    // 按当前视口里实际看得到的柱子重新计算刻度并重画
+    // 横向滚动停下来之后(防抖150ms,避免滚动过程中柱子一直跳动重算),
+    // 按当前视口里实际看得到的柱子重新计算刻度——只改已有元素的y/height属性(配合CSS transition
+    // 逐步长大/缩小),不整个重建,这样才有平滑的动画过渡而不是瞬间跳变
     if(scrollEl){
       let scrollTimer = null;
       scrollEl.onscroll = () => {
@@ -2569,7 +2596,7 @@
           const mv = visibleMaxVal(scrollEl.scrollLeft, scrollEl.clientWidth);
           if(mv !== currentMaxVal){
             currentMaxVal = mv;
-            drawBars(currentMaxVal);
+            applyScale(currentMaxVal);
           }
         }, 150);
       };
