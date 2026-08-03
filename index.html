@@ -722,7 +722,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803g';
+  const APP_BUILD = '20260803h';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -743,7 +743,7 @@
       emptyChart:'这段时间还没有相关记录', saveFailed:'保存失败,请检查网络后重试',
       compareTemplate:'{cur}{type} · 对比{prev}',
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
-      catFieldLabel:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
+      catFieldLabel:'分类', catPickerTitle:'选择分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
       dimCategory:'分类', tagOtherBucket:'其他',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）',
@@ -796,9 +796,9 @@
       emptyChart:'この期間の記録はまだありません', saveFailed:'保存に失敗しました。ネットワークをご確認の上再試行してください',
       compareTemplate:'{cur}の{type}（{prev}比）',
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
-      catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
+      catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリを選択', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
-      dimCategory:'分類', tagOtherBucket:'その他',
+      dimCategory:'カテゴリ', tagOtherBucket:'その他',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateSubReverse:'日本円 → 人民元', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
@@ -1348,6 +1348,8 @@
     $('segExpense').textContent = t('segExpense');
     $('segIncome').textContent = t('segIncome');
     $('catFieldLabel').textContent = t('catFieldLabel');
+    $('catFieldLabel2').textContent = t('catFieldLabel');
+    $('catPickerTitle').textContent = t('catPickerTitle');
     $('subFieldLabel').textContent = t('subFieldLabel');
     $('payFieldLabel').textContent = t('payFieldLabel');
     $('tagFieldLabel').textContent = t('tagFieldLabel');
