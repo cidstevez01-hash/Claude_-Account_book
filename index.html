@@ -723,7 +723,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803a';
+  const APP_BUILD = '20260803b';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -847,9 +847,9 @@
 
   function rebuildCatalogMaps(){
     Object.keys(allCatMap).forEach(k=> delete allCatMap[k]);
-    expenseCats.concat(incomeCats).forEach(c=> allCatMap[c.key]=c);
+    expenseCats.concat(incomeCats).forEach(c=> allCatMap[c.code]=c);
     Object.keys(payMethodMap).forEach(k=> delete payMethodMap[k]);
-    paymentMethods.forEach(p=> payMethodMap[p.key]=p);
+    paymentMethods.forEach(p=> payMethodMap[p.code]=p);
     Object.keys(allTagMap).forEach(k=> delete allTagMap[k]);
     expenseTags.concat(incomeTags).forEach(tg=> allTagMap[tg.code]=tg);
   }
@@ -874,8 +874,8 @@
   }
   function rowsToCatArray(catRows, subRows, type){
     return catRows.filter(c=>c.type===type).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(c=>({
-      key:c.key, zh:c.zh, ja:c.ja, icon:c.icon, color:c.color,
-      subs: subRows.filter(s=>s.cat_key===c.key).map(s=>({key:s.key, zh:s.zh, ja:s.ja, custom: !s.is_preset}))
+      id:c.id, code:c.code, zh:c.zh, ja:c.ja, icon:c.icon, color:c.color,
+      subs: subRows.filter(s=>s.cat_code===c.code).map(s=>({id:s.id, code:s.code, zh:s.zh, ja:s.ja, custom: !s.is_preset}))
     }));
   }
   function rowsToTagArray(tagRows, type){
@@ -899,7 +899,7 @@
       expenseCats = rowsToCatArray(catRows, subRows, 'expense');
       incomeCats = rowsToCatArray(catRows, subRows, 'income');
       paymentMethods = payRows.slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(p=>({
-        key:p.key, zh:p.zh, ja:p.ja, icon:p.icon||undefined,
+        id:p.id, code:p.code, zh:p.zh, ja:p.ja, icon:p.icon||undefined,
         badge: p.badge_bg ? {bg:p.badge_bg, text:p.badge_text} : undefined
       }));
       // tags表是后加的,万一还没跑迁移SQL/建表,不能让它拖累分类/支付方式一起加载失败——单独try,失败就标签列表留空
@@ -926,7 +926,7 @@
     }
   }
   function subLabel(sub){ if(!sub) return ''; return sub[settings.lang] || sub.zh || sub.label || ''; }
-  function findSub(catObj, subKey){ return catObj && catObj.subs && catObj.subs.find(s=>s.key===subKey); }
+  function findSub(catObj, subCode){ return catObj && catObj.subs && catObj.subs.find(s=>s.code===subCode); }
   function tagLabel(tag){ if(!tag) return ''; return tag[settings.lang] || tag.zh || tag.label || ''; }
   function iconSvg(iconId){ return `<svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-${iconId}"/></svg>`; }
   function catIconHtml(cat){ return cat ? `<span style="color:${cat.color}">${iconSvg(cat.icon)}</span>` : ''; }
@@ -1408,8 +1408,8 @@
       type: entry.type,
       amount: entry.amount,
       currency: entry.currency,
-      cat_key: entry.catKey,
-      sub_key: entry.subKey,
+      cat_code: entry.catCode,
+      sub_code: entry.subCode,
       payment_method: entry.paymentMethod,
       tag_code: entry.tagCode || null,
       note: entry.note || null,
@@ -1418,13 +1418,13 @@
     };
   }
   function dbRowToEntry(row){
-    const catObj = allCatMap[row.cat_key];
-    const subObj = catObj ? findSub(catObj, row.sub_key) : null;
+    const catObj = allCatMap[row.cat_code];
+    const subObj = catObj ? findSub(catObj, row.sub_code) : null;
     const tagObj = row.tag_code ? allTagMap[row.tag_code] : null;
     return {
       id: row.id, type: row.type, amount: row.amount, currency: row.currency,
-      catKey: row.cat_key, category: catObj ? catLabel(catObj) : '',
-      subKey: row.sub_key, subCategory: subObj ? subLabel(subObj) : '',
+      catCode: row.cat_code, category: catObj ? catLabel(catObj) : '',
+      subCode: row.sub_code, subCategory: subObj ? subLabel(subObj) : '',
       paymentMethod: row.payment_method,
       tagCode: row.tag_code || null, tag: tagObj ? tagLabel(tagObj) : '',
       icon: catObj ? catObj.icon : '',
@@ -1684,9 +1684,9 @@
       html += `<div class="day-group"><div class="day-header"><span class="day-date-chip">${dLabel}</span><span class="day-total ${dayTotal>=0?'income':'expense'}">${dayTotal>=0?'+':'-'}${fmtCur(Math.abs(dayTotal), settings.currency)}</span></div>`;
       dlist.forEach(e=>{
         const disp = convForDisplay(e);
-        const catObj = e.catKey && allCatMap[e.catKey];
+        const catObj = e.catCode && allCatMap[e.catCode];
         const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
-        const subObj = catObj && e.subKey ? findSub(catObj, e.subKey) : null;
+        const subObj = catObj && e.subCode ? findSub(catObj, e.subCode) : null;
         const subTxt = escapeHtml(subObj ? subLabel(subObj) : (e.subCategory || ''));
         const catLine = subTxt ? `${label} · ${subTxt}` : label;
         const pm = payMethodMap[e.paymentMethod];
@@ -1729,7 +1729,7 @@
         const entry = entries.find(e=> String(e.id)===id);
         if(act==='del'){
           if(!entry) return;
-          const catObj = entry.catKey && allCatMap[entry.catKey];
+          const catObj = entry.catCode && allCatMap[entry.catCode];
           const catTxt = catObj ? catLabel(catObj) : (entry.category||'');
           const dispDel = convForDisplay(entry);
           const info = `${catTxt} ${fmtCur(dispDel.amount, dispDel.cur)}`;
@@ -1813,8 +1813,8 @@
         const tagObj = e.tagCode && allTagMap[e.tagCode];
         label = tagObj ? escapeHtml(tagLabel(tagObj)) : t('tagDefault');
       }else{
-        key = e.catKey || e.category;
-        const catObj = e.catKey && allCatMap[e.catKey];
+        key = e.catCode || e.category;
+        const catObj = e.catCode && allCatMap[e.catCode];
         label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
       }
       const v = toBase(e.amount, e.currency||'CNY', e.date);
@@ -1903,7 +1903,7 @@
     return parts[0]+'年'+parseInt(parts[1],10)+'月';
   }
   function openMonthDetail(filter, monthKey){
-    // filter: null(不筛选) | {dim:'category', key:catKey} | {dim:'tag', key:tagCode|'__default__'}
+    // filter: null(不筛选) | {dim:'category', key:catCode} | {dim:'tag', key:tagCode|'__default__'}
     monthDetailFilter = filter || null;
     monthDetailMonthKey = monthKey || currentMonthKey();
     renderMonthDetailList();
@@ -1917,7 +1917,7 @@
     if(monthDetailFilter && monthDetailFilter.dim==='tag'){
       list = monthDetailFilter.key==='__default__' ? list.filter(e=> !e.tagCode) : list.filter(e=> e.tagCode===monthDetailFilter.key);
     }else if(monthDetailFilter && monthDetailFilter.dim==='category'){
-      list = list.filter(e=> e.catKey===monthDetailFilter.key);
+      list = list.filter(e=> e.catCode===monthDetailFilter.key);
     }
     if(monthDetailFilter && monthDetailFilter.dim==='category'){
       const cat = allCatMap[monthDetailFilter.key];
@@ -1958,9 +1958,9 @@
 
   function ensureSelectedCat(){
     const cats = currentType==='expense' ? expenseCats : incomeCats;
-    if(!selectedCat || !cats.find(c=>c.key===selectedCat.key)){ selectedCat = cats[0] || null; selectedSub = null; }
+    if(!selectedCat || !cats.find(c=>c.code===selectedCat.code)){ selectedCat = cats[0] || null; selectedSub = null; }
     const subs = (selectedCat && selectedCat.subs) || [];
-    if(!selectedSub || !subs.find(s=>s.key===selectedSub.key)) selectedSub = subs[0] || null;
+    if(!selectedSub || !subs.find(s=>s.code===selectedSub.code)) selectedSub = subs[0] || null;
   }
 
   function updateCatPickerRowDisplay(){
@@ -1982,11 +1982,11 @@
   function renderPayGrid(){
     if(!selectedPayMethod) selectedPayMethod = paymentMethods[0];
     $('payGrid').innerHTML = paymentMethods.map(p=>
-      `<button type="button" class="sub-pill ${p.key===selectedPayMethod.key?'selected':''}" data-key="${p.key}">${pmIconHtml(p)} ${payLabel(p)}</button>`
+      `<button type="button" class="sub-pill ${p.code===selectedPayMethod.code?'selected':''}" data-code="${p.code}">${pmIconHtml(p)} ${payLabel(p)}</button>`
     ).join('');
     $('payGrid').querySelectorAll('.sub-pill').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        selectedPayMethod = paymentMethods.find(p=>p.key===btn.getAttribute('data-key'));
+        selectedPayMethod = paymentMethods.find(p=>p.code===btn.getAttribute('data-code'));
         renderPayGrid();
       });
     });
@@ -1996,53 +1996,53 @@
     ensureSelectedCat();
     const cats = currentType==='expense' ? expenseCats : incomeCats;
     $('catGrid').innerHTML = cats.map(c=>
-      `<button type="button" class="cat-btn ${c.key===selectedCat.key?'selected':''}" data-key="${c.key}">
+      `<button type="button" class="cat-btn ${c.code===selectedCat.code?'selected':''}" data-code="${c.code}">
         <span class="ic-wrap" style="background:${tintColor(c.color,0.85)};color:${c.color}">${iconSvg(c.icon)}</span><span class="lb">${catLabel(c)}</span></button>`
     ).join('');
     $('catGrid').querySelectorAll('.cat-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        const key = btn.getAttribute('data-key');
-        if(!selectedCat || selectedCat.key!==key){ selectedCat = cats.find(c=>c.key===key); selectedSub = null; }
+        const code = btn.getAttribute('data-code');
+        if(!selectedCat || selectedCat.code!==code){ selectedCat = cats.find(c=>c.code===code); selectedSub = null; }
         renderCatGrid();
       });
     });
     renderSubGrid();
   }
 
-  let editingSubKey = null; // 具体sub的key = 编辑该项;'__new__' = 正在新增;null = 都没有
-  let openSubMenuKey = null; // 自定义细分右上角"⋯"菜单当前展开的是哪个,null = 都没展开
+  let editingSubCode = null; // 具体sub的code = 编辑该项;'__new__' = 正在新增;null = 都没有
+  let openSubMenuCode = null; // 自定义细分右上角"⋯"菜单当前展开的是哪个,null = 都没展开
 
   function renderSubGrid(){
     const subs = (selectedCat && selectedCat.subs) || [];
-    if(!selectedSub || !subs.find(s=>s.key===selectedSub.key)) selectedSub = subs[0] || null;
+    if(!selectedSub || !subs.find(s=>s.code===selectedSub.code)) selectedSub = subs[0] || null;
     let html = subs.map(s=>{
-      if(editingSubKey === s.key){
+      if(editingSubCode === s.code){
         return `<span class="sub-item-wrap">
-          <input type="text" class="sub-inline-input" data-editing-key="${s.key}" value="${escapeHtml(subLabel(s))}">
-          <button type="button" class="sub-mini-btn sub-confirm" data-editing-key="${s.key}">${iconSvg('check')}</button>
+          <input type="text" class="sub-inline-input" data-editing-code="${s.code}" value="${escapeHtml(subLabel(s))}">
+          <button type="button" class="sub-mini-btn sub-confirm" data-editing-code="${s.code}">${iconSvg('check')}</button>
         </span>`;
       }
-      const selCls = selectedSub && s.key===selectedSub.key ? 'selected' : '';
+      const selCls = selectedSub && s.code===selectedSub.code ? 'selected' : '';
       if(s.custom){
         // 自定义细分点胶囊本体=选中(跟普通细分一样),编辑/删除收进右上角"⋯"菜单里,不会一点就跳进改名
-        const menuOpen = openSubMenuKey === s.key;
+        const menuOpen = openSubMenuCode === s.code;
         return `<span class="sub-item-wrap">
           <span class="sub-pill-box">
-            <button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${escapeHtml(subLabel(s))}</button>
-            <button type="button" class="sub-menu-btn" data-key="${s.key}">⋯</button>
-            ${menuOpen ? `<div class="sub-menu-popover" data-key="${s.key}">
-              <button type="button" class="sub-menu-item" data-action="edit" data-key="${s.key}">${iconSvg('pencil')}<span>${t('edit')}</span></button>
-              <button type="button" class="sub-menu-item danger" data-action="delete" data-key="${s.key}">${iconSvg('trash')}<span>${t('delete')}</span></button>
+            <button type="button" class="sub-pill ${selCls}" data-code="${s.code}">${escapeHtml(subLabel(s))}</button>
+            <button type="button" class="sub-menu-btn" data-code="${s.code}">⋯</button>
+            ${menuOpen ? `<div class="sub-menu-popover" data-code="${s.code}">
+              <button type="button" class="sub-menu-item" data-action="edit" data-code="${s.code}">${iconSvg('pencil')}<span>${t('edit')}</span></button>
+              <button type="button" class="sub-menu-item danger" data-action="delete" data-code="${s.code}">${iconSvg('trash')}<span>${t('delete')}</span></button>
             </div>` : ''}
           </span>
         </span>`;
       }
-      return `<button type="button" class="sub-pill ${selCls}" data-key="${s.key}">${escapeHtml(subLabel(s))}</button>`;
+      return `<button type="button" class="sub-pill ${selCls}" data-code="${s.code}">${escapeHtml(subLabel(s))}</button>`;
     }).join('');
-    if(editingSubKey === '__new__'){
+    if(editingSubCode === '__new__'){
       html += `<span class="sub-item-wrap">
-        <input type="text" class="sub-inline-input" data-editing-key="__new__" placeholder="${t('newSubPlaceholder')}">
-        <button type="button" class="sub-mini-btn sub-confirm" data-editing-key="__new__">${iconSvg('check')}</button>
+        <input type="text" class="sub-inline-input" data-editing-code="__new__" placeholder="${t('newSubPlaceholder')}">
+        <button type="button" class="sub-mini-btn sub-confirm" data-editing-code="__new__">${iconSvg('check')}</button>
       </span>`;
     }else{
       html += `<button type="button" class="sub-pill add-sub" id="addSubBtn">＋</button>`;
@@ -2052,8 +2052,8 @@
       btn.addEventListener('click', ()=>{
         // 自定义细分的编辑/删除已经挪进"⋯"菜单,点胶囊本体现在只代表"选中",
         // 不会再跟"进入改名"冲突,所以选中后可以放心直接跳回记账表单(留一点延迟让选中态先闪一下)
-        openSubMenuKey = null;
-        selectedSub = subs.find(s=>s.key===btn.getAttribute('data-key'));
+        openSubMenuCode = null;
+        selectedSub = subs.find(s=>s.code===btn.getAttribute('data-code'));
         renderSubGrid();
         updateCatPickerRowDisplay();
         setTimeout(closeCatPicker, 180);
@@ -2062,25 +2062,25 @@
     $('subGrid').querySelectorAll('.sub-menu-btn').forEach(btn=>{
       btn.addEventListener('click', (ev)=>{
         ev.stopPropagation();
-        const key = btn.getAttribute('data-key');
-        openSubMenuKey = (openSubMenuKey===key) ? null : key;
+        const code = btn.getAttribute('data-code');
+        openSubMenuCode = (openSubMenuCode===code) ? null : code;
         renderSubGrid();
       });
     });
     $('subGrid').querySelectorAll('.sub-menu-item').forEach(btn=>{
       btn.addEventListener('click', async (ev)=>{
         ev.stopPropagation();
-        const key = btn.getAttribute('data-key');
+        const code = btn.getAttribute('data-code');
         const action = btn.getAttribute('data-action');
-        openSubMenuKey = null;
+        openSubMenuCode = null;
         if(action==='edit'){
-          const sub = subs.find(s=>s.key===key);
+          const sub = subs.find(s=>s.code===code);
           if(sub) openEditSubInput(sub);
           return;
         }
-        await deleteCustomSub(selectedCat.key, key);
-        if(selectedSub && selectedSub.key===key) selectedSub = null;
-        if(editingSubKey===key) editingSubKey=null;
+        await deleteCustomSub(selectedCat.code, code);
+        if(selectedSub && selectedSub.code===code) selectedSub = null;
+        if(editingSubCode===code) editingSubCode=null;
         renderSubGrid();
         updateCatPickerRowDisplay();
       });
@@ -2100,42 +2100,42 @@
   // "⋯"菜单展开时,点菜单/按钮以外的任何地方都应该收起来,这个监听全局只绑一次(不放进renderSubGrid,
   // 不然每次重渲染都会叠加重复绑定)
   document.addEventListener('click', (ev)=>{
-    if(!openSubMenuKey) return;
+    if(!openSubMenuCode) return;
     if(ev.target.closest('.sub-menu-btn') || ev.target.closest('.sub-menu-popover')) return;
-    openSubMenuKey = null;
+    openSubMenuCode = null;
     renderSubGrid();
   });
 
   // 新增/编辑子分类都直接变成小框内的输入框(不再另起一行),
   // 输入完成靠对勾按钮/回车确认保存,不再只靠"点别处自动保存"这种看不出反馈的方式(用户明确反馈过点不出保存在哪)
   function bindInlineSubInput(inputEl){
-    const key = inputEl.getAttribute('data-editing-key');
+    const code = inputEl.getAttribute('data-editing-code');
     let settled = false;
     async function commit(){
       if(settled) return;
       settled = true;
       const label = inputEl.value.trim();
       if(label && selectedCat){
-        if(key && key !== '__new__'){
-          await updateCustomSub(selectedCat.key, key, label);
-          if(selectedSub && selectedSub.key===key){ selectedSub.zh = label; selectedSub.ja = label; }
+        if(code && code !== '__new__'){
+          await updateCustomSub(selectedCat.code, code, label);
+          if(selectedSub && selectedSub.code===code){ selectedSub.zh = label; selectedSub.ja = label; }
         }else{
-          selectedSub = await addCustomSub(selectedCat.key, label);
+          selectedSub = await addCustomSub(selectedCat.code, label);
         }
       }
-      if(editingSubKey === key){ editingSubKey = null; renderSubGrid(); updateCatPickerRowDisplay(); }
+      if(editingSubCode === code){ editingSubCode = null; renderSubGrid(); updateCatPickerRowDisplay(); }
     }
     function cancel(){
       if(settled) return;
       settled = true;
-      if(editingSubKey === key){ editingSubKey = null; renderSubGrid(); }
+      if(editingSubCode === code){ editingSubCode = null; renderSubGrid(); }
     }
     inputEl.addEventListener('keydown', (ev)=>{
       if(ev.key==='Enter'){ ev.preventDefault(); commit(); }
       if(ev.key==='Escape'){ ev.preventDefault(); cancel(); }
     });
     inputEl.addEventListener('blur', ()=> commit());
-    const confirmBtn = $('subGrid').querySelector(`.sub-confirm[data-editing-key="${key}"]`);
+    const confirmBtn = $('subGrid').querySelector(`.sub-confirm[data-editing-code="${code}"]`);
     if(confirmBtn){
       confirmBtn.addEventListener('mousedown', (ev)=> ev.preventDefault());
       confirmBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); commit(); });
@@ -2145,11 +2145,11 @@
   }
 
   function openAddSubInput(){
-    editingSubKey = '__new__';
+    editingSubCode = '__new__';
     renderSubGrid();
   }
   function openEditSubInput(sub){
-    editingSubKey = sub.key;
+    editingSubCode = sub.code;
     renderSubGrid();
   }
 
@@ -2300,38 +2300,40 @@
 
   // 自定义细分现在直接是 expenseCats/incomeCats 里 subs 数组的一部分(custom:true 标记),
   // 不再单独存一份 customSubsMap——本机缓存靠 saveCatalogCache() 统一存;登录状态下再额外写库。
-  async function addCustomSub(catKey, label){
-    const sub = {key:genCustomKey(), custom:true, zh:label, ja:label};
-    const cat = allCatMap[catKey];
+  // 主键是id(不是code),做法照抄标签：id客户端就地生成，改/删按id匹配，不用等insert返回回填
+  async function addCustomSub(catCode, label){
+    const sub = {id:genUuid(), code:genCustomKey(), custom:true, zh:label, ja:label};
+    const cat = allCatMap[catCode];
     if(cat) cat.subs.push(sub);
     saveCatalogCache();
     if(cloudUser && supabaseClient){
       try{
-        const { error } = await supabaseClient.from('subcategories').insert({ key:sub.key, cat_key:catKey, zh:label, ja:label, is_preset:false, user_id:cloudUser.id });
+        const { error } = await supabaseClient.from('subcategories').insert({ id:sub.id, code:sub.code, cat_code:catCode, zh:label, ja:label, is_preset:false, user_id:cloudUser.id });
         if(error) throw error;
       }catch(e){ console.error('自定义细分同步失败', e); showToast(t('cloudSyncError')); }
     }
     return sub;
   }
-  async function updateCustomSub(catKey, subKey, newLabel){
-    const cat = allCatMap[catKey];
-    const sub = cat && cat.subs.find(s=>s.key===subKey);
+  async function updateCustomSub(catCode, subCode, newLabel){
+    const cat = allCatMap[catCode];
+    const sub = cat && cat.subs.find(s=>s.code===subCode);
     if(sub){ sub.zh = newLabel; sub.ja = newLabel; }
     saveCatalogCache();
-    if(cloudUser && supabaseClient){
+    if(cloudUser && supabaseClient && sub){
       try{
-        const { error } = await supabaseClient.from('subcategories').update({zh:newLabel, ja:newLabel}).eq('key', subKey).eq('user_id', cloudUser.id);
+        const { error } = await supabaseClient.from('subcategories').update({zh:newLabel, ja:newLabel}).eq('id', sub.id);
         if(error) throw error;
       }catch(e){ console.error('自定义细分更新失败', e); showToast(t('cloudSyncError')); }
     }
   }
-  async function deleteCustomSub(catKey, subKey){
-    const cat = allCatMap[catKey];
-    if(cat) cat.subs = cat.subs.filter(s=>s.key!==subKey);
+  async function deleteCustomSub(catCode, subCode){
+    const cat = allCatMap[catCode];
+    const sub = cat && cat.subs.find(s=>s.code===subCode);
+    if(cat) cat.subs = cat.subs.filter(s=>s.code!==subCode);
     saveCatalogCache();
-    if(cloudUser && supabaseClient){
+    if(cloudUser && supabaseClient && sub){
       try{
-        const { error } = await supabaseClient.from('subcategories').delete().eq('key', subKey).eq('user_id', cloudUser.id);
+        const { error } = await supabaseClient.from('subcategories').delete().eq('id', sub.id);
         if(error) throw error;
       }catch(e){ console.error('自定义细分删除失败', e); showToast(t('cloudSyncError')); }
     }
@@ -2399,7 +2401,7 @@
     $('dateInput').value = todayStr();
     $('amountInput').value = '';
     $('noteInput').value = '';
-    editingSubKey = null;
+    editingSubCode = null;
     editingTagCode = null;
     openTagMenuCode = null;
   }
@@ -2407,8 +2409,8 @@
     currentType = entry.type;
     currentCurrency = entry.currency || settings.currency;
     const cats = currentType==='expense' ? expenseCats : incomeCats;
-    selectedCat = cats.find(c=>c.key===entry.catKey) || cats[0];
-    selectedSub = (selectedCat.subs||[]).find(s=>s.key===entry.subKey) || null;
+    selectedCat = cats.find(c=>c.code===entry.catCode) || cats[0];
+    selectedSub = (selectedCat.subs||[]).find(s=>s.code===entry.subCode) || null;
     selectedPayMethod = payMethodMap[entry.paymentMethod] || paymentMethods[0];
     const tags = currentType==='expense' ? expenseTags : incomeTags;
     selectedTag = entry.tagCode ? (tags.find(tg=>tg.code===entry.tagCode) || null) : null;
@@ -2418,7 +2420,7 @@
     $('amountInput').value = entry.amount;
     $('noteInput').value = entry.note || '';
     $('dateInput').value = useToday ? todayStr() : entry.date;
-    editingSubKey = null;
+    editingSubCode = null;
     editingTagCode = null;
     openTagMenuCode = null;
     updateCatPickerRowDisplay();
@@ -2468,7 +2470,7 @@
     $('ymPickerSheet').classList.remove('show');
     $('cumRangeSheet').classList.remove('show');
     editingEntryId = null;
-    editingSubKey = null;
+    editingSubCode = null;
     editingTagCode = null;
     openTagMenuCode = null;
     // 点空白处/关闭按钮退出整个记账流程时清空已选的分类,下次新建从默认分类重新开始;
@@ -2502,9 +2504,9 @@
         entries[idx] = {
           ...entries[idx],
           type: currentType, amount: amt, currency: currentCurrency,
-          category: catLabel(selectedCat), catKey: selectedCat.key, icon: selectedCat.icon,
-          subCategory: selectedSub? subLabel(selectedSub) : '', subKey: selectedSub? selectedSub.key : '',
-          paymentMethod: selectedPayMethod ? selectedPayMethod.key : 'cash',
+          category: catLabel(selectedCat), catCode: selectedCat.code, icon: selectedCat.icon,
+          subCategory: selectedSub? subLabel(selectedSub) : '', subCode: selectedSub? selectedSub.code : '',
+          paymentMethod: selectedPayMethod ? selectedPayMethod.code : 'cash',
           tag: selectedTag? tagLabel(selectedTag) : '', tagCode: selectedTag? selectedTag.code : null,
           note: note, date: date
         };
@@ -2514,9 +2516,9 @@
       savedEntry = {
         id: Date.now()+Math.random().toString(16).slice(2),
         type: currentType, amount: amt, currency: currentCurrency,
-        category: catLabel(selectedCat), catKey: selectedCat.key, icon: selectedCat.icon,
-        subCategory: selectedSub? subLabel(selectedSub) : '', subKey: selectedSub? selectedSub.key : '',
-        paymentMethod: selectedPayMethod ? selectedPayMethod.key : 'cash',
+        category: catLabel(selectedCat), catCode: selectedCat.code, icon: selectedCat.icon,
+        subCategory: selectedSub? subLabel(selectedSub) : '', subCode: selectedSub? selectedSub.code : '',
+        paymentMethod: selectedPayMethod ? selectedPayMethod.code : 'cash',
         tag: selectedTag? tagLabel(selectedTag) : '', tagCode: selectedTag? selectedTag.code : null,
         note: note, date: date, createdAt: Date.now()
       };
@@ -2736,7 +2738,7 @@
       const b = map[e.date];
       if(!b) return;
       const v = toBase(e.amount, e.currency||'CNY', e.date);
-      const k = e.catKey || e.category;
+      const k = e.catCode || e.category;
       if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
     });
@@ -2753,7 +2755,7 @@
       const b = map[mk];
       if(!b) return;
       const v = toBase(e.amount, e.currency||'CNY', e.date);
-      const k = e.catKey || e.category;
+      const k = e.catCode || e.category;
       if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
     });
@@ -3261,10 +3263,10 @@
 
   // 固定每月收支规则:每个月自动补一笔(不会重复生成,也不会补历史月份)
   const RECURRING_RULES = [
-    { id:'rule_salary_default', type:'income', amount:289346, currency:'JPY', catKey:'salary', subKey:'salary_base', dayOfMonth:10, paymentMethod:'transfer', bizDayAdjust:'before' },
-    { id:'rule_rent_default', type:'expense', amount:73440, currency:'JPY', catKey:'housing', subKey:'rent', dayOfMonth:26, paymentMethod:'transfer', bizDayAdjust:'after' },
-    { id:'rule_paidy_default', type:'expense', amount:5272, currency:'JPY', catKey:'telecom', subKey:'phone', dayOfMonth:'last', paymentMethod:'paidy', bizDayAdjust:'after', note:'iPhone' },
-    { id:'rule_amazon_prime', type:'expense', amount:600, currency:'JPY', catKey:'hobby', subKey:'video', dayOfMonth:'last', paymentMethod:'amazon', bizDayAdjust:'after', note:'Amazon Prime' }
+    { id:'rule_salary_default', type:'income', amount:289346, currency:'JPY', catCode:'salary', subCode:'salary_base', dayOfMonth:10, paymentMethod:'transfer', bizDayAdjust:'before' },
+    { id:'rule_rent_default', type:'expense', amount:73440, currency:'JPY', catCode:'housing', subCode:'rent', dayOfMonth:26, paymentMethod:'transfer', bizDayAdjust:'after' },
+    { id:'rule_paidy_default', type:'expense', amount:5272, currency:'JPY', catCode:'telecom', subCode:'phone', dayOfMonth:'last', paymentMethod:'paidy', bizDayAdjust:'after', note:'iPhone' },
+    { id:'rule_amazon_prime', type:'expense', amount:600, currency:'JPY', catCode:'hobby', subCode:'video', dayOfMonth:'last', paymentMethod:'amazon', bizDayAdjust:'after', note:'Amazon Prime' }
   ];
   async function ensureRecurringEntries(){
     const mk = currentMonthKey();
@@ -3281,14 +3283,14 @@
         if(existing.date !== dateStr){ existing.date = dateStr; changed = true; touched.push(existing); }
         return;
       }
-      const catObj = allCatMap[rule.catKey];
+      const catObj = allCatMap[rule.catCode];
       if(!catObj) return; // 分类数据还没加载好(比如离线且没缓存),先跳过,下次App启动再补
-      const subObj = findSub(catObj, rule.subKey);
+      const subObj = findSub(catObj, rule.subCode);
       const newEntry = {
         id,
         type: rule.type, amount: rule.amount, currency: rule.currency,
-        category: catLabel(catObj), catKey: rule.catKey,
-        subCategory: subObj? subLabel(subObj) : '', subKey: rule.subKey,
+        category: catLabel(catObj), catCode: rule.catCode,
+        subCategory: subObj? subLabel(subObj) : '', subCode: rule.subCode,
         paymentMethod: rule.paymentMethod || 'cash',
         icon: catObj.icon, note: rule.note || '', date: dateStr,
         createdAt: Date.now(), recurringId: rule.id
@@ -3303,7 +3305,7 @@
 
   // 固定隔周收支规则:从 anchorDate 起,每隔 intervalDays 天补一笔,补到今天为止(不含 anchorDate 之前)
   const RECURRING_BIWEEKLY_RULES = [
-    { id:'rule_pili_video', type:'expense', amount:300, currency:'JPY', catKey:'hobby', subKey:'video', paymentMethod:'merpay', note:'pili', anchorDate:'2026-08-14', intervalDays:14 }
+    { id:'rule_pili_video', type:'expense', amount:300, currency:'JPY', catCode:'hobby', subCode:'video', paymentMethod:'merpay', note:'pili', anchorDate:'2026-08-14', intervalDays:14 }
   ];
   async function ensureBiweeklyRecurringEntries(){
     const today = todayStr();
@@ -3312,18 +3314,18 @@
     RECURRING_BIWEEKLY_RULES.forEach(rule=>{
       let d = new Date(rule.anchorDate+'T00:00:00');
       const todayD = new Date(today+'T00:00:00');
-      const catObj = allCatMap[rule.catKey];
+      const catObj = allCatMap[rule.catCode];
       if(!catObj) return; // 分类数据还没加载好(比如离线且没缓存),先跳过,下次App启动再补
       while(d <= todayD){
         const dateStr = fmtDateObj(d);
         const id = 'recur_'+rule.id+'_'+dateStr;
         if(!entries.find(e=> e.id===id)){
-          const subObj = findSub(catObj, rule.subKey);
+          const subObj = findSub(catObj, rule.subCode);
           const newEntry = {
             id,
             type: rule.type, amount: rule.amount, currency: rule.currency,
-            category: catLabel(catObj), catKey: rule.catKey,
-            subCategory: subObj? subLabel(subObj) : '', subKey: rule.subKey,
+            category: catLabel(catObj), catCode: rule.catCode,
+            subCategory: subObj? subLabel(subObj) : '', subCode: rule.subCode,
             paymentMethod: rule.paymentMethod || 'cash',
             icon: catObj.icon, note: rule.note || '', date: dateStr,
             createdAt: Date.now(), recurringId: rule.id
