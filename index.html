@@ -225,6 +225,8 @@
   .legend-row .name{flex:1;font-size:13px;display:flex;align-items:center;}
   .legend-row .pct{font-size:12px;color:var(--ink-soft);width:42px;text-align:right;}
   .legend-row .amt{font-size:13px;width:82px;text-align:right;font-variant-numeric:tabular-nums;}
+  #homeLegendList.expense .legend-row .amt{color:var(--seal);}
+  #homeLegendList.income .legend-row .amt{color:var(--jade);}
   .empty-chart{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0;}
   .ym-picker{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
   .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:opacity 0.12s ease;}
@@ -696,7 +698,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802j';
+  const APP_BUILD = '20260802k';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1756,6 +1758,8 @@
     const total = list.reduce((s,g)=>s+g.amount,0);
     $('homeDonutTotal').textContent = fmtCur(total, settings.currency);
     const donutEl = $('homeDonutChart'), legendEl = $('homeLegendList');
+    legendEl.classList.toggle('expense', homeDonutType==='expense');
+    legendEl.classList.toggle('income', homeDonutType==='income');
     if(total===0){
       donutEl.innerHTML = `<circle cx="70" cy="70" r="54" fill="none" stroke="var(--grid)" stroke-width="18"/>`;
       legendEl.innerHTML = `<div class="empty-chart">${t('emptyChart')}</div>`;
