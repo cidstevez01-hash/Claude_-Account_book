@@ -723,7 +723,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803c';
+  const APP_BUILD = '20260803d';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1797,7 +1797,14 @@
   // 统一归到"默认"这一档,并且用一个调淡的灰色跟真正打了标签的部分区分开,不会显得太抢眼
   let homeDonutDim = 'category';
   const TAG_DEFAULT_COLOR = '#c2b8a3';
+  // 下拉框"标签"这个选项的文字不用死板的通用词,取tags表里实际的数据:当前收支类型下
+  // 只有一个标签时就直接显示那个标签的名字(比如"固定支出"),有多个/没有标签时才退回通用的"标签"/"タグ"
+  function updateDonutDimTagOptionLabel(){
+    const tags = homeDonutType==='expense' ? expenseTags : incomeTags;
+    $('homeDonutDimTagOpt').textContent = tags.length===1 ? tagLabel(tags[0]) : t('dimTag');
+  }
   function renderHomeDonut(){
+    updateDonutDimTagOptionLabel();
     const mk = getHomeDonutMonthKey();
     $('homeMonthLabel').textContent = getHomeDonutMonthLabel();
     $('homeMonthPrev').disabled = !monthHasAnyEntries(homeDonutMonthOffset-1);
