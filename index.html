@@ -692,7 +692,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802d';
+  const APP_BUILD = '20260802e';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2562,6 +2562,9 @@
       tick: $('trendAxisFixed').querySelector(`.axis-tick[data-s="${s}"]`),
     }));
     const barEls = Array.from(svgEl.querySelectorAll('.trend-bar-seg'));
+    // 记录每根柱子上一次是不是在可见范围内,用来区分"从无到有第一次冒出来"跟"已经在看着、
+    // 只是因为刻度变了而升降高度"这两种情况——前者要快,后者可以慢慢升
+    const barWasInView = {};
 
     // 屏幕外(当前滚动视口看不到)的柱子不给它算高度、不渲染出来,
     // 等拖拉进度条把它带入视口范围后,才按这时候的刻度把它画出来(配合CSS transition表现为"长出来")
@@ -2580,10 +2583,15 @@
         const x0 = leftPad + 10 + bIdx*groupW;
         const inView = (x0+barW >= scrollLeft) && (x0 <= scrollLeft+clientWidth);
         if(!inView){
+          rect.style.transition = 'y 0.15s ease, height 0.15s ease';
           rect.setAttribute('y', base.toFixed(1));
           rect.setAttribute('height', 0);
+          barWasInView[bIdx] = false;
           return;
         }
+        // 刚从视口外滑进来(上一次还不可见)用快速过渡,已经在视口里、只是刻度变化导致升降高度的用慢速过渡
+        rect.style.transition = barWasInView[bIdx] ? 'y 0.35s ease, height 0.35s ease' : 'y 0.15s ease, height 0.15s ease';
+        barWasInView[bIdx] = true;
         const v = parseFloat(rect.getAttribute('data-v'));
         const h = Math.min((v/maxVal)*(base-top), base-top);
         const yTop = stackTop[bIdx] - h;
