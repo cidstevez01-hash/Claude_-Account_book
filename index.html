@@ -52,7 +52,6 @@
   /* min-height给个保底值,不完全依赖flex-grow的实时计算——内容很短(比如只有一个分类)时
      也能保证图表卡片本身不会缩得太小,配合上面.page.active的min-height双重保险撑满一屏 */
   #pageStats .chart-card{flex:1 1 auto; display:flex; flex-direction:column; min-height:380px;}
-  #pageStats .chart-scroll{flex:1 1 auto; min-height:140px;}
   .header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; position:relative;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
   .header .month{font-size:13px; color:var(--ink-soft); margin-top:4px;}
@@ -261,16 +260,17 @@
   .month-grid button{padding:12px 0;border-radius:12px;border:1.5px solid var(--grid);background:var(--card);font-size:14px;color:var(--ink);font-family:'Noto Sans SC',sans-serif;transition:transform 0.1s ease;}
   .month-grid button:active{transform:scale(0.93);}
   .month-grid button.selected{border-color:var(--seal);background:#f7ded9;color:var(--seal);font-weight:700;}
-  .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px;}
+  .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px;flex:1 1 auto;min-width:0;}
   .chart-scroll svg{display:block;}
   /* 滚动切换到不同数据量级的区间时,纵轴刻度/柱子改的是同一批元素的属性而不是重建,
      这里给个过渡动画,刻度变大/变小时是逐步平滑地长/缩,不是瞬间跳变 */
   #trendChart .trend-bar-seg{transition:y 0.35s ease, height 0.35s ease;}
   #trendChart .trend-grid-line{transition:y1 0.35s ease, y2 0.35s ease;}
   /* 纵轴数值刻度固定在最左侧,不跟着横向拖拉滚动;柱子/网格线在它右边正常滚动,
-     视觉上就像刻度"冻结"在窗口左边、内容在它下面滑动 */
-  .chart-scroll-wrap{position:relative;}
-  .trend-axis-fixed{position:absolute;left:0;top:0;bottom:0;width:34px;background:var(--card);z-index:2;pointer-events:none;}
+     视觉上就像刻度"冻结"在窗口左边、内容在它右边滑动。这里用真实的flex布局分栏,
+     而不是绝对定位盖在柱子上面——不然滚动到某些位置时柱子会被这层刻度挡住/切掉一截 */
+  .chart-scroll-wrap{display:flex;flex:1 1 auto;min-height:140px;}
+  .trend-axis-fixed{position:relative;flex:0 0 34px;width:34px;background:var(--card);}
   .trend-axis-fixed .axis-tick{position:absolute;right:6px;font-size:9px;color:var(--ink-soft);transform:translateY(-50%);white-space:nowrap;transition:top 0.35s ease;}
   .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
@@ -692,7 +692,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802e';
+  const APP_BUILD = '20260802f';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2482,7 +2482,7 @@
     const chartH = Math.max(160, Math.round(scrollElForSize && scrollElForSize.clientHeight) || 190);
     const top=14, base=chartH-40, barW=20, barGap=10;
     const groupW = barW+barGap;
-    const leftPad = 34; // 给左边纵轴数值刻度留出的空间
+    const leftPad = 0; // 纵轴数值刻度现在是外面单独一栏(见trendAxisFixed),不用在SVG里面留空间了
     const totalW = Math.max(300, leftPad + buckets.length*groupW+20);
     const svgEl = $('trendChart');
     svgEl.setAttribute('viewBox', `0 0 ${totalW} ${chartH}`);
