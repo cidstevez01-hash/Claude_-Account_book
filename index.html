@@ -696,7 +696,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802i';
+  const APP_BUILD = '20260802j';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1608,7 +1608,15 @@
 
   function buildDayGroupedHtml(list){
     if(list.length===0) return '';
-    const sorted = [...list].sort((a,b)=> b.date.localeCompare(a.date) || b.createdAt-a.createdAt);
+    // 今天及之前(已经发生的)按日期倒序置顶;晚于今天的(比如提前生成的下个房租/工资这种还没发生的)
+    // 统一沉到最下面,内部按日期升序排(越快发生的排越靠前),不再跟已发生的混在一起按纯日期倒序排
+    const today = todayStr();
+    const sorted = [...list].sort((a,b)=>{
+      const aFuture = a.date > today, bFuture = b.date > today;
+      if(aFuture !== bFuture) return aFuture ? 1 : -1;
+      if(aFuture) return a.date.localeCompare(b.date) || a.createdAt-b.createdAt;
+      return b.date.localeCompare(a.date) || b.createdAt-a.createdAt;
+    });
     const groups = {};
     sorted.forEach(e=>{ if(!groups[e.date]) groups[e.date]=[]; groups[e.date].push(e); });
     let html='';
