@@ -267,7 +267,11 @@
      这里给个过渡动画,刻度变大/变小时是逐步平滑地长/缩,不是瞬间跳变 */
   #trendChart .trend-bar-seg{transition:y 0.35s ease, height 0.35s ease;}
   #trendChart .trend-grid-line{transition:y1 0.35s ease, y2 0.35s ease;}
-  #trendChart .trend-grid-label{transition:y 0.35s ease;}
+  /* 纵轴数值刻度固定在最左侧,不跟着横向拖拉滚动;柱子/网格线在它右边正常滚动,
+     视觉上就像刻度"冻结"在窗口左边、内容在它下面滑动 */
+  .chart-scroll-wrap{position:relative;}
+  .trend-axis-fixed{position:absolute;left:0;top:0;bottom:0;width:34px;background:var(--card);z-index:2;pointer-events:none;}
+  .trend-axis-fixed .axis-tick{position:absolute;right:6px;font-size:9px;color:var(--ink-soft);transform:translateY(-50%);white-space:nowrap;transition:top 0.35s ease;}
   .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
   .cat-legend-row .item .legend-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
@@ -470,7 +474,10 @@
           <option value="income" id="trendTypeIncomeOpt">收入</option>
         </select>
       </div>
-      <div class="chart-scroll"><svg id="trendChart" style="display:block;"></svg></div>
+      <div class="chart-scroll-wrap">
+        <div class="trend-axis-fixed" id="trendAxisFixed"></div>
+        <div class="chart-scroll"><svg id="trendChart" style="display:block;"></svg></div>
+      </div>
       <div id="trendPointInfo" class="trend-point-info" style="display:none;"></div>
       <div class="cat-legend-row" id="trendCatLegend"></div>
     </div>
@@ -685,7 +692,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802a';
+  const APP_BUILD = '20260802b';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2509,13 +2516,17 @@
     }
 
     // 柱子/网格线只建一次DOM元素,重新算刻度时改的是同一批元素的y/height属性(不是整个重建),
-    // 这样配合CSS的transition才能有"刻度逐步变大/变小"的过渡动画,而不是瞬间跳变
+    // 这样配合CSS的transition才能有"刻度逐步变大/变小"的过渡动画,而不是瞬间跳变。
+    // 纵轴数值刻度本身不放在这个会横向滚动的SVG里,单独放在旁边固定不动的trendAxisFixed里,
+    // 拖拉横向进度条时刻度文字停在最左侧不跟着跑,只有数值内容跟着当前视口变
     const gridSteps = 4;
     let svg = '';
     for(let s=0; s<=gridSteps; s++){
       svg += `<line class="trend-grid-line" data-s="${s}" x1="${leftPad}" y1="${base}" x2="${totalW-8}" y2="${base}" stroke="var(--grid)" stroke-width="1" stroke-dasharray="2,3"/>`;
-      svg += `<text class="trend-grid-label" data-s="${s}" x="${leftPad-6}" y="${base+3}" font-size="9" fill="var(--ink-soft)" text-anchor="end">0</text>`;
     }
+    $('trendAxisFixed').innerHTML = Array.from({length:gridSteps+1}, (_,s)=>
+      `<span class="axis-tick" data-s="${s}" style="top:${base}px;">0</span>`
+    ).join('');
     svg += `<rect id="trendSelHighlight" x="0" y="2" width="${barW+8}" height="${base-2}" rx="6" fill="var(--seal)" opacity="0.12" style="display:none;pointer-events:none;"/>`;
     let hitRects = '';
     buckets.forEach((b,i)=>{
@@ -2543,17 +2554,17 @@
     });
     const gridLineEls = Array.from({length:gridSteps+1}, (_,s)=>({
       line: svgEl.querySelector(`.trend-grid-line[data-s="${s}"]`),
-      text: svgEl.querySelector(`.trend-grid-label[data-s="${s}"]`),
+      tick: $('trendAxisFixed').querySelector(`.axis-tick[data-s="${s}"]`),
     }));
     const barEls = Array.from(svgEl.querySelectorAll('.trend-bar-seg'));
 
     function applyScale(maxVal){
-      gridLineEls.forEach(({line,text}, s)=>{
+      gridLineEls.forEach(({line,tick}, s)=>{
         const gy = base - (s/gridSteps)*(base-top);
         const gv = Math.round((s/gridSteps)*maxVal);
         line.setAttribute('y1', gy.toFixed(1)); line.setAttribute('y2', gy.toFixed(1));
-        text.setAttribute('y', (gy+3).toFixed(1));
-        text.textContent = gv>=1000 ? (gv/1000).toFixed(1)+'k' : gv;
+        tick.style.top = gy.toFixed(1)+'px';
+        tick.textContent = gv>=1000 ? (gv/1000).toFixed(1)+'k' : gv;
       });
       const stackTop = {};
       buckets.forEach((b,i)=>{ stackTop[i] = base; });
