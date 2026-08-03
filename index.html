@@ -692,7 +692,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802b';
+  const APP_BUILD = '20260802c';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2558,7 +2558,9 @@
     }));
     const barEls = Array.from(svgEl.querySelectorAll('.trend-bar-seg'));
 
-    function applyScale(maxVal){
+    // 屏幕外(当前滚动视口看不到)的柱子不给它算高度、不渲染出来,
+    // 等拖拉进度条把它带入视口范围后,才按这时候的刻度把它画出来(配合CSS transition表现为"长出来")
+    function applyScale(maxVal, scrollLeft, clientWidth){
       gridLineEls.forEach(({line,tick}, s)=>{
         const gy = base - (s/gridSteps)*(base-top);
         const gv = Math.round((s/gridSteps)*maxVal);
@@ -2570,6 +2572,13 @@
       buckets.forEach((b,i)=>{ stackTop[i] = base; });
       barEls.forEach(rect=>{
         const bIdx = parseInt(rect.getAttribute('data-b'), 10);
+        const x0 = leftPad + 10 + bIdx*groupW;
+        const inView = (x0+barW >= scrollLeft) && (x0 <= scrollLeft+clientWidth);
+        if(!inView){
+          rect.setAttribute('y', base.toFixed(1));
+          rect.setAttribute('height', 0);
+          return;
+        }
         const v = parseFloat(rect.getAttribute('data-v'));
         const h = Math.min((v/maxVal)*(base-top), base-top);
         const yTop = stackTop[bIdx] - h;
@@ -2593,22 +2602,20 @@
       initialScrollLeft = totalW;
     }
     let currentMaxVal = visibleMaxVal(initialScrollLeft, clientW);
-    applyScale(currentMaxVal);
+    applyScale(currentMaxVal, initialScrollLeft, clientW);
     if(scrollEl) scrollEl.scrollLeft = initialScrollLeft;
 
     // 横向滚动停下来之后(防抖150ms,避免滚动过程中柱子一直跳动重算),
-    // 按当前视口里实际看得到的柱子重新计算刻度——只改已有元素的y/height属性(配合CSS transition
-    // 逐步长大/缩小),不整个重建,这样才有平滑的动画过渡而不是瞬间跳变
+    // 按当前视口里实际看得到的柱子重新计算刻度、重新决定哪些柱子该显示——只改已有元素的
+    // y/height属性(配合CSS transition逐步长大/缩小),不整个重建,这样才有平滑的动画过渡而不是瞬间跳变
     if(scrollEl){
       let scrollTimer = null;
       scrollEl.onscroll = () => {
         clearTimeout(scrollTimer);
         scrollTimer = setTimeout(()=>{
-          const mv = visibleMaxVal(scrollEl.scrollLeft, scrollEl.clientWidth);
-          if(mv !== currentMaxVal){
-            currentMaxVal = mv;
-            applyScale(currentMaxVal);
-          }
+          const sl = scrollEl.scrollLeft, cw = scrollEl.clientWidth;
+          currentMaxVal = visibleMaxVal(sl, cw);
+          applyScale(currentMaxVal, sl, cw);
         }, 150);
       };
     }
