@@ -696,7 +696,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802h';
+  const APP_BUILD = '20260802i';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1946,11 +1946,13 @@
     $('subGrid').innerHTML = html;
     $('subGrid').querySelectorAll('.sub-pill:not(.add-sub)').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        // 选中细分后不再自动跳回记账表单,只记住选择,面板留给用户自己关
+        // 自定义细分的编辑/删除已经挪进"⋯"菜单,点胶囊本体现在只代表"选中",
+        // 不会再跟"进入改名"冲突,所以选中后可以放心直接跳回记账表单(留一点延迟让选中态先闪一下)
         openSubMenuKey = null;
         selectedSub = subs.find(s=>s.key===btn.getAttribute('data-key'));
         renderSubGrid();
         updateCatPickerRowDisplay();
+        setTimeout(closeCatPicker, 180);
       });
     });
     $('subGrid').querySelectorAll('.sub-menu-btn').forEach(btn=>{
