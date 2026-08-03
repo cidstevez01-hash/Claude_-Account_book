@@ -295,9 +295,8 @@
   .donut-hint{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:8px;padding-top:10px;border-top:1px dashed var(--grid);}
   .legend-row.clickable-legend{cursor:pointer;border-radius:10px;padding-left:6px;padding-right:6px;margin:0 -6px;transition:background 0.15s ease;}
   .legend-row.clickable-legend:active{background:var(--legend-bg, rgba(209,102,90,0.14));}
-  .filter-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 10px 7px 12px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:14px;}
+  .filter-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:14px;}
   .filter-chip .hd-icon{width:15px;height:15px;vertical-align:-3px;}
-  .filter-chip button{border:none;background:rgba(0,0,0,0.12);color:inherit;width:18px;height:18px;border-radius:50%;font-size:10px;display:inline-flex;align-items:center;justify-content:center;padding:0;}
   .app-toast{position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 92px);transform:translateX(-50%) translateY(12px);background:var(--ink);color:var(--paper);padding:11px 12px 11px 18px;border-radius:12px;font-size:13px;max-width:82%;box-shadow:0 6px 18px rgba(0,0,0,0.25);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;display:flex;align-items:center;gap:10px;cursor:pointer;}
   .app-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .app-toast-text{flex:1;}
@@ -649,7 +648,6 @@
   </div>
   <div id="monthDetailFilterChip" class="filter-chip" style="display:none;">
     <span id="monthDetailFilterChipText"></span>
-    <button type="button" id="monthDetailFilterClear">✕</button>
   </div>
   <div id="monthDetailList"></div>
 </div>
@@ -692,7 +690,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802f';
+  const APP_BUILD = '20260802g';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1847,7 +1845,6 @@
     wireEntryRows(container);
   }
   $('monthDetailCloseBtn').addEventListener('click', closeAllSheets);
-  $('monthDetailFilterClear').addEventListener('click', ()=>{ monthDetailFilterCatKey=null; renderMonthDetailList(); });
 
   function ensureSelectedCat(){
     const cats = currentType==='expense' ? expenseCats : incomeCats;
