@@ -692,7 +692,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260802c';
+  const APP_BUILD = '20260802d';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2506,13 +2506,18 @@
     // 纵轴刻度只按"当前实际能看到的这几根柱子"里的最大值来算,而不是整个月的最大值——
     // 不然月中一笔大额支出(比如房租)一出现,月初/月末那些正常小额支出的刻度会被硬生生压扁看不清。
     // 用户滚动横向查看不同区间时,刻度会跟着重新适配那段区间里的数据(见下面的scroll监听)。
+    // 如果当前视口里这几根柱子全都没数据,返回null——调用方应该沿用上一次的刻度,
+    // 不然会掉回兜底值1,刻度就会显示成很丑的"0/0/1/1"这种数字
     function visibleMaxVal(scrollLeft, clientWidth){
-      let maxV = 1;
+      let maxV = 0, found = false;
       buckets.forEach((b,i)=>{
         const x0 = leftPad + 10 + i*groupW;
-        if(x0+barW >= scrollLeft && x0 <= scrollLeft+clientWidth) maxV = Math.max(maxV, b[valField]);
+        if(x0+barW >= scrollLeft && x0 <= scrollLeft+clientWidth && b[valField] > 0){
+          found = true;
+          maxV = Math.max(maxV, b[valField]);
+        }
       });
-      return maxV;
+      return found ? maxV : null;
     }
 
     // 柱子/网格线只建一次DOM元素,重新算刻度时改的是同一批元素的y/height属性(不是整个重建),
@@ -2601,7 +2606,7 @@
     }else{
       initialScrollLeft = totalW;
     }
-    let currentMaxVal = visibleMaxVal(initialScrollLeft, clientW);
+    let currentMaxVal = visibleMaxVal(initialScrollLeft, clientW) || 1;
     applyScale(currentMaxVal, initialScrollLeft, clientW);
     if(scrollEl) scrollEl.scrollLeft = initialScrollLeft;
 
@@ -2614,7 +2619,8 @@
         clearTimeout(scrollTimer);
         scrollTimer = setTimeout(()=>{
           const sl = scrollEl.scrollLeft, cw = scrollEl.clientWidth;
-          currentMaxVal = visibleMaxVal(sl, cw);
+          const mv = visibleMaxVal(sl, cw);
+          if(mv !== null) currentMaxVal = mv; // 这段视口没数据就沿用上一次的刻度,不掉回兜底值
           applyScale(currentMaxVal, sl, cw);
         }, 150);
       };
