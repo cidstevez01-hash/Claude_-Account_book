@@ -721,7 +721,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803i';
+  const APP_BUILD = '20260803j';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -3385,6 +3385,10 @@
     fetchRate(false).catch(e=> console.error('汇率初始拉取失败', e));
     ensureRatesForEntries().catch(e=> console.error('补充历史汇率失败', e));
     fetchJpHolidays().catch(e=> console.error('日本の祝日データ取得失敗', e));
+    // 之前只在"App开着不关"的场景下(定时器/切回前台)才检查更新,完全关闭App重新打开
+    // (冷启动)反而没检查——如果这次冷启动加载到的还是浏览器HTTP缓存里的旧版本,
+    // 就要等最多3分钟才会弹更新提示。这里补上启动时也检查一次,尽早发现新版本
+    checkForAppUpdate().catch(e=> console.error('启动时检查更新失败', e));
   }
   // iOS Safari 下 :active 伪类默认不会在点按时触发(除非页面上有个触摸事件监听器),
   // 加这一行是让所有按钮的按压反馈(变暗/缩放)在真机上真的生效,而不是只在桌面浏览器里好使
