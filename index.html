@@ -722,7 +722,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803f';
+  const APP_BUILD = '20260803g';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -745,7 +745,7 @@
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
       catFieldLabel:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
-      dimCategory:'分类',
+      dimCategory:'分类', tagOtherBucket:'其他',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）',
       curCNYFullLabel:'人民币 (CNY)', curJPYFullLabel:'日元 (JPY)',
       rateTitle:'汇率', rateSub:'人民币 → 日元', rateSubReverse:'日元 → 人民币', rateUpdateLabel:'更新时间', rateTrend30Days:'近30天走势',
@@ -798,7 +798,7 @@
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
       catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
-      dimCategory:'分類',
+      dimCategory:'分類', tagOtherBucket:'その他',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateSubReverse:'日本円 → 人民元', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
@@ -1799,8 +1799,10 @@
   }
   // 环状图默认统计全部账目(按分类分组);下拉框第一项固定是"分类"(等价不筛选),
   // 后面每一项都是tags表里当前收支类型下的一条真实标签数据(不是写死的通用"标签"选项)——
-  // 选中某个标签= 只看打了这个标签的账目,图表本身还是按分类细分,方便看清"这个标签的钱花在哪些分类上"
+  // 选中某个标签≠按分类细分,而是看"这个标签 vs 其他"两档,占当月总支出/收入的比例
+  // (比如固定支出占了这个月总支出的多少),跟"分类"模式用的是不同的统计维度
   let homeDonutTagFilter = null; // null = 分类(不筛选) | 具体标签的code
+  const TAG_OTHER_COLOR = '#c2b8a3';
   function renderDonutDimOptions(){
     const tags = homeDonutType==='expense' ? expenseTags : incomeTags;
     if(homeDonutTagFilter && !tags.find(tg=>tg.code===homeDonutTagFilter)) homeDonutTagFilter = null;
@@ -1815,18 +1817,29 @@
     $('homeMonthLabel').textContent = getHomeDonutMonthLabel();
     $('homeMonthPrev').disabled = !monthHasAnyEntries(homeDonutMonthOffset-1);
     $('homeMonthNext').disabled = !monthHasAnyEntries(homeDonutMonthOffset+1);
-    let periodEntries = entries.filter(e=> e.date.startsWith(mk) && e.type===homeDonutType);
-    if(homeDonutTagFilter) periodEntries = periodEntries.filter(e=> e.tagCode===homeDonutTagFilter);
+    const periodEntries = entries.filter(e=> e.date.startsWith(mk) && e.type===homeDonutType);
     $('homeDonutCenterLabel').textContent = homeDonutType==='expense' ? t('donutMonthExpense') : t('donutMonthIncome');
     const groups = {};
-    periodEntries.forEach(e=>{
-      const key = e.catCode || e.category;
-      const catObj = e.catCode && allCatMap[e.catCode];
-      const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
-      const v = toBase(e.amount, e.currency||'CNY', e.date);
-      if(!groups[key]) groups[key] = {key, label, amount:0};
-      groups[key].amount += v;
-    });
+    if(homeDonutTagFilter){
+      const tagObj = allTagMap[homeDonutTagFilter];
+      periodEntries.forEach(e=>{
+        const matched = e.tagCode === homeDonutTagFilter;
+        const key = matched ? homeDonutTagFilter : '__other__';
+        const label = matched ? escapeHtml(tagLabel(tagObj)) : t('tagOtherBucket');
+        const v = toBase(e.amount, e.currency||'CNY', e.date);
+        if(!groups[key]) groups[key] = {key, label, amount:0};
+        groups[key].amount += v;
+      });
+    }else{
+      periodEntries.forEach(e=>{
+        const key = e.catCode || e.category;
+        const catObj = e.catCode && allCatMap[e.catCode];
+        const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
+        const v = toBase(e.amount, e.currency||'CNY', e.date);
+        if(!groups[key]) groups[key] = {key, label, amount:0};
+        groups[key].amount += v;
+      });
+    }
     const list = Object.values(groups).sort((a,b)=> b.amount-a.amount);
     const total = list.reduce((s,g)=>s+g.amount,0);
     $('homeDonutTotal').textContent = fmtCur(total, settings.currency);
@@ -1843,18 +1856,25 @@
     let offsetAcc=0, svg=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--grid)" stroke-width="18"/>`, legendHtml='';
     list.forEach((g,i)=>{
       const pct=g.amount/total*100;
-      const color = (allCatMap[g.key]&&allCatMap[g.key].color)||palette[i%palette.length];
+      let color;
+      if(homeDonutTagFilter) color = g.key==='__other__' ? TAG_OTHER_COLOR : palette[0];
+      else color = (allCatMap[g.key]&&allCatMap[g.key].color)||palette[i%palette.length];
       const dash=(pct/100)*circ;
       svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="18" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offsetAcc}" stroke-linecap="butt"/>`;
       offsetAcc += dash;
-      legendHtml += `<div class="legend-row clickable-legend" data-key="${g.key}" style="--legend-bg:${tintColor(color,0.82)};"><span class="name"><span class="legend-dot" style="background:${color}"></span>${g.label}</span><span class="pct">${pct.toFixed(1)}%</span><span class="amt">${fmtCur(g.amount, settings.currency)}</span></div>`;
+      legendHtml += `<div class="legend-row clickable-legend" data-key="${g.key}" data-label="${escapeHtml(g.label)}" style="--legend-bg:${tintColor(color,0.82)};"><span class="name"><span class="legend-dot" style="background:${color}"></span>${g.label}</span><span class="pct">${pct.toFixed(1)}%</span><span class="amt">${fmtCur(g.amount, settings.currency)}</span></div>`;
     });
     donutEl.innerHTML = svg;
     legendEl.innerHTML = legendHtml;
     legendEl.querySelectorAll('.clickable-legend').forEach(row=>{
       row.addEventListener('click', (ev)=>{
         ev.stopPropagation();
-        openMonthDetail({catCode: row.getAttribute('data-key'), tagCode: homeDonutTagFilter}, getHomeDonutMonthKey());
+        const key = row.getAttribute('data-key');
+        if(homeDonutTagFilter){
+          openMonthDetail({tagCode: homeDonutTagFilter, tagExclude: key==='__other__', tagLabelText: row.getAttribute('data-label')}, getHomeDonutMonthKey());
+        }else{
+          openMonthDetail({catCode: key}, getHomeDonutMonthKey());
+        }
       });
     });
   }
@@ -1888,7 +1908,7 @@
     el.addEventListener('click', (ev)=>{
       if(swiped){ swiped=false; return; }
       if(ev.target.closest('#homeTypeSegment') || ev.target.closest('.ym-picker') || ev.target.closest('.clickable-legend') || ev.target.closest('#homeDonutDimSelect')) return;
-      openMonthDetail(homeDonutTagFilter ? {tagCode: homeDonutTagFilter} : null, getHomeDonutMonthKey());
+      openMonthDetail(null, getHomeDonutMonthKey());
     });
   })();
   $('homeTypeSegment').querySelectorAll('button').forEach(btn=>{
@@ -1907,7 +1927,7 @@
     return parts[0]+'年'+parseInt(parts[1],10)+'月';
   }
   function openMonthDetail(filter, monthKey){
-    // filter: null(不筛选) | {catCode?, tagCode?} 两个字段都可选,同时给就是"且"的关系
+    // filter: null(不筛选) | {catCode?} 按分类 | {tagCode?, tagExclude?, tagLabelText?} 按标签(tagExclude=true时是"非这个标签")
     monthDetailFilter = filter || null;
     monthDetailMonthKey = monthKey || currentMonthKey();
     renderMonthDetailList();
@@ -1918,14 +1938,15 @@
     const mk = monthDetailMonthKey || currentMonthKey();
     $('monthDetailTitle').textContent = monthKeyLabel(mk) + ' ' + t('detailWord');
     let list = entries.filter(e=> e.date.startsWith(mk));
-    let catCode = monthDetailFilter && monthDetailFilter.catCode;
-    let tagCode = monthDetailFilter && monthDetailFilter.tagCode;
+    const catCode = monthDetailFilter && monthDetailFilter.catCode;
+    const tagCode = monthDetailFilter && monthDetailFilter.tagCode;
+    const tagExclude = !!(monthDetailFilter && monthDetailFilter.tagExclude);
     const cat = catCode ? allCatMap[catCode] : null;
     const tagObj = tagCode ? allTagMap[tagCode] : null;
-    if(catCode && !cat){ catCode = null; if(monthDetailFilter) monthDetailFilter.catCode = null; }
-    if(tagCode && !tagObj){ tagCode = null; if(monthDetailFilter) monthDetailFilter.tagCode = null; }
-    if(catCode) list = list.filter(e=> e.catCode===catCode);
-    if(tagCode) list = list.filter(e=> e.tagCode===tagCode);
+    if(catCode && !cat){ if(monthDetailFilter) monthDetailFilter.catCode = null; }
+    if(tagCode && !tagObj){ if(monthDetailFilter){ monthDetailFilter.tagCode = null; monthDetailFilter.tagExclude = false; } }
+    if(catCode && cat) list = list.filter(e=> e.catCode===catCode);
+    if(tagCode && tagObj) list = tagExclude ? list.filter(e=> e.tagCode!==tagCode) : list.filter(e=> e.tagCode===tagCode);
     if(!cat && !tagObj){
       $('monthDetailFilterChip').style.display = 'none';
     }else{
@@ -1933,7 +1954,10 @@
       $('monthDetailFilterChip').style.background = cat ? tintColor(cat.color, 0.82) : '#efe4df';
       $('monthDetailFilterChip').style.color = cat ? cat.color : '#8a6a4e';
       const parts = [];
-      if(tagObj) parts.push(iconSvg('tag')+' '+escapeHtml(tagLabel(tagObj)));
+      if(tagObj){
+        const tagText = tagExclude ? (monthDetailFilter.tagLabelText || t('tagOtherBucket')) : escapeHtml(tagLabel(tagObj));
+        parts.push(iconSvg('tag')+' '+tagText);
+      }
       if(cat) parts.push(iconSvg(cat.icon)+' '+catLabel(cat));
       $('monthDetailFilterChipText').innerHTML = parts.join(' · ');
     }
