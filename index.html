@@ -448,8 +448,7 @@
       </div>
       <div class="donut-row">
         <select class="dim-select" id="homeDonutDimSelect">
-          <option value="category" id="homeDonutDimCatOpt">分类</option>
-          <option value="tag" id="homeDonutDimTagOpt">标签</option>
+          <option value="" id="homeDonutDimCatOpt">分类</option>
         </select>
         <div class="donut-wrap" id="homeDonutWrap">
           <svg id="homeDonutChart" viewBox="0 0 140 140"></svg>
@@ -723,7 +722,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803d';
+  const APP_BUILD = '20260803f';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -746,7 +745,7 @@
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
       catFieldLabel:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
-      tagDefault:'其他', dimCategory:'分类', dimTag:'标签',
+      dimCategory:'分类',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）',
       curCNYFullLabel:'人民币 (CNY)', curJPYFullLabel:'日元 (JPY)',
       rateTitle:'汇率', rateSub:'人民币 → 日元', rateSubReverse:'日元 → 人民币', rateUpdateLabel:'更新时间', rateTrend30Days:'近30天走势',
@@ -799,7 +798,7 @@
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
       catFieldLabel:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
-      tagDefault:'その他', dimCategory:'分類', dimTag:'タグ',
+      dimCategory:'分類',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateSubReverse:'日本円 → 人民元', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
@@ -853,14 +852,20 @@
     Object.keys(allTagMap).forEach(k=> delete allTagMap[k]);
     expenseTags.concat(incomeTags).forEach(tg=> allTagMap[tg.code]=tg);
   }
+  // 缓存数据结构变了(比如分类/细分/支付方式的主键从key换成id+code)就把这个版本号加1——
+  // 老版本号的本机缓存会被当成无效直接丢弃、强制走一次云端拉取,不会让改了字段名的旧缓存
+  // (比如只有key没有code)在没联网/联网失败时被当成正常数据渲染出来,导致选中判断全部匹配不上、
+  // 看起来像"选不中"/"锁死"这种诡异的假bug
+  const CATALOG_CACHE_VERSION = 2;
   function saveCatalogCache(){
-    storageSetSafe('ledger_catalog_cache', JSON.stringify({expenseCats, incomeCats, paymentMethods, expenseTags, incomeTags}), false).catch(e=> console.error('分类缓存保存失败', e));
+    storageSetSafe('ledger_catalog_cache', JSON.stringify({v:CATALOG_CACHE_VERSION, expenseCats, incomeCats, paymentMethods, expenseTags, incomeTags}), false).catch(e=> console.error('分类缓存保存失败', e));
   }
   function loadCatalogCacheFromLocal(){
     try{
       const res = LocalStore.get('ledger_catalog_cache');
       if(res && res.value){
         const data = JSON.parse(res.value);
+        if(data.v !== CATALOG_CACHE_VERSION) return false;
         expenseCats = data.expenseCats || [];
         incomeCats = data.incomeCats || [];
         paymentMethods = data.paymentMethods || [];
@@ -1335,8 +1340,7 @@
     $('trendTypeExpenseOpt').textContent = t('expenseWord');
     $('trendTypeIncomeOpt').textContent = t('incomeWord');
     $('homeDonutHint').textContent = t('homeDonutHint');
-    $('homeDonutDimCatOpt').textContent = t('dimCategory');
-    $('homeDonutDimTagOpt').textContent = t('dimTag');
+    renderDonutDimOptions();
     $('homeTypeExpenseBtn').textContent = t('segExpense');
     $('homeTypeIncomeBtn').textContent = t('segIncome');
     $('monthDetailTitle').textContent = t('monthDetailTitle');
@@ -1777,7 +1781,7 @@
 
   // ---------- Home donut + month detail ----------
   let homeDonutType = 'expense';
-  let monthDetailFilter = null; // {dim:'category'|'tag', key} | null
+  let monthDetailFilter = null; // {catCode?, tagCode?} | null
   let monthDetailMonthKey = null;
 
   let homeDonutMonthOffset = 0;
@@ -1793,37 +1797,32 @@
     const mk = getHomeDonutMonthKey(offset);
     return entries.some(e=> e.date.startsWith(mk));
   }
-  // 环状图默认按分类统计,也可以切到按标签统计(见homeDonutDimSelect)——没打标签的账目
-  // 统一归到"默认"这一档,并且用一个调淡的灰色跟真正打了标签的部分区分开,不会显得太抢眼
-  let homeDonutDim = 'category';
-  const TAG_DEFAULT_COLOR = '#c2b8a3';
-  // 下拉框"标签"这个选项的文字不用死板的通用词,取tags表里实际的数据:当前收支类型下
-  // 只有一个标签时就直接显示那个标签的名字(比如"固定支出"),有多个/没有标签时才退回通用的"标签"/"タグ"
-  function updateDonutDimTagOptionLabel(){
+  // 环状图默认统计全部账目(按分类分组);下拉框第一项固定是"分类"(等价不筛选),
+  // 后面每一项都是tags表里当前收支类型下的一条真实标签数据(不是写死的通用"标签"选项)——
+  // 选中某个标签= 只看打了这个标签的账目,图表本身还是按分类细分,方便看清"这个标签的钱花在哪些分类上"
+  let homeDonutTagFilter = null; // null = 分类(不筛选) | 具体标签的code
+  function renderDonutDimOptions(){
     const tags = homeDonutType==='expense' ? expenseTags : incomeTags;
-    $('homeDonutDimTagOpt').textContent = tags.length===1 ? tagLabel(tags[0]) : t('dimTag');
+    if(homeDonutTagFilter && !tags.find(tg=>tg.code===homeDonutTagFilter)) homeDonutTagFilter = null;
+    const sel = $('homeDonutDimSelect');
+    sel.innerHTML = `<option value="" id="homeDonutDimCatOpt">${t('dimCategory')}</option>`
+      + tags.map(tg=>`<option value="${tg.code}">${escapeHtml(tagLabel(tg))}</option>`).join('');
+    sel.value = homeDonutTagFilter || '';
   }
   function renderHomeDonut(){
-    updateDonutDimTagOptionLabel();
+    renderDonutDimOptions();
     const mk = getHomeDonutMonthKey();
     $('homeMonthLabel').textContent = getHomeDonutMonthLabel();
     $('homeMonthPrev').disabled = !monthHasAnyEntries(homeDonutMonthOffset-1);
     $('homeMonthNext').disabled = !monthHasAnyEntries(homeDonutMonthOffset+1);
-    const periodEntries = entries.filter(e=> e.date.startsWith(mk) && e.type===homeDonutType);
+    let periodEntries = entries.filter(e=> e.date.startsWith(mk) && e.type===homeDonutType);
+    if(homeDonutTagFilter) periodEntries = periodEntries.filter(e=> e.tagCode===homeDonutTagFilter);
     $('homeDonutCenterLabel').textContent = homeDonutType==='expense' ? t('donutMonthExpense') : t('donutMonthIncome');
-    const byTag = homeDonutDim === 'tag';
     const groups = {};
     periodEntries.forEach(e=>{
-      let key, label;
-      if(byTag){
-        key = e.tagCode || '__default__';
-        const tagObj = e.tagCode && allTagMap[e.tagCode];
-        label = tagObj ? escapeHtml(tagLabel(tagObj)) : t('tagDefault');
-      }else{
-        key = e.catCode || e.category;
-        const catObj = e.catCode && allCatMap[e.catCode];
-        label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
-      }
+      const key = e.catCode || e.category;
+      const catObj = e.catCode && allCatMap[e.catCode];
+      const label = escapeHtml(catObj ? catLabel(catObj) : (e.category || ''));
       const v = toBase(e.amount, e.currency||'CNY', e.date);
       if(!groups[key]) groups[key] = {key, label, amount:0};
       groups[key].amount += v;
@@ -1844,9 +1843,7 @@
     let offsetAcc=0, svg=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--grid)" stroke-width="18"/>`, legendHtml='';
     list.forEach((g,i)=>{
       const pct=g.amount/total*100;
-      let color;
-      if(byTag) color = g.key==='__default__' ? TAG_DEFAULT_COLOR : palette[i%palette.length];
-      else color = (allCatMap[g.key]&&allCatMap[g.key].color)||palette[i%palette.length];
+      const color = (allCatMap[g.key]&&allCatMap[g.key].color)||palette[i%palette.length];
       const dash=(pct/100)*circ;
       svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="18" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offsetAcc}" stroke-linecap="butt"/>`;
       offsetAcc += dash;
@@ -1857,13 +1854,13 @@
     legendEl.querySelectorAll('.clickable-legend').forEach(row=>{
       row.addEventListener('click', (ev)=>{
         ev.stopPropagation();
-        openMonthDetail({dim: homeDonutDim, key: row.getAttribute('data-key')}, getHomeDonutMonthKey());
+        openMonthDetail({catCode: row.getAttribute('data-key'), tagCode: homeDonutTagFilter}, getHomeDonutMonthKey());
       });
     });
   }
   $('homeDonutDimSelect').addEventListener('change', (ev)=>{
     ev.stopPropagation();
-    homeDonutDim = $('homeDonutDimSelect').value;
+    homeDonutTagFilter = $('homeDonutDimSelect').value || null;
     renderHomeDonut();
   });
   $('homeMonthPrev').addEventListener('click', (ev)=>{
@@ -1891,7 +1888,7 @@
     el.addEventListener('click', (ev)=>{
       if(swiped){ swiped=false; return; }
       if(ev.target.closest('#homeTypeSegment') || ev.target.closest('.ym-picker') || ev.target.closest('.clickable-legend') || ev.target.closest('#homeDonutDimSelect')) return;
-      openMonthDetail(null, getHomeDonutMonthKey());
+      openMonthDetail(homeDonutTagFilter ? {tagCode: homeDonutTagFilter} : null, getHomeDonutMonthKey());
     });
   })();
   $('homeTypeSegment').querySelectorAll('button').forEach(btn=>{
@@ -1910,7 +1907,7 @@
     return parts[0]+'年'+parseInt(parts[1],10)+'月';
   }
   function openMonthDetail(filter, monthKey){
-    // filter: null(不筛选) | {dim:'category', key:catCode} | {dim:'tag', key:tagCode|'__default__'}
+    // filter: null(不筛选) | {catCode?, tagCode?} 两个字段都可选,同时给就是"且"的关系
     monthDetailFilter = filter || null;
     monthDetailMonthKey = monthKey || currentMonthKey();
     renderMonthDetailList();
@@ -1921,37 +1918,24 @@
     const mk = monthDetailMonthKey || currentMonthKey();
     $('monthDetailTitle').textContent = monthKeyLabel(mk) + ' ' + t('detailWord');
     let list = entries.filter(e=> e.date.startsWith(mk));
-    if(monthDetailFilter && monthDetailFilter.dim==='tag'){
-      list = monthDetailFilter.key==='__default__' ? list.filter(e=> !e.tagCode) : list.filter(e=> e.tagCode===monthDetailFilter.key);
-    }else if(monthDetailFilter && monthDetailFilter.dim==='category'){
-      list = list.filter(e=> e.catCode===monthDetailFilter.key);
-    }
-    if(monthDetailFilter && monthDetailFilter.dim==='category'){
-      const cat = allCatMap[monthDetailFilter.key];
-      if(!cat){
-        monthDetailFilter = null;
-        $('monthDetailFilterChip').style.display = 'none';
-      }else{
-        $('monthDetailFilterChip').style.display = 'inline-flex';
-        $('monthDetailFilterChip').style.background = tintColor(cat.color, 0.82);
-        $('monthDetailFilterChip').style.color = cat.color;
-        $('monthDetailFilterChipText').innerHTML = iconSvg(cat.icon)+' '+catLabel(cat);
-      }
-    }else if(monthDetailFilter && monthDetailFilter.dim==='tag'){
-      const isDefault = monthDetailFilter.key==='__default__';
-      const tagObj = isDefault ? null : allTagMap[monthDetailFilter.key];
-      if(!isDefault && !tagObj){
-        monthDetailFilter = null;
-        $('monthDetailFilterChip').style.display = 'none';
-      }else{
-        const label = isDefault ? t('tagDefault') : tagLabel(tagObj);
-        $('monthDetailFilterChip').style.display = 'inline-flex';
-        $('monthDetailFilterChip').style.background = '#efe4df';
-        $('monthDetailFilterChip').style.color = '#8a6a4e';
-        $('monthDetailFilterChipText').innerHTML = iconSvg('tag')+' '+escapeHtml(label);
-      }
-    }else{
+    let catCode = monthDetailFilter && monthDetailFilter.catCode;
+    let tagCode = monthDetailFilter && monthDetailFilter.tagCode;
+    const cat = catCode ? allCatMap[catCode] : null;
+    const tagObj = tagCode ? allTagMap[tagCode] : null;
+    if(catCode && !cat){ catCode = null; if(monthDetailFilter) monthDetailFilter.catCode = null; }
+    if(tagCode && !tagObj){ tagCode = null; if(monthDetailFilter) monthDetailFilter.tagCode = null; }
+    if(catCode) list = list.filter(e=> e.catCode===catCode);
+    if(tagCode) list = list.filter(e=> e.tagCode===tagCode);
+    if(!cat && !tagObj){
       $('monthDetailFilterChip').style.display = 'none';
+    }else{
+      $('monthDetailFilterChip').style.display = 'inline-flex';
+      $('monthDetailFilterChip').style.background = cat ? tintColor(cat.color, 0.82) : '#efe4df';
+      $('monthDetailFilterChip').style.color = cat ? cat.color : '#8a6a4e';
+      const parts = [];
+      if(tagObj) parts.push(iconSvg('tag')+' '+escapeHtml(tagLabel(tagObj)));
+      if(cat) parts.push(iconSvg(cat.icon)+' '+catLabel(cat));
+      $('monthDetailFilterChipText').innerHTML = parts.join(' · ');
     }
     const container = $('monthDetailList');
     if(list.length===0){
