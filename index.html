@@ -721,7 +721,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803j';
+  const APP_BUILD = '20260803k';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1803,6 +1803,9 @@
   // (比如固定支出占了这个月总支出的多少),跟"分类"模式用的是不同的统计维度
   let homeDonutTagFilter = null; // null = 分类(不筛选) | 具体标签的code
   const TAG_OTHER_COLOR = '#c2b8a3';
+  // 之前打了标签这一档直接用 palette[0],跟 --seal(支出红,FAB/支出按钮/支出金额都在用)是完全一样的色值,
+  // 混在一起很难看也分不清。改用App本来就有的金色强调色(装饰胶带用的那个),不跟支出红/收入绿撞色
+  const TAG_MATCHED_COLOR = '#e3b23c';
   function renderDonutDimOptions(){
     const tags = homeDonutType==='expense' ? expenseTags : incomeTags;
     if(homeDonutTagFilter && !tags.find(tg=>tg.code===homeDonutTagFilter)) homeDonutTagFilter = null;
@@ -1857,7 +1860,7 @@
     list.forEach((g,i)=>{
       const pct=g.amount/total*100;
       let color;
-      if(homeDonutTagFilter) color = g.key==='__other__' ? TAG_OTHER_COLOR : palette[0];
+      if(homeDonutTagFilter) color = g.key==='__other__' ? TAG_OTHER_COLOR : TAG_MATCHED_COLOR;
       else color = (allCatMap[g.key]&&allCatMap[g.key].color)||palette[i%palette.length];
       const dash=(pct/100)*circ;
       svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="18" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offsetAcc}" stroke-linecap="butt"/>`;
