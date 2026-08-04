@@ -721,7 +721,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803k';
+  const APP_BUILD = '20260803l';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1144,25 +1144,34 @@
 
   async function fetchRate(manual){
     rateLoading = true; lastRateError = ''; renderRatePage();
-    let ok = false;
+    // 之前是"谁第一个成功谁就用",不比较各个源实际返回的日期新旧——jsdelivr的@latest
+    // 是跟着npm发包节奏更新的,经常会比cf-pages/frankfurter这些源慢个几天,一旦它先返回
+    // (哪怕数据是旧的)就再也不会去试后面可能更新的源了。改成把4个源都试一遍,谁的date
+    // 最新就用谁,不再是"先到先得"
+    let best = null;
+    const errors = [];
     for(const src of RATE_SOURCES){
       try{
         const data = await fetchJsonOrThrow(src.url);
         const result = src.parse(data);
         if(result){
-          rateData = {rate:result.rate, date:result.date, fetchedAt:Date.now(), source:src.name};
-          ok = true;
-          break;
+          if(!best || (result.date && (!best.date || result.date > best.date))){
+            best = {rate:result.rate, date:result.date, fetchedAt:Date.now(), source:src.name};
+          }
+        }else{
+          errors.push(src.name+': 数据格式不符');
         }
-        lastRateError = src.name+': 数据格式不符';
       }catch(e){
-        lastRateError = src.name+': '+(e && e.message ? e.message : String(e));
+        errors.push(src.name+': '+(e && e.message ? e.message : String(e)));
         console.error('汇率获取失败', src.name, e);
       }
     }
-    if(ok){
+    if(best){
+      rateData = best;
       lastRateError = '';
       try{ await storageSetSafe('ledger_rate', JSON.stringify(rateData), false); }catch(e){ console.error('汇率缓存保存失败', e); }
+    }else{
+      lastRateError = errors.join('; ');
     }
     await fetchRateHistory();
     await fetchRateHistoryMonthly();
