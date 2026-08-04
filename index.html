@@ -721,7 +721,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803l';
+  const APP_BUILD = '20260803m';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1280,13 +1280,26 @@
     let path = pts.map((p,i)=> (i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
     let area = path+` L${pts[pts.length-1].x.toFixed(1)},${base} L${pts[0].x.toFixed(1)},${base} Z`;
     const showEvery = pts.length>12 ? Math.ceil(pts.length/8) : 1;
+    // 之前是"每隔showEvery个点显示一个,最后一个点也强制显示",如果最后一个规律点跟强制加的
+    // 最后一个点靠得太近(比如刚好差1个点),两个日期文字会挤在一起糊成一团。改成:先按老逻辑
+    // 选出要标的点,再过滤一遍——如果某个点跟下一个要标的点靠得太近(小于最小间距),就跳过它,
+    // 把位置让给后面那个(优先保留最新的日期),不会再有强制加最后一个点导致的重叠
+    const labelIdxs = [];
+    for(let i=0;i<pts.length;i+=showEvery) labelIdxs.push(i);
+    if(labelIdxs[labelIdxs.length-1] !== pts.length-1) labelIdxs.push(pts.length-1);
+    const minLabelGapPx = 22;
+    const filteredLabelIdxs = labelIdxs.filter((idx,k)=>{
+      const nextIdx = labelIdxs[k+1];
+      return nextIdx===undefined || (pts[nextIdx].x - pts[idx].x) >= minLabelGapPx;
+    });
     let labels = '';
     let dots = '';
-    pts.forEach((p,i)=>{
+    filteredLabelIdxs.forEach(i=>{
+      const p = pts[i];
       const lbl = rateGranularity==='day' ? p.date.slice(5) : (rateGranularity==='month' ? p.date.slice(5)+'月' : p.date);
-      if(i%showEvery===0 || i===pts.length-1){
-        labels += `<text x="${p.x.toFixed(1)}" y="${base+16}" font-size="8" fill="var(--ink-soft)" text-anchor="middle">${lbl}</text>`;
-      }
+      labels += `<text x="${p.x.toFixed(1)}" y="${base+16}" font-size="8" fill="var(--ink-soft)" text-anchor="middle">${lbl}</text>`;
+    });
+    pts.forEach((p,i)=>{
       dots += `<circle class="rate-point-dot" data-idx="${i}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9" fill="transparent"/>`;
     });
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -1304,6 +1317,10 @@
     // 默认高亮最后一个点(最新数据),点击任意点会把这个标记移过去,让用户清楚看到自己点在哪
     if(selectedRatePointIdx==null || selectedRatePointIdx>=pts.length) selectedRatePointIdx = pts.length-1;
     showRateSelMarker(pts[selectedRatePointIdx], selectedRatePointIdx);
+    // 图表比外层容器宽的时候(点数多,横向可滚动)默认要停在最右边(最新数据),
+    // 不然一进页面看到的是30天前的旧数据,还得自己手动划到最右边才看得到最新走势
+    const scrollEl = svg.closest('.chart-scroll');
+    if(scrollEl) scrollEl.scrollLeft = W;
     svg.querySelectorAll('.rate-point-dot').forEach(dot=>{
       dot.addEventListener('click', ()=>{
         const idx = parseInt(dot.getAttribute('data-idx'),10);
