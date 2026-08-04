@@ -721,7 +721,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803m';
+  const APP_BUILD = '20260803n';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1190,9 +1190,29 @@
         if(data && data.cny && typeof data.cny.jpy === 'number') return {rate: data.cny.jpy};
       }catch(e){ /* 试下一个源 */ }
     }
+    // 上面两个源都是同一个开源项目(fawazahmed0/currency-api)的镜像,历史数据只从项目
+    // 收录那天开始算,更早的日期两个源都查不到。frankfurter.dev背后是欧洲央行的历史牌价,
+    // 覆盖年份长得多,专门拿来兜底比较久远的日期(比如"过去8年"里靠前的那几年)
+    try{
+      const data = await fetchJsonOrThrow(`https://api.frankfurter.dev/v1/${dateStr}?base=CNY&symbols=JPY`);
+      if(data && data.rates && typeof data.rates.JPY === 'number') return {rate: data.rates.JPY};
+    }catch(e){ /* 三个源都试完了,拿不到就返回null */ }
     return null;
   }
   const fmtDateObj = d => d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+
+  // 目标日期(比如"今年12月31日")当天未必刚好有发布快照(周末/节假日/还没到那天),
+  // 从目标日期往前逐天找,找到最近的一个有数据的日子就用,避免因为"精确卡在那一天"没数据
+  // 就直接放弃整个点(月度/年度视图尤其容易踩到这个,比如年底12-31常常是节假日)
+  async function fetchNearDateRateFromCdn(dateStr, maxLookbackDays){
+    for(let back=0; back<=maxLookbackDays; back++){
+      const d = new Date(dateStr+'T00:00:00');
+      d.setDate(d.getDate()-back);
+      const result = await fetchOneDayRateFromCdn(fmtDateObj(d));
+      if(result) return result;
+    }
+    return null;
+  }
 
   async function fetchRateHistory(){
     const dates = [];
@@ -1217,8 +1237,15 @@
       items.push({label: useDate.getFullYear()+'-'+pad2(useDate.getMonth()+1), dateStr: fmtDateObj(useDate)});
     }
     try{
-      const results = await Promise.all(items.map(it=> fetchOneDayRateFromCdn(it.dateStr)));
-      const points = items.map((it,i)=> results[i] ? {date:it.label, rate:results[i].rate} : null).filter(Boolean);
+      const results = await Promise.all(items.map(it=> fetchNearDateRateFromCdn(it.dateStr, 10)));
+      const points = items.map((it,i)=>{
+        if(results[i]) return {date:it.label, rate:results[i].rate};
+        // 当月(最后一项)如果连往前找10天都没有数据,大概率是目标日期本身超出了数据源实际
+        // 覆盖的范围(比如就是"今天"，数据源还没来得及发布),用目前已经拿到的最新汇率顶上,
+        // 不让"这个月"直接从图上消失
+        if(i===items.length-1 && rateData) return {date:it.label, rate:rateData.rate};
+        return null;
+      }).filter(Boolean);
       if(points.length>0){
         rateHistoryMonthly = points;
         try{ await storageSetSafe('ledger_rate_history_monthly', JSON.stringify(points), false); }catch(e){ console.error('月度汇率历史缓存保存失败', e); }
@@ -1236,8 +1263,13 @@
       items.push({label:String(y), dateStr: fmtDateObj(useDate)});
     }
     try{
-      const results = await Promise.all(items.map(it=> fetchOneDayRateFromCdn(it.dateStr)));
-      const points = items.map((it,i)=> results[i] ? {date:it.label, rate:results[i].rate} : null).filter(Boolean);
+      const results = await Promise.all(items.map(it=> fetchNearDateRateFromCdn(it.dateStr, 10)));
+      const points = items.map((it,i)=>{
+        if(results[i]) return {date:it.label, rate:results[i].rate};
+        // 今年(最后一项)同上,找不到就先用目前的最新汇率顶上
+        if(i===items.length-1 && rateData) return {date:it.label, rate:rateData.rate};
+        return null;
+      }).filter(Boolean);
       if(points.length>0){
         rateHistoryYearly = points;
         try{ await storageSetSafe('ledger_rate_history_yearly', JSON.stringify(points), false); }catch(e){ console.error('年度汇率历史缓存保存失败', e); }
