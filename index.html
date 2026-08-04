@@ -139,6 +139,8 @@
   .segment button.active.expense{background:var(--seal);color:#fff;}
   .segment button.active.income{background:var(--jade);color:#fff;}
   .segment button.active:not(.expense):not(.income){background:var(--ink);color:var(--paper);}
+  /* 编辑/复制已有记录时,支出/收入类型锁死不让改(避免改类型后分类/标签这些跟type绑定的字段跟着乱掉) */
+  #typeSegment.disabled button{opacity:0.5;}
   .amount-input-wrap{display:flex;align-items:baseline;gap:6px;border-bottom:2px solid var(--ink);padding:8px 4px 12px;margin-bottom:18px;}
   .amount-input-wrap span{font-family:'Noto Serif SC',serif;font-size:24px;color:var(--ink-soft);}
   .amount-input-wrap input{border:none;background:transparent;outline:none;font-family:'Noto Serif SC',serif;font-size:32px;font-weight:600;width:100%;color:var(--ink);}
@@ -577,7 +579,7 @@
     <h2 id="sheetTitle" style="margin:0;">记一笔</h2>
     <button type="button" class="icon-btn" id="sheetCloseBtn">✕</button>
   </div>
-  <div class="segment">
+  <div class="segment" id="typeSegment">
     <button type="button" class="active expense" id="segExpense">支出</button>
     <button type="button" class="income" id="segIncome">收入</button>
   </div>
@@ -721,7 +723,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260803n';
+  const APP_BUILD = '20260804a';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2503,10 +2505,16 @@
     renderPayGrid();
     renderTagGrid();
   }
+  function setTypeSegmentLocked(locked){
+    $('typeSegment').classList.toggle('disabled', locked);
+    $('segExpense').disabled = locked;
+    $('segIncome').disabled = locked;
+  }
   function openEntrySheetForEdit(entry){
     editingEntryId = entry.id;
     applyEntryToForm(entry, false);
     $('sheetTitle').textContent = t('editEntryTitle');
+    setTypeSegmentLocked(true);
     $('monthDetailSheet').classList.remove('show');
     $('catPickerSheet').classList.remove('show');
     $('overlay').classList.add('show');
@@ -2516,6 +2524,7 @@
     editingEntryId = null;
     applyEntryToForm(entry, true);
     $('sheetTitle').textContent = t('copyEntryTitle');
+    setTypeSegmentLocked(true);
     $('monthDetailSheet').classList.remove('show');
     $('catPickerSheet').classList.remove('show');
     $('overlay').classList.add('show');
@@ -2530,6 +2539,7 @@
     selectedTag = null;
     $('curSymbolDisplay').textContent = symbolFor(currentCurrency);
     $('sheetTitle').textContent = t('sheetAddTitle');
+    setTypeSegmentLocked(false);
     updateCatPickerRowDisplay();
     renderPayGrid();
     renderTagGrid();
