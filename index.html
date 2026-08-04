@@ -23,6 +23,18 @@
     --seal:#d1665a; --seal-soft:#e2897d; --jade:#7a9b6e; --grid:#e7dcc4; --grid-bg:#e3e7dd; --accent:#e3b23c;
     --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
+  /* 主题皮肤(着せ替え) v1:只换色板token,不改卡片形状/图标画法(那是后续阶段再做的事)。
+     配色沿用之前设计稿里定好的8款四季配色,選中哪个就把这些token整体覆盖掉 :root 的默认值。
+     "枫拾"这款配色本来就跟現状一样(它在设计稿里是靠卡片形状/粗墨线区分的,不是靠颜色),
+     v1只做颜色所以先跟現状同色,等以后做卡片形状阶段再让它们分开。 */
+  :root[data-skin="springA"]{ --paper:#FBF1EF; --card:#FFFFFF; --ink:#4A3438; --ink-soft:#B99AA0; --ink-faint:#E3C9CE; --seal:#D96B87; --seal-soft:#EFA8BC; --jade:#86B77A; --grid:#F0D3D8; --grid-bg:#F6E4E2; --accent:#E7A94A; }
+  :root[data-skin="springB"]{ --paper:#F2F7EF; --card:#FFFFFF; --ink:#37432F; --ink-soft:#8FA382; --ink-faint:#D6E3CD; --seal:#5E9354; --seal-soft:#8FBB80; --jade:#3F84A6; --grid:#D8E7D0; --grid-bg:#E5EFDD; --accent:#D2A22E; }
+  :root[data-skin="summerA"]{ --paper:#EFF6F5; --card:#FFFFFF; --ink:#1F3A3E; --ink-soft:#7FA6A6; --ink-faint:#C9E0DD; --seal:#DD5A3A; --seal-soft:#F0917A; --jade:#2E9C93; --grid:#C9E7E3; --grid-bg:#DCEFEC; --accent:#2678B5; }
+  :root[data-skin="summerB"]{ --paper:#101B33; --card:#1A2C4D; --ink:#F0E9D8; --ink-soft:#93A6C4; --ink-faint:#33436A; --seal:#E85D4A; --seal-soft:#F2967F; --jade:#4FD1A5; --grid:#2A3D63; --grid-bg:#1F3155; --accent:#F2C94C; }
+  :root[data-skin="autumnA"]{ --paper:#F7F1E7; --card:#FFFDF8; --ink:#3A2F28; --ink-soft:#A99C86; --ink-faint:#CFC3AC; --seal:#C1512E; --seal-soft:#DE8760; --jade:#6E8F4E; --grid:#E7DCC4; --grid-bg:#E3E7DD; --accent:#D19A2B; }
+  :root[data-skin="autumnB"]{ --paper:#FBF3E1; --card:#FFFCF3; --ink:#4A3A1E; --ink-soft:#B39A6E; --ink-faint:#E8D8B0; --seal:#B5651D; --seal-soft:#D68C4A; --jade:#7A8B3E; --grid:#EDDFBB; --grid-bg:#F3E8CC; --accent:#D4A017; }
+  :root[data-skin="winterA"]{ --paper:#EDF1F5; --card:#FFFFFF; --ink:#2B3446; --ink-soft:#8B97AC; --ink-faint:#D2DAE5; --seal:#B23A52; --seal-soft:#D97C90; --jade:#4F7A8C; --grid:#D7E0EA; --grid-bg:#E4EAF1; --accent:#3F6B52; }
+  :root[data-skin="winterB"]{ --paper:#0E1A2B; --card:#16253C; --ink:#E8EDF5; --ink-soft:#8B9DBA; --ink-faint:#2C3D5A; --seal:#C65D8A; --seal-soft:#E092B3; --jade:#4FC98A; --grid:#233754; --grid-bg:#182740; --accent:#5FA8D9; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;height:100%;}
   body{
@@ -158,6 +170,8 @@
   .cat-picker-icon .hd-icon{width:18px;height:18px;vertical-align:0;}
   .cat-picker-text{flex:1;text-align:left;font-size:15px;color:var(--ink);}
   .cat-picker-chevron{color:var(--ink-soft);font-size:18px;}
+  .theme-swatch{width:32px;height:32px;border-radius:50%;margin:0 auto 4px;border:1px solid rgba(0,0,0,0.08);}
+  .theme-picker-swatch{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,0.08);}
   .sub-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
   .sub-pill{padding:8px 14px;border-radius:20px;border:1.5px solid var(--grid);background:var(--card);font-size:13px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;transition:transform 0.1s ease,opacity 0.1s ease;}
   .sub-pill:active{transform:scale(0.95);opacity:0.8;}
@@ -630,6 +644,12 @@
     <button type="button" class="active" data-cur="CNY" id="curSetCNY">人民币 (CNY)</button>
     <button type="button" data-cur="JPY" id="curSetJPY">日元 (JPY)</button>
   </div>
+  <div class="field-label" id="themeFieldLabel">主题</div>
+  <button type="button" class="cat-picker-row" id="themePickerRow">
+    <span class="cat-picker-icon" id="themePickerIcon"></span>
+    <span class="cat-picker-text" id="themePickerText">现状</span>
+    <span class="cat-picker-chevron">›</span>
+  </button>
   <div class="field-label" id="cloudSyncFieldLabel">实时云同步（测试中）</div>
   <div id="cloudSyncSignedOutBlock">
     <div id="cloudSigninModeBlock">
@@ -671,6 +691,15 @@
     <button type="button" class="save-btn" id="cloudSignOutBtn" style="margin-top:0;padding:11px 4px;font-size:13px;background:var(--seal);"></button>
   </div>
   <div id="cloudSyncHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-top:8px;"></div>
+</div>
+
+<div class="sheet" id="themeSheet" style="max-height:92vh;">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+    <button type="button" class="icon-btn" id="themeSheetBackBtn">‹</button>
+    <h2 id="themeSheetTitle" style="margin:0;flex:1;">主题</h2>
+  </div>
+  <div class="cat-grid" id="themeGrid"></div>
 </div>
 
 <div class="sheet" id="monthDetailSheet" style="max-height:92vh;">
@@ -723,7 +752,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260804a';
+  const APP_BUILD = '20260804b';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -747,7 +776,7 @@
       catFieldLabel:'分类', catPickerTitle:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
       dimCategory:'分类', tagOtherBucket:'其他',
-      settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）',
+      settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）', themeFieldLabel:'主题', themeSheetTitle:'主题',
       curCNYFullLabel:'人民币 (CNY)', curJPYFullLabel:'日元 (JPY)',
       rateTitle:'汇率', rateSub:'人民币 → 日元', rateSubReverse:'日元 → 人民币', rateUpdateLabel:'更新时间', rateTrend30Days:'近30天走势',
       rateTrend12Months:'近12个月走势', rateTrend8Years:'近8年走势',
@@ -800,7 +829,7 @@
       catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
       dimCategory:'カテゴリ', tagOtherBucket:'その他',
-      settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）',
+      settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeFieldLabel:'テーマ', themeSheetTitle:'テーマ',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateSubReverse:'日本円 → 人民元', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
       rateTrend12Months:'過去12か月の推移', rateTrend8Years:'過去8年間の推移',
@@ -963,7 +992,28 @@
   }
 
   let entries = [];
-  let settings = {lang:'ja', currency:'JPY'};
+  let settings = {lang:'ja', currency:'JPY', themeSkin:'current'};
+  // 主题皮肤(着せ替え) v1:先只做换色板,不改卡片形状/图标画法(那部分留到下一阶段)。
+  // 每一项对应一组 :root[data-skin="x"] 里定义好的CSS变量覆盖
+  // swatch: [paper, seal, jade, accent] 四色预览,直接照抄各主题在:root[data-skin]里定义的实际色值
+  // (不现场探测CSS变量——:root[data-skin]这个选择器只认document root元素本身,探测用的
+  // 隐藏div挂在body下试不出效果,干脆把预览色跟着主题数据一起写死更省事也更可靠)
+  const THEME_SKINS = [
+    { id:'current', zh:'现状', ja:'現状', swatch:['#F7F1E7','#d1665a','#7a9b6e','#e3b23c'] },
+    { id:'springA', zh:'春 · 樱语', ja:'春・桜だより', swatch:['#FBF1EF','#D96B87','#86B77A','#E7A94A'] },
+    { id:'springB', zh:'春 · 沐雨', ja:'春・春雨', swatch:['#F2F7EF','#5E9354','#3F84A6','#D2A22E'] },
+    { id:'summerA', zh:'夏 · 蓝染', ja:'夏・藍染', swatch:['#EFF6F5','#DD5A3A','#2E9C93','#2678B5'] },
+    { id:'summerB', zh:'夏 · 花火', ja:'夏・花火', swatch:['#101B33','#E85D4A','#4FD1A5','#F2C94C'] },
+    { id:'autumnA', zh:'秋 · 枫拾', ja:'秋・紅葉狩り', swatch:['#F7F1E7','#C1512E','#6E8F4E','#D19A2B'] },
+    { id:'autumnB', zh:'秋 · 麦香', ja:'秋・実り', swatch:['#FBF3E1','#B5651D','#7A8B3E','#D4A017'] },
+    { id:'winterA', zh:'冬 · 雪梅', ja:'冬・寒梅', swatch:['#EDF1F5','#B23A52','#4F7A8C','#3F6B52'] },
+    { id:'winterB', zh:'冬 · 极光', ja:'冬・オーロラ', swatch:['#0E1A2B','#C65D8A','#4FC98A','#5FA8D9'] },
+  ];
+  function themeSkinLabel(sk){ return settings.lang==='ja' ? sk.ja : sk.zh; }
+  function applyThemeSkin(){
+    if(settings.themeSkin && settings.themeSkin!=='current') document.documentElement.setAttribute('data-skin', settings.themeSkin);
+    else document.documentElement.removeAttribute('data-skin');
+  }
   let rateData = null;
   let dateRateCache = {};
   let rateHistory = [];
@@ -1417,6 +1467,9 @@
     $('settingsTitle').textContent = t('settingsTitle');
     $('langFieldLabel').textContent = t('langFieldLabel');
     $('currencyFieldLabel').textContent = t('currencyFieldLabel');
+    $('themeFieldLabel').textContent = t('themeFieldLabel');
+    $('themeSheetTitle').textContent = t('themeSheetTitle');
+    updateThemePickerRowDisplay();
     $('curSetCNY').textContent = t('curCNYFullLabel');
     $('curSetJPY').textContent = t('curJPYFullLabel');
     $('rateUpdateLabel').textContent = t('rateUpdateLabel');
@@ -1522,10 +1575,18 @@
   }
   async function pushSettingsUpsert(){
     if(!supabaseClient || !cloudUser) return;
+    const base = { user_id: cloudUser.id, lang: settings.lang, currency: settings.currency, updated_at: new Date().toISOString() };
     try{
-      const { error } = await supabaseClient.from('user_settings').upsert({ user_id: cloudUser.id, lang: settings.lang, currency: settings.currency, updated_at: new Date().toISOString() });
+      const { error } = await supabaseClient.from('user_settings').upsert({ ...base, theme_skin: settings.themeSkin });
       if(error) throw error;
-    }catch(e){ console.error('设置同步失败', e); }
+    }catch(e){
+      // theme_skin这一列可能还没跑迁移SQL加上去,退回不带这个字段再试一次,
+      // 不能让主题字段(还没建好列)拖累语言/货币这些本来能正常同步的字段
+      try{
+        const { error } = await supabaseClient.from('user_settings').upsert(base);
+        if(error) throw error;
+      }catch(e2){ console.error('设置同步失败', e2); }
+    }
   }
   async function pullSettingsFromCloud(){
     if(!supabaseClient || !cloudUser) return null;
@@ -1588,7 +1649,9 @@
     if(remoteSettings){
       settings.lang = remoteSettings.lang || settings.lang;
       settings.currency = remoteSettings.currency || settings.currency;
+      settings.themeSkin = remoteSettings.theme_skin || settings.themeSkin;
       await saveSettings();
+      applyThemeSkin();
     }else{
       await pushSettingsUpsert();
     }
@@ -1620,7 +1683,9 @@
         if(remoteSettings){
           settings.lang = remoteSettings.lang || settings.lang;
           settings.currency = remoteSettings.currency || settings.currency;
+          settings.themeSkin = remoteSettings.theme_skin || settings.themeSkin;
           await saveSettings();
+          applyThemeSkin();
           applyStaticI18n();
         }
         startCloudRealtime();
@@ -2552,6 +2617,7 @@
     $('sheet').classList.remove('show');
     $('catPickerSheet').classList.remove('show');
     $('settingsSheet').classList.remove('show');
+    $('themeSheet').classList.remove('show');
     $('monthDetailSheet').classList.remove('show');
     $('ymPickerSheet').classList.remove('show');
     $('cumRangeSheet').classList.remove('show');
@@ -2574,6 +2640,42 @@
   $('settingsBtn3').addEventListener('click', openSettingsSheet);
   $('sheetCloseBtn').addEventListener('click', closeAllSheets);
   $('settingsCloseBtn').addEventListener('click', closeAllSheets);
+
+  function themeSwatchGradient(sk){
+    const [paper, seal, jade, accent] = sk.swatch;
+    return `conic-gradient(${paper} 0turn 0.25turn, ${seal} 0.25turn 0.5turn, ${jade} 0.5turn 0.75turn, ${accent} 0.75turn 1turn)`;
+  }
+  function updateThemePickerRowDisplay(){
+    const sk = THEME_SKINS.find(s=>s.id===settings.themeSkin) || THEME_SKINS[0];
+    $('themePickerText').textContent = themeSkinLabel(sk);
+    $('themePickerIcon').style.background = themeSwatchGradient(sk);
+  }
+  function renderThemeGrid(){
+    $('themeGrid').innerHTML = THEME_SKINS.map(sk=>
+      `<button type="button" class="cat-btn ${sk.id===settings.themeSkin?'selected':''}" data-skin-id="${sk.id}">
+        <span class="theme-swatch" style="background:${themeSwatchGradient(sk)}"></span><span class="lb">${themeSkinLabel(sk)}</span></button>`
+    ).join('');
+    $('themeGrid').querySelectorAll('.cat-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        settings.themeSkin = btn.getAttribute('data-skin-id');
+        applyThemeSkin();
+        await saveSettings();
+        renderThemeGrid();
+        updateThemePickerRowDisplay();
+      });
+    });
+  }
+  function openThemePicker(){
+    renderThemeGrid();
+    $('themeSheet').classList.add('show');
+    $('settingsSheet').classList.remove('show');
+  }
+  function closeThemePicker(){
+    $('themeSheet').classList.remove('show');
+    $('settingsSheet').classList.add('show');
+  }
+  $('themePickerRow').addEventListener('click', openThemePicker);
+  $('themeSheetBackBtn').addEventListener('click', closeThemePicker);
 
   $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
   $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
@@ -3433,6 +3535,7 @@
       catch(e){ console.error('初始化步骤失败: '+name, e); }
     };
     await step('loadSettings', loadSettings);
+    await step('applyThemeSkin', async ()=> applyThemeSkin());
     await step('loadCatalogData', loadCatalogData);
     await step('applyStaticI18n', applyStaticI18n);
     await step('setMonthLabel', setMonthLabel);
