@@ -158,8 +158,15 @@
   .cat-picker-icon .hd-icon{width:18px;height:18px;vertical-align:0;}
   .cat-picker-text{flex:1;text-align:left;font-size:15px;color:var(--ink);}
   .cat-picker-chevron{color:var(--ink-soft);font-size:18px;}
-  .theme-swatch{width:32px;height:32px;border-radius:50%;margin:0 auto 4px;border:1px solid rgba(0,0,0,0.08);}
-  .theme-picker-swatch{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,0.08);}
+  .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+  .theme-card{background:var(--card);border:2px solid var(--grid);border-radius:14px;padding:8px 6px 10px;text-align:center;font-family:'Noto Sans SC',sans-serif;}
+  .theme-thumb{width:100%;aspect-ratio:3/4;border-radius:8px;border:1px solid var(--grid);overflow:hidden;position:relative;box-sizing:border-box;padding:7px 7px 0;}
+  .theme-thumb .tt-bar{height:20%;border-radius:4px;margin-bottom:5px;}
+  .theme-thumb .tt-donut{width:36%;aspect-ratio:1;border-radius:50%;margin:6px auto 0;}
+  .theme-name{font-size:11.5px;color:var(--ink);margin-top:6px;}
+  .theme-radio{display:block;width:18px;height:18px;border-radius:50%;border:1.6px solid var(--ink-faint);margin:8px auto 0;position:relative;}
+  .theme-radio.checked{border-color:var(--seal);}
+  .theme-radio.checked::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--seal);}
   .sub-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
   .sub-pill{padding:8px 14px;border-radius:20px;border:1.5px solid var(--grid);background:var(--card);font-size:13px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;transition:transform 0.1s ease,opacity 0.1s ease;}
   .sub-pill:active{transform:scale(0.95);opacity:0.8;}
@@ -366,6 +373,7 @@
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
 <defs>
   <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6"/></symbol>
+  <symbol id="ic-shirt" viewBox="0 0 24 24"><path d="M8 4 4 7.5l2 2.7 2-1.4V20h8V8.8l2 1.4 2-2.7L16 4c0 1.5-1.8 2.8-4 2.8S8 5.5 8 4z"/></symbol>
   <symbol id="ic-book" viewBox="0 0 24 24"><path d="M4 4.5c3-1.4 6-1.4 8 0v13c-2-1.2-5-1.2-8 0z"/><path d="M20 4.5c-3-1.4-6-1.4-8 0v13c2-1.2 5-1.2 8 0z"/></symbol>
   <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M3.5 20.5V9"/><path d="M10 20.5V4"/><path d="M16.5 20.5V12.5"/><path d="M3 20.7h18"/></symbol>
   <symbol id="ic-exchange" viewBox="0 0 24 24"><path d="M3.5 8h13.5"/><path d="M14 4.2 17.3 8l-3.3 3.8"/><path d="M20.5 16H7"/><path d="M10 12.2 6.7 16l3.3 3.8"/></symbol>
@@ -426,6 +434,7 @@
         <div class="month" id="monthLabel"></div>
       </div>
       <div class="header-right">
+        <button type="button" class="icon-btn" id="themeBtn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-shirt"/></svg></button>
         <button type="button" class="icon-btn" id="settingsBtn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
         <div class="seal" id="sealBadge">总</div>
       </div>
@@ -471,6 +480,7 @@
       <div class="washi-tape"></div>
       <div><h1 id="statsTitleText" class="papercut">统计</h1></div>
       <div class="header-right">
+        <button type="button" class="icon-btn" id="themeBtn2"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-shirt"/></svg></button>
         <button type="button" class="icon-btn" id="settingsBtn2"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
         <div class="seal" id="sealBadge2">总</div>
       </div>
@@ -521,6 +531,7 @@
       <div class="washi-tape"></div>
       <div><h1 id="rateTitleText" class="papercut">汇率</h1><div class="month" id="rateSubLabel">日元 → 人民币</div></div>
       <div class="header-right">
+        <button type="button" class="icon-btn" id="themeBtn3"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-shirt"/></svg></button>
         <button type="button" class="icon-btn" id="settingsBtn3"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
         <div class="seal" id="sealBadge3">总</div>
       </div>
@@ -632,12 +643,6 @@
     <button type="button" class="active" data-cur="CNY" id="curSetCNY">人民币 (CNY)</button>
     <button type="button" data-cur="JPY" id="curSetJPY">日元 (JPY)</button>
   </div>
-  <div class="field-label" id="themeFieldLabel">主题</div>
-  <button type="button" class="cat-picker-row" id="themePickerRow">
-    <span class="cat-picker-icon" id="themePickerIcon"></span>
-    <span class="cat-picker-text" id="themePickerText">现状</span>
-    <span class="cat-picker-chevron">›</span>
-  </button>
   <div class="field-label" id="cloudSyncFieldLabel">实时云同步（测试中）</div>
   <div id="cloudSyncSignedOutBlock">
     <div id="cloudSigninModeBlock">
@@ -687,7 +692,8 @@
     <button type="button" class="icon-btn" id="themeSheetBackBtn">‹</button>
     <h2 id="themeSheetTitle" style="margin:0;flex:1;">主题</h2>
   </div>
-  <div class="cat-grid" id="themeGrid"></div>
+  <div class="theme-grid" id="themeGrid"></div>
+  <button type="button" class="save-btn" id="themeSaveBtn">保存</button>
 </div>
 
 <div class="sheet" id="monthDetailSheet" style="max-height:92vh;">
@@ -740,7 +746,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260804c';
+  const APP_BUILD = '20260804d';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -764,7 +770,7 @@
       catFieldLabel:'分类', catPickerTitle:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
       dimCategory:'分类', tagOtherBucket:'其他',
-      settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）', themeFieldLabel:'主题', themeSheetTitle:'主题',
+      settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）', themeSheetTitle:'主题', themeSavedToast:'主题已保存',
       curCNYFullLabel:'人民币 (CNY)', curJPYFullLabel:'日元 (JPY)',
       rateTitle:'汇率', rateSub:'人民币 → 日元', rateSubReverse:'日元 → 人民币', rateUpdateLabel:'更新时间', rateTrend30Days:'近30天走势',
       rateTrend12Months:'近12个月走势', rateTrend8Years:'近8年走势',
@@ -817,7 +823,7 @@
       catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
       dimCategory:'カテゴリ', tagOtherBucket:'その他',
-      settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeFieldLabel:'着せ替え', themeSheetTitle:'着せ替え',
+      settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeSheetTitle:'着せ替え', themeSavedToast:'テーマを保存しました',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateSubReverse:'日本円 → 人民元', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
       rateTrend12Months:'過去12か月の推移', rateTrend8Years:'過去8年間の推移',
@@ -1444,9 +1450,9 @@
     $('settingsTitle').textContent = t('settingsTitle');
     $('langFieldLabel').textContent = t('langFieldLabel');
     $('currencyFieldLabel').textContent = t('currencyFieldLabel');
-    $('themeFieldLabel').textContent = t('themeFieldLabel');
     $('themeSheetTitle').textContent = t('themeSheetTitle');
-    updateThemePickerRowDisplay();
+    $('themeSaveBtn').textContent = t('saveBtn');
+    if($('themeSheet').classList.contains('show')) renderThemeGrid();
     $('curSetCNY').textContent = t('curCNYFullLabel');
     $('curSetJPY').textContent = t('curJPYFullLabel');
     $('rateUpdateLabel').textContent = t('rateUpdateLabel');
@@ -2618,42 +2624,54 @@
   $('sheetCloseBtn').addEventListener('click', closeAllSheets);
   $('settingsCloseBtn').addEventListener('click', closeAllSheets);
 
-  function themeSwatchGradient(sk){
+  // 首页缩略图:纸底+一条支出色的"余额卡"+一个三色环状图,凑出跟真实首页神似的迷你版,
+  // 不用真的去渲染一份首页(维护成本太高),这几个元素已经足够让人认出"这是哪套配色"
+  function themeThumbHtml(sk){
     const [paper, seal, jade, accent] = sk.swatch;
-    return `conic-gradient(${paper} 0turn 0.25turn, ${seal} 0.25turn 0.5turn, ${jade} 0.5turn 0.75turn, ${accent} 0.75turn 1turn)`;
+    return `<div class="theme-thumb" style="background:${paper}">
+      <div class="tt-bar" style="background:${seal}"></div>
+      <div class="tt-donut" style="background:conic-gradient(${seal} 0turn 0.4turn, ${jade} 0.4turn 0.7turn, ${accent} 0.7turn 1turn)"></div>
+    </div>`;
   }
-  function updateThemePickerRowDisplay(){
-    const sk = THEME_SKINS.find(s=>s.id===settings.themeSkin) || THEME_SKINS[0];
-    $('themePickerText').textContent = themeSkinLabel(sk);
-    $('themePickerIcon').style.background = themeSwatchGradient(sk);
-  }
+  // 点缩略图先只是"选中待保存"(圆圈打勾),不会立刻换肤;按了下面的保存按钮才真正生效+落盘,
+  // 这样用户可以先把几个主题都点一遍比较着看,不会每点一下全屏配色就跳一次
+  let pendingThemeSkin = null;
   function renderThemeGrid(){
-    // 不标"当前选中",做成跟LINE"着せ替え"商店里那种一排卡片一样的中性展示
     $('themeGrid').innerHTML = THEME_SKINS.map(sk=>
-      `<button type="button" class="cat-btn" data-skin-id="${sk.id}">
-        <span class="theme-swatch" style="background:${themeSwatchGradient(sk)}"></span><span class="lb">${themeSkinLabel(sk)}</span></button>`
+      `<button type="button" class="theme-card" data-skin-id="${sk.id}">
+        ${themeThumbHtml(sk)}
+        <div class="theme-name">${themeSkinLabel(sk)}</div>
+        <span class="theme-radio ${pendingThemeSkin===sk.id?'checked':''}"></span>
+      </button>`
     ).join('');
-    $('themeGrid').querySelectorAll('.cat-btn').forEach(btn=>{
-      btn.addEventListener('click', async ()=>{
-        settings.themeSkin = btn.getAttribute('data-skin-id');
-        applyThemeSkin();
-        await saveSettings();
+    $('themeGrid').querySelectorAll('.theme-card').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        pendingThemeSkin = btn.getAttribute('data-skin-id');
         renderThemeGrid();
-        updateThemePickerRowDisplay();
       });
     });
   }
   function openThemePicker(){
+    pendingThemeSkin = settings.themeSkin;
     renderThemeGrid();
+    $('overlay').classList.add('show');
     $('themeSheet').classList.add('show');
-    $('settingsSheet').classList.remove('show');
   }
   function closeThemePicker(){
     $('themeSheet').classList.remove('show');
-    $('settingsSheet').classList.add('show');
+    $('overlay').classList.remove('show');
   }
-  $('themePickerRow').addEventListener('click', openThemePicker);
+  $('themeBtn').addEventListener('click', openThemePicker);
+  $('themeBtn2').addEventListener('click', openThemePicker);
+  $('themeBtn3').addEventListener('click', openThemePicker);
   $('themeSheetBackBtn').addEventListener('click', closeThemePicker);
+  $('themeSaveBtn').addEventListener('click', async ()=>{
+    settings.themeSkin = pendingThemeSkin;
+    applyThemeSkin();
+    await saveSettings();
+    closeThemePicker();
+    showToast(t('themeSavedToast'));
+  });
 
   $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
   $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
