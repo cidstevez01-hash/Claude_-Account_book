@@ -160,9 +160,8 @@
   .cat-picker-chevron{color:var(--ink-soft);font-size:18px;}
   .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
   .theme-card{background:var(--card);border:2px solid var(--grid);border-radius:14px;padding:8px 6px 10px;text-align:center;font-family:'Noto Sans SC',sans-serif;}
-  .theme-thumb{width:100%;aspect-ratio:3/4;border-radius:8px;border:1px solid var(--grid);overflow:hidden;position:relative;box-sizing:border-box;padding:7px 7px 0;}
-  .theme-thumb .tt-bar{height:20%;border-radius:4px;margin-bottom:5px;}
-  .theme-thumb .tt-donut{width:36%;aspect-ratio:1;border-radius:50%;margin:6px auto 0;}
+  .theme-thumb{width:100%;aspect-ratio:3/4;border-radius:8px;border:1px solid var(--grid);overflow:hidden;position:relative;background:#fff;}
+  .theme-thumb-inner{position:absolute;top:0;left:0;transform-origin:top left;pointer-events:none;}
   .theme-name{font-size:11.5px;color:var(--ink);margin-top:6px;}
   .theme-radio{display:block;width:18px;height:18px;border-radius:50%;border:1.6px solid var(--ink-faint);margin:8px auto 0;position:relative;}
   .theme-radio.checked{border-color:var(--seal);}
@@ -746,7 +745,7 @@
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260804d';
+  const APP_BUILD = '20260804e';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -988,9 +987,14 @@
   let entries = [];
   let settings = {lang:'ja', currency:'JPY', themeSkin:'current'};
   // 主题皮肤(着せ替え):目前只保留"基本"这一款默认配色,之前做的8款四季配色先撤下来
-  // (对应的:root[data-skin]覆盖块也一并删掉了),以后要重新上再加回THEME_SKINS就行
+  // (对应的:root[data-skin]覆盖块也一并删掉了),以后要重新上再加回THEME_SKINS就行。
+  // vars要存完整一套token(不只是四色摘要),因为缩略图是把首页真实DOM克隆过来后拿这些
+  // token去整体覆盖颜色变量,少了哪个token那部分颜色就会露馅显示成"current"的颜色
   const THEME_SKINS = [
-    { id:'current', zh:'基本', ja:'基本', swatch:['#F7F1E7','#d1665a','#7a9b6e','#e3b23c'] },
+    { id:'current', zh:'基本', ja:'基本', vars:{
+      paper:'#F7F1E7', card:'#FFFDF8', ink:'#3a2f28', 'ink-soft':'#a99c86', 'ink-faint':'#cfc3ac',
+      seal:'#d1665a', 'seal-soft':'#e2897d', jade:'#7a9b6e', grid:'#e7dcc4', 'grid-bg':'#e3e7dd', accent:'#e3b23c'
+    } },
   ];
   function themeSkinLabel(sk){ return settings.lang==='ja' ? sk.ja : sk.zh; }
   function applyThemeSkin(){
@@ -2626,30 +2630,54 @@
 
   // 首页缩略图:纸底+一条支出色的"余额卡"+一个三色环状图,凑出跟真实首页神似的迷你版,
   // 不用真的去渲染一份首页(维护成本太高),这几个元素已经足够让人认出"这是哪套配色"
+  // 缩略图要是首页的真实截图,不是手画的示意图——直接把首页头部+余额卡+环状图卡这三块
+  // 真实DOM原样搬过来(不是照数据重新画一份简化版),外层套一个改了颜色变量的容器,
+  // 靠这个App本来就是"整套颜色都走CSS变量"的写法,让同一份真实标记在不同token下重新上色,
+  // 缩放到缩略图大小再裁切显示,这样看到的就是这个主题下首页实际会长什么样,不是预设的示意图
   function themeThumbHtml(sk){
-    const [paper, seal, jade, accent] = sk.swatch;
-    return `<div class="theme-thumb" style="background:${paper}">
-      <div class="tt-bar" style="background:${seal}"></div>
-      <div class="tt-donut" style="background:conic-gradient(${seal} 0turn 0.4turn, ${jade} 0.4turn 0.7turn, ${accent} 0.7turn 1turn)"></div>
-    </div>`;
+    const src = $('pageLedger');
+    const header = src.querySelector('.header');
+    const ledgerCard = src.querySelector('.ledger-card');
+    const chartCard = src.querySelector('.chart-card');
+    let html = (header ? header.outerHTML : '') + (ledgerCard ? ledgerCard.outerHTML : '') + (chartCard ? chartCard.outerHTML : '');
+    // 缩略图纯展示不需要交互,把id都去掉,避免克隆出来的节点在页面里跟原节点id重复
+    html = html.replace(/ id="[^"]*"/g, '');
+    const varsCss = Object.entries(sk.vars).map(([k,v])=> `--${k}:${v}`).join(';');
+    return `<div class="theme-thumb"><div class="theme-thumb-inner" style="${varsCss}">${html}</div></div>`;
+  }
+  function scaleThemeThumbs(){
+    $('themeGrid').querySelectorAll('.theme-thumb').forEach(clip=>{
+      const inner = clip.querySelector('.theme-thumb-inner');
+      if(!inner) return;
+      inner.style.width = '340px';
+      const naturalWidth = inner.scrollWidth || 340;
+      const scale = clip.clientWidth / naturalWidth;
+      inner.style.transform = `scale(${scale})`;
+    });
   }
   // 点缩略图先只是"选中待保存"(圆圈打勾),不会立刻换肤;按了下面的保存按钮才真正生效+落盘,
   // 这样用户可以先把几个主题都点一遍比较着看,不会每点一下全屏配色就跳一次
   let pendingThemeSkin = null;
   function renderThemeGrid(){
+    // 用div不用button:缩略图里克隆进来的是首页真实DOM,里面本来就带按钮/下拉框这些交互元素,
+    // 塞进<button>会是不合法的嵌套(button/select不能套button),浏览器解析时会把结构拆散
     $('themeGrid').innerHTML = THEME_SKINS.map(sk=>
-      `<button type="button" class="theme-card" data-skin-id="${sk.id}">
+      `<div class="theme-card" role="button" tabindex="0" data-skin-id="${sk.id}">
         ${themeThumbHtml(sk)}
         <div class="theme-name">${themeSkinLabel(sk)}</div>
         <span class="theme-radio ${pendingThemeSkin===sk.id?'checked':''}"></span>
-      </button>`
+      </div>`
     ).join('');
     $('themeGrid').querySelectorAll('.theme-card').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         pendingThemeSkin = btn.getAttribute('data-skin-id');
         renderThemeGrid();
       });
+      btn.addEventListener('keydown', (ev)=>{
+        if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); btn.click(); }
+      });
     });
+    scaleThemeThumbs();
   }
   function openThemePicker(){
     pendingThemeSkin = settings.themeSkin;
