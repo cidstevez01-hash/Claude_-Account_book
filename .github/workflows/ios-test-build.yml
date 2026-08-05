@@ -25,6 +25,9 @@ jobs:
       - name: 生成iOS原生工程(ios/不提交进仓库,每次CI都是全新生成)
         run: npx cap add ios
 
+      - name: 生成真实App图标(resources/icon.png -> AppIcon.appiconset,不然用的是Capacitor默认占位图标)
+        run: npx capacitor-assets generate --ios
+
       - name: 同步网页内容+配置到原生工程
         run: npx cap sync ios
 
