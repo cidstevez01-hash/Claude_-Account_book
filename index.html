@@ -114,9 +114,9 @@
   }
   .ledger-card{background:var(--card);border:2px dashed var(--seal);border-radius:26px 12px 24px 12px/12px 24px 12px 26px;padding:22px 20px;box-shadow:0 2px 0 rgba(58,47,40,0.05);margin-bottom:22px;}
   .balance-label{font-size:12px;color:var(--ink-soft);letter-spacing:2px;}
-  .balance-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:38px;margin:4px 0 8px;font-variant-numeric: tabular-nums;}
-  .points-chip-row{margin:0 0 12px;}
-  .points-chip-row:empty{display:none;margin:0;}
+  .balance-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 16px;}
+  .balance-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:38px;margin:0;font-variant-numeric: tabular-nums;}
+  .points-chip-row:empty{display:none;}
   .points-chip{display:inline-flex;align-items:center;gap:4px;font-family:'Noto Sans SC',sans-serif;font-size:12px;font-weight:600;color:var(--jade);background:color-mix(in srgb, var(--jade) 16%, transparent);border:1px solid color-mix(in srgb, var(--jade) 40%, transparent);border-radius:20px;padding:3px 10px 3px 8px;font-variant-numeric:tabular-nums;}
   .points-chip svg{width:11px;height:11px;flex-shrink:0;}
   .stats-row{display:flex;gap:24px;padding-top:14px;border-top:2px dotted var(--grid);}
@@ -269,8 +269,8 @@
   .range-pill{flex:1;padding:9px 12px;border-radius:14px;border:1.5px solid var(--grid);background:var(--paper);font-size:13.5px;color:var(--ink);font-family:'Noto Sans SC',sans-serif;text-align:center;transition:opacity 0.12s ease;}
   .range-pill:active{opacity:0.6;}
   .range-arrow{color:var(--ink-soft);font-size:13px;flex-shrink:0;}
-  .cr-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:32px;text-align:center;margin:4px 0 6px;font-variant-numeric: tabular-nums;}
-  .cumulative-range-card .points-chip-row{text-align:center;margin-bottom:10px;}
+  .cr-row{display:flex;align-items:baseline;justify-content:center;gap:10px;flex-wrap:wrap;margin:4px 0 14px;}
+  .cr-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:32px;text-align:center;margin:0;font-variant-numeric: tabular-nums;}
   .card-title{font-size:13px;color:var(--ink-soft);letter-spacing:1px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
   .legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;}
   .donut-row{position:relative;}
@@ -1277,8 +1277,10 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
 
     <div class="ledger-card">
       <div class="balance-label" id="balanceLabelText">本月结余 <span id="baseCurTag" style="opacity:0.6"></span></div>
-      <div class="balance-amount" id="balanceAmount">¥0.00</div>
-      <div class="points-chip-row" id="monthPointsRow"></div>
+      <div class="balance-row">
+        <div class="balance-amount" id="balanceAmount">¥0.00</div>
+        <div class="points-chip-row" id="monthPointsRow"></div>
+      </div>
       <div class="stats-row">
         <div class="stat income clickable-stat" data-type="income"><div class="lbl" id="monthIncomeLabel">本月收入</div><div class="val" id="monthIncome">¥0.00</div></div>
         <div class="stat expense clickable-stat" data-type="expense"><div class="lbl" id="monthExpenseLabel">本月支出</div><div class="val" id="monthExpense">¥0.00</div></div>
@@ -1329,8 +1331,10 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
         <span class="range-arrow">→</span>
         <button type="button" class="range-pill" id="cumRangeEndBtn">2026年8月</button>
       </div>
-      <div class="cr-amount" id="cumRangeAmount">¥0</div>
-      <div class="points-chip-row" id="cumPointsRow"></div>
+      <div class="cr-row">
+        <div class="cr-amount" id="cumRangeAmount">¥0</div>
+        <div class="points-chip-row" id="cumPointsRow"></div>
+      </div>
       <div class="stats-row" style="margin-top:2px;">
         <div class="stat income"><div class="lbl" id="cumRangeIncomeLabel">累计收入</div><div class="val" id="cumRangeIncome">¥0</div></div>
         <div class="stat expense"><div class="lbl" id="cumRangeExpenseLabel">累计支出</div><div class="val" id="cumRangeExpense">¥0</div></div>
