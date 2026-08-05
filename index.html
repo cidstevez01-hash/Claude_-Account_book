@@ -41,11 +41,21 @@
   [data-skin="summerB"] .icon-btn{border:1px solid var(--seal);box-shadow:0 0 8px -2px var(--seal);}
   [data-skin="summerB"] .tab-btn.active .hd-icon{filter:drop-shadow(0 0 4px var(--seal));}
   [data-skin="summerB"] .fab{box-shadow:0 0 16px -2px var(--seal), 0 3px 0 var(--seal-soft);}
+  /* .save-btn全局默认background:var(--ink);color:#FFFDF8——这在其它主题里
+     成立是因为--ink一直是深色(用作深色字/深色底都行)，但summerB的--ink
+     故意反过来是浅米色(用作深色底上的浅色字)，直接拿去当按钮底色就变成
+     浅底浅字看不清(反馈"レートを更新"按钮糊成一片就是这个)。改用--seal
+     强调色打底，跟FAB/图标按钮同一套发光描边。 */
+  [data-skin="summerB"] .save-btn{background:var(--seal);color:#fff;box-shadow:0 0 10px -2px var(--seal);}
   [data-skin="summerB"] .papercut{color:var(--accent);font-weight:800;text-shadow:0 0 6px var(--accent), 0 0 16px color-mix(in srgb, var(--seal) 60%, transparent);}
-  /* 首页背景插画：星空静态图+canvas烟花动画叠在一起，只在data-skin=summerB
-     且当前停在记账页时才挂载(见JS里的updateFireworksBg/switchToPage)，
-     切到集計/為替或换别的主题就会拆掉，不会一直占着性能。 */
-  .fw-bg-layer{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  /* 背景插画：星空静态图+canvas烟花动画叠在一起，只在data-skin=summerB时
+     跟着当前显示的.page挂载(见JS里的updateFireworksBg/switchToPage)，换
+     别的主题或切别的页面会拆掉，不会一直占着性能。position用fixed而不是
+     absolute——.fw-bg-layer虽然挂在某个.page里，但.page是.app(max-width:
+     480px居中+安全区留白)的子元素，absolute只会填满.app那个居中窄栏，顶部
+     状态栏那一截和两侧留白的空隙填不到；fixed直接钉在视口上，不受.app的
+     宽度/内边距影响，才能真正铺满整个屏幕。 */
+  .fw-bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
   .fw-bg-layer svg{width:100%;height:100%;display:block;}
   .fw-bg-layer canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
   .page{position:relative;}
