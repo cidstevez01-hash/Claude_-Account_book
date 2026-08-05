@@ -1566,7 +1566,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260804i';
+  const APP_BUILD = '20260804j';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -3172,9 +3172,9 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
         ev.stopPropagation();
         const key = row.getAttribute('data-key');
         if(homeDonutTagFilter){
-          openMonthDetail({tagCode: homeDonutTagFilter, tagExclude: key==='__other__', tagLabelText: row.getAttribute('data-label')}, getHomeDonutMonthKey());
+          openMonthDetail({tagCode: homeDonutTagFilter, tagExclude: key==='__other__', tagLabelText: row.getAttribute('data-label'), type: homeDonutType}, getHomeDonutMonthKey());
         }else{
-          openMonthDetail({catCode: key}, getHomeDonutMonthKey());
+          openMonthDetail({catCode: key, type: homeDonutType}, getHomeDonutMonthKey());
         }
       });
     });
@@ -3209,7 +3209,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     el.addEventListener('click', (ev)=>{
       if(swiped){ swiped=false; return; }
       if(ev.target.closest('#homeTypeSegment') || ev.target.closest('.ym-picker') || ev.target.closest('.clickable-legend') || ev.target.closest('#homeDonutDimSelect')) return;
-      openMonthDetail(null, getHomeDonutMonthKey());
+      openMonthDetail({type: homeDonutType}, getHomeDonutMonthKey());
     });
   })();
   $('homeTypeSegment').querySelectorAll('button').forEach(btn=>{
@@ -3228,7 +3228,9 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     return parts[0]+'年'+parseInt(parts[1],10)+'月';
   }
   function openMonthDetail(filter, monthKey){
-    // filter: null(不筛选) | {catCode?} 按分类 | {tagCode?, tagExclude?, tagLabelText?} 按标签(tagExclude=true时是"非这个标签")
+    // filter: null(不筛选) | {type?, catCode?} 按分类 | {type?, tagCode?, tagExclude?, tagLabelText?} 按标签(tagExclude=true时是"非这个标签")
+    // type跟着donut当前显示的支出/收入走,不然"其他"这种排除式筛选(tagCode!==x)会把另一种
+    // 类型的账目也漏进来——比如支出环状图的"其他"档,不限制type的话收入记录也会符合"tagCode!==固定支出"这个条件
     monthDetailFilter = filter || null;
     monthDetailMonthKey = monthKey || currentMonthKey();
     renderMonthDetailList();
@@ -3239,6 +3241,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const mk = monthDetailMonthKey || currentMonthKey();
     $('monthDetailTitle').textContent = monthKeyLabel(mk) + ' ' + t('detailWord');
     let list = entries.filter(e=> e.date.startsWith(mk));
+    const filterType = monthDetailFilter && monthDetailFilter.type;
+    if(filterType) list = list.filter(e=> e.type===filterType);
     const catCode = monthDetailFilter && monthDetailFilter.catCode;
     const tagCode = monthDetailFilter && monthDetailFilter.tagCode;
     const tagExclude = !!(monthDetailFilter && monthDetailFilter.tagExclude);
