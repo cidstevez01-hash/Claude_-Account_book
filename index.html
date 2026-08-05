@@ -1613,7 +1613,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       compareTemplate:'{cur}{type} · 对比{prev}',
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
       catFieldLabel:'分类', catPickerTitle:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', pointsFieldLabel:'获得积分', notePlaceholder:'备注(可选)', saveBtn:'保存',
-      pointsBadgeUnit:'积分', pointsBadgeTitle:'获得积分，不计入残高',
+      pointsBadgeUnit:'积分', pointsBadgeTitle:'获得积分，不计入残高', pointsLegendLabel:'积分',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
       dimCategory:'分类', tagOtherBucket:'其他',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）', themeSheetTitle:'主题', themeSavedToast:'主题已保存',
@@ -1667,7 +1667,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       compareTemplate:'{cur}の{type}（{prev}比）',
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
       catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', pointsFieldLabel:'付与ポイント数', notePlaceholder:'メモ(任意)', saveBtn:'保存',
-      pointsBadgeUnit:'pt', pointsBadgeTitle:'獲得ポイント(残高には含まれません)',
+      pointsBadgeUnit:'pt', pointsBadgeTitle:'獲得ポイント(残高には含まれません)', pointsLegendLabel:'ポイント',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
       dimCategory:'カテゴリ', tagOtherBucket:'その他',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeSheetTitle:'着せ替え', themeSavedToast:'着せ替えを保存しました',
@@ -4160,7 +4160,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const daysInMonth = new Date(year, month, 0).getDate();
     const arr=[];
     for(let d=1; d<=daysInMonth; d++){
-      arr.push({key:year+'-'+pad2(month)+'-'+pad2(d), label:String(d), income:0, expense:0, catExpense:{}, catIncome:{}});
+      arr.push({key:year+'-'+pad2(month)+'-'+pad2(d), label:String(d), income:0, expense:0, points:0, catExpense:{}, catIncome:{}});
     }
     const map={}; arr.forEach(x=>map[x.key]=x);
     entries.forEach(e=>{
@@ -4170,13 +4170,14 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       const k = e.catCode || e.category;
       if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
+      if(e.points) b.points += e.points;
     });
     return arr;
   }
   function getMonthlyBucketsForYear(year){
     const arr=[];
     for(let m=1;m<=12;m++){
-      arr.push({key:year+'-'+pad2(m), label:m+'月', income:0, expense:0, catExpense:{}, catIncome:{}});
+      arr.push({key:year+'-'+pad2(m), label:m+'月', income:0, expense:0, points:0, catExpense:{}, catIncome:{}});
     }
     const map={}; arr.forEach(x=>map[x.key]=x);
     entries.forEach(e=>{
@@ -4187,6 +4188,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       const k = e.catCode || e.category;
       if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
+      if(e.points) b.points += e.points;
     });
     return arr;
   }
@@ -4255,8 +4257,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const catField = isIncome ? 'catIncome' : 'catExpense';
     const scrollElForSize = $('trendChart').parentElement;
     const chartH = Math.max(160, Math.round(scrollElForSize && scrollElForSize.clientHeight) || 190);
-    const top=14, base=chartH-40, barW=20, barGap=10;
-    const groupW = barW+barGap;
+    const top=14, base=chartH-40, barW=20, ptBarW=8, ptGap=6, barGap=10;
+    const groupW = barW+ptGap+ptBarW+barGap;
     const leftPad = 0; // 纵轴数值刻度现在是外面单独一栏(见trendAxisFixed),不用在SVG里面留空间了
     const totalW = Math.max(300, leftPad + buckets.length*groupW+20);
     const svgEl = $('trendChart');
@@ -4277,6 +4279,12 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       const color = colorForKey(k,i);
       return `<span class="item"><span class="legend-sq" style="background:${color}"></span><span class="legend-label">${labelForKey(k)}</span><span class="legend-pct-track"><span class="legend-pct-fill" style="width:${pct.toFixed(1)}%;background:${color}"></span></span><span class="legend-pct-num">${pct.toFixed(1)}%</span></span>`;
     }).join('');
+    // 积分不是分类金额,没法跟上面几项算同一份占比,但复用同一行结构(方块+标签+条+数值)保持视觉一致——
+    // 条填满整条只是当装饰用,右侧数值直接显示总积分而不是百分比
+    const grandPoints = buckets.reduce((s,b)=> s+(b.points||0), 0);
+    if(grandPoints > 0){
+      $('trendCatLegend').innerHTML += `<span class="item"><span class="legend-sq" style="background:var(--jade)"></span><span class="legend-label">${t('pointsLegendLabel')}</span><span class="legend-pct-track"><span class="legend-pct-fill" style="width:100%;background:var(--jade)"></span></span><span class="legend-pct-num">+${grandPoints.toLocaleString()}</span></span>`;
+    }
 
     // 纵轴刻度只按"当前实际能看到的这几根柱子"里的最大值来算,而不是整个月的最大值——
     // 不然月中一笔大额支出(比如房租)一出现,月初/月末那些正常小额支出的刻度会被硬生生压扁看不清。
@@ -4294,6 +4302,19 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       });
       return found ? maxV : null;
     }
+    // 积分柱子跟金额柱子完全不是一个量级(几十积分 vs 几千日元),不能共用同一套刻度,
+    // 所以单独算它自己的可视范围最大值,两根柱子各自撑满同样的高度区间、互不干扰
+    function visiblePtMaxVal(scrollLeft, clientWidth){
+      let maxV = 0, found = false;
+      buckets.forEach((b,i)=>{
+        const x0 = leftPad + 10 + i*groupW + barW + ptGap;
+        if(x0+ptBarW >= scrollLeft && x0 <= scrollLeft+clientWidth && b.points > 0){
+          found = true;
+          maxV = Math.max(maxV, b.points);
+        }
+      });
+      return found ? maxV : null;
+    }
 
     // 柱子/网格线只建一次DOM元素,重新算刻度时改的是同一批元素的y/height属性(不是整个重建),
     // 这样配合CSS的transition才能有"刻度逐步变大/变小"的过渡动画,而不是瞬间跳变。
@@ -4307,17 +4328,21 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     $('trendAxisFixed').innerHTML = Array.from({length:gridSteps+1}, (_,s)=>
       `<span class="axis-tick" data-s="${s}" style="top:${base}px;">0</span>`
     ).join('');
-    svg += `<rect id="trendSelHighlight" x="0" y="2" width="${barW+8}" height="${base-2}" rx="6" fill="var(--seal)" opacity="0.12" style="display:none;pointer-events:none;"/>`;
+    const groupHitW = barW+ptGap+ptBarW+8;
+    svg += `<rect id="trendSelHighlight" x="0" y="2" width="${groupHitW}" height="${base-2}" rx="6" fill="var(--seal)" opacity="0.12" style="display:none;pointer-events:none;"/>`;
     let hitRects = '';
     buckets.forEach((b,i)=>{
       const x0 = leftPad + 10 + i*groupW;
       Object.entries(b[catField]).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
         svg += `<rect class="trend-bar-seg" data-b="${i}" data-v="${v}" x="${x0}" y="${base}" width="${barW}" height="0" rx="4" fill="${colorForKey(k, isIncome?1:0)}"/>`;
       });
-      svg += `<text x="${x0+barW/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
+      if(b.points > 0){
+        svg += `<rect class="trend-pt-bar" data-b="${i}" data-v="${b.points}" x="${x0+barW+ptGap}" y="${base}" width="${ptBarW}" height="0" rx="3" fill="var(--jade)"/>`;
+      }
+      svg += `<text x="${x0+(barW+ptGap+ptBarW)/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
       // 这一天/这个月没有数据就不给它加点击热区,点了也没反应(不能选中)
-      if(b[valField] > 0){
-        hitRects += `<rect class="trend-bar-hit" data-idx="${i}" x="${x0-4}" y="0" width="${barW+8}" height="${chartH}" fill="transparent"/>`;
+      if(b[valField] > 0 || b.points > 0){
+        hitRects += `<rect class="trend-bar-hit" data-idx="${i}" x="${x0-4}" y="0" width="${groupHitW}" height="${chartH}" fill="transparent"/>`;
       }
     });
     svg += hitRects;
@@ -4337,13 +4362,17 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       tick: $('trendAxisFixed').querySelector(`.axis-tick[data-s="${s}"]`),
     }));
     const barEls = Array.from(svgEl.querySelectorAll('.trend-bar-seg'));
+    const ptBarEls = Array.from(svgEl.querySelectorAll('.trend-pt-bar'));
     // 记录每根柱子上一次是不是在可见范围内,用来区分"从无到有第一次冒出来"跟"已经在看着、
     // 只是因为刻度变了而升降高度"这两种情况——前者要快,后者可以慢慢升
     const barWasInView = {};
+    const ptBarWasInView = {};
 
     // 屏幕外(当前滚动视口看不到)的柱子不给它算高度、不渲染出来,
     // 等拖拉进度条把它带入视口范围后,才按这时候的刻度把它画出来(配合CSS transition表现为"长出来")
-    function applyScale(maxVal, scrollLeft, clientWidth){
+    // 积分柱子用ptMaxVal单独算高度,跟左边的金额柱子共用同一段可视高度(top~base)但不共用刻度,
+    // 两根柱子只是并排站在同一组里,数值本身不能互相比较
+    function applyScale(maxVal, scrollLeft, clientWidth, ptMaxVal){
       gridLineEls.forEach(({line,tick}, s)=>{
         const gy = base - (s/gridSteps)*(base-top);
         const gv = Math.round((s/gridSteps)*maxVal);
@@ -4374,6 +4403,24 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
         rect.setAttribute('height', h.toFixed(1));
         stackTop[bIdx] = yTop;
       });
+      ptBarEls.forEach(rect=>{
+        const bIdx = parseInt(rect.getAttribute('data-b'), 10);
+        const x0 = leftPad + 10 + bIdx*groupW + barW + ptGap;
+        const inView = (x0+ptBarW >= scrollLeft) && (x0 <= scrollLeft+clientWidth);
+        if(!inView || !ptMaxVal){
+          rect.style.transition = 'y 0.15s ease, height 0.15s ease';
+          rect.setAttribute('y', base.toFixed(1));
+          rect.setAttribute('height', 0);
+          ptBarWasInView[bIdx] = false;
+          return;
+        }
+        rect.style.transition = ptBarWasInView[bIdx] ? 'y 0.35s ease, height 0.35s ease' : 'y 0.15s ease, height 0.15s ease';
+        ptBarWasInView[bIdx] = true;
+        const v = parseFloat(rect.getAttribute('data-v'));
+        const h = Math.min((v/ptMaxVal)*(base-top), base-top);
+        rect.setAttribute('y', (base-h).toFixed(1));
+        rect.setAttribute('height', h.toFixed(1));
+      });
     }
 
     // 按日对比且看的正是当前这个月:默认定位到"今天"这一根柱子,不用靠数据推算;
@@ -4390,7 +4437,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       initialScrollLeft = totalW;
     }
     let currentMaxVal = visibleMaxVal(initialScrollLeft, clientW) || 1;
-    applyScale(currentMaxVal, initialScrollLeft, clientW);
+    let currentMaxPtVal = visiblePtMaxVal(initialScrollLeft, clientW) || 1;
+    applyScale(currentMaxVal, initialScrollLeft, clientW, currentMaxPtVal);
     if(scrollEl) scrollEl.scrollLeft = initialScrollLeft;
 
     // 横向滚动停下来之后(防抖150ms,避免滚动过程中柱子一直跳动重算),
@@ -4404,7 +4452,9 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
           const sl = scrollEl.scrollLeft, cw = scrollEl.clientWidth;
           const mv = visibleMaxVal(sl, cw);
           if(mv !== null) currentMaxVal = mv; // 这段视口没数据就沿用上一次的刻度,不掉回兜底值
-          applyScale(currentMaxVal, sl, cw);
+          const pmv = visiblePtMaxVal(sl, cw);
+          if(pmv !== null) currentMaxPtVal = pmv;
+          applyScale(currentMaxVal, sl, cw, currentMaxPtVal);
         }, 150);
       };
     }
@@ -4426,9 +4476,12 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       const color = colorForKey(k, isIncome?1:0);
       return `<span class="tpi-item"><span class="legend-sq" style="background:${color}"></span><span class="tpi-label">${labelForKey(k)}</span><span class="tpi-amt">${fmtCur(v, settings.currency)}</span></span>`;
     }).join('') : `<span class="tpi-item">${t('emptyChart')}</span>`;
+    const ptHtml = bucket.points > 0
+      ? `<span class="tpi-item"><span class="legend-sq" style="background:var(--jade)"></span><span class="tpi-label">${t('pointsLegendLabel')}</span><span class="tpi-amt">+${bucket.points.toLocaleString()}</span></span>`
+      : '';
     $('trendPointInfo').innerHTML = `
       <div class="tpi-header"><span class="tpi-date">${dateLabel}</span><span class="tpi-total ${isIncome?'income':'expense'}">${fmtCur(total, settings.currency)}</span></div>
-      <div class="tpi-list">${listHtml}</div>
+      <div class="tpi-list">${listHtml}${ptHtml}</div>
     `;
     $('trendPointInfo').style.display = 'block';
     // 只显示这一天/这个月自己的明细,收起下面整段时间汇总的图例,避免两份数字同时出现
