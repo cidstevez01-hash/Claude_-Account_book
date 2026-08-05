@@ -1439,6 +1439,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
   <div class="sub-wrap" id="payGrid" style="margin-bottom:18px;"></div>
   <div class="field-label" id="tagFieldLabel">标签</div>
   <div class="sub-wrap" id="tagGrid" style="margin-bottom:18px;"></div>
+  <div class="field-label" id="pointsFieldLabel">获得积分</div>
+  <div class="text-row" style="margin-bottom:18px;"><input type="text" inputmode="numeric" id="pointsInput" placeholder="0"></div>
   <div class="row2">
     <div class="text-row"><input type="text" id="noteInput" placeholder="备注(可选)"></div>
     <div class="text-row" style="max-width:150px;"><input type="date" id="dateInput"></div>
@@ -1578,7 +1580,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260804j';
+  const APP_BUILD = '20260805a';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1599,7 +1601,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       emptyChart:'这段时间还没有相关记录', saveFailed:'保存失败,请检查网络后重试',
       compareTemplate:'{cur}{type} · 对比{prev}',
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
-      catFieldLabel:'分类', catPickerTitle:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', notePlaceholder:'备注(可选)', saveBtn:'保存',
+      catFieldLabel:'分类', catPickerTitle:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', pointsFieldLabel:'获得积分', notePlaceholder:'备注(可选)', saveBtn:'保存',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
       dimCategory:'分类', tagOtherBucket:'其他',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）', themeSheetTitle:'主题', themeSavedToast:'主题已保存',
@@ -1652,7 +1654,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       emptyChart:'この期間の記録はまだありません', saveFailed:'保存に失敗しました。ネットワークをご確認の上再試行してください',
       compareTemplate:'{cur}の{type}（{prev}比）',
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
-      catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
+      catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', pointsFieldLabel:'付与ポイント数', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
       dimCategory:'カテゴリ', tagOtherBucket:'その他',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeSheetTitle:'着せ替え', themeSavedToast:'着せ替えを保存しました',
@@ -2646,6 +2648,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     $('subFieldLabel').textContent = t('subFieldLabel');
     $('payFieldLabel').textContent = t('payFieldLabel');
     $('tagFieldLabel').textContent = t('tagFieldLabel');
+    $('pointsFieldLabel').textContent = t('pointsFieldLabel');
     renderPayGrid();
     $('noteInput').placeholder = t('notePlaceholder');
     $('saveBtn').textContent = t('saveBtn');
@@ -2715,6 +2718,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       payment_method: entry.paymentMethod,
       tag_code: entry.tagCode || null,
       note: entry.note || null,
+      points: entry.points || null,
       entry_date: entry.date,
       recurring_id: entry.recurringId || null,
     };
@@ -2730,7 +2734,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       paymentMethod: row.payment_method,
       tagCode: row.tag_code || null, tag: tagObj ? tagLabel(tagObj) : '',
       icon: catObj ? catObj.icon : '',
-      note: row.note || '', date: row.entry_date,
+      note: row.note || '', points: row.points || null, date: row.entry_date,
       createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
       recurringId: row.recurring_id || undefined,
     };
@@ -2740,7 +2744,16 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     try{
       const { error } = await supabaseClient.from('entries').upsert(list.map(entryToDbRow));
       if(error) throw error;
-    }catch(e){ console.error('账目同步到数据库失败', e); }
+    }catch(e){
+      // points这一列可能还没跑迁移SQL加上去,退回不带这个字段再试一次,
+      // 不能让积分字段(还没建好列)拖累账目本身其它字段的同步
+      try{
+        const { error } = await supabaseClient.from('entries').upsert(list.map(entry=>{
+          const row = entryToDbRow(entry); delete row.points; return row;
+        }));
+        if(error) throw error;
+      }catch(e2){ console.error('账目同步到数据库失败', e2); }
+    }
   }
   function pushEntryUpsert(entry){ return pushEntriesBulkUpsert([entry]); }
   async function pushEntryDelete(id){
@@ -3734,6 +3747,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     $('dateInput').value = todayStr();
     $('amountInput').value = '';
     $('noteInput').value = '';
+    $('pointsInput').value = '';
     editingSubCode = null;
     editingTagCode = null;
     openTagMenuCode = null;
@@ -3752,6 +3766,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     $('curSymbolDisplay').textContent = symbolFor(currentCurrency);
     $('amountInput').value = entry.amount;
     $('noteInput').value = entry.note || '';
+    $('pointsInput').value = entry.points || '';
     $('dateInput').value = useToday ? todayStr() : entry.date;
     editingSubCode = null;
     editingTagCode = null;
@@ -3885,6 +3900,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     if(!amt || amt<=0){ $('amountInput').focus(); return; }
     const date = $('dateInput').value || todayStr();
     const note = $('noteInput').value.trim();
+    const pointsRaw = parseInt($('pointsInput').value, 10);
+    const points = (!isNaN(pointsRaw) && pointsRaw>0) ? pointsRaw : null;
     let savedEntry;
     if(editingEntryId){
       const idx = entries.findIndex(e=> e.id===editingEntryId);
@@ -3896,7 +3913,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
           subCategory: selectedSub? subLabel(selectedSub) : '', subCode: selectedSub? selectedSub.code : '',
           paymentMethod: selectedPayMethod ? selectedPayMethod.code : 'cash',
           tag: selectedTag? tagLabel(selectedTag) : '', tagCode: selectedTag? selectedTag.code : null,
-          note: note, date: date
+          note: note, points: points, date: date
         };
         savedEntry = entries[idx];
       }
@@ -3908,7 +3925,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
         subCategory: selectedSub? subLabel(selectedSub) : '', subCode: selectedSub? selectedSub.code : '',
         paymentMethod: selectedPayMethod ? selectedPayMethod.code : 'cash',
         tag: selectedTag? tagLabel(selectedTag) : '', tagCode: selectedTag? selectedTag.code : null,
-        note: note, date: date, createdAt: Date.now()
+        note: note, points: points, date: date, createdAt: Date.now()
       };
       entries.push(savedEntry);
     }
