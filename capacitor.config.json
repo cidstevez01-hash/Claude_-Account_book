@@ -3,6 +3,7 @@
   "appName": "记账本",
   "webDir": "www",
   "ios": {
-    "contentInset": "automatic"
+    "contentInset": "never",
+    "backgroundColor": "#101B33"
   }
 }

@@ -92,7 +92,12 @@
   /* min-height给个保底值,不完全依赖flex-grow的实时计算——内容很短(比如只有一个分类)时
      也能保证图表卡片本身不会缩得太小,配合上面.page.active的min-height双重保险撑满一屏 */
   #pageStats .chart-card{flex:1 1 auto; display:flex; flex-direction:column; min-height:380px;}
-  .header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; position:relative;}
+  /* 顶部标题+图标固定在屏幕最上方,不随内容滚动;背景补成跟纸面同色,
+     不然滚动的卡片经过头部下面时会跟透明的头部区域叠在一起看不清。
+     position/z-index单独用.page > .header覆盖,因为下面`.page > *:not(.fw-bg-layer)`
+     那条规则选择器带两个class、优先级比单纯的.header高,直接写在.header里会被吃掉 */
+  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:0 -16px 16px; padding:6px 16px 12px; background:var(--paper);}
+  .page > .header{position:sticky; top:var(--safe-top); z-index:16;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
   .header .month{font-size:13px; color:var(--ink-soft); margin-top:4px;}
   .header-right{display:flex;gap:8px;align-items:flex-start;}
