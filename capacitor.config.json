@@ -1,0 +1,8 @@
+{
+  "appId": "com.cidstevez01.jiazhangbu",
+  "appName": "记账本",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "automatic"
+  }
+}
