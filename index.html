@@ -3866,14 +3866,6 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     updateCatPickerRowDisplay();
     renderPayGrid();
     renderTagGrid();
-    updatePointsFieldVisibility();
-  }
-  // 积分只跟收入挂钩(比如利息/返现到账),支出记录不该有这个字段,切支出时直接隐藏输入框+清空已填的值,
-  // 避免用户在收入档填了积分、又切回支出忘记清空,脏数据混进只该有收入的统计里
-  function updatePointsFieldVisibility(){
-    const isIncome = currentType==='income';
-    $('pointsFieldWrap').style.display = isIncome ? '' : 'none';
-    if(!isIncome) $('pointsInput').value = '';
   }
   function setTypeSegmentLocked(locked){
     $('typeSegment').classList.toggle('disabled', locked);
@@ -3913,7 +3905,6 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     updateCatPickerRowDisplay();
     renderPayGrid();
     renderTagGrid();
-    updatePointsFieldVisibility();
     $('catPickerSheet').classList.remove('show');
     $('overlay').classList.add('show');
     $('sheet').classList.add('show');
@@ -3993,8 +3984,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     showToast(t('themeSavedToast'));
   });
 
-  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); });
-  $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); });
+  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
+  $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
 
   $('saveBtn').addEventListener('click', async ()=>{
     const amt = parseFloat($('amountInput').value);
@@ -4002,7 +3993,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const date = $('dateInput').value || todayStr();
     const note = $('noteInput').value.trim();
     const pointsRaw = parseInt($('pointsInput').value, 10);
-    const points = (currentType==='income' && !isNaN(pointsRaw) && pointsRaw>0) ? pointsRaw : null;
+    const points = (!isNaN(pointsRaw) && pointsRaw>0) ? pointsRaw : null;
     let savedEntry;
     if(editingEntryId){
       const idx = entries.findIndex(e=> e.id===editingEntryId);
