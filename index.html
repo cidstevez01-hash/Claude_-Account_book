@@ -30,7 +30,8 @@
   /* "夏 · 花火"不只是换色板：卡片/图标按钮/FAB加发光描边，标题从纸卡纸边
      描边效果换成夜里霓虹发光(深色底不需要浅色卡纸描边)，跟设计稿里
      .phone[data-mood="summerB"]那一套是同一份规则，选择器换成App真实的
-     类名。首页背景插画(星空+烟花动画)是单独一块，见下方#fwBgLayer相关。 */
+     类名。三个页面共用的背景插画(星空+烟花动画)是单独一块，见下方
+     .fw-bg-layer相关，只挂在当前显示的那个.page里。 */
   [data-skin="summerB"] .ledger-card,
   [data-skin="summerB"] .chart-card{border:1px solid color-mix(in srgb, var(--seal) 50%, transparent);border-radius:14px;box-shadow:0 0 22px -4px color-mix(in srgb, var(--seal) 55%, transparent), 0 0 0 1px color-mix(in srgb, var(--seal) 20%, transparent) inset;}
   [data-skin="summerB"] .entry{border:1px solid var(--grid);box-shadow:0 0 10px -3px color-mix(in srgb, var(--jade) 40%, transparent);}
@@ -45,8 +46,8 @@
   .fw-bg-layer{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
   .fw-bg-layer svg{width:100%;height:100%;display:block;}
   .fw-bg-layer canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
-  #pageLedger{position:relative;}
-  #pageLedger > *:not(.fw-bg-layer){position:relative;z-index:1;}
+  .page{position:relative;}
+  .page > *:not(.fw-bg-layer){position:relative;z-index:1;}
   .fw-star-tw{animation:fwstartw 3.2s ease-in-out infinite;}
   @keyframes fwstartw{0%,100%{opacity:0.35;}50%{opacity:1;}}
   @media (prefers-reduced-motion: reduce){ .fw-star-tw{animation:none;opacity:0.7;} }
@@ -1243,7 +1244,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
 <div class="app">
 
   <div class="page active" id="pageLedger">
-    <div class="fw-bg-layer" id="fwBgLayer"></div>
+    <div class="fw-bg-layer"></div>
     <div class="header">
       <div class="washi-tape"></div>
       <div>
@@ -1293,6 +1294,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
   </div>
 
   <div class="page" id="pageStats">
+    <div class="fw-bg-layer"></div>
     <div class="header">
       <div class="washi-tape"></div>
       <div><h1 id="statsTitleText" class="papercut">统计</h1></div>
@@ -1344,6 +1346,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
   </div>
 
   <div class="page" id="pageRate">
+    <div class="fw-bg-layer"></div>
     <div class="header">
       <div class="washi-tape"></div>
       <div><h1 id="rateTitleText" class="papercut">汇率</h1><div class="month" id="rateSubLabel">日元 → 人民币</div></div>
@@ -2148,22 +2151,27 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     swap('.tab-btn[data-page="stats"] use', 'ic-chart');
     swap('.tab-btn[data-page="rate"] use', 'ic-exchange');
   }
-  // 首页背景插画只在"夏 · 花火"生效且当前正停在记账页时才挂载——离开这页
-  // 或换别的主题都要立刻拆掉(stopFireworksCanvas会取消动画帧+断开ResizeObserver)，
-  // 不会有animation loop在看不见的地方空转耗电。
-  let fwBgMounted = false;
+  // 首页背景插画三个页面(记账/集計/為替)都要生效，但同一时间只有一份
+  // canvas在跑——跟着当前显示的.page走，切页面就把上一个.page里的拆掉、
+  // 挂到新的那个上；换成"基本"主题也立刻拆掉(stopFireworksCanvas会取消
+  // 动画帧+断开ResizeObserver)，不会有animation loop在看不见的地方空转。
+  let fwBgMountedLayer = null;
   function updateFireworksBg(){
-    const layer = document.getElementById('fwBgLayer');
-    if(!layer) return;
-    const shouldMount = settings.themeSkin === 'summerB' && document.getElementById('pageLedger').classList.contains('active');
-    if(shouldMount && !fwBgMounted){
-      layer.innerHTML = starSkySvg() + '<canvas class="fw-canvas"></canvas>';
-      startFireworksCanvas(layer.querySelector('canvas'), {seal:'#E85D4A', accent:'#F2C94C', jade:'#4FD1A5', sealSoft:'#F2967F'});
-      fwBgMounted = true;
-    }else if(!shouldMount && fwBgMounted){
+    const shouldShow = settings.themeSkin === 'summerB';
+    const activeLayer = document.querySelector('.page.active .fw-bg-layer');
+    if(fwBgMountedLayer && fwBgMountedLayer !== activeLayer){
       stopFireworksCanvas();
-      layer.innerHTML = '';
-      fwBgMounted = false;
+      fwBgMountedLayer.innerHTML = '';
+      fwBgMountedLayer = null;
+    }
+    if(shouldShow && activeLayer && fwBgMountedLayer !== activeLayer){
+      activeLayer.innerHTML = starSkySvg() + '<canvas class="fw-canvas"></canvas>';
+      startFireworksCanvas(activeLayer.querySelector('canvas'), {seal:'#E85D4A', accent:'#F2C94C', jade:'#4FD1A5', sealSoft:'#F2967F'});
+      fwBgMountedLayer = activeLayer;
+    }else if(!shouldShow && fwBgMountedLayer){
+      stopFireworksCanvas();
+      fwBgMountedLayer.innerHTML = '';
+      fwBgMountedLayer = null;
     }
   }
   
