@@ -35,7 +35,9 @@
   [data-skin="summerB"] .ledger-card,
   [data-skin="summerB"] .chart-card{border:1px solid color-mix(in srgb, var(--seal) 50%, transparent);border-radius:14px;box-shadow:0 0 22px -4px color-mix(in srgb, var(--seal) 55%, transparent), 0 0 0 1px color-mix(in srgb, var(--seal) 20%, transparent) inset;}
   [data-skin="summerB"] .entry{border:1px solid var(--grid);box-shadow:0 0 10px -3px color-mix(in srgb, var(--jade) 40%, transparent);}
-  [data-skin="summerB"] .entry .icon{box-shadow:0 0 8px -2px color-mix(in srgb, var(--seal) 45%, transparent);}
+  [data-skin="summerB"] .entry .icon{box-shadow:0 0 10px -1px color-mix(in srgb, var(--ic-color, var(--seal)) 60%, transparent), 0 0 0 1px color-mix(in srgb, var(--ic-color, var(--seal)) 40%, transparent);}
+  [data-skin="summerB"] .cat-btn .ic-wrap,
+  [data-skin="summerB"] .cat-picker-icon{box-shadow:0 0 10px -1px color-mix(in srgb, var(--ic-color, var(--seal)) 60%, transparent), 0 0 0 1px color-mix(in srgb, var(--ic-color, var(--seal)) 40%, transparent);}
   [data-skin="summerB"] .icon-btn{border:1px solid var(--seal);box-shadow:0 0 8px -2px var(--seal);}
   [data-skin="summerB"] .tab-btn.active .hd-icon{filter:drop-shadow(0 0 4px var(--seal));}
   [data-skin="summerB"] .fab{box-shadow:0 0 16px -2px var(--seal), 0 3px 0 var(--seal-soft);}
@@ -2986,7 +2988,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
         const iconHtml = catObj ? iconSvg(catObj.icon) : '';
         html += `<div class="entry ${e.type}" data-id="${e.id}">
           <div class="entry-main">
-            <div class="icon" style="background:${iconBg};color:${iconColor}">${iconHtml}</div>
+            <div class="icon" style="background:${iconBg};color:${iconColor};--ic-color:${iconColor}">${iconHtml}</div>
             <div class="info"><div class="cat">${catLine}</div><div class="entry-meta">${payBadgeHtml}${e.note? `<span class="note-text">${escapeHtml(e.note)}</span>` : ''}</div></div>
             <div class="amount-wrap">${signBadgeHtml(e.type)}<span class="amount">${fmtCur(disp.amount, disp.cur)}</span></div>
           </div>
@@ -3279,6 +3281,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     $('catPickerIcon').innerHTML = iconSvg(selectedCat.icon);
     $('catPickerIcon').style.background = tintColor(selectedCat.color, 0.85);
     $('catPickerIcon').style.color = selectedCat.color;
+    $('catPickerIcon').style.setProperty('--ic-color', selectedCat.color);
     const subTxt = selectedSub ? subLabel(selectedSub) : '';
     $('catPickerText').textContent = catLabel(selectedCat) + (subTxt ? ' · '+subTxt : '');
   }
@@ -3301,7 +3304,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const cats = currentType==='expense' ? expenseCats : incomeCats;
     $('catGrid').innerHTML = cats.map(c=>
       `<button type="button" class="cat-btn ${c.code===selectedCat.code?'selected':''}" data-code="${c.code}">
-        <span class="ic-wrap" style="background:${tintColor(c.color,0.85)};color:${c.color}">${iconSvg(c.icon)}</span><span class="lb">${catLabel(c)}</span></button>`
+        <span class="ic-wrap" style="background:${tintColor(c.color,0.85)};color:${c.color};--ic-color:${c.color}">${iconSvg(c.icon)}</span><span class="lb">${catLabel(c)}</span></button>`
     ).join('');
     $('catGrid').querySelectorAll('.cat-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
