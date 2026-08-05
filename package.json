@@ -1,0 +1,18 @@
+{
+  "name": "account-book",
+  "version": "1.0.0",
+  "private": true,
+  "description": "单文件记账本App，用Capacitor包成iOS外壳供测试模式(Sideloadly/AltStore)安装",
+  "scripts": {
+    "build": "mkdir -p www && cp index.html www/index.html",
+    "ios:add": "npx cap add ios",
+    "ios:sync": "npx cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
