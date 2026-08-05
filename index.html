@@ -114,7 +114,11 @@
   }
   .ledger-card{background:var(--card);border:2px dashed var(--seal);border-radius:26px 12px 24px 12px/12px 24px 12px 26px;padding:22px 20px;box-shadow:0 2px 0 rgba(58,47,40,0.05);margin-bottom:22px;}
   .balance-label{font-size:12px;color:var(--ink-soft);letter-spacing:2px;}
-  .balance-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:38px;margin:4px 0 16px;font-variant-numeric: tabular-nums;}
+  .balance-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:38px;margin:4px 0 8px;font-variant-numeric: tabular-nums;}
+  .points-chip-row{margin:0 0 12px;}
+  .points-chip-row:empty{display:none;margin:0;}
+  .points-chip{display:inline-flex;align-items:center;gap:4px;font-family:'Noto Sans SC',sans-serif;font-size:12px;font-weight:600;color:var(--jade);background:color-mix(in srgb, var(--jade) 16%, transparent);border:1px solid color-mix(in srgb, var(--jade) 40%, transparent);border-radius:20px;padding:3px 10px 3px 8px;font-variant-numeric:tabular-nums;}
+  .points-chip svg{width:11px;height:11px;flex-shrink:0;}
   .stats-row{display:flex;gap:24px;padding-top:14px;border-top:2px dotted var(--grid);}
   .stat{flex:1;}
   .stat .lbl{font-size:12px;color:var(--ink-soft);}
@@ -265,7 +269,8 @@
   .range-pill{flex:1;padding:9px 12px;border-radius:14px;border:1.5px solid var(--grid);background:var(--paper);font-size:13.5px;color:var(--ink);font-family:'Noto Sans SC',sans-serif;text-align:center;transition:opacity 0.12s ease;}
   .range-pill:active{opacity:0.6;}
   .range-arrow{color:var(--ink-soft);font-size:13px;flex-shrink:0;}
-  .cr-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:32px;text-align:center;margin:4px 0 14px;font-variant-numeric: tabular-nums;}
+  .cr-amount{font-family:'Noto Serif SC', serif;font-weight:700;font-size:32px;text-align:center;margin:4px 0 6px;font-variant-numeric: tabular-nums;}
+  .cumulative-range-card .points-chip-row{text-align:center;margin-bottom:10px;}
   .card-title{font-size:13px;color:var(--ink-soft);letter-spacing:1px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
   .legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;}
   .donut-row{position:relative;}
@@ -1273,6 +1278,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     <div class="ledger-card">
       <div class="balance-label" id="balanceLabelText">本月结余 <span id="baseCurTag" style="opacity:0.6"></span></div>
       <div class="balance-amount" id="balanceAmount">¥0.00</div>
+      <div class="points-chip-row" id="monthPointsRow"></div>
       <div class="stats-row">
         <div class="stat income clickable-stat" data-type="income"><div class="lbl" id="monthIncomeLabel">本月收入</div><div class="val" id="monthIncome">¥0.00</div></div>
         <div class="stat expense clickable-stat" data-type="expense"><div class="lbl" id="monthExpenseLabel">本月支出</div><div class="val" id="monthExpense">¥0.00</div></div>
@@ -1324,6 +1330,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
         <button type="button" class="range-pill" id="cumRangeEndBtn">2026年8月</button>
       </div>
       <div class="cr-amount" id="cumRangeAmount">¥0</div>
+      <div class="points-chip-row" id="cumPointsRow"></div>
       <div class="stats-row" style="margin-top:2px;">
         <div class="stat income"><div class="lbl" id="cumRangeIncomeLabel">累计收入</div><div class="val" id="cumRangeIncome">¥0</div></div>
         <div class="stat expense"><div class="lbl" id="cumRangeExpenseLabel">累计支出</div><div class="val" id="cumRangeExpense">¥0</div></div>
@@ -1602,6 +1609,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       compareTemplate:'{cur}{type} · 对比{prev}',
       sheetAddTitle:'记一笔', editEntryTitle:'编辑记录', copyEntryTitle:'复制', segExpense:'支出', segIncome:'收入',
       catFieldLabel:'分类', catPickerTitle:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', pointsFieldLabel:'获得积分', notePlaceholder:'备注(可选)', saveBtn:'保存',
+      pointsBadgeUnit:'积分', pointsBadgeTitle:'获得积分，不计入残高',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
       dimCategory:'分类', tagOtherBucket:'其他',
       settingsTitle:'设置', langFieldLabel:'语言', currencyFieldLabel:'本位货币（用于统计汇总）', themeSheetTitle:'主题', themeSavedToast:'主题已保存',
@@ -1655,6 +1663,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       compareTemplate:'{cur}の{type}（{prev}比）',
       sheetAddTitle:'入力', editEntryTitle:'編集', copyEntryTitle:'コピー', segExpense:'支出', segIncome:'収入',
       catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', pointsFieldLabel:'付与ポイント数', notePlaceholder:'メモ(任意)', saveBtn:'保存',
+      pointsBadgeUnit:'pt', pointsBadgeTitle:'獲得ポイント(残高には含まれません)',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
       dimCategory:'カテゴリ', tagOtherBucket:'その他',
       settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeSheetTitle:'着せ替え', themeSavedToast:'着せ替えを保存しました',
@@ -3073,19 +3082,29 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     });
   }
 
+  // 积分点数只是记录用,不参与残高(income-expense)计算,用独立的胶囊徽标展示,避免跟残高数字混在一起
+  function renderPointsChip(rowId, totalPoints){
+    const row = $(rowId);
+    if(!totalPoints || totalPoints<=0){ row.innerHTML=''; return; }
+    const unit = t('pointsBadgeUnit'), title = t('pointsBadgeTitle');
+    row.innerHTML = `<span class="points-chip" title="${title}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>+${totalPoints.toLocaleString()}${unit}</span>`;
+  }
+
   // ---------- Ledger page ----------
   function renderLedger(){
     const mk = currentMonthKey();
-    let income=0, expense=0;
+    let income=0, expense=0, points=0;
     entries.forEach(e=>{
       if(e.date.startsWith(mk)){
         const v = toBase(e.amount, e.currency||'CNY', e.date);
         if(e.type==='income') income+=v; else expense+=v;
+        if(e.points) points += e.points;
       }
     });
     $('monthIncome').textContent = fmtCur(income, settings.currency);
     $('monthExpense').textContent = fmtCur(expense, settings.currency);
     $('balanceAmount').textContent = fmtCur(income-expense, settings.currency);
+    renderPointsChip('monthPointsRow', points);
 
     const total = entries.reduce((s,e)=> s + (e.type==='income'?1:-1)*toBase(e.amount, e.currency||'CNY', e.date), 0);
     const sealText = total>=0 ? t('surplus') : t('deficit');
@@ -4487,17 +4506,19 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     $('cumRangeStartBtn').textContent = cumRangeStart.year+'年'+cumRangeStart.month+'月';
     $('cumRangeEndBtn').textContent = cumRangeEnd.year+'年'+cumRangeEnd.month+'月';
     const startKey = ymKey(cumRangeStart), endKey = ymKey(cumRangeEnd);
-    let income=0, expense=0;
+    let income=0, expense=0, points=0;
     entries.forEach(e=>{
       const mk = e.date.slice(0,7);
       if(mk>=startKey && mk<=endKey){
         const v = toBase(e.amount, e.currency||'CNY', e.date);
         if(e.type==='income') income+=v; else expense+=v;
+        if(e.points) points += e.points;
       }
     });
     $('cumRangeAmount').textContent = fmtCur(income-expense, settings.currency);
     $('cumRangeIncome').textContent = fmtCur(income, settings.currency);
     $('cumRangeExpense').textContent = fmtCur(expense, settings.currency);
+    renderPointsChip('cumPointsRow', points);
   }
   let cumRangeDraft = {start:null, end:null}, cumRangeEditMode = 'start';
   function openCumRangeSheet(mode){
