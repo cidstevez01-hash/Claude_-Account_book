@@ -1450,8 +1450,10 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
   <div class="sub-wrap" id="payGrid" style="margin-bottom:18px;"></div>
   <div class="field-label" id="tagFieldLabel">标签</div>
   <div class="sub-wrap" id="tagGrid" style="margin-bottom:18px;"></div>
-  <div class="field-label" id="pointsFieldLabel">获得积分</div>
-  <div class="text-row" style="margin-bottom:18px;"><input type="text" inputmode="numeric" id="pointsInput" placeholder="0"></div>
+  <div id="pointsFieldWrap">
+    <div class="field-label" id="pointsFieldLabel">获得积分</div>
+    <div class="text-row" style="margin-bottom:18px;"><input type="text" inputmode="numeric" id="pointsInput" placeholder="0"></div>
+  </div>
   <div class="row2">
     <div class="text-row"><input type="text" id="noteInput" placeholder="备注(可选)"></div>
     <div class="text-row" style="max-width:150px;"><input type="date" id="dateInput"></div>
@@ -3102,7 +3104,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       if(e.date.startsWith(mk)){
         const v = toBase(e.amount, e.currency||'CNY', e.date);
         if(e.type==='income') income+=v; else expense+=v;
-        if(e.points) points += e.points;
+        if(e.type==='income' && e.points) points += e.points;
       }
     });
     $('monthIncome').textContent = fmtCur(income, settings.currency);
@@ -3797,6 +3799,14 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     updateCatPickerRowDisplay();
     renderPayGrid();
     renderTagGrid();
+    updatePointsFieldVisibility();
+  }
+  // 积分只跟收入挂钩(比如利息/返现到账),支出记录不该有这个字段,切支出时直接隐藏输入框+清空已填的值,
+  // 避免用户在收入档填了积分、又切回支出忘记清空,脏数据混进只该有收入的统计里
+  function updatePointsFieldVisibility(){
+    const isIncome = currentType==='income';
+    $('pointsFieldWrap').style.display = isIncome ? '' : 'none';
+    if(!isIncome) $('pointsInput').value = '';
   }
   function setTypeSegmentLocked(locked){
     $('typeSegment').classList.toggle('disabled', locked);
@@ -3836,6 +3846,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     updateCatPickerRowDisplay();
     renderPayGrid();
     renderTagGrid();
+    updatePointsFieldVisibility();
     $('catPickerSheet').classList.remove('show');
     $('overlay').classList.add('show');
     $('sheet').classList.add('show');
@@ -3915,8 +3926,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     showToast(t('themeSavedToast'));
   });
 
-  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
-  $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); });
+  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); });
+  $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); });
 
   $('saveBtn').addEventListener('click', async ()=>{
     const amt = parseFloat($('amountInput').value);
@@ -3924,7 +3935,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const date = $('dateInput').value || todayStr();
     const note = $('noteInput').value.trim();
     const pointsRaw = parseInt($('pointsInput').value, 10);
-    const points = (!isNaN(pointsRaw) && pointsRaw>0) ? pointsRaw : null;
+    const points = (currentType==='income' && !isNaN(pointsRaw) && pointsRaw>0) ? pointsRaw : null;
     let savedEntry;
     if(editingEntryId){
       const idx = entries.findIndex(e=> e.id===editingEntryId);
@@ -4168,9 +4179,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       if(!b) return;
       const v = toBase(e.amount, e.currency||'CNY', e.date);
       const k = e.catCode || e.category;
-      if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
+      if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; if(e.points) b.points += e.points; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
-      if(e.points) b.points += e.points;
     });
     return arr;
   }
@@ -4186,9 +4196,8 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       if(!b) return;
       const v = toBase(e.amount, e.currency||'CNY', e.date);
       const k = e.catCode || e.category;
-      if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; }
+      if(e.type==='income'){ b.income+=v; b.catIncome[k]=(b.catIncome[k]||0)+v; if(e.points) b.points += e.points; }
       else{ b.expense+=v; b.catExpense[k]=(b.catExpense[k]||0)+v; }
-      if(e.points) b.points += e.points;
     });
     return arr;
   }
@@ -4279,10 +4288,12 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       const color = colorForKey(k,i);
       return `<span class="item"><span class="legend-sq" style="background:${color}"></span><span class="legend-label">${labelForKey(k)}</span><span class="legend-pct-track"><span class="legend-pct-fill" style="width:${pct.toFixed(1)}%;background:${color}"></span></span><span class="legend-pct-num">${pct.toFixed(1)}%</span></span>`;
     }).join('');
+    // 积分只跟收入挂钩,只在"收入"这个档位下才有意义,切到"支出"档时完全不显示这一行/这根柱子,
+    // 不然会出现"明明看的是支出明细,却混进一根跟支出毫不相干的积分柱子"这种误导
     // 积分不是分类金额,没法跟上面几项算同一份占比,但复用同一行结构(方块+标签+条+数值)保持视觉一致——
     // 条填满整条只是当装饰用,右侧数值直接显示总积分而不是百分比
     const grandPoints = buckets.reduce((s,b)=> s+(b.points||0), 0);
-    if(grandPoints > 0){
+    if(isIncome && grandPoints > 0){
       $('trendCatLegend').innerHTML += `<span class="item"><span class="legend-sq" style="background:var(--jade)"></span><span class="legend-label">${t('pointsLegendLabel')}</span><span class="legend-pct-track"><span class="legend-pct-fill" style="width:100%;background:var(--jade)"></span></span><span class="legend-pct-num">+${grandPoints.toLocaleString()}</span></span>`;
     }
 
@@ -4336,12 +4347,12 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       Object.entries(b[catField]).sort((a,c)=>c[1]-a[1]).forEach(([k,v])=>{
         svg += `<rect class="trend-bar-seg" data-b="${i}" data-v="${v}" x="${x0}" y="${base}" width="${barW}" height="0" rx="4" fill="${colorForKey(k, isIncome?1:0)}"/>`;
       });
-      if(b.points > 0){
+      if(isIncome && b.points > 0){
         svg += `<rect class="trend-pt-bar" data-b="${i}" data-v="${b.points}" x="${x0+barW+ptGap}" y="${base}" width="${ptBarW}" height="0" rx="3" fill="var(--jade)"/>`;
       }
       svg += `<text x="${x0+(barW+ptGap+ptBarW)/2}" y="${base+16}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${b.label}</text>`;
       // 这一天/这个月没有数据就不给它加点击热区,点了也没反应(不能选中)
-      if(b[valField] > 0 || b.points > 0){
+      if(b[valField] > 0 || (isIncome && b.points > 0)){
         hitRects += `<rect class="trend-bar-hit" data-idx="${i}" x="${x0-4}" y="0" width="${groupHitW}" height="${chartH}" fill="transparent"/>`;
       }
     });
@@ -4476,7 +4487,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       const color = colorForKey(k, isIncome?1:0);
       return `<span class="tpi-item"><span class="legend-sq" style="background:${color}"></span><span class="tpi-label">${labelForKey(k)}</span><span class="tpi-amt">${fmtCur(v, settings.currency)}</span></span>`;
     }).join('') : `<span class="tpi-item">${t('emptyChart')}</span>`;
-    const ptHtml = bucket.points > 0
+    const ptHtml = (isIncome && bucket.points > 0)
       ? `<span class="tpi-item"><span class="legend-sq" style="background:var(--jade)"></span><span class="tpi-label">${t('pointsLegendLabel')}</span><span class="tpi-amt">+${bucket.points.toLocaleString()}</span></span>`
       : '';
     $('trendPointInfo').innerHTML = `
@@ -4569,7 +4580,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       if(mk>=startKey && mk<=endKey){
         const v = toBase(e.amount, e.currency||'CNY', e.date);
         if(e.type==='income') income+=v; else expense+=v;
-        if(e.points) points += e.points;
+        if(e.type==='income' && e.points) points += e.points;
       }
     });
     $('cumRangeAmount').textContent = fmtCur(income-expense, settings.currency);
