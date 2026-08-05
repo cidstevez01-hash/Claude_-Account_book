@@ -1568,7 +1568,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
 <script>
 (function(){
   // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
-  const APP_BUILD = '20260804f';
+  const APP_BUILD = '20260804i';
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -1645,7 +1645,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
       dimCategory:'カテゴリ', tagOtherBucket:'その他',
-      settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeSheetTitle:'着せ替え', themeSavedToast:'テーマを保存しました',
+      settingsTitle:'設定', langFieldLabel:'言語', currencyFieldLabel:'基本通貨（集計に使用）', themeSheetTitle:'着せ替え', themeSavedToast:'着せ替えを保存しました',
       curCNYFullLabel:'人民元 (CNY)', curJPYFullLabel:'日本円 (JPY)',
       rateTitle:'為替レート', rateSub:'人民元 → 日本円', rateSubReverse:'日本円 → 人民元', rateUpdateLabel:'更新日時', rateTrend30Days:'過去30日間の推移',
       rateTrend12Months:'過去12か月の推移', rateTrend8Years:'過去8年間の推移',
@@ -2389,6 +2389,18 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       lastRateError = errors.join('; ');
     }
     await fetchRateHistory();
+    // 顶部大数字跟趋势图走的是两条独立链路(上面这4个源只查"最新",下面走历史每日快照+
+    // frankfurter兜底+就近取值,更容易拿到最新一天),各查各的就会出现"下面已经取到8月5日,
+    // 上面还卡在8月4日"这种不同步。改成拿趋势图(rateHistory)实际算出来的最后一天数据
+    // 去校正顶部显示,只要它比上面4个源查到的还新就直接采用,保证两处永远同源、不会打架
+    if(rateHistory && rateHistory.length){
+      const last = rateHistory[rateHistory.length-1];
+      if(!rateData || !rateData.date || last.date >= rateData.date){
+        rateData = {rate:last.rate, date:last.date, fetchedAt:Date.now(), source:'history'};
+        lastRateError = '';
+        try{ await storageSetSafe('ledger_rate', JSON.stringify(rateData), false); }catch(e){ console.error('汇率缓存保存失败', e); }
+      }
+    }
     await fetchRateHistoryMonthly();
     await fetchRateHistoryYearly();
     rateLoading = false; renderRatePage();
