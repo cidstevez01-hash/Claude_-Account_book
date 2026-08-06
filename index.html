@@ -40,6 +40,10 @@
   [data-skin="summerB"] .cat-picker-icon{box-shadow:0 0 10px -1px color-mix(in srgb, var(--ic-color, var(--seal)) 60%, transparent), 0 0 0 1px color-mix(in srgb, var(--ic-color, var(--seal)) 40%, transparent);}
   [data-skin="summerB"] .icon-btn{border:1px solid var(--seal);box-shadow:0 0 8px -2px var(--seal);color:var(--seal);}
   [data-skin="summerB"] .tab-btn.active .hd-icon{filter:drop-shadow(0 0 4px var(--seal));}
+  /* 最下方tabbar的选中态底色(.tab-btn.active)全局默认写死rgba(209,102,90,...)，
+     那正是"基本"皮肤的--seal(#d1665a)，summerB的--seal是更亮的橙红(#E85D4A)，
+     不跟着换会跟图标发光色对不上。这里改用color-mix带出当前皮肤的--seal。 */
+  [data-skin="summerB"] .tab-btn.active{background:color-mix(in srgb, var(--seal) 22%, transparent);}
   [data-skin="summerB"] .fab{box-shadow:0 0 16px -2px var(--seal), 0 3px 0 var(--seal-soft);}
   /* .save-btn全局默认background:var(--ink);color:#FFFDF8——这在其它主题里
      成立是因为--ink一直是深色(用作深色字/深色底都行)，但summerB的--ink
@@ -48,6 +52,16 @@
      强调色打底，跟FAB/图标按钮同一套发光描边。 */
   [data-skin="summerB"] .save-btn{background:var(--seal);color:#fff;box-shadow:0 0 10px -2px var(--seal);}
   [data-skin="summerB"] .papercut{color:var(--accent);font-weight:800;text-shadow:0 0 6px var(--accent), 0 0 16px color-mix(in srgb, var(--seal) 60%, transparent);}
+  /* 设置页语言/货币两个.segment的未选中态是浅底浅字这套同一个问题：
+     基础规则.segment button.active:not(.expense):not(.income)写死
+     background:var(--ink)，summerB下--ink是浅米色，配上var(--paper)当字色
+     虽然勉强能看但跟夜里霓虹发光的整体风格不搭，这里换成跟FAB/保存按钮
+     一致的--seal发光底。 */
+  [data-skin="summerB"] .segment button.active:not(.expense):not(.income){background:var(--seal);color:#fff;box-shadow:0 0 8px -2px var(--seal);}
+  /* 云同步"注册"按钮(#cloudSignUpBtn)的background:var(--ink)是写在HTML行内
+     style上的，行内样式优先级高于普通class选择器，光靠上面.save-btn那条
+     规则盖不掉，得单独用!important，否则summerB下这个按钮还是浅底浅字。 */
+  [data-skin="summerB"] #cloudSignUpBtn{background:var(--seal-soft) !important;color:var(--paper) !important;box-shadow:0 0 8px -2px var(--seal-soft);}
   /* 背景插画：星空静态图+canvas烟花动画叠在一起，只在data-skin=summerB时
      跟着当前显示的.page挂载(见JS里的updateFireworksBg/switchToPage)，换
      别的主题或切别的页面会拆掉，不会一直占着性能。position用fixed而不是
@@ -1228,6 +1242,15 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       <circle cx="18" cy="12" r="1" fill="url(#fw-icon-grad)" stroke="none"/>
       <circle cx="6" cy="12" r="1" fill="url(#fw-icon-grad)" stroke="none"/>
     </symbol>
+  <!-- ic-shirt-fw：切换主题按钮(themeBtn)的花火版，没有对应的用户参考图可描，
+       照ic-exchange-fw的做法手绘简笔线稿+fw-icon-grad渐变，外形沿用ic-shirt
+       的衣架/T恤轮廓保持可识别，加一个右上角小火花做点题。 -->
+  <symbol id="ic-shirt-fw" viewBox="0 0 24 24">
+    <path d="M8 4 4 7.5l2 2.7 2-1.4V20h8V8.8l2 1.4 2-2.7L16 4c0 1.5-1.8 2.8-4 2.8S8 5.5 8 4z" stroke="url(#fw-icon-grad)"/>
+    <path d="M9.3 13.2h5.4M12 10.5v6" stroke="url(#fw-icon-grad)" stroke-width="1.1"/>
+    <circle cx="18.6" cy="5.4" r="0.9" fill="url(#fw-icon-grad)" stroke="none"/>
+    <path d="M18.6 3.3v1M18.6 6.5v1M16.5 5.4h1M19.7 5.4h1" stroke="url(#fw-icon-grad)" stroke-width="1"/>
+  </symbol>
   <symbol id="ic-plus" viewBox="0 0 24 24"><path d="M12 4.5v15"/><path d="M4.5 12h15"/></symbol>
   <symbol id="ic-pencil" viewBox="0 0 24 24"><path d="M4 20l1-4.4L15.6 5 19 8.4 8.4 19z"/><path d="M13 7 17 10.5"/></symbol>
   <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
@@ -2289,6 +2312,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
       document.querySelectorAll(sel).forEach(useEl => useEl.setAttribute('href', '#'+base+(fw?'-fw':'')));
     };
     swap('#settingsBtn use, #settingsBtn2 use, #settingsBtn3 use', 'ic-gear');
+    swap('#themeBtn use, #themeBtn2 use, #themeBtn3 use', 'ic-shirt');
     swap('.tab-btn[data-page="ledger"] use', 'ic-book');
     swap('.tab-btn[data-page="stats"] use', 'ic-chart');
     swap('.tab-btn[data-page="rate"] use', 'ic-exchange');
