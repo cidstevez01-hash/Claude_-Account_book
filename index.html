@@ -40,6 +40,12 @@
   [data-skin="summerB"] .cat-picker-icon{box-shadow:0 0 10px -1px color-mix(in srgb, var(--ic-color, var(--seal)) 60%, transparent), 0 0 0 1px color-mix(in srgb, var(--ic-color, var(--seal)) 40%, transparent);}
   [data-skin="summerB"] .icon-btn{border:1px solid var(--seal);box-shadow:0 0 8px -2px var(--seal);color:var(--seal);}
   [data-skin="summerB"] .tab-btn.active .hd-icon{filter:drop-shadow(0 0 4px var(--seal));}
+  /* 主题切换按钮(themeBtn)图案还是原来的#ic-shirt，形状不用换，只是花火
+     皮肤下希望跟设置/记账本/统计/汇率那几个-fw图标一个色调，用
+     fw-icon-grad渐变描边盖掉.icon-btn给的纯色currentColor。 */
+  [data-skin="summerB"] #themeBtn .hd-icon,
+  [data-skin="summerB"] #themeBtn2 .hd-icon,
+  [data-skin="summerB"] #themeBtn3 .hd-icon{stroke:url(#fw-icon-grad);}
   [data-skin="summerB"] .fab{box-shadow:0 0 16px -2px var(--seal), 0 3px 0 var(--seal-soft);}
   /* .save-btn全局默认background:var(--ink);color:#FFFDF8——这在其它主题里
      成立是因为--ink一直是深色(用作深色字/深色底都行)，但summerB的--ink
@@ -684,7 +690,7 @@ l-29 25 0 213 0 214 30 26 c29 26 30 29 30 120 0 90 1 94 29 120 18 17 31 41
 -25 -10 -32 -25z"/>
 </g></symbol>
   <symbol id="ic-book-fw" viewBox="0 0 588.000000 588.000000"><g transform="translate(0.000000,588.000000) scale(0.100000,-0.100000)"
-fill="currentColor" stroke="none">
+fill="url(#fw-icon-grad)" stroke="none">
 <path d="M1898 5239 c-44 -46 -47 -65 -13 -81 14 -6 32 -22 40 -35 12 -17 25
 -23 53 -23 48 0 62 14 62 62 0 28 -6 41 -23 53 -13 8 -29 26 -35 40 -16 35
 -41 30 -84 -16z"/>
