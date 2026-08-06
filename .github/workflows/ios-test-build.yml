@@ -28,6 +28,17 @@ jobs:
       - name: 生成真实App图标(resources/icon.png -> AppIcon.appiconset,不然用的是Capacitor默认占位图标)
         run: npx capacitor-assets generate --ios
 
+      - name: 锁定竖屏(Info.plist的UISupportedInterfaceOrientations改成只留Portrait,ios/每次全新生成所以要在CI里patch,不能直接改仓库里不存在的文件)
+        run: |
+          set -e
+          PLIST=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" "$PLIST"
+
       - name: 同步网页内容+配置到原生工程
         run: npx cap sync ios
 
