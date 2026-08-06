@@ -46,6 +46,13 @@
   [data-skin="summerB"] #themeBtn .hd-icon,
   [data-skin="summerB"] #themeBtn2 .hd-icon,
   [data-skin="summerB"] #themeBtn3 .hd-icon{stroke:url(#fw-icon-grad);}
+  /* #ic-shirt图案本身在24视口里只占16/24≈67%(比金鱼图标的85%小一截)，
+     但#ic-shirt是"基本"皮肤也在用的共享图形，不能直接改它的viewBox
+     (会连带把基本皮肤下的衣服图标也放大)。花火皮肤单独用scale放大到
+     0.85/0.667≈1.27倍，视觉上跟其它几个-fw图标的尺寸对齐。 */
+  [data-skin="summerB"] #themeBtn .hd-icon,
+  [data-skin="summerB"] #themeBtn2 .hd-icon,
+  [data-skin="summerB"] #themeBtn3 .hd-icon{transform:scale(1.274);transform-origin:center;}
   [data-skin="summerB"] .fab{box-shadow:0 0 16px -2px var(--seal), 0 3px 0 var(--seal-soft);}
   /* .save-btn全局默认background:var(--ink);color:#FFFDF8——这在其它主题里
      成立是因为--ink一直是深色(用作深色字/深色底都行)，但summerB的--ink
@@ -452,7 +459,7 @@
       <stop offset="55%" stop-color="#E85D4A"/>
       <stop offset="100%" stop-color="#F2967F"/>
     </radialGradient>
-  <symbol id="ic-gear-fw" viewBox="0 0 510.000000 510.000000"><g transform="translate(0.000000,510.000000) scale(0.100000,-0.100000)"
+  <symbol id="ic-gear-fw" viewBox="11.47 11.36 487.07 487.07"><g transform="translate(0.000000,510.000000) scale(0.100000,-0.100000)"
 fill="url(#fw-icon-grad)" stroke="none">
 <path d="M2347 4613 c-16 -15 -5 -44 23 -58 25 -13 30 -22 30 -51 0 -31 11
 -46 110 -145 61 -60 115 -109 120 -109 6 0 10 -20 10 -44 0 -38 4 -48 30 -66
@@ -689,7 +696,7 @@ l-29 25 0 213 0 214 30 26 c29 26 30 29 30 120 0 90 1 94 29 120 18 17 31 41
 25 23 55 0 30 -5 43 -23 55 -13 8 -29 26 -35 40 -7 15 -20 25 -32 25 -12 0
 -25 -10 -32 -25z"/>
 </g></symbol>
-  <symbol id="ic-book-fw" viewBox="0 0 588.000000 588.000000"><g transform="translate(0.000000,588.000000) scale(0.100000,-0.100000)"
+  <symbol id="ic-book-fw" viewBox="11.50 8.61 565.01 565.01"><g transform="translate(0.000000,588.000000) scale(0.100000,-0.100000)"
 fill="url(#fw-icon-grad)" stroke="none">
 <path d="M1898 5239 c-44 -46 -47 -65 -13 -81 14 -6 32 -22 40 -35 12 -17 25
 -23 53 -23 48 0 62 14 62 62 0 28 -6 41 -23 53 -13 8 -29 26 -35 40 -16 35
@@ -866,7 +873,7 @@ c-121 0 -126 -1 -141 -23 -8 -13 -26 -29 -40 -35 -35 -16 -32 -48 5 -67 25
 <path d="M2652 1188 c-16 -16 -16 -80 0 -96 7 -7 40 -12 78 -12 76 0 90 9 90
 60 0 51 -14 60 -90 60 -38 0 -71 -5 -78 -12z"/>
 </g></symbol>
-  <symbol id="ic-chart-fw" viewBox="0 0 1020.000000 1020.000000"><g transform="translate(0.000000,1020.000000) scale(0.100000,-0.100000)"
+  <symbol id="ic-chart-fw" viewBox="22.58 25.55 974.91 974.91"><g transform="translate(0.000000,1020.000000) scale(0.100000,-0.100000)"
 fill="url(#fw-icon-grad)" stroke="none">
 <path d="M4332 8988 c-7 -7 -12 -39 -12 -76 l0 -63 150 -149 c132 -131 150
 -153 150 -181 0 -26 11 -42 60 -89 52 -49 60 -62 60 -93 0 -28 6 -40 30 -57
