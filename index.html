@@ -120,7 +120,13 @@
      不然滚动的卡片经过头部下面时会跟透明的头部区域叠在一起看不清。
      position/z-index单独用.page > .header覆盖,因为下面`.page > *:not(.fw-bg-layer)`
      那条规则选择器带两个class、优先级比单纯的.header高,直接写在.header里会被吃掉 */
-  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:0 -16px 16px; padding:6px 16px 12px; background:var(--paper); opacity:1; transition:opacity 0.2s ease;}
+  /* 头部在未滚动的初始状态下,自然位置是.app的padding-top(safe-top+18px)决定的,
+     比.status-bar-bg的下边缘(safe-top)整整低18px——两块紧挨着的实心色块之间会露出
+     18px的缝(缝里是空的,能看到底下的花火背景/或者别的东西透出来)。用margin-top:-18px
+     把头部整体往上顶,让它一开始就跟状态栏条无缝贴合(不用等滚动触发sticky才贴上);
+     顶掉的这18px换算成padding-top补回头部内部(6px+18px=24px),标题文字相对头部
+     自己顶边的视觉间距不变,只是这份留白从"头部外面的透明缝"挪到了"头部自己的实心背景内" */
+  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:-18px -16px 16px; padding:24px 16px 12px; background:var(--paper); opacity:1; transition:opacity 0.2s ease;}
   .page > .header{position:sticky; top:var(--safe-top); z-index:16;}
   /* 状态栏那截.status-bar-bg滑动时会淡出,头部这块紧接在它正下方、同样是纸色实心底,
      两块颜色一样但只有上面那块跟着滑动淡出的话,滑动过程中会看起来"上面透明、下面还是实心"
