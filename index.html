@@ -107,8 +107,13 @@
      不然滚动的卡片经过头部下面时会跟透明的头部区域叠在一起看不清。
      position/z-index单独用.page > .header覆盖,因为下面`.page > *:not(.fw-bg-layer)`
      那条规则选择器带两个class、优先级比单纯的.header高,直接写在.header里会被吃掉 */
-  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:0 -16px 16px; padding:6px 16px 12px; background:var(--paper);}
+  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:0 -16px 16px; padding:6px 16px 12px; background:var(--paper); opacity:1; transition:opacity 0.2s ease;}
   .page > .header{position:sticky; top:var(--safe-top); z-index:16;}
+  /* 状态栏那截.status-bar-bg滑动时会淡出,头部这块紧接在它正下方、同样是纸色实心底,
+     两块颜色一样但只有上面那块跟着滑动淡出的话,滑动过程中会看起来"上面透明、下面还是实心"
+     一截一截很不协调——头部这块也加上同样的淡出,滑动时两块一起变透明、停下来一起变回实心,
+     看起来像同一整条 */
+  .header.is-scrolling{opacity:0;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
   .header .month{font-size:13px; color:var(--ink-soft); margin-top:4px;}
   .header-right{display:flex;gap:8px;align-items:flex-start;}
@@ -1952,16 +1957,24 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const row = $('nativeAppVersionRow');
     if(row) row.style.display = '';
   }
-  // 试验方案：滑动时状态栏这块实心条淡出变透明，停下来170ms后淡回实心——
-  // 网页/PWA模式下这块条高度恒为0，加不加这个监听肉眼看不出区别，不用额外判断是否原生环境
+  // 试验方案：滑动时状态栏实心条+头部这两块紧挨着的纸色实心底一起淡出变透明，停下来170ms后
+  // 一起淡回实心——两块颜色一样，只淡其中一块的话滑动过程中会看起来一截透明一截不透明很不协调，
+  // 所以两块共用同一个滚动监听、同步切换.is-scrolling。头部每个页面各有一份(#pageLedger/
+  // #pageStats/#pageRate),不管当前显示哪个都一起toggle,反正隐藏的页面看不见,无所谓
+  // 网页/PWA模式下状态栏那块条高度恒为0，加不加这个监听肉眼看不出区别，不用额外判断是否原生环境
   (function initStatusBarScrollFade(){
     const bar = document.querySelector('.status-bar-bg');
-    if(!bar) return;
+    const headers = document.querySelectorAll('.header');
+    if(!bar && !headers.length) return;
     let scrollFadeTimer = null;
+    function setFading(on){
+      if(bar) bar.classList.toggle('is-scrolling', on);
+      headers.forEach(h=> h.classList.toggle('is-scrolling', on));
+    }
     window.addEventListener('scroll', function(){
-      bar.classList.add('is-scrolling');
+      setFading(true);
       clearTimeout(scrollFadeTimer);
-      scrollFadeTimer = setTimeout(()=> bar.classList.remove('is-scrolling'), 170);
+      scrollFadeTimer = setTimeout(()=> setFading(false), 170);
     }, {passive:true, capture:true});
   })();
   function starSkySvg(){
