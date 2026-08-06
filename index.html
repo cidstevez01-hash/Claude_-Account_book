@@ -1592,6 +1592,10 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     <button type="button" class="save-btn" id="cloudSignOutBtn" style="margin-top:0;padding:11px 4px;font-size:13px;background:var(--seal);"></button>
   </div>
   <div id="cloudSyncHelpText" style="font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-top:8px;"></div>
+  <!-- 只在原生App里显示,网页/PWA模式下不需要——版本号文字是iOS编译时CI脚本把
+       __NATIVE_APP_VERSION__这个占位符替换成真实版本号写进www/index.html的,
+       仓库里这份源文件本身不会被替换,网页版永远走不到这行(display:none且没有native判断不会显示) -->
+  <div id="nativeAppVersionRow" style="display:none;font-size:11.5px;color:var(--ink-faint);text-align:center;margin-top:14px;">App版本 __NATIVE_APP_VERSION__</div>
 </div>
 
 <div class="sheet" id="themeSheet" style="max-height:92vh;">
@@ -1933,6 +1937,14 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     if(!StatusBar) return;
     const isDarkSkin = document.documentElement.getAttribute('data-skin') === 'summerB';
     StatusBar.setStyle({style:isDarkSkin?'LIGHT':'DARK'}).catch(()=>{});
+  }
+  // 设置页底部显示当前App版本号,只在原生App里出现——版本号文字是CI编译时写进去的,
+  // 网页/PWA模式下这行永远保持隐藏
+  function revealNativeVersionRow(){
+    const Cap = window.Capacitor;
+    if(!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;
+    const row = $('nativeAppVersionRow');
+    if(row) row.style.display = '';
   }
   function starSkySvg(){
     const c = {seal:'#E85D4A', accent:'#F2C94C', jade:'#4FD1A5', sealSoft:'#F2967F', card:'#1A2C4D', paper:'#101B33'};
@@ -5225,6 +5237,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     };
     await step('loadSettings', loadSettings);
     await step('applyThemeSkin', async ()=> applyThemeSkin());
+    await step('revealNativeVersionRow', async ()=> revealNativeVersionRow());
     await step('loadCatalogData', loadCatalogData);
     await step('applyStaticI18n', applyStaticI18n);
     await step('setMonthLabel', setMonthLabel);

@@ -1,0 +1,168 @@
+name: iOS 发布(GitHub Release + AltStore更新源)
+
+# 手动触发,只在"已经在测试分支上验证过没问题、决定要发布"的时候才点一下(通常是合并进
+# 主分支之后)。跟ios-test-build.yml的区别:这个workflow除了出.ipa,还会:
+# ①发一个内容固定的GitHub Release(标签固定叫ios-latest,每次发布覆盖同一个标签下的文件,
+#   保证下载链接永远不变)②生成/更新一份AltStore更新源JSON(altstore-source.json)一起
+#   传上去。用户在AltStore里把这个JSON的地址加成"更新源"一次,以后每次发新版,AltStore
+#   自己就能查到新版本、点一下重新拉取+签名安装,不用再手动复制ipa下载链接。
+# Sideloadly那条路完全不受影响——它只认.ipa文件本身,不看这个workflow产出的Release/JSON。
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+env:
+  ALTSTORE_RELEASE_TAG: ios-latest
+  IPA_FILENAME: jiazhangbu-unsigned.ipa
+  MANIFEST_FILENAME: altstore-source.json
+  ICON_FILENAME: icon.png
+
+jobs:
+  release-ipa-and-altstore-source:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 算版本号(跟ios-test-build.yml用同一套算法:VERSION文件的语义版本号+Actions运行号当build号)
+        run: |
+          echo "APP_VERSION=$(cat VERSION | tr -d '[:space:]')" >> "$GITHUB_ENV"
+          echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
+
+      - name: 安装依赖 + 生成www/(把版本号占位符换成真实版本号)
+        run: |
+          npm install
+          npm run build
+          sed -i '' "s/__NATIVE_APP_VERSION__/${APP_VERSION} (${APP_BUILD_NUMBER})/g" www/index.html
+
+      - name: 生成iOS原生工程(ios/不提交进仓库,每次CI都是全新生成)
+        run: npx cap add ios
+
+      - name: 生成真实App图标(resources/icon.png -> AppIcon.appiconset)
+        run: npx capacitor-assets generate --ios
+
+      - name: 锁定竖屏+写版本号(Info.plist每次CI全新生成,只能在这一步patch)
+        run: |
+          set -e
+          PLIST=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${APP_VERSION}" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${APP_BUILD_NUMBER}" "$PLIST"
+
+      - name: 同步网页内容+配置到原生工程
+        run: npx cap sync ios
+
+      - name: pod install
+        working-directory: ios/App
+        run: pod install --repo-update
+
+      - name: 编译(不签名,签名这一步交给AltStore/Sideloadly用你自己的Apple ID在装机时现场做)
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE="" \
+            build
+
+      - name: 打包成.ipa(未签名,文件名固定,配合固定的Release标签让下载链接不变)
+        run: |
+          set -e
+          PRODUCTS_DIR="ios/build/Build/Products/Release-iphoneos"
+          cd "$PRODUCTS_DIR"
+          mkdir -p Payload
+          cp -r App.app Payload/
+          zip -r "$GITHUB_WORKSPACE/${IPA_FILENAME}" Payload
+          echo "IPA_SIZE=$(stat -f%z "$GITHUB_WORKSPACE/${IPA_FILENAME}")" >> "$GITHUB_ENV"
+
+      - name: 准备AltStore更新源用的图标(从resources/icon.png复制一份跟ipa一起发布,不依赖仓库分支名会不会变)
+        run: cp resources/icon.png "$GITHUB_WORKSPACE/${ICON_FILENAME}"
+
+      - name: 生成AltStore更新源JSON(altstore-source.json)
+        run: |
+          python3 - <<'EOF'
+          import json, os, datetime
+
+          version = os.environ['APP_VERSION']
+          build_number = os.environ['APP_BUILD_NUMBER']
+          size = int(os.environ['IPA_SIZE'])
+          repo = os.environ['GITHUB_REPOSITORY']
+          tag = os.environ['ALTSTORE_RELEASE_TAG']
+          ipa_name = os.environ['IPA_FILENAME']
+          icon_name = os.environ['ICON_FILENAME']
+          now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+          base = f"https://github.com/{repo}/releases/download/{tag}"
+          download_url = f"{base}/{ipa_name}"
+          icon_url = f"{base}/{icon_name}"
+
+          app = {
+              "name": "记账本",
+              "bundleIdentifier": "com.cidstevez01.jiazhangbu",
+              "developerName": "cidstevez01",
+              "subtitle": "个人记账本(测试版,非App Store签名)",
+              "localizedDescription": f"个人记账本测试版,通过AltStore自签名安装。build {build_number}。",
+              "iconURL": icon_url,
+              "tintColor": "e3b23c",
+              "version": version,
+              "versionDate": now,
+              "downloadURL": download_url,
+              "size": size,
+              "versions": [
+                  {
+                      "version": version,
+                      "date": now,
+                      "localizedDescription": f"build {build_number}",
+                      "downloadURL": download_url,
+                      "size": size,
+                  }
+              ],
+          }
+          source = {
+              "name": "记账本 更新源",
+              "identifier": "com.cidstevez01.jiazhangbu.altstore-source",
+              "apps": [app],
+          }
+          with open(os.path.join(os.environ['GITHUB_WORKSPACE'], os.environ['MANIFEST_FILENAME']), 'w', encoding='utf-8') as f:
+              json.dump(source, f, ensure_ascii=False, indent=2)
+          EOF
+
+      - name: 发布/覆盖固定的GitHub Release(标签固定为${{ env.ALTSTORE_RELEASE_TAG }},下载链接永远不变)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          gh release delete "${ALTSTORE_RELEASE_TAG}" --yes --cleanup-tag || true
+          gh release create "${ALTSTORE_RELEASE_TAG}" \
+            --title "记账本 iOS测试包 v${APP_VERSION} (build ${APP_BUILD_NUMBER})" \
+            --notes "AltStore更新源自动发布,版本 ${APP_VERSION} build ${APP_BUILD_NUMBER}。这个Release的文件会在下次发布时被覆盖,不要依赖具体的Release页面链接,请用下面的更新源地址加进AltStore:
+          \`\`\`
+          https://github.com/${{ github.repository }}/releases/download/${ALTSTORE_RELEASE_TAG}/${MANIFEST_FILENAME}
+          \`\`\`" \
+            "${IPA_FILENAME}" \
+            "${MANIFEST_FILENAME}" \
+            "${ICON_FILENAME}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jiazhangbu-release-v${{ env.APP_VERSION }}-${{ env.APP_BUILD_NUMBER }}
+          path: |
+            ${{ env.IPA_FILENAME }}
+            ${{ env.MANIFEST_FILENAME }}
+          retention-days: 14

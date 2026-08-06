@@ -17,10 +17,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: 安装依赖 + 生成www/(把index.html原样拷进去,没有额外构建步骤)
+      - name: 算版本号(VERSION文件的语义版本号 + Actions运行号当build号,每次编译必定不一样、方便区分装的是哪一次)
+        run: |
+          echo "APP_VERSION=$(cat VERSION | tr -d '[:space:]')" >> "$GITHUB_ENV"
+          echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
+
+      - name: 安装依赖 + 生成www/(把index.html原样拷进去,顺带把版本号占位符换成真实版本号)
         run: |
           npm install
           npm run build
+          sed -i '' "s/__NATIVE_APP_VERSION__/${APP_VERSION} (${APP_BUILD_NUMBER})/g" www/index.html
 
       - name: 生成iOS原生工程(ios/不提交进仓库,每次CI都是全新生成)
         run: npx cap add ios
@@ -28,7 +34,7 @@ jobs:
       - name: 生成真实App图标(resources/icon.png -> AppIcon.appiconset,不然用的是Capacitor默认占位图标)
         run: npx capacitor-assets generate --ios
 
-      - name: 锁定竖屏(Info.plist的UISupportedInterfaceOrientations改成只留Portrait,ios/每次全新生成所以要在CI里patch,不能直接改仓库里不存在的文件)
+      - name: 锁定竖屏+写版本号(Info.plist每次CI全新生成,不能直接改仓库里不存在的文件,只能在这一步patch)
         run: |
           set -e
           PLIST=ios/App/App/Info.plist
@@ -38,6 +44,8 @@ jobs:
           /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" "$PLIST" || true
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$PLIST"
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${APP_VERSION}" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${APP_BUILD_NUMBER}" "$PLIST"
 
       - name: 同步网页内容+配置到原生工程
         run: npx cap sync ios
@@ -67,10 +75,10 @@ jobs:
           cd "$PRODUCTS_DIR"
           mkdir -p Payload
           cp -r App.app Payload/
-          zip -r "$GITHUB_WORKSPACE/jiazhangbu-unsigned.ipa" Payload
+          zip -r "$GITHUB_WORKSPACE/jiazhangbu-unsigned-v${APP_VERSION}-${APP_BUILD_NUMBER}.ipa" Payload
 
       - uses: actions/upload-artifact@v4
         with:
-          name: jiazhangbu-unsigned-ipa
-          path: jiazhangbu-unsigned.ipa
+          name: jiazhangbu-unsigned-ipa-v${{ env.APP_VERSION }}-${{ env.APP_BUILD_NUMBER }}
+          path: jiazhangbu-unsigned-v${{ env.APP_VERSION }}-${{ env.APP_BUILD_NUMBER }}.ipa
           retention-days: 14
