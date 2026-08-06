@@ -79,6 +79,11 @@
                 3px 4px 0 rgba(58,47,40,0.16);
   }
   .washi-tape{position:absolute;top:-8px;left:14px;width:56px;height:20px;background:repeating-linear-gradient(-45deg, rgba(227,178,60,0.55) 0 6px, rgba(227,178,60,0.32) 6px 12px);transform:rotate(-5deg);border-radius:2px;opacity:0.9;pointer-events:none;}
+  /* iOS原生状态栏没有"设背景色"这个API(StatusBar插件的setBackgroundColor/setOverlaysWebView
+     在iOS上都是no-op，只有Android有效)，网页内容又是contentInset:never整屏铺满，滚动的卡片
+     会直接穿到状态栏那条区域里。唯一在iOS上可靠的办法是自己在最顶上钉一条position:fixed的
+     实心色块盖住状态栏那一截，跟随主题色切换、不随页面滚动。 */
+  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:var(--paper); z-index:17; pointer-events:none;}
   .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
   #pageLedger{ padding-bottom:60px; }
   .page{display:none;}
@@ -419,6 +424,7 @@
 </style>
 </head>
 <body>
+<div class="status-bar-bg"></div>
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
 <defs>
   <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6"/></symbol>
@@ -1915,19 +1921,17 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     updateFireworksBg();
     updateNativeStatusBar();
   }
-  // 打包成App(Capacitor)之后,原生状态栏默认是透明覆盖在网页上面的——之前用contentInset:"never"
-  // 让网页画到状态栏底下解决了顶部露出原生黑底的问题,但代价是滚动到底的内容会从透明状态栏里"透"出来,
-  // 跟时间/信号格这些系统图标叠在一起看不清。这里改成让状态栏用实色打底(颜色跟随当前主题的纸面色),
-  // 不透明,滚动内容自然不会再透上来;只在真机App环境下生效,网页/PWA模式下Capacitor全局对象不存在直接跳过
+  // 打包成App(Capacitor)之后,原生状态栏默认是透明覆盖在网页上面的,且iOS上StatusBar插件的
+  // setBackgroundColor/setOverlaysWebView这两个API根本没实现(只在Android有效,iOS状态栏原生
+  // 就没有"设背景色"这回事)——不能靠原生API打底,只能靠CSS里的.status-bar-bg那个fixed实色块
+  // 自己盖住状态栏区域(见样式表.status-bar-bg注释)。这里只保留setStyle切状态栏图标黑/白色,
+  // 这个是iOS/Android都支持的;只在真机App环境下生效,网页/PWA模式下Capacitor全局对象不存在直接跳过
   function updateNativeStatusBar(){
     const Cap = window.Capacitor;
     if(!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;
     const StatusBar = Cap.Plugins && Cap.Plugins.StatusBar;
     if(!StatusBar) return;
-    const paper = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim() || '#F7F1E7';
     const isDarkSkin = document.documentElement.getAttribute('data-skin') === 'summerB';
-    StatusBar.setOverlaysWebView({overlay:false}).catch(()=>{});
-    StatusBar.setBackgroundColor({color:paper}).catch(()=>{});
     StatusBar.setStyle({style:isDarkSkin?'LIGHT':'DARK'}).catch(()=>{});
   }
   function starSkySvg(){
