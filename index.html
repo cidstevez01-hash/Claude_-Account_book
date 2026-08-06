@@ -83,7 +83,9 @@
      在iOS上都是no-op，只有Android有效)，网页内容又是contentInset:never整屏铺满，滚动的卡片
      会直接穿到状态栏那条区域里。唯一在iOS上可靠的办法是自己在最顶上钉一条position:fixed的
      实心色块盖住状态栏那一截，跟随主题色切换、不随页面滚动。 */
-  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:var(--paper); z-index:17; pointer-events:none;}
+  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:var(--paper); z-index:17; pointer-events:none; opacity:1; transition:opacity 0.2s ease;}
+  /* 试验方案：滑动过程中这块实心条淡出变透明，停下来后淡回实心——见下面JS的scroll监听 */
+  .status-bar-bg.is-scrolling{opacity:0;}
   .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
   #pageLedger{ padding-bottom:60px; }
   .page{display:none;}
@@ -1946,6 +1948,18 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
     const row = $('nativeAppVersionRow');
     if(row) row.style.display = '';
   }
+  // 试验方案：滑动时状态栏这块实心条淡出变透明，停下来170ms后淡回实心——
+  // 网页/PWA模式下这块条高度恒为0，加不加这个监听肉眼看不出区别，不用额外判断是否原生环境
+  (function initStatusBarScrollFade(){
+    const bar = document.querySelector('.status-bar-bg');
+    if(!bar) return;
+    let scrollFadeTimer = null;
+    window.addEventListener('scroll', function(){
+      bar.classList.add('is-scrolling');
+      clearTimeout(scrollFadeTimer);
+      scrollFadeTimer = setTimeout(()=> bar.classList.remove('is-scrolling'), 170);
+    }, {passive:true, capture:true});
+  })();
   function starSkySvg(){
     const c = {seal:'#E85D4A', accent:'#F2C94C', jade:'#4FD1A5', sealSoft:'#F2967F', card:'#1A2C4D', paper:'#101B33'};
     const moon = `<circle cx="258" cy="34" r="15" fill="${c.accent}" fill-opacity="0.3"/>`;
