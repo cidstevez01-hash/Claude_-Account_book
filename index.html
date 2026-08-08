@@ -101,7 +101,10 @@
      会直接穿到状态栏那条区域里。唯一在iOS上可靠的办法是自己在最顶上钉一条position:fixed的
      实心色块盖住状态栏那一截，跟随主题色切换、不随页面滚动。 */
   /* 试验：状态栏这块实心条先改成透明看看效果，不确定要不要保留 */
-  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:transparent; z-index:17; pointer-events:none; opacity:1; transition:opacity 0.2s ease;}
+  /* 完全透明会让滑动经过的内容原样穿帮,完全不透明又挡住了花火主题的星空/烟花背景——
+     改成半透明纸色+毛玻璃模糊(iOS原生导航栏那种效果),经过的内容变成模糊的色块看不清细节,
+     同时花火背景的星星/烟花轮廓还能隐约透出来,两头兼顾 */
+  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:color-mix(in srgb, var(--paper) 55%, transparent); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); z-index:17; pointer-events:none; opacity:1; transition:opacity 0.2s ease, background-color 0.2s ease;}
   /* 试验方案：滑动过程中这块实心条淡出变透明，停下来后淡回实心——见下面JS的scroll监听 */
   .status-bar-bg.is-scrolling{opacity:0;}
   .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
@@ -131,7 +134,7 @@
      把头部整体往上顶,让它一开始就跟状态栏条无缝贴合(不用等滚动触发sticky才贴上);
      顶掉的这18px换算成padding-top补回头部内部(6px+18px=24px),标题文字相对头部
      自己顶边的视觉间距不变,只是这份留白从"头部外面的透明缝"挪到了"头部自己的实心背景内" */
-  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:-18px -16px 16px; padding:24px 16px 12px; background:var(--paper); opacity:1; transition:opacity 0.2s ease;}
+  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:-18px -16px 16px; padding:24px 16px 12px; background:color-mix(in srgb, var(--paper) 55%, transparent); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); opacity:1; transition:opacity 0.2s ease, background-color 0.2s ease;}
   .page > .header{position:sticky; top:var(--safe-top); z-index:16;}
   /* 状态栏那截.status-bar-bg滑动时会淡出,头部这块紧接在它正下方、同样是纸色实心底,
      两块颜色一样但只有上面那块跟着滑动淡出的话,滑动过程中会看起来"上面透明、下面还是实心"
