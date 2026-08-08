@@ -44,14 +44,19 @@
      专属的ic-shirt-fw(折扇+飘带，AI生成线稿+potrace描摹，流程跟金鱼/
      孔明灯一致)，fill/viewBox都已经在symbol里配好，不再需要这两条CSS
      hack。 */
-  /* 设置按钮反馈"图标比圆圈小一大圈"：图标本身内容占比已经跟其它-fw
+  /* 设置/主题按钮反馈"图标比圆圈小一大圈"：图标本身内容占比已经跟其它-fw
      图标一致(见ic-chart-fw注释)，问题在于.icon-btn svg默认只给17px，
-     在40px的圆按钮里显得空。这里单独把设置按钮的图标框放大到28px
-     (17px是.icon-btn svg{width/height:17px}的全局默认，其它icon-btn
-     如themeBtn/settingsCloseBtn不受影响)。 */
+     在40px的圆按钮里显得空。这里统一把两个按钮的图标框放大到圆圈
+     直径(40px)的63% = 25.2px(17px是.icon-btn svg{width/height:17px}的
+     全局默认，其它icon-btn如settingsCloseBtn不受影响)。 */
   [data-skin="summerB"] #settingsBtn .hd-icon,
   [data-skin="summerB"] #settingsBtn2 .hd-icon,
-  [data-skin="summerB"] #settingsBtn3 .hd-icon{width:28px;height:28px;}
+  [data-skin="summerB"] #settingsBtn3 .hd-icon,
+  [data-skin="summerB"] #themeBtn .hd-icon,
+  [data-skin="summerB"] #themeBtn2 .hd-icon,
+  [data-skin="summerB"] #themeBtn3 .hd-icon{width:25.2px;height:25.2px;}
+  /* 底部标签栏反馈"显得太空"：三个图标从默认20px放大到27px */
+  [data-skin="summerB"] .tab-btn .hd-icon{width:27px;height:27px;}
   [data-skin="summerB"] .fab{box-shadow:0 0 16px -2px var(--seal), 0 3px 0 var(--seal-soft);}
   /* .save-btn全局默认background:var(--ink);color:#FFFDF8——这在其它主题里
      成立是因为--ink一直是深色(用作深色字/深色底都行)，但summerB的--ink
@@ -708,7 +713,7 @@ l-29 25 0 213 0 214 30 26 c29 26 30 29 30 120 0 90 1 94 29 120 18 17 31 41
 -25 -10 -32 -25z"/>
 </g></symbol>
   <symbol id="ic-book-fw" viewBox="11.50 8.61 565.01 565.01"><g transform="translate(0.000000,588.000000) scale(0.100000,-0.100000)"
-fill="url(#fw-icon-grad)" stroke="none">
+fill="url(#fw-icon-grad)" stroke="url(#fw-icon-grad)" stroke-width="18" stroke-linejoin="round">
 <path d="M1898 5239 c-44 -46 -47 -65 -13 -81 14 -6 32 -22 40 -35 12 -17 25
 -23 53 -23 48 0 62 14 62 62 0 28 -6 41 -23 53 -13 8 -29 26 -35 40 -16 35
 -41 30 -84 -16z"/>
@@ -886,8 +891,8 @@ c-121 0 -126 -1 -141 -23 -8 -13 -26 -29 -40 -35 -35 -16 -32 -48 5 -67 25
 </g></symbol>
   <!-- ic-chart-fw：花火皮肤下现在是设置按钮在用(原来是统计tab用的
        烟花图标，两个按钮互换了)，viewBox裁得比其它-fw图标更紧
-       (内容占比~98%)，配合CSS里#settingsBtn .hd-icon放大到28px，
-       解决"设置按钮图标比圆圈小一大圈"的反馈。 -->
+       (内容占比~98%)，配合CSS里#settingsBtn/#themeBtn .hd-icon放大到
+       圆圈直径的63%(25.2px)，解决"设置按钮图标比圆圈小一大圈"的反馈。 -->
   <symbol id="ic-chart-fw" viewBox="87.46 90.43 845.13 845.13"><g transform="translate(0.000000,1020.000000) scale(0.100000,-0.100000)"
 fill="url(#fw-icon-grad)" stroke="none">
 <path d="M4332 8988 c-7 -7 -12 -39 -12 -76 l0 -63 150 -149 c132 -131 150
@@ -1255,7 +1260,7 @@ l44 44 0 486 0 485 30 21 30 21 0 335 0 335 30 27 29 27 2 150 c3 153 9 185
        两条鱼中心连线方向朝反方向推开(数值是在potrace原始坐标系里算的，
        跟外层scale(0.1,-0.1)配合，最终视觉间距约拉开816视口的10%)。 -->
   <symbol id="ic-exchange-fw" viewBox="0 0 816 816">
-    <g transform="translate(0,816) scale(0.1,-0.1)" fill="none" stroke="url(#fw-icon-grad)" stroke-width="300" stroke-linejoin="round" stroke-linecap="round">
+    <g transform="translate(0,816) scale(0.1,-0.1)" fill="none" stroke="url(#fw-icon-grad)" stroke-width="380" stroke-linejoin="round" stroke-linecap="round">
       <g transform="translate(-664.8,444.0)"><path d="M3523 7205 c-23 -61 24 -144 156 -275 64 -63 131 -136 148 -162 17
 -25 55 -65 83 -87 35 -28 46 -41 33 -41 -255 -2 -659 -94 -873 -200 -27 -13
 -72 -19 -190 -23 -544 -21 -922 -233 -1105 -620 -44 -92 -121 -359 -109 -378
@@ -1302,7 +1307,7 @@ c223 2 295 13 447 70 250 94 465 299 581 556 97 215 90 249 -26 128 -150 -157
        给设置按钮用了(见ic-chart-fw上面的注释)。viewBox裁到内容占比~98%，
        用户反馈"可以放大一点"后从84%调过来的。 -->
   <symbol id="ic-lantern-fw" viewBox="13.53 25.80 219.99 219.99">
-    <g transform="translate(0,256) scale(0.1,-0.1)" fill="url(#fw-icon-grad)" stroke="none">
+    <g transform="translate(0,256) scale(0.1,-0.1)" fill="url(#fw-icon-grad)" stroke="url(#fw-icon-grad)" stroke-width="18" stroke-linejoin="round">
 <path d="M1175 2271 c-7 -12 12 -24 25 -16 11 7 4 25 -10 25 -5 0 -11 -4 -15
 -9z"/>
 <path d="M1295 2170 c-4 -6 -3 -16 3 -22 6 -6 12 -6 17 2 4 6 3 16 -3 22 -6 6
@@ -1382,7 +1387,7 @@ m-191 -69 c26 -33 35 -55 34 -81 0 -33 -1 -34 -10 -12 -5 13 -23 41 -40 63
        呼应夏日祭典意象——AI生成创意线稿+potrace描摹成矢量，跟孔明灯/
        金鱼同一套流程。viewBox裁到内容占比~98%，跟其它-fw图标统一。 -->
   <symbol id="ic-shirt-fw" viewBox="30.24 33.24 194.18 194.18">
-    <g transform="translate(0,256) scale(0.1,-0.1)" fill="url(#fw-icon-grad)" stroke="none">
+    <g transform="translate(0,256) scale(0.1,-0.1)" fill="url(#fw-icon-grad)" stroke="url(#fw-icon-grad)" stroke-width="18" stroke-linejoin="round">
 <path d="M1917 2190 c-3 -8 -8 -27 -11 -42 -5 -21 -14 -29 -41 -34 -19 -3 -35
 -10 -35 -14 0 -4 16 -11 35 -14 27 -5 36 -13 41 -34 12 -54 16 -57 28 -17 9
 32 18 42 44 50 17 5 32 12 32 15 0 3 -15 10 -32 15 -26 8 -35 18 -44 50 -7 24
