@@ -299,7 +299,7 @@
   .save-btn.is-loading{animation:pulseBg 1s ease-in-out infinite;}
   /* 日别/月别切换改成一对圆形图标按钮,居中放在合并后的卡片顶部(见#compareCard),
      不再是撑满整行的胶囊分段——避免跟上面"收支/积分"那个满宽胶囊长得一样、贴在一起显得重复 */
-  .dim-toggle-row{display:flex; justify-content:center; align-items:center; gap:18px; margin:4px 0 16px;}
+  .dim-toggle-row{display:flex; justify-content:center; align-items:center; gap:10px; margin:4px 0 16px;}
   .dim-toggle-row button{width:36px;height:36px;border-radius:50%;border:2px dashed var(--grid);background:var(--card);color:var(--ink-soft);font-size:12.5px;font-family:'Noto Sans SC',sans-serif;display:flex;align-items:center;justify-content:center;padding:0;transition:all 0.15s ease;}
   .dim-toggle-row button.active{background:var(--seal);border-color:var(--seal);border-style:solid;color:#fff;}
   /* 今天支出/今天收入的对比数字复用.stats-row/.stat(累计残高卡同一套),
@@ -1942,7 +1942,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
-  // 每次有实质性改动部署时手动改一下这个值,配合下面的 checkForAppUpdate() 提示用户刷新
+  // 更新检测已经改成直接比对页面源码文本(见下面checkForAppUpdate),不再依赖这个值——
+  // 保留只是方便调试时肉眼确认当前跑的是哪个版本,改不改都不影响更新提示是否生效
   const APP_BUILD = '20260808a';
   const I18N = {
     zh:{
@@ -3355,17 +3356,22 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   window.addEventListener('pageshow', (ev)=>{ if(ev.persisted){ resyncCloudOnResume(); checkForAppUpdate(); } });
 
   // GitHub Pages部署后CDN缓存要过一阵子才会真正刷新,App开着不关的话不会自己知道有新版本。
-  // 定期悄悄拉一次自己这个页面(带时间戳绕过缓存),比对页面里写的版本号,不一样就在右边缘弹出一个可折叠的小标签
+  // 定期悄悄拉一次自己这个页面(带时间戳绕过缓存),不一样就在右边缘弹出一个可折叠的小标签
   // (不做成自动刷新,避免正在填账目填到一半被强制刷掉)
+  // 之前靠比对APP_BUILD版本号判断有没有更新,但这个号需要每次实质性改动都手动改一下——
+  // 多个会话并发提交时很容易漏改,漏了就等于更新提示永久失效。改成直接比对整段页面源码文本:
+  // 第一次成功拉取时把原始HTML存成基准,之后每次定期拉取跟基准逐字比对,文件有任何改动都测得出来,
+  // 不再依赖人记得手动改数字。APP_BUILD常量保留,只作调试时肉眼确认版本用,不参与判断。
   let updateTabShown = false;
+  let appBaselineSrc = null;
   async function checkForAppUpdate(){
     if(updateTabShown) return;
     try{
       const res = await fetch(location.pathname + '?_v=' + Date.now(), {cache:'no-store'});
       if(!res.ok) return;
       const text = await res.text();
-      const m = text.match(/const APP_BUILD\s*=\s*'([^']+)'/);
-      if(m && m[1] && m[1] !== APP_BUILD) showUpdateTab();
+      if(appBaselineSrc === null){ appBaselineSrc = text; return; }
+      if(text !== appBaselineSrc) showUpdateTab();
     }catch(e){}
   }
   function showUpdateTab(){
