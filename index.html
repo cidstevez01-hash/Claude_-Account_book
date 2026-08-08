@@ -306,6 +306,10 @@
      不用再单独维护一套.compare-row/.compare-item样式 */
   #compareRow .stat .val{font-family:'Noto Serif SC',serif;font-weight:600;font-size:19px;margin:4px 0 5px;font-variant-numeric:tabular-nums;}
   #compareRow .stat.expense .val{color:var(--seal);} #compareRow .stat.income .val{color:var(--jade);}
+  /* 试验：两栏盒子样式调轻一点——之前2px实线+不对称圆角，套在已经有边框的大卡片里面
+     显得"框里套框"太重；改成跟上面日/月圆圈同一套虚线描边语言，圆角也统一成一个数值 */
+  #compareRow.stats-row{border-top:none; padding-top:0; gap:12px;}
+  #compareRow .stat{background:var(--card); border:1.5px dashed var(--grid); border-radius:16px; padding:13px 14px;}
   /* 月份选择器现在挪进了合并后的卡片中段,靠左对齐、用点状分隔线跟上面的对比数字区分开,
      不再是单独卡片里居中放置的那种 */
   #compareYmPicker{justify-content:flex-start; margin:18px 0 12px; padding-top:16px; border-top:2px dotted var(--grid);}
