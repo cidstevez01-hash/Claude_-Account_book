@@ -95,18 +95,11 @@
                 1px 1px 0 var(--card), -1px -1px 0 var(--card), 1px -1px 0 var(--card), -1px 1px 0 var(--card),
                 3px 4px 0 rgba(58,47,40,0.16);
   }
-  .washi-tape{position:absolute;top:-8px;left:14px;width:56px;height:20px;background:repeating-linear-gradient(-45deg, rgba(227,178,60,0.55) 0 6px, rgba(227,178,60,0.32) 6px 12px);transform:rotate(-5deg);border-radius:2px;opacity:0.9;pointer-events:none;}
-  /* iOS原生状态栏没有"设背景色"这个API(StatusBar插件的setBackgroundColor/setOverlaysWebView
-     在iOS上都是no-op，只有Android有效)，网页内容又是contentInset:never整屏铺满，滚动的卡片
-     会直接穿到状态栏那条区域里。唯一在iOS上可靠的办法是自己在最顶上钉一条position:fixed的
-     实心色块盖住状态栏那一截，跟随主题色切换、不随页面滚动。 */
-  /* 试验：状态栏这块实心条先改成透明看看效果，不确定要不要保留 */
-  /* 完全透明会让滑动经过的内容原样穿帮,完全不透明又挡住了花火主题的星空/烟花背景——
-     改成半透明纸色+毛玻璃模糊(iOS原生导航栏那种效果),经过的内容变成模糊的色块看不清细节,
-     同时花火背景的星星/烟花轮廓还能隐约透出来,两头兼顾 */
-  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:color-mix(in srgb, var(--paper) 55%, transparent); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); z-index:17; pointer-events:none; opacity:1; transition:opacity 0.2s ease, background-color 0.2s ease;}
-  /* 试验方案：滑动过程中这块实心条淡出变透明，停下来后淡回实心——见下面JS的scroll监听 */
-  .status-bar-bg.is-scrolling{opacity:0;}
+  /* washi-tape原本设计成"贴纸条从卡片顶边探出去一截"的效果，探出去的距离固定8px；
+     现在头部自己的实心底延伸到了真正的屏幕顶部(见下面.header的margin/padding)，
+     "卡片顶边"这个视觉锚点也跟着挪到了safe-top那条线，所以探出去的偏移量要在
+     -8px基础上再往下补safe-top，不然纸条会探到屏幕最顶上、盖到系统状态栏图标上 */
+  .washi-tape{position:absolute;top:calc(var(--safe-top) - 8px);left:14px;width:56px;height:20px;background:repeating-linear-gradient(-45deg, rgba(227,178,60,0.55) 0 6px, rgba(227,178,60,0.32) 6px 12px);transform:rotate(-5deg);border-radius:2px;opacity:0.9;pointer-events:none;}
   .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
   #pageLedger{ padding-bottom:60px; }
   .page{display:none;}
@@ -124,22 +117,21 @@
      分组数通常很少(比如只用了一种支付方式时图例只有一行),上面380px的保底高度会在图例下面
      留一大截空白。这两张卡片改成按内容实际高度收缩,不参与flex伸展、也不设保底高度 */
   #pageStats #payMethodDonutCard, #pageStats #pointsDonutCard{flex:0 0 auto; min-height:0;}
-  /* 顶部标题+图标固定在屏幕最上方,不随内容滚动;背景补成跟纸面同色,
+  /* 顶部标题+图标固定在屏幕最上方,不随内容滚动;背景补成半透明纸色+毛玻璃模糊,
      不然滚动的卡片经过头部下面时会跟透明的头部区域叠在一起看不清。
      position/z-index单独用.page > .header覆盖,因为下面`.page > *:not(.fw-bg-layer)`
-     那条规则选择器带两个class、优先级比单纯的.header高,直接写在.header里会被吃掉 */
-  /* 头部在未滚动的初始状态下,自然位置是.app的padding-top(safe-top+18px)决定的,
-     比.status-bar-bg的下边缘(safe-top)整整低18px——两块紧挨着的实心色块之间会露出
-     18px的缝(缝里是空的,能看到底下的花火背景/或者别的东西透出来)。用margin-top:-18px
-     把头部整体往上顶,让它一开始就跟状态栏条无缝贴合(不用等滚动触发sticky才贴上);
-     顶掉的这18px换算成padding-top补回头部内部(6px+18px=24px),标题文字相对头部
-     自己顶边的视觉间距不变,只是这份留白从"头部外面的透明缝"挪到了"头部自己的实心背景内" */
-  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:-18px -16px 16px; padding:24px 16px 12px; background:color-mix(in srgb, var(--paper) 55%, transparent); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); opacity:1; transition:opacity 0.2s ease, background-color 0.2s ease;}
-  .page > .header{position:sticky; top:var(--safe-top); z-index:16;}
-  /* 状态栏那截.status-bar-bg滑动时会淡出,头部这块紧接在它正下方、同样是纸色实心底,
-     两块颜色一样但只有上面那块跟着滑动淡出的话,滑动过程中会看起来"上面透明、下面还是实心"
-     一截一截很不协调——头部这块也加上同样的淡出,滑动时两块一起变透明、停下来一起变回实心,
-     看起来像同一整条 */
+     那条规则选择器带两个class、优先级比单纯的.header高,直接写在.header里会被吃掉。
+
+     之前拿一块单独的.status-bar-bg(position:fixed)盖住真正的状态栏那一细条(y:0~safe-top),
+     跟下面sticky的.header两块拼起来看——两个各自独立的backdrop-filter区域拼接处会有一条
+     看得出来的接缝,而且.washi-tape(贴纸条装饰)顶部一小截会被上面那块盖住/糊掉。
+     现在把两块合成.header自己一个元素:sticky的粘住位置从top:safe-top改成top:0(从状态栏
+     最顶上开始就粘住,不用再等一块专门的fixed条打底),margin-top/padding-top在原来"抵消
+     .app的18px顶部留白"基础上再往上多顶safe-top这么多,把头部自己的实心底一路延伸到真正
+     的屏幕顶端,标题文字的视觉位置不变(顶掉的空间换算成padding补回来)。 */
+  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:calc(-1 * (var(--safe-top) + 18px)) -16px 16px; padding:calc(var(--safe-top) + 24px) 16px 12px; background:color-mix(in srgb, var(--paper) 32%, transparent); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); opacity:1; transition:opacity 0.2s ease, background-color 0.2s ease;}
+  .page > .header{position:sticky; top:0; z-index:16;}
+  /* 滑动时头部整体(现在已经包含了以前状态栏条那部分)淡出变透明，停下来后淡回——见下面JS的scroll监听 */
   .header.is-scrolling{opacity:0;}
   .header h1{font-family:'Noto Serif SC', serif; font-weight:700; font-size:26px; margin:0; letter-spacing:1px;}
   .header .month{font-size:13px; color:var(--ink-soft); margin-top:4px;}
@@ -462,7 +454,6 @@
 </style>
 </head>
 <body>
-<div class="status-bar-bg"></div>
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
 <defs>
   <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6"/></symbol>
@@ -2221,8 +2212,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
   // 打包成App(Capacitor)之后,原生状态栏默认是透明覆盖在网页上面的,且iOS上StatusBar插件的
   // setBackgroundColor/setOverlaysWebView这两个API根本没实现(只在Android有效,iOS状态栏原生
-  // 就没有"设背景色"这回事)——不能靠原生API打底,只能靠CSS里的.status-bar-bg那个fixed实色块
-  // 自己盖住状态栏区域(见样式表.status-bar-bg注释)。这里只保留setStyle切状态栏图标黑/白色,
+  // 就没有"设背景色"这回事)——不能靠原生API打底,只能靠CSS里.header自己延伸到屏幕最顶端那块
+  // 半透明毛玻璃背景(见样式表.header注释)。这里只保留setStyle切状态栏图标黑/白色,
   // 这个是iOS/Android都支持的;只在真机App环境下生效,网页/PWA模式下Capacitor全局对象不存在直接跳过
   function updateNativeStatusBar(){
     const Cap = window.Capacitor;
@@ -2240,18 +2231,15 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     const row = $('nativeAppVersionRow');
     if(row) row.style.display = '';
   }
-  // 试验方案：滑动时状态栏实心条+头部这两块紧挨着的纸色实心底一起淡出变透明，停下来170ms后
-  // 一起淡回实心——两块颜色一样，只淡其中一块的话滑动过程中会看起来一截透明一截不透明很不协调，
-  // 所以两块共用同一个滚动监听、同步切换.is-scrolling。头部每个页面各有一份(#pageLedger/
-  // #pageStats/#pageRate),不管当前显示哪个都一起toggle,反正隐藏的页面看不见,无所谓
-  // 网页/PWA模式下状态栏那块条高度恒为0，加不加这个监听肉眼看不出区别，不用额外判断是否原生环境
+  // 试验方案：滑动时头部(现在已经包含了原来单独一块状态栏条的区域)淡出变透明，停下来170ms后
+  // 淡回实心。头部每个页面各有一份(#pageLedger/#pageStats/#pageRate),不管当前显示哪个都
+  // 一起toggle,反正隐藏的页面看不见,无所谓；网页/PWA模式下这块条延伸的高度恒为0，
+  // 加不加这个监听肉眼看不出区别，不用额外判断是否原生环境
   (function initStatusBarScrollFade(){
-    const bar = document.querySelector('.status-bar-bg');
     const headers = document.querySelectorAll('.header');
-    if(!bar && !headers.length) return;
+    if(!headers.length) return;
     let scrollFadeTimer = null;
     function setFading(on){
-      if(bar) bar.classList.toggle('is-scrolling', on);
       headers.forEach(h=> h.classList.toggle('is-scrolling', on));
     }
     window.addEventListener('scroll', function(){
