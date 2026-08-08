@@ -2235,13 +2235,16 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // 试验方案：滑动时头部(现在已经包含了原来单独一块状态栏条的区域)淡出变透明，停下来170ms后
   // 淡回实心。头部每个页面各有一份(#pageLedger/#pageStats/#pageRate),不管当前显示哪个都
   // 一起toggle,反正隐藏的页面看不见,无所谓；网页/PWA模式下这块条延伸的高度恒为0，
-  // 加不加这个监听肉眼看不出区别，不用额外判断是否原生环境
+  // 加不加这个监听肉眼看不出区别，不用额外判断是否原生环境。
+  // 同一个滚动监听顺便把"夏·花火"背景的烟花动画也一起暂停/恢复(见startFireworksCanvas
+  // 里的pause/resume)——滚动时背景动画短暂定格感知不到，但省下的主线程时间能明显缓解卡顿；
+  // 不用summerB皮肤时fwEngine是null，pause/resume里判断一下直接跳过就行
   (function initStatusBarScrollFade(){
     const headers = document.querySelectorAll('.header');
-    if(!headers.length) return;
     let scrollFadeTimer = null;
     function setFading(on){
       headers.forEach(h=> h.classList.toggle('is-scrolling', on));
+      if(fwEngine){ if(on) fwEngine.pause && fwEngine.pause(); else fwEngine.resume && fwEngine.resume(); }
     }
     window.addEventListener('scroll', function(){
       setFading(true);
@@ -2277,7 +2280,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(!ctx) return;
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const parent = canvas.parentElement;
-    let w=0, h=0, dpr=Math.min(window.devicePixelRatio||1, 1.5);
+    /* 像素比上限从1.5降到1——Retina屏下1.5x比1x要多算1.5倍的像素填充量,这块是纯背景装饰,
+       降到1x肉眼基本看不出差别,但每帧要处理的像素数直接少一大截,减轻负担 */
+    let w=0, h=0, dpr=Math.min(window.devicePixelRatio||1, 1);
     function resize(){
       const r = parent.getBoundingClientRect();
       w = Math.max(1, r.width); h = Math.max(1, r.height);
@@ -2564,8 +2569,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       if(raf) cancelAnimationFrame(raf);
       if(ro) ro.disconnect();
     }
+    /* 滑动页面时暂停这个循环(见initStatusBarScrollFade)——粒子物理计算+Canvas绘制(尤其是
+       每个粒子的渐变拖尾/shadowBlur发光)跟滚动抢同一条主线程是卡顿的根源，直接停掉rAF
+       比"降低画质硬扛"更彻底。dt的钳制(Math.min(...,0.05))已经能兜住恢复时那一下的时间跳变，
+       不会因为暂停了一段时间就在恢复的第一帧里把物理往前算一大截 */
+    function pause(){ if(raf){ cancelAnimationFrame(raf); raf = 0; } }
+    function resume(){ if(alive && !raf){ last = performance.now(); raf = requestAnimationFrame(frame); } }
     raf = requestAnimationFrame(frame);
-    fwEngine = { stop };
+    fwEngine = { stop, pause, resume };
   }
   
   function applyThemeIcons(){
