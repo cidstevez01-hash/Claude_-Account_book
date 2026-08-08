@@ -95,7 +95,8 @@
      在iOS上都是no-op，只有Android有效)，网页内容又是contentInset:never整屏铺满，滚动的卡片
      会直接穿到状态栏那条区域里。唯一在iOS上可靠的办法是自己在最顶上钉一条position:fixed的
      实心色块盖住状态栏那一截，跟随主题色切换、不随页面滚动。 */
-  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:var(--paper); z-index:17; pointer-events:none; opacity:1; transition:opacity 0.2s ease;}
+  /* 试验：状态栏这块实心条先改成透明看看效果，不确定要不要保留 */
+  .status-bar-bg{position:fixed; top:0; left:0; right:0; height:var(--safe-top); background:transparent; z-index:17; pointer-events:none; opacity:1; transition:opacity 0.2s ease;}
   /* 试验方案：滑动过程中这块实心条淡出变透明，停下来后淡回实心——见下面JS的scroll监听 */
   .status-bar-bg.is-scrolling{opacity:0;}
   .app{ max-width:480px; margin:0 auto; padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 90px); position:relative; }
