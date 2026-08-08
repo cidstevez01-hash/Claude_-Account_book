@@ -113,10 +113,10 @@
   /* min-height给个保底值,不完全依赖flex-grow的实时计算——内容很短(比如只有一个分类)时
      也能保证图表卡片本身不会缩得太小,配合上面.page.active的min-height双重保险撑满一屏 */
   #pageStats .chart-card{flex:1 1 auto; display:flex; flex-direction:column; min-height:380px;}
-  /* 支付方式内訳/积分内訳这两张环状图+图例的卡片不需要跟趋势图那种长条形图表一样撑满剩余空间——
+  /* 积分内訳这张环状图+图例的卡片不需要跟趋势图那种长条形图表一样撑满剩余空间——
      分组数通常很少(比如只用了一种支付方式时图例只有一行),上面380px的保底高度会在图例下面
-     留一大截空白。这两张卡片改成按内容实际高度收缩,不参与flex伸展、也不设保底高度 */
-  #pageStats #payMethodDonutCard, #pageStats #pointsDonutCard{flex:0 0 auto; min-height:0;}
+     留一大截空白。这张卡片改成按内容实际高度收缩,不参与flex伸展、也不设保底高度 */
+  #pageStats #pointsDonutCard{flex:0 0 auto; min-height:0;}
   /* 顶部标题+图标固定在屏幕最上方,不随内容滚动;背景补成半透明纸色+毛玻璃模糊,
      不然滚动的卡片经过头部下面时会跟透明的头部区域叠在一起看不清。
      position/z-index单独用.page > .header覆盖,因为下面`.page > *:not(.fw-bg-layer)`
@@ -1643,20 +1643,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       <button type="button" data-tab="points" id="statsTabPointsBtn">积分</button>
     </div>
     <div id="statsMoneyPane">
-      <div class="chart-card" id="payMethodDonutCard">
-        <div class="card-title" id="payMethodDonutTitle">支付方式内訳</div>
-        <div class="segment" id="payMethodTypeSegment" style="margin-bottom:14px;">
-          <button type="button" class="active expense" data-type="expense" id="payMethodExpenseBtn">支出</button>
-          <button type="button" class="income" data-type="income" id="payMethodIncomeBtn">收入</button>
-        </div>
-        <div class="donut-row">
-          <div class="donut-wrap">
-            <svg id="payMethodDonutChart" viewBox="0 0 140 140"></svg>
-            <div class="donut-center"><div class="donut-total" id="payMethodDonutTotal">¥0</div></div>
-          </div>
-        </div>
-        <div id="payMethodLegendList"></div>
-      </div>
       <div class="segment" id="dimSegment">
         <button type="button" class="active" data-dim="day" id="dimDayBtn">按日对比</button>
         <button type="button" data-dim="month" id="dimMonthBtn">按月对比</button>
@@ -1968,7 +1954,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       catFieldLabel:'分类', catPickerTitle:'分类', subFieldLabel:'细分', payFieldLabel:'支付方式', tagFieldLabel:'标签', pointsFieldLabel:'获得积分', notePlaceholder:'备注(可选)', saveBtn:'保存',
       pointsBadgeUnit:'积分', pointsBadgeTitle:'获得积分，不计入残高', pointsLegendLabel:'积分',
       statsTabMoney:'收支', statsTabPoints:'积分',
-      payMethodDonutTitle:'支付方式内訳', payMethodOtherBucket:'其他',
       pointsDonutTitle:'积分内訳(按支付方式)', pointsTrendTitle:'还元(获得积分)推移',
       pointsDimDay:'按日', pointsDimMonth:'按月',
       newSubPlaceholder:'新中项目名称', newTagPlaceholder:'新标签名称',
@@ -2026,7 +2011,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       catFieldLabel:'カテゴリ', catPickerTitle:'カテゴリ', subFieldLabel:'中項目', payFieldLabel:'支払い方法', tagFieldLabel:'タグ', pointsFieldLabel:'付与ポイント数', notePlaceholder:'メモ(任意)', saveBtn:'保存',
       pointsBadgeUnit:'pt', pointsBadgeTitle:'獲得ポイント(残高には含まれません)', pointsLegendLabel:'ポイント',
       statsTabMoney:'収支', statsTabPoints:'ポイント',
-      payMethodDonutTitle:'支払い方法内訳', payMethodOtherBucket:'その他',
       pointsDonutTitle:'ポイント内訳(支払い方法別)', pointsTrendTitle:'還元(獲得ポイント)推移',
       pointsDimDay:'日別', pointsDimMonth:'月別',
       newSubPlaceholder:'新しい中項目名', newTagPlaceholder:'新しいタグ名',
@@ -3062,9 +3046,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('dimMonthBtn').textContent = t('dimMonth');
     $('statsTabMoneyBtn').textContent = t('statsTabMoney');
     $('statsTabPointsBtn').textContent = t('statsTabPoints');
-    $('payMethodDonutTitle').textContent = t('payMethodDonutTitle');
-    $('payMethodExpenseBtn').textContent = t('segExpense');
-    $('payMethodIncomeBtn').textContent = t('segIncome');
     $('pointsDonutTitle').textContent = t('pointsDonutTitle');
     $('pointsTrendTitle').textContent = t('pointsTrendTitle');
     $('pointsDimDayBtn').textContent = t('pointsDimDay');
@@ -4576,16 +4557,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     });
   });
 
-  let payMethodDonutType = 'expense';
-  $('payMethodTypeSegment').querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      $('payMethodTypeSegment').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      payMethodDonutType = btn.getAttribute('data-type');
-      renderPayMethodDonut();
-    });
-  });
-
   function payMethodColor(code, idx){
     const p = payMethodMap[code];
     return (p && p.badge && p.badge.bg) || CHART_PALETTE[idx % CHART_PALETTE.length];
@@ -4594,44 +4565,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     const p = payMethodMap[code];
     return escapeHtml(p ? payLabel(p) : (code || ''));
   }
-  // 支付方式内訳跟上面的累计残高卡用同一个统计区间(cumRangeStart~cumRangeEnd),
-  // 不单独再加一套月份选择器,减少一层"这张图现在看的是哪个月"的心智负担
-  function renderPayMethodDonut(){
-    ensureCumRangeDefaults();
-    const startKey = ymKey(cumRangeStart), endKey = ymKey(cumRangeEnd);
-    const groups = {};
-    entries.forEach(e=>{
-      const mk = e.date.slice(0,7);
-      if(mk<startKey || mk>endKey) return;
-      if(e.type !== payMethodDonutType) return;
-      const key = e.paymentMethod || 'cash';
-      const v = toBase(e.amount, e.currency||'CNY', e.date);
-      if(!groups[key]) groups[key] = {key, amount:0};
-      groups[key].amount += v;
-    });
-    const list = Object.values(groups).sort((a,b)=> b.amount-a.amount);
-    const total = list.reduce((s,g)=>s+g.amount,0);
-    $('payMethodDonutTotal').textContent = fmtCur(total, settings.currency);
-    const donutEl = $('payMethodDonutChart'), legendEl = $('payMethodLegendList');
-    if(total===0){
-      donutEl.innerHTML = `<circle cx="70" cy="70" r="54" fill="none" stroke="var(--grid)" stroke-width="18"/>`;
-      legendEl.innerHTML = `<div class="empty-chart">${t('emptyChart')}</div>`;
-      return;
-    }
-    const r=54,cx=70,cy=70,circ=2*Math.PI*r;
-    let offsetAcc=0, svg=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--grid)" stroke-width="18"/>`, legendHtml='';
-    list.forEach((g,i)=>{
-      const pct=g.amount/total*100;
-      const color = payMethodColor(g.key, i);
-      const dash=(pct/100)*circ;
-      svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="18" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offsetAcc}" stroke-linecap="butt"/>`;
-      offsetAcc += dash;
-      legendHtml += `<div class="legend-row"><span class="name"><span class="legend-dot" style="background:${color}"></span>${payMethodLabelForKey(g.key)}</span><span class="pct">${pct.toFixed(1)}%</span><span class="amt">${fmtCur(g.amount, settings.currency)}</span></div>`;
-    });
-    donutEl.innerHTML = svg;
-    legendEl.innerHTML = legendHtml;
-  }
-
   // 积分内訳(按支付方式)同样用累计残高卡那个统计区间;积分是花钱后的返还,只可能来自支出记录,
   // 这里复用支付方式环状图那套颜色/标签(payMethodColor/payMethodLabelForKey),跟上面的
   // 支付方式内訳视觉上是同一套配色,方便对照(比如"信用卡"在两张图里颜色一致)
@@ -4792,8 +4725,13 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       });
     }
 
+    // "今天"只在今天确实有积分数据时才当默认定位点，不然会跟收支趋势图一样定位到一段空视口、
+    // 纵轴刻度掉回兜底值(见renderTrendChart同一处的注释)
     let targetIdx = -1;
-    if(pointsTrendDim==='day'){ targetIdx = buckets.findIndex(b=> b.key===todayStr()); }
+    if(pointsTrendDim==='day'){
+      const todayIdx = buckets.findIndex(b=> b.key===todayStr());
+      if(todayIdx>=0 && buckets[todayIdx].points>0) targetIdx = todayIdx;
+    }
     if(targetIdx < 0){ buckets.forEach((b,i)=>{ if(b.points>0) targetIdx=i; }); }
     const clientW = (scrollEl && scrollEl.clientWidth) || 300;
     let initialScrollLeft;
@@ -5151,9 +5089,16 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     }
 
     // 按日对比且看的正是当前这个月:默认定位到"今天"这一根柱子,不用靠数据推算;
-    // 否则(浏览历史月份/按月对比)退回"当前选中类型最后一笔有数据的那一段"
+    // 但前提是今天在当前选中的类型(支出/收入)下确实有数据——收入通常只集中在发薪日那几天,
+    // 今天如果没有收入记录,硬定位到今天会让视口里一根收入柱子都看不到,纵轴刻度也会掉回
+    // 兜底值1、显示成很丑的"0/0/1/1"这种数字(明明这个月有收入,却像是完全没数据)。
+    // 所以"今天"只在它对当前类型有意义时才用,没有就跟"浏览历史月份/按月对比"一样,
+    // 退回"当前选中类型最后一笔有数据的那一段"
     let targetIdx = -1;
-    if(currentDim==='day'){ targetIdx = buckets.findIndex(b=> b.key===todayStr()); }
+    if(currentDim==='day'){
+      const todayIdx = buckets.findIndex(b=> b.key===todayStr());
+      if(todayIdx>=0 && buckets[todayIdx][valField] > 0) targetIdx = todayIdx;
+    }
     if(targetIdx < 0){ buckets.forEach((b,i)=>{ if(b[valField] > 0) targetIdx = i; }); }
     const clientW = (scrollEl && scrollEl.clientWidth) || 300;
     let initialScrollLeft;
@@ -5358,7 +5303,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
 
   function renderStats(){
     renderCompare(); renderTrendChart(); renderCumulativeRangeCard();
-    renderPayMethodDonut(); renderPointsDonut(); renderPointsTrendChart();
+    renderPointsDonut(); renderPointsTrendChart();
   }
 
   // ---------- Rate page ----------
