@@ -15,7 +15,7 @@ permissions:
 
 env:
   ALTSTORE_RELEASE_TAG: ios-latest
-  IPA_FILENAME: jiazhangbu-unsigned.ipa
+  IPA_FILENAME: pigbang-unsigned.ipa
   MANIFEST_FILENAME: altstore-source.json
   ICON_FILENAME: icon.png
 
@@ -113,7 +113,7 @@ jobs:
           icon_url = f"{base}/{icon_name}"
 
           app = {
-              "name": "记账本",
+              "name": "PigBang",
               "bundleIdentifier": "com.cidstevez01.jiazhangbu",
               "developerName": "cidstevez01",
               "subtitle": "个人记账本(测试版,非App Store签名)",
@@ -135,7 +135,7 @@ jobs:
               ],
           }
           source = {
-              "name": "记账本 更新源",
+              "name": "PigBang 更新源",
               "identifier": "com.cidstevez01.jiazhangbu.altstore-source",
               "apps": [app],
           }
@@ -150,7 +150,7 @@ jobs:
           set -e
           gh release delete "${ALTSTORE_RELEASE_TAG}" --yes --cleanup-tag || true
           gh release create "${ALTSTORE_RELEASE_TAG}" \
-            --title "记账本 iOS测试包 v${APP_VERSION} (build ${APP_BUILD_NUMBER})" \
+            --title "PigBang iOS测试包 v${APP_VERSION} (build ${APP_BUILD_NUMBER})" \
             --notes "AltStore更新源自动发布,版本 ${APP_VERSION} build ${APP_BUILD_NUMBER}。这个Release的文件会在下次发布时被覆盖,不要依赖具体的Release页面链接,请用下面的更新源地址加进AltStore:
           \`\`\`
           https://github.com/${{ github.repository }}/releases/download/${ALTSTORE_RELEASE_TAG}/${MANIFEST_FILENAME}
@@ -161,7 +161,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: jiazhangbu-release-v${{ env.APP_VERSION }}-${{ env.APP_BUILD_NUMBER }}
+          name: pigbang-release-v${{ env.APP_VERSION }}-${{ env.APP_BUILD_NUMBER }}
           path: |
             ${{ env.IPA_FILENAME }}
             ${{ env.MANIFEST_FILENAME }}

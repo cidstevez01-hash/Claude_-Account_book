@@ -1,4 +1,4 @@
-# AltStore 安装与更新教程（记账本 iOS 测试版）
+# AltStore 安装与更新教程（PigBang iOS 测试版）
 
 免费 Apple ID 签名的 App 没法走 App Store，只能靠 AltStore 这类工具在自己手机上"现场签名"安装。签名默认 7 天过期，AltStore 的作用就是帮你按时自动续期、以及以后收新版时不用再手动折腾。
 
@@ -25,7 +25,7 @@
 
 以上这几步跟直接用 AltStore 装账本 App 是同一套，如果之前已经装过 AltStore 本体，这一节可以跳过，直接看下一节。
 
-## 四、添加"记账本"的更新源
+## 四、添加"PigBang"的更新源
 
 这是新加的功能，加一次以后就不用每次手动下载 ipa 了。
 
@@ -37,13 +37,13 @@
    https://github.com/cidstevez01-hash/Claude_-Account_book/releases/download/ios-latest/altstore-source.json
    ```
 
-4. 添加成功后，"浏览"列表里会出现"记账本"，点进去可以直接装
+4. 添加成功后，"浏览"列表里会出现"PigBang"，点进去可以直接装
 
 > 目前这个地址还没正式发布内容——我们这一批新改动（竖屏锁定、版本号、状态栏效果）还在测试分支验证阶段，等你确认没问题、合并发布后这个地址才会真正生效，到时候我会告诉你可以加了。
 
 ## 五、以后怎么更新
 
-- 每次我们出新版并正式发布后，AltStore 里"我的应用 / My Apps"这个记账本条目会自动显示"更新 / Update"
+- 每次我们出新版并正式发布后，AltStore 里"我的应用 / My Apps"这个 PigBang 条目会自动显示"更新 / Update"
 - 点更新前确保：AltServer 在电脑上开着、手机和电脑连同一个 WiFi
 - 免费签名 7 天会过期，只要 AltServer 定期开着连一下手机，AltStore 会在后台自动帮你重新签名续期，不需要额外手动操作
 
