@@ -5069,16 +5069,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       });
     }
 
-    // 按日对比且看的正是当前这个月:默认定位到"今天"这一根柱子,不用靠数据推算;
-    // 但前提是今天在当前选中的类型(支出/收入)下确实有数据——收入通常只集中在发薪日那几天,
-    // 今天如果没有收入记录,硬定位到今天会让视口里一根收入柱子都看不到,纵轴刻度也会掉回
-    // 兜底值1、显示成很丑的"0/0/1/1"这种数字(明明这个月有收入,却像是完全没数据)。
-    // 所以"今天"只在它对当前类型有意义时才用,没有就跟"浏览历史月份/按月对比"一样,
-    // 退回"当前选中类型最后一笔有数据的那一段"
+    // 按日对比且看的正是当前这个月:默认视窗一律定位到"今天"这一根柱子,不管今天有没有
+    // 当前类型(支出/收入)的数据——用户反馈过窗口应该固定显示到当天,不能因为今天还没记账
+    // 就悄悄倒退到几天前最后一笔有数据的地方(那样容易让人以为"今天"根本不在视窗里)。
+    // 纵轴刻度不受影响,visibleMaxVal已经在"视口内没有数据"时回退到1,不会崩成负数或空白。
     let targetIdx = -1;
     if(currentDim==='day'){
       const todayIdx = buckets.findIndex(b=> b.key===todayStr());
-      if(todayIdx>=0 && buckets[todayIdx][valField] > 0) targetIdx = todayIdx;
+      if(todayIdx>=0) targetIdx = todayIdx;
     }
     if(targetIdx < 0){ buckets.forEach((b,i)=>{ if(b[valField] > 0) targetIdx = i; }); }
     const clientW = (scrollEl && scrollEl.clientWidth) || 300;
