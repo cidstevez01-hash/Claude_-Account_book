@@ -409,6 +409,8 @@
   .cat-legend-row .item .legend-pct-track{flex:1;height:7px;background:var(--grid);border-radius:4px;overflow:hidden;}
   .cat-legend-row .item .legend-pct-fill{display:block;height:100%;border-radius:4px;}
   .cat-legend-row .item .legend-pct-num{flex-shrink:0;width:42px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600;}
+  .cat-legend-row .item.clickable{cursor:pointer;border-radius:8px;padding:3px 4px;margin:0 -4px;transition:background 0.15s ease;}
+  .cat-legend-row .item.clickable:active{background:var(--legend-bg, rgba(0,0,0,0.06));}
   .trend-point-info{margin-top:12px;padding:10px 12px;background:var(--paper);border-radius:12px;}
   .trend-point-info .tpi-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:13px;}
   .trend-point-info .tpi-date{color:var(--ink-soft);font-variant-numeric:tabular-nums;}
@@ -3695,6 +3697,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
 
   function monthKeyLabel(mk){
     const parts = mk.split('-');
+    if(parts.length<2) return parts[0]+'年';
     return parts[0]+'年'+parseInt(parts[1],10)+'月';
   }
   function openMonthDetail(filter, monthKey){
@@ -4953,8 +4956,18 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('trendCatLegend').innerHTML = legendKeys.map((k,i)=>{
       const pct = totals[k]/grandTotal*100;
       const color = colorForKey(k,i);
-      return `<span class="item"><span class="legend-sq" style="background:${color}"></span><span class="legend-label">${labelForKey(k)}</span><span class="legend-pct-track"><span class="legend-pct-fill" style="width:${pct.toFixed(1)}%;background:${color}"></span></span><span class="legend-pct-num">${pct.toFixed(1)}%</span></span>`;
+      return `<span class="item clickable" data-key="${escapeHtml(k)}" style="--legend-bg:${tintColor(color,0.82)};"><span class="legend-sq" style="background:${color}"></span><span class="legend-label">${labelForKey(k)}</span><span class="legend-pct-track"><span class="legend-pct-fill" style="width:${pct.toFixed(1)}%;background:${color}"></span></span><span class="legend-pct-num">${pct.toFixed(1)}%</span></span>`;
     }).join('');
+    // 点图例弹出这个分类在当前显示区间(日别对比=当月,月别对比=当年)内的出入金明细,
+    // 复用首页环状图图例已有的openMonthDetail/monthDetailSheet(内部用e.date.startsWith匹配,
+    // 传年月'YYYY-MM'或纯年'YYYY'前缀都能用,不用另外写一套区间筛选)
+    $('trendCatLegend').querySelectorAll('.item.clickable').forEach(item=>{
+      item.addEventListener('click', ()=>{
+        const key = item.getAttribute('data-key');
+        const rangeKey = currentDim==='day' ? `${statsDayYear}-${pad2(statsDayMonth)}` : `${statsMonthYear}`;
+        openMonthDetail({catCode: key, type: trendChartType}, rangeKey);
+      });
+    });
 
     // 纵轴刻度只按"当前实际能看到的这几根柱子"里的最大值来算,而不是整个月的最大值——
     // 不然月中一笔大额支出(比如房租)一出现,月初/月末那些正常小额支出的刻度会被硬生生压扁看不清。
