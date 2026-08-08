@@ -129,7 +129,8 @@
      最顶上开始就粘住,不用再等一块专门的fixed条打底),margin-top/padding-top在原来"抵消
      .app的18px顶部留白"基础上再往上多顶safe-top这么多,把头部自己的实心底一路延伸到真正
      的屏幕顶端,标题文字的视觉位置不变(顶掉的空间换算成padding补回来)。 */
-  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:calc(-1 * (var(--safe-top) + 18px)) -16px 16px; padding:calc(var(--safe-top) + 24px) 16px 12px; background:color-mix(in srgb, var(--paper) 15%, transparent); backdrop-filter:blur(5px) saturate(150%); -webkit-backdrop-filter:blur(5px) saturate(150%); opacity:1; transition:opacity 0.2s ease, background-color 0.2s ease;}
+  /* 试验：改回完全透明看看，不带任何模糊/纸色 */
+  .header{display:flex; justify-content:space-between; align-items:flex-start; margin:calc(-1 * (var(--safe-top) + 18px)) -16px 16px; padding:calc(var(--safe-top) + 24px) 16px 12px; background:transparent; opacity:1; transition:opacity 0.2s ease, background-color 0.2s ease;}
   .page > .header{position:sticky; top:0; z-index:16;}
   /* 滑动时头部整体(现在已经包含了以前状态栏条那部分)淡出变透明，停下来后淡回——见下面JS的scroll监听 */
   .header.is-scrolling{opacity:0;}
