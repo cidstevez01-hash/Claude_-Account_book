@@ -299,7 +299,7 @@
   .save-btn.is-loading{animation:pulseBg 1s ease-in-out infinite;}
   /* 日别/月别切换改成一对圆形图标按钮,居中放在合并后的卡片顶部(见#compareCard),
      不再是撑满整行的胶囊分段——避免跟上面"收支/积分"那个满宽胶囊长得一样、贴在一起显得重复 */
-  .dim-toggle-row{display:flex; justify-content:center; gap:14px; margin-bottom:2px;}
+  .dim-toggle-row{display:flex; justify-content:center; align-items:center; gap:18px; margin:4px 0 16px;}
   .dim-toggle-row button{width:36px;height:36px;border-radius:50%;border:2px dashed var(--grid);background:var(--card);color:var(--ink-soft);font-size:12.5px;font-family:'Noto Sans SC',sans-serif;display:flex;align-items:center;justify-content:center;padding:0;transition:all 0.15s ease;}
   .dim-toggle-row button.active{background:var(--seal);border-color:var(--seal);border-style:solid;color:#fff;}
   /* 今天支出/今天收入的对比数字复用.stats-row/.stat(累计残高卡同一套),
