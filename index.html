@@ -354,6 +354,9 @@
   .legend-row .amt{font-size:13px;width:82px;text-align:right;font-variant-numeric:tabular-nums;}
   #homeLegendList.expense .legend-row .amt{color:var(--seal);}
   #homeLegendList.income .legend-row .amt{color:var(--jade);}
+  /* 图例条目多的时候(比如分类很多),视窗最多露5条,多出来的靠拖拽滚动条查看,
+     不然一长串图例会把下面卡片/正文顶得很远才看得到——37px是.legend-row实测的单行高度 */
+  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .empty-chart{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0;}
   .ym-picker{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
   .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:opacity 0.12s ease;}
@@ -407,7 +410,8 @@
   .chart-scroll-wrap{display:flex;flex:1 1 auto;min-height:140px;}
   .trend-axis-fixed{position:relative;flex:0 0 34px;width:34px;background:var(--card);}
   .trend-axis-fixed .axis-tick{position:absolute;right:6px;font-size:9px;color:var(--ink-soft);transform:translateY(-50%);white-space:nowrap;transition:top 0.35s ease;}
-  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);}
+  /* 同上,最多露5条(23px单行高+10px间距,量出来的实测值),多的靠拖拽滚动条查看 */
+  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
   .cat-legend-row .item .legend-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
   .cat-legend-row .item .legend-label{flex-shrink:0;min-width:56px;}
