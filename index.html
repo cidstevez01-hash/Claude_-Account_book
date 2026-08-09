@@ -429,17 +429,23 @@
   .legend-row.clickable-legend:active{background:var(--legend-bg, rgba(209,102,90,0.14));}
   .filter-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:14px;}
   .filter-chip .hd-icon{width:15px;height:15px;vertical-align:-3px;}
-  .detail-search{display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border:1.5px dashed var(--grid);border-radius:12px;background:var(--card);margin-bottom:8px;}
   #listArea .day-group:first-child .day-header{padding-top:0;}
-  .detail-search .hd-icon{width:16px;height:16px;color:var(--ink-soft);flex-shrink:0;}
-  .detail-search input{flex:1;min-width:0;border:none;outline:none;background:none;font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);}
+  .ledger-section-title{margin:10px 2px 8px;gap:10px;}
+  .ledger-section-title #ledgerSectionTitleText{flex-shrink:0;}
+  .detail-search{
+    display:flex;align-items:center;gap:6px;height:30px;width:30px;padding:0;overflow:hidden;
+    border:1.5px dashed var(--grid);border-radius:50%;background:var(--card);flex-shrink:0;
+    transition:width 0.22s ease, border-radius 0.22s ease, padding 0.22s ease;
+  }
+  .detail-search.expanded{width:100%;padding:0 6px 0 10px;border-radius:12px;}
+  .detail-search .search-icon-btn{border:none;background:none;padding:0;width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:width 0.22s ease, height 0.22s ease;}
+  .detail-search.expanded .search-icon-btn{width:16px;height:16px;}
+  .detail-search .hd-icon{width:14px;height:14px;color:inherit;flex-shrink:0;}
+  .detail-search input{flex:0;width:0;min-width:0;border:none;outline:none;background:none;font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);opacity:0;transition:opacity 0.15s ease;}
+  .detail-search.expanded input{flex:1;width:auto;opacity:1;}
   .detail-search input::placeholder{color:var(--ink-faint);}
   .detail-search .clear-btn{border:none;background:var(--grid);color:var(--ink-soft);width:18px;height:18px;border-radius:50%;flex-shrink:0;display:none;align-items:center;justify-content:center;padding:0;font-size:10px;line-height:1;}
   .detail-search.has-text .clear-btn{display:inline-flex;}
-  .ledger-section-title{margin:10px 2px 10px;}
-  .section-search-btn{width:30px;height:30px;border-radius:50%;border:1.5px dashed var(--grid);background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);flex-shrink:0;padding:0;}
-  .section-search-btn .hd-icon{width:14px;height:14px;}
-  .section-search-btn.active{background:var(--seal);border-color:var(--seal);border-style:solid;color:#fff;}
   .app-toast{position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 92px);transform:translateX(-50%) translateY(12px);background:var(--ink);color:var(--paper);padding:11px 12px 11px 18px;border-radius:12px;font-size:13px;max-width:82%;box-shadow:0 6px 18px rgba(0,0,0,0.25);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;display:flex;align-items:center;gap:10px;cursor:pointer;}
   .app-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .app-toast-text{flex:1;}
@@ -1634,14 +1640,13 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
 
     <div class="card-title ledger-section-title" id="ledgerSectionTitleRow">
       <span id="ledgerSectionTitleText">出入金</span>
-      <button type="button" class="section-search-btn" id="ledgerSearchToggleBtn">
-        <svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
-      </button>
-    </div>
-    <div class="detail-search" id="ledgerSearch" style="display:none;">
-      <svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
-      <input type="text" id="ledgerSearchInput" placeholder="搜索备注/分类/支付方式" autocomplete="off">
-      <button type="button" class="clear-btn" id="ledgerSearchClear">✕</button>
+      <div class="detail-search" id="ledgerSearch">
+        <button type="button" class="search-icon-btn" id="ledgerSearchToggleBtn">
+          <svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
+        </button>
+        <input type="text" id="ledgerSearchInput" placeholder="搜索备注/分类/支付方式" autocomplete="off">
+        <button type="button" class="clear-btn" id="ledgerSearchClear">✕</button>
+      </div>
     </div>
     <div id="listArea"></div>
   </div>
@@ -3613,22 +3618,27 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     renderLedger();
     $('ledgerSearchInput').focus();
   });
-  // 搜索框默认收起,只留标题行右边一个小图标按钮;点一下弹出输入框(展开时按钮变实心高亮),
-  // 再点一下收起的同时清空搜索词、恢复完整列表,不留着"已经收起但筛选还生效"这种反直觉状态
+  // 搜索框默认收起成标题行右边一个小圆点图标,点一下原地展开成横条输入框(不再另起一行,
+  // 就在"出入金"标题右侧展开),再点一下收起的同时清空搜索词、恢复完整列表,不留着
+  // "已经收起但筛选还生效"这种反直觉状态
   $('ledgerSearchToggleBtn').addEventListener('click', ()=>{
-    const isOpen = $('ledgerSearch').style.display !== 'none';
+    const isOpen = $('ledgerSearch').classList.contains('expanded');
     if(isOpen){
-      $('ledgerSearch').style.display = 'none';
-      $('ledgerSearchToggleBtn').classList.remove('active');
+      $('ledgerSearch').classList.remove('expanded');
       ledgerSearchQuery = '';
       $('ledgerSearchInput').value = '';
       $('ledgerSearch').classList.remove('has-text');
       renderLedger();
     }else{
-      $('ledgerSearch').style.display = 'flex';
-      $('ledgerSearchToggleBtn').classList.add('active');
+      $('ledgerSearch').classList.add('expanded');
       $('ledgerSearchInput').focus();
     }
+  });
+  // WKWebView(iOS原生壳)不会像普通浏览器那样自动把聚焦的输入框滚动到软键盘上方,
+  // 键盘弹出后如果输入框刚好在可视区域偏下的位置就会被键盘直接挡住看不见;
+  // 手动在聚焦后延迟一小段时间(等键盘动画基本展开)再自己滚动一次兜底
+  $('ledgerSearchInput').addEventListener('focus', ()=>{
+    setTimeout(()=>{ $('ledgerSearchInput').scrollIntoView({behavior:'smooth', block:'center'}); }, 320);
   });
 
   // ---------- Home donut + month detail ----------
