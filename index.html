@@ -355,8 +355,14 @@
   #homeLegendList.expense .legend-row .amt{color:var(--seal);}
   #homeLegendList.income .legend-row .amt{color:var(--jade);}
   /* 图例条目多的时候(比如分类很多),视窗最多露5条,多出来的靠拖拽滚动条查看,
-     不然一长串图例会把下面卡片/正文顶得很远才看得到——37px是.legend-row实测的单行高度 */
-  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+     不然一长串图例会把下面卡片/正文顶得很远才看得到——37px是.legend-row实测的单行高度。
+     只允许竖向滚动(overflow-x:hidden,横向内容本来就不会溢出,这里显式锁死不需要横向滚动);
+     滚动条默认在iOS上只有滑动时才会短暂闪现,这里用::-webkit-scrollbar自定义成右侧
+     常驻可见的细条,让用户一眼就能看出"这里还能往下滚"而不用先摸索着滑一下才发现 */
+  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--ink-faint) transparent;}
+  #homeLegendList::-webkit-scrollbar, #pointsDonutLegendList::-webkit-scrollbar{width:4px;}
+  #homeLegendList::-webkit-scrollbar-track, #pointsDonutLegendList::-webkit-scrollbar-track{background:transparent;}
+  #homeLegendList::-webkit-scrollbar-thumb, #pointsDonutLegendList::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:4px;}
   .empty-chart{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0;}
   .ym-picker{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
   .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:opacity 0.12s ease;}
@@ -410,8 +416,12 @@
   .chart-scroll-wrap{display:flex;flex:1 1 auto;min-height:140px;}
   .trend-axis-fixed{position:relative;flex:0 0 34px;width:34px;background:var(--card);}
   .trend-axis-fixed .axis-tick{position:absolute;right:6px;font-size:9px;color:var(--ink-soft);transform:translateY(-50%);white-space:nowrap;transition:top 0.35s ease;}
-  /* 同上,最多露5条(23px单行高+10px间距,量出来的实测值),多的靠拖拽滚动条查看 */
-  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  /* 同上,最多露5条(23px单行高+10px间距,量出来的实测值),多的靠拖拽滚动条查看,
+     只允许竖向滚动、右侧常驻可见滚动条,道理跟上面首页/积分内訳图例一样 */
+  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--ink-faint) transparent;}
+  .cat-legend-row::-webkit-scrollbar{width:4px;}
+  .cat-legend-row::-webkit-scrollbar-track{background:transparent;}
+  .cat-legend-row::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:4px;}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
   .cat-legend-row .item .legend-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
   .cat-legend-row .item .legend-label{flex-shrink:0;min-width:56px;}
@@ -3657,18 +3667,17 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if($('ledgerSearch').classList.contains('expanded')) collapseLedgerSearch();
     else expandLedgerSearch();
   });
-  // 之前用"点页面其它位置收起"判断,真机上体验不好——手机上输入框聚焦时,第一下点别的
-  // 地方往往只是把输入法收起(输入框失焦),不一定会真的触发那个位置本身的点击/事件,
-  // 用户得再点第二下才轮到"点外面收起"的逻辑生效,感觉像点了没反应。改成直接监听输入框的
-  // blur(失焦)事件——失焦约等于输入法消失,不管是点了别的地方、点了输入法上的"完成"、
-  // 还是手动下滑收起输入法,只要输入框不再聚焦就应该收起。
-  // 这里加了个可取消的短延迟(不是失焦了立刻收起):点"清空"按钮(✕)时也会先让输入框失焦
-  // 一瞬间、按钮自己的click处理完之后又马上把焦点还给输入框,如果失焦立刻收起就会跟清空
-  // 按钮的"收回焦点"打架、出现"收起了又立刻展开"的抽搐感;延迟150ms、期间如果重新聚焦
-  // 就把这次收起取消掉,刚好覆盖清空按钮这种"焦点短暂离开又马上回来"的场景
+  // 输入法(键盘)消失时是否自动收起,分两种情况:
+  // ①还没输入任何内容就把键盘收起——大概率是打开了搜索又反悔,直接收起图标符合直觉;
+  // ②已经输入过内容(哪怕搜索结果是空的)后把键盘收起——很可能是想收起键盘腾出屏幕空间
+  //   看筛选结果,这时候如果还跟着自动收起,连同搜索词一起被清空,体验很差。这种情况改成
+  //   只有再点搜索框以外的地方才会真正关闭(下面的document click监听)
+  // 用输入框内容是否为空来区分这两种情况,不看"搜索结果"是否为空(结果为空也算"已经搜索过")
   let ledgerSearchBlurTimer = null;
   $('ledgerSearchInput').addEventListener('blur', ()=>{
-    ledgerSearchBlurTimer = setTimeout(()=>{ collapseLedgerSearch(); }, 150);
+    ledgerSearchBlurTimer = setTimeout(()=>{
+      if($('ledgerSearchInput').value.length === 0) collapseLedgerSearch();
+    }, 150);
   });
   // WKWebView(iOS原生壳)不会像普通浏览器那样自动把聚焦的输入框滚动到软键盘上方,
   // 键盘弹出后如果输入框刚好在可视区域偏下的位置就会被键盘直接挡住看不见;
@@ -3676,6 +3685,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   $('ledgerSearchInput').addEventListener('focus', ()=>{
     if(ledgerSearchBlurTimer){ clearTimeout(ledgerSearchBlurTimer); ledgerSearchBlurTimer = null; }
     setTimeout(()=>{ $('ledgerSearchInput').scrollIntoView({behavior:'smooth', block:'center'}); }, 320);
+  });
+  // 已经输入过内容的情况下,键盘消失不会自动收起(见上面blur的判断),要靠点搜索框以外的
+  // 任何地方(列表/图表卡片/标签栏等)才会真正关闭并清空搜索词。输入框内部的点击
+  // (清空按钮、输入框本身)天然算"内部",不会被这个监听误收起
+  document.addEventListener('click', (ev)=>{
+    if(!$('ledgerSearch').classList.contains('expanded')) return;
+    if($('ledgerSearch').contains(ev.target)) return;
+    collapseLedgerSearch();
   });
 
   // ---------- Home donut + month detail ----------
