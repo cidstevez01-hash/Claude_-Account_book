@@ -3619,20 +3619,32 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('ledgerSearchInput').focus();
   });
   // 搜索框默认收起成标题行右边一个小圆点图标,点一下原地展开成横条输入框(不再另起一行,
-  // 就在"出入金"标题右侧展开),再点一下收起的同时清空搜索词、恢复完整列表,不留着
-  // "已经收起但筛选还生效"这种反直觉状态
+  // 就在"出入金"标题右侧展开);收起的同时清空搜索词、恢复完整列表,不留着
+  // "已经收起但筛选还生效"这种反直觉状态。收起入口有两个(再点一次图标/点页面其它地方),
+  // 抽成同一个函数避免两处各写一遍逻辑、以后改一处漏改另一处
+  function collapseLedgerSearch(){
+    if(!$('ledgerSearch').classList.contains('expanded')) return;
+    $('ledgerSearch').classList.remove('expanded');
+    ledgerSearchQuery = '';
+    $('ledgerSearchInput').value = '';
+    $('ledgerSearch').classList.remove('has-text');
+    renderLedger();
+  }
+  function expandLedgerSearch(){
+    $('ledgerSearch').classList.add('expanded');
+    $('ledgerSearchInput').focus();
+  }
   $('ledgerSearchToggleBtn').addEventListener('click', ()=>{
-    const isOpen = $('ledgerSearch').classList.contains('expanded');
-    if(isOpen){
-      $('ledgerSearch').classList.remove('expanded');
-      ledgerSearchQuery = '';
-      $('ledgerSearchInput').value = '';
-      $('ledgerSearch').classList.remove('has-text');
-      renderLedger();
-    }else{
-      $('ledgerSearch').classList.add('expanded');
-      $('ledgerSearchInput').focus();
-    }
+    if($('ledgerSearch').classList.contains('expanded')) collapseLedgerSearch();
+    else expandLedgerSearch();
+  });
+  // 展开状态下点搜索框以外的任何地方(列表、图表卡片、标签页等)都会收起——
+  // 用捕获阶段监听document点击,只要点击目标不在#ledgerSearch内部就收起;
+  // 挂在document上而不是给每个"外部元素"单独绑定,不用管页面上还有哪些新增的可点击区域
+  document.addEventListener('click', (ev)=>{
+    if(!$('ledgerSearch').classList.contains('expanded')) return;
+    if($('ledgerSearch').contains(ev.target)) return;
+    collapseLedgerSearch();
   });
   // WKWebView(iOS原生壳)不会像普通浏览器那样自动把聚焦的输入框滚动到软键盘上方,
   // 键盘弹出后如果输入框刚好在可视区域偏下的位置就会被键盘直接挡住看不见;
