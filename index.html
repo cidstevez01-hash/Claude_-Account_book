@@ -429,6 +429,12 @@
   .legend-row.clickable-legend:active{background:var(--legend-bg, rgba(209,102,90,0.14));}
   .filter-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:14px;}
   .filter-chip .hd-icon{width:15px;height:15px;vertical-align:-3px;}
+  .detail-search{display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border:1px solid var(--grid);border-radius:12px;background:var(--card);margin-bottom:14px;}
+  .detail-search .hd-icon{width:16px;height:16px;color:var(--ink-soft);flex-shrink:0;}
+  .detail-search input{flex:1;min-width:0;border:none;outline:none;background:none;font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);}
+  .detail-search input::placeholder{color:var(--ink-faint);}
+  .detail-search .clear-btn{border:none;background:var(--grid);color:var(--ink-soft);width:18px;height:18px;border-radius:50%;flex-shrink:0;display:none;align-items:center;justify-content:center;padding:0;font-size:10px;line-height:1;}
+  .detail-search.has-text .clear-btn{display:inline-flex;}
   .app-toast{position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 92px);transform:translateX(-50%) translateY(12px);background:var(--ink);color:var(--paper);padding:11px 12px 11px 18px;border-radius:12px;font-size:13px;max-width:82%;box-shadow:0 6px 18px rgba(0,0,0,0.25);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;display:flex;align-items:center;gap:10px;cursor:pointer;}
   .app-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .app-toast-text{flex:1;}
@@ -1532,6 +1538,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   <symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 0 1 12.6-5.5"/><path d="M17.5 3.5v4h-4"/><path d="M19.5 12a7.5 7.5 0 0 1-12.6 5.5"/><path d="M6.5 20.5v-4h4"/></symbol>
   <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></symbol>
   <symbol id="ic-tag" viewBox="0 0 24 24"><path d="M4 12 12 4h7v7l-8 8z"/><circle cx="15.2" cy="8.8" r="1.3" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M15.5 15.5 20 20"/></symbol>
   <!-- 以下两个是真实品牌Logo(不是线条图标),来源:Simple Icons(CC0)/Font Awesome Free(CC BY 4.0),渲染时走fill而不是stroke -->
   <symbol id="ic-pm-amazon" viewBox="0 0 448 512"><path d="M257.2 162.7c-48.7 1.8-169.5 15.5-169.5 117.5 0 109.5 138.3 114 183.5 43.2 6.5 10.2 35.4 37.5 45.3 46.8l56.8-56S341 288.9 341 261.4V114.3C341 89 316.5 32 228.7 32 140.7 32 94 87 94 136.3l73.5 6.8c16.3-49.5 54.2-49.5 54.2-49.5 40.7-.1 35.5 29.8 35.5 69.1zm0 86.8c0 80-84.2 68-84.2 17.2 0-47.2 50.5-56.7 84.2-57.8v40.6zm136 163.5c-7.7 10-70 67-174.5 67S34.2 408.5 9.7 379c-6.8-7.7 1-11.3 5.5-8.3C88.5 415.2 203 488.5 387.7 401c7.5-3.7 13.3 2 5.5 12zm39.8 2.2c-6.5 15.8-16 26.8-21.2 31-5.5 4.5-9.5 2.7-6.5-3.8s19.3-46.5 12.7-55c-6.5-8.3-37-4.3-48-3.2-10.8 1-13 2-14-.3-2.3-5.7 21.7-15.5 37.5-17.5 15.7-1.8 41-.8 46 5.7 3.7 5.1 0 27.1-6.5 43.1z"/></symbol>
   <symbol id="ic-pm-rakuten" viewBox="0 0 24 24"><path d="M23.277 21.3L3.939 24 .722 21.3h22.555zM7.6 19.276H3.939V0h6.052a6.653 6.653 0 0 1 6.65 6.646c0 2.234-1.108 4.204-2.799 5.418l5.418 7.211h-4.585l-4.486-5.979H7.6v5.98zm0-9.64h2.392a2.992 2.992 0 0 0 2.989-2.989 2.994 2.994 0 0 0-2.989-2.986H7.6v5.975z"/></symbol>
@@ -1902,6 +1909,11 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   <div id="monthDetailFilterChip" class="filter-chip" style="display:none;">
     <span id="monthDetailFilterChipText"></span>
   </div>
+  <div class="detail-search" id="monthDetailSearch">
+    <svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
+    <input type="text" id="monthDetailSearchInput" placeholder="搜索备注/分类/支付方式" autocomplete="off">
+    <button type="button" class="clear-btn" id="monthDetailSearchClear">✕</button>
+  </div>
   <div id="monthDetailList"></div>
 </div>
 
@@ -1959,6 +1971,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cumRangeSheetTitle:'选择起止年月', cumRangeStartMode:'起始', cumRangeEndMode:'截止',
       typeExpense:'支出构成', typeIncome:'收入构成',
       homeDonutHint:'点击查看本月明细 ›', monthDetailTitle:'本月明细', detailWord:'明细',
+      detailSearchPlaceholder:'搜索备注/分类/支付方式',
       donutTodayExpense:'今日支出', donutTodayIncome:'今日收入',
       donutMonthExpense:'本月支出', donutMonthIncome:'本月收入',
       emptyChart:'这段时间还没有相关记录', saveFailed:'保存失败,请检查网络后重试',
@@ -2016,6 +2029,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cumRangeSheetTitle:'開始・終了年月を選択', cumRangeStartMode:'開始', cumRangeEndMode:'終了',
       typeExpense:'支出内訳', typeIncome:'収入内訳',
       homeDonutHint:'タップして今月の明細を見る ›', monthDetailTitle:'今月の明細', detailWord:'明細',
+      detailSearchPlaceholder:'メモ/カテゴリ/支払い方法で検索',
       donutTodayExpense:'本日の支出', donutTodayIncome:'本日の収入',
       donutMonthExpense:'今月の支出', donutMonthIncome:'今月の収入',
       emptyChart:'この期間の記録はまだありません', saveFailed:'保存に失敗しました。ネットワークをご確認の上再試行してください',
@@ -3078,6 +3092,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('homeTypeExpenseBtn').textContent = t('segExpense');
     $('homeTypeIncomeBtn').textContent = t('segIncome');
     $('monthDetailTitle').textContent = t('monthDetailTitle');
+    $('monthDetailSearchInput').placeholder = t('detailSearchPlaceholder');
     $('sheetTitle').textContent = editingEntryId ? t('editEntryTitle') : t('sheetAddTitle');
     $('segExpense').textContent = t('segExpense');
     $('segIncome').textContent = t('segIncome');
@@ -3554,6 +3569,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   let homeDonutType = 'expense';
   let monthDetailFilter = null; // {catCode?, tagCode?} | null
   let monthDetailMonthKey = null;
+  let monthDetailSearchQuery = '';
 
   let homeDonutMonthOffset = 0;
   function getHomeDonutMonthKey(offset){
@@ -3707,6 +3723,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     // 类型的账目也漏进来——比如支出环状图的"其他"档,不限制type的话收入记录也会符合"tagCode!==固定支出"这个条件
     monthDetailFilter = filter || null;
     monthDetailMonthKey = monthKey || currentMonthKey();
+    monthDetailSearchQuery = '';
+    $('monthDetailSearchInput').value = '';
+    $('monthDetailSearch').classList.remove('has-text');
     renderMonthDetailList();
     $('overlay').classList.add('show');
     $('monthDetailSheet').classList.add('show');
@@ -3726,6 +3745,18 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(tagCode && !tagObj){ if(monthDetailFilter){ monthDetailFilter.tagCode = null; monthDetailFilter.tagExclude = false; } }
     if(catCode && cat) list = list.filter(e=> e.catCode===catCode);
     if(tagCode && tagObj) list = tagExclude ? list.filter(e=> e.tagCode!==tagCode) : list.filter(e=> e.tagCode===tagCode);
+    const searchQuery = monthDetailSearchQuery.trim().toLowerCase();
+    if(searchQuery){
+      list = list.filter(e=>{
+        if((e.note||'').toLowerCase().includes(searchQuery)) return true;
+        const catObj2 = e.catCode ? allCatMap[e.catCode] : null;
+        const catText = catObj2 ? catLabel(catObj2) : (e.category||'');
+        if(catText.toLowerCase().includes(searchQuery)) return true;
+        const pmObj = e.paymentMethod ? payMethodMap[e.paymentMethod] : null;
+        if(pmObj && payLabel(pmObj).toLowerCase().includes(searchQuery)) return true;
+        return false;
+      });
+    }
     if(!cat && !tagObj){
       $('monthDetailFilterChip').style.display = 'none';
     }else{
@@ -3749,6 +3780,18 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     wireEntryRows(container);
   }
   $('monthDetailCloseBtn').addEventListener('click', closeAllSheets);
+  $('monthDetailSearchInput').addEventListener('input', ()=>{
+    monthDetailSearchQuery = $('monthDetailSearchInput').value;
+    $('monthDetailSearch').classList.toggle('has-text', monthDetailSearchQuery.length>0);
+    renderMonthDetailList();
+  });
+  $('monthDetailSearchClear').addEventListener('click', ()=>{
+    monthDetailSearchQuery = '';
+    $('monthDetailSearchInput').value = '';
+    $('monthDetailSearch').classList.remove('has-text');
+    renderMonthDetailList();
+    $('monthDetailSearchInput').focus();
+  });
 
   function ensureSelectedCat(){
     const cats = currentType==='expense' ? expenseCats : incomeCats;
