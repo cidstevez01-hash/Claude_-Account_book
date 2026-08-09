@@ -3687,11 +3687,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     setTimeout(()=>{ $('ledgerSearchInput').scrollIntoView({behavior:'smooth', block:'center'}); }, 320);
   });
   // 已经输入过内容的情况下,键盘消失不会自动收起(见上面blur的判断),要靠点搜索框以外的
-  // 任何地方(列表/图表卡片/标签栏等)才会真正关闭并清空搜索词。输入框内部的点击
-  // (清空按钮、输入框本身)天然算"内部",不会被这个监听误收起
+  // 地方才会真正关闭并清空搜索词。输入框内部的点击(清空按钮、输入框本身)天然算"内部",
+  // 不会被这个监听误收起;搜索结果列表(#listArea)也算"内部"——用户点结果里的某一条
+  // (查看/编辑/复制/删除)是在继续跟搜索结果打交道,不该把搜索框顺带关掉丢了筛选状态,
+  // 只有点列表和搜索框以外的地方(页头/图表卡片/标签栏等)才真正算"点别处了"
   document.addEventListener('click', (ev)=>{
     if(!$('ledgerSearch').classList.contains('expanded')) return;
     if($('ledgerSearch').contains(ev.target)) return;
+    if($('listArea').contains(ev.target)) return;
     collapseLedgerSearch();
   });
 
