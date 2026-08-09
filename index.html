@@ -108,6 +108,11 @@
      之前只留1px余量,在"内容很短"(比如某个分类只有一条记录、图例只有一行)的情况下这道余量
      可能不够(flex拉伸的取整/重排时机在部分iOS上不够可靠),这次加大到24px留足安全空间 */
   .page.active{display:flex; flex-direction:column; justify-content:center; min-height:calc(100svh - var(--safe-top) - var(--safe-bottom) - 108px + 24px);}
+  /* 搜索展开时,过滤结果的条数会随打字实时变化,内容高度跟着一起变——如果还用上面的
+     justify-content:center,内容一旦比一屏矮就会被居中,每敲一个字符结果集变短/变长,
+     整块内容就跟着上下跳来跳去,边打字边看结果的体验很差。搜索展开期间固定靠顶部对齐,
+     不参与"内容矮就居中"这套逻辑,避免这种跳动 */
+  #pageLedger.ledger-searching{justify-content:flex-start;}
   /* 集計页内容本来就比较多,不用居中撑高度,让图表卡片自己长满剩余空间,图表也跟着变高 */
   #pageStats.active{justify-content:flex-start;}
   /* min-height给个保底值,不完全依赖flex-grow的实时计算——内容很短(比如只有一个分类)时
@@ -3625,6 +3630,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   function collapseLedgerSearch(){
     if(!$('ledgerSearch').classList.contains('expanded')) return;
     $('ledgerSearch').classList.remove('expanded');
+    $('pageLedger').classList.remove('ledger-searching');
+    $('listArea').style.minHeight = '';
     ledgerSearchQuery = '';
     $('ledgerSearchInput').value = '';
     $('ledgerSearch').classList.remove('has-text');
@@ -3632,6 +3639,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
   function expandLedgerSearch(){
     $('ledgerSearch').classList.add('expanded');
+    $('pageLedger').classList.add('ledger-searching');
+    // 光去掉居中(justify-content)还不够消除跳动——搜索结果变少时,列表本身变矮,
+    // 页面总高度跟着变矮,如果用户当时已经往下滚了一截,浏览器会强制把滚动位置往上收紧
+    // (没法停留在一个已经不存在的滚动范围里),看起来就是内容突然往下"弹"一截。
+    // 展开的这一刻(还没开始输入,显示的是完整未过滤列表,是能出现的最高高度)先量出
+    // 这个高度锁成min-height,之后不管过滤剩几条,列表容器都不会矮过这个基准,页面总高度
+    // 全程不变,自然也就没有滚动位置被收紧这回事了;收起时把这个锁定去掉,恢复正常自适应高度
+    $('listArea').style.minHeight = $('listArea').scrollHeight + 'px';
     $('ledgerSearchInput').focus();
   }
   $('ledgerSearchToggleBtn').addEventListener('click', ()=>{
