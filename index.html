@@ -1627,6 +1627,11 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       <div class="donut-hint" id="homeDonutHint">点击查看本月明细 ›</div>
     </div>
 
+    <div class="detail-search" id="ledgerSearch">
+      <svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
+      <input type="text" id="ledgerSearchInput" placeholder="搜索备注/分类/支付方式" autocomplete="off">
+      <button type="button" class="clear-btn" id="ledgerSearchClear">✕</button>
+    </div>
     <div id="listArea"></div>
   </div>
 
@@ -1908,11 +1913,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   </div>
   <div id="monthDetailFilterChip" class="filter-chip" style="display:none;">
     <span id="monthDetailFilterChipText"></span>
-  </div>
-  <div class="detail-search" id="monthDetailSearch">
-    <svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
-    <input type="text" id="monthDetailSearchInput" placeholder="搜索备注/分类/支付方式" autocomplete="off">
-    <button type="button" class="clear-btn" id="monthDetailSearchClear">✕</button>
   </div>
   <div id="monthDetailList"></div>
 </div>
@@ -3093,7 +3093,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('homeTypeExpenseBtn').textContent = t('segExpense');
     $('homeTypeIncomeBtn').textContent = t('segIncome');
     $('monthDetailTitle').textContent = t('monthDetailTitle');
-    $('monthDetailSearchInput').placeholder = t('detailSearchPlaceholder');
+    $('ledgerSearchInput').placeholder = t('detailSearchPlaceholder');
     $('sheetTitle').textContent = editingEntryId ? t('editEntryTitle') : t('sheetAddTitle');
     $('segExpense').textContent = t('segExpense');
     $('segIncome').textContent = t('segIncome');
@@ -3541,6 +3541,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
 
   // ---------- Ledger page ----------
+  let ledgerSearchQuery = '';
   function renderLedger(){
     const mk = currentMonthKey();
     let income=0, expense=0, points=0;
@@ -3567,15 +3568,44 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       listArea.innerHTML = `<div class="empty"><div class="big"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-book"/></svg></div><p>${t('emptyLine1')}<br>${t('emptyLine2')}</p></div>`;
       return;
     }
-    listArea.innerHTML = buildDayGroupedHtml(entries);
+    // 备注/分类/支付方式模糊搜索,只影响下面这份列表显示,不影响上面的月度收支汇总数字
+    const q = ledgerSearchQuery.trim().toLowerCase();
+    let list = entries;
+    if(q){
+      list = entries.filter(e=>{
+        if((e.note||'').toLowerCase().includes(q)) return true;
+        const catObj = e.catCode ? allCatMap[e.catCode] : null;
+        const catText = catObj ? catLabel(catObj) : (e.category||'');
+        if(catText.toLowerCase().includes(q)) return true;
+        const pmObj = e.paymentMethod ? payMethodMap[e.paymentMethod] : null;
+        if(pmObj && payLabel(pmObj).toLowerCase().includes(q)) return true;
+        return false;
+      });
+    }
+    if(list.length===0){
+      listArea.innerHTML = `<div class="empty"><div class="big"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-book"/></svg></div><p>${t('emptyChart')}</p></div>`;
+      return;
+    }
+    listArea.innerHTML = buildDayGroupedHtml(list);
     wireEntryRows(listArea);
   }
+  $('ledgerSearchInput').addEventListener('input', ()=>{
+    ledgerSearchQuery = $('ledgerSearchInput').value;
+    $('ledgerSearch').classList.toggle('has-text', ledgerSearchQuery.length>0);
+    renderLedger();
+  });
+  $('ledgerSearchClear').addEventListener('click', ()=>{
+    ledgerSearchQuery = '';
+    $('ledgerSearchInput').value = '';
+    $('ledgerSearch').classList.remove('has-text');
+    renderLedger();
+    $('ledgerSearchInput').focus();
+  });
 
   // ---------- Home donut + month detail ----------
   let homeDonutType = 'expense';
   let monthDetailFilter = null; // {catCode?, tagCode?} | null
   let monthDetailMonthKey = null;
-  let monthDetailSearchQuery = '';
 
   let homeDonutMonthOffset = 0;
   function getHomeDonutMonthKey(offset){
@@ -3729,9 +3759,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     // 类型的账目也漏进来——比如支出环状图的"其他"档,不限制type的话收入记录也会符合"tagCode!==固定支出"这个条件
     monthDetailFilter = filter || null;
     monthDetailMonthKey = monthKey || currentMonthKey();
-    monthDetailSearchQuery = '';
-    $('monthDetailSearchInput').value = '';
-    $('monthDetailSearch').classList.remove('has-text');
     renderMonthDetailList();
     $('overlay').classList.add('show');
     $('monthDetailSheet').classList.add('show');
@@ -3751,18 +3778,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(tagCode && !tagObj){ if(monthDetailFilter){ monthDetailFilter.tagCode = null; monthDetailFilter.tagExclude = false; } }
     if(catCode && cat) list = list.filter(e=> e.catCode===catCode);
     if(tagCode && tagObj) list = tagExclude ? list.filter(e=> e.tagCode!==tagCode) : list.filter(e=> e.tagCode===tagCode);
-    const searchQuery = monthDetailSearchQuery.trim().toLowerCase();
-    if(searchQuery){
-      list = list.filter(e=>{
-        if((e.note||'').toLowerCase().includes(searchQuery)) return true;
-        const catObj2 = e.catCode ? allCatMap[e.catCode] : null;
-        const catText = catObj2 ? catLabel(catObj2) : (e.category||'');
-        if(catText.toLowerCase().includes(searchQuery)) return true;
-        const pmObj = e.paymentMethod ? payMethodMap[e.paymentMethod] : null;
-        if(pmObj && payLabel(pmObj).toLowerCase().includes(searchQuery)) return true;
-        return false;
-      });
-    }
     if(!cat && !tagObj){
       $('monthDetailFilterChip').style.display = 'none';
     }else{
@@ -3786,18 +3801,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     wireEntryRows(container);
   }
   $('monthDetailCloseBtn').addEventListener('click', closeAllSheets);
-  $('monthDetailSearchInput').addEventListener('input', ()=>{
-    monthDetailSearchQuery = $('monthDetailSearchInput').value;
-    $('monthDetailSearch').classList.toggle('has-text', monthDetailSearchQuery.length>0);
-    renderMonthDetailList();
-  });
-  $('monthDetailSearchClear').addEventListener('click', ()=>{
-    monthDetailSearchQuery = '';
-    $('monthDetailSearchInput').value = '';
-    $('monthDetailSearch').classList.remove('has-text');
-    renderMonthDetailList();
-    $('monthDetailSearchInput').focus();
-  });
 
   function ensureSelectedCat(){
     const cats = currentType==='expense' ? expenseCats : incomeCats;
