@@ -356,13 +356,14 @@
   #homeLegendList.income .legend-row .amt{color:var(--jade);}
   /* 图例条目多的时候(比如分类很多),视窗最多露5条,多出来的靠拖拽滚动条查看,
      不然一长串图例会把下面卡片/正文顶得很远才看得到——37px是.legend-row实测的单行高度。
-     只允许竖向滚动(overflow-x:hidden,横向内容本来就不会溢出,这里显式锁死不需要横向滚动);
-     滚动条默认在iOS上只有滑动时才会短暂闪现,这里用::-webkit-scrollbar自定义成右侧
-     常驻可见的细条,让用户一眼就能看出"这里还能往下滚"而不用先摸索着滑一下才发现 */
-  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--ink-faint) transparent;}
-  #homeLegendList::-webkit-scrollbar, #pointsDonutLegendList::-webkit-scrollbar{width:4px;}
-  #homeLegendList::-webkit-scrollbar-track, #pointsDonutLegendList::-webkit-scrollbar-track{background:transparent;}
-  #homeLegendList::-webkit-scrollbar-thumb, #pointsDonutLegendList::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:4px;}
+     只允许竖向滚动(overflow-x:hidden,横向内容本来就不会溢出,这里显式锁死不需要横向滚动)。
+     iOS上系统原生的滚动指示条只有手指正在划的时候才会短暂闪现,松手就淡出,没法用CSS强制
+     一直显示;改成自己画一条常驻的滚动进度条(.legend-scroll-thumb,JS按scrollTop/scrollHeight
+     算高度和位置),不依赖也不遮挡系统那条看不见摸不着的原生滚动条。列表本身留出右侧空间
+     (padding-right)避免金额数字跟这条自画的进度条挤在一起被盖住 */
+  .legend-scroll-wrap{position:relative;}
+  .legend-scroll-thumb{position:absolute;top:0;right:0;width:3px;border-radius:3px;background:var(--ink-faint);opacity:0.85;pointer-events:none;display:none;}
+  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:10px;}
   .empty-chart{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0;}
   .ym-picker{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
   .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:opacity 0.12s ease;}
@@ -417,11 +418,8 @@
   .trend-axis-fixed{position:relative;flex:0 0 34px;width:34px;background:var(--card);}
   .trend-axis-fixed .axis-tick{position:absolute;right:6px;font-size:9px;color:var(--ink-soft);transform:translateY(-50%);white-space:nowrap;transition:top 0.35s ease;}
   /* 同上,最多露5条(23px单行高+10px间距,量出来的实测值),多的靠拖拽滚动条查看,
-     只允许竖向滚动、右侧常驻可见滚动条,道理跟上面首页/积分内訳图例一样 */
-  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--ink-faint) transparent;}
-  .cat-legend-row::-webkit-scrollbar{width:4px;}
-  .cat-legend-row::-webkit-scrollbar-track{background:transparent;}
-  .cat-legend-row::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:4px;}
+     只允许竖向滚动、用同一套自画常驻进度条,道理跟上面首页/积分内訳图例一样 */
+  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;padding-right:10px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
   .cat-legend-row .item .legend-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
   .cat-legend-row .item .legend-label{flex-shrink:0;min-width:56px;}
@@ -1656,7 +1654,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
           <div class="donut-center"><div class="donut-total" id="homeDonutTotal">¥0</div><div class="donut-label" id="homeDonutCenterLabel">支出</div></div>
         </div>
       </div>
-      <div id="homeLegendList"></div>
+      <div class="legend-scroll-wrap">
+        <div id="homeLegendList"></div>
+        <div class="legend-scroll-thumb" id="homeLegendThumb"></div>
+      </div>
       <div class="donut-hint" id="homeDonutHint">点击查看本月明细 ›</div>
     </div>
 
@@ -1730,7 +1731,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
           <div class="chart-scroll"><svg id="trendChart" style="display:block;"></svg></div>
         </div>
         <div id="trendPointInfo" class="trend-point-info" style="display:none;"></div>
-        <div class="cat-legend-row" id="trendCatLegend"></div>
+        <div class="legend-scroll-wrap">
+          <div class="cat-legend-row" id="trendCatLegend"></div>
+          <div class="legend-scroll-thumb" id="trendLegendThumb"></div>
+        </div>
       </div>
     </div>
     <div id="statsPointsPane" style="display:none;">
@@ -1742,7 +1746,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
             <div class="donut-center"><div class="donut-total" id="pointsDonutTotal">0</div><div class="donut-label">pt</div></div>
           </div>
         </div>
-        <div id="pointsDonutLegendList"></div>
+        <div class="legend-scroll-wrap">
+          <div id="pointsDonutLegendList"></div>
+          <div class="legend-scroll-thumb" id="pointsLegendThumb"></div>
+        </div>
       </div>
       <div class="chart-card">
         <div class="ym-picker">
@@ -3488,6 +3495,26 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     return `rgb(${nr},${ng},${nb})`;
   }
 
+  // 图例超过5条会出现内部滚动(见.legend-scroll-wrap相关CSS),iOS上系统原生滚动指示条
+  // 松手就淡出、没法用CSS强制常驻显示,所以自己画一条极细的进度条(.legend-scroll-thumb)
+  // 常驻在图例右侧——每次图例内容重新渲染(条目数变了)、以及用户实际滚动图例时都要调用
+  // 这个函数重新计算一次高度和位置,没有可滚动内容(条目≤5)就直接隐藏，不占地方
+  function updateLegendScrollThumb(containerId, thumbId){
+    const container = $(containerId), thumb = $(thumbId);
+    if(!container || !thumb) return;
+    const maxScroll = container.scrollHeight - container.clientHeight;
+    if(maxScroll <= 1){ thumb.style.display = 'none'; return; }
+    const trackH = container.clientHeight;
+    const thumbH = Math.max(20, trackH * trackH / container.scrollHeight);
+    const thumbTop = (trackH - thumbH) * (container.scrollTop / maxScroll);
+    thumb.style.display = 'block';
+    thumb.style.height = thumbH.toFixed(1) + 'px';
+    thumb.style.top = thumbTop.toFixed(1) + 'px';
+  }
+  [['homeLegendList','homeLegendThumb'], ['pointsDonutLegendList','pointsLegendThumb'], ['trendCatLegend','trendLegendThumb']].forEach(([containerId, thumbId])=>{
+    $(containerId).addEventListener('scroll', ()=> updateLegendScrollThumb(containerId, thumbId));
+  });
+
   function buildDayGroupedHtml(list){
     if(list.length===0) return '';
     // 今天及之前(已经发生的)按日期倒序置顶;晚于今天的(比如提前生成的下个房租/工资这种还没发生的)
@@ -3774,6 +3801,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(total===0){
       donutEl.innerHTML = `<circle cx="70" cy="70" r="54" fill="none" stroke="var(--grid)" stroke-width="18"/>`;
       legendEl.innerHTML = `<div class="empty-chart">${t('emptyChart')}</div>`;
+      updateLegendScrollThumb('homeLegendList', 'homeLegendThumb');
       return;
     }
     const palette=['#d1665a','#7a9b6e','#b58838','#5b7a99','#7a5c3e','#8a5b7a','#4a6b8a','#c96b5f','#a99c86'];
@@ -3791,6 +3819,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     });
     donutEl.innerHTML = svg;
     legendEl.innerHTML = legendHtml;
+    legendEl.scrollTop = 0;
+    updateLegendScrollThumb('homeLegendList', 'homeLegendThumb');
     legendEl.querySelectorAll('.clickable-legend').forEach(row=>{
       row.addEventListener('click', (ev)=>{
         ev.stopPropagation();
@@ -4753,6 +4783,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(total===0){
       donutEl.innerHTML = `<circle cx="70" cy="70" r="54" fill="none" stroke="var(--grid)" stroke-width="18"/>`;
       legendEl.innerHTML = `<div class="empty-chart">${t('emptyChart')}</div>`;
+      updateLegendScrollThumb('pointsDonutLegendList', 'pointsLegendThumb');
       return;
     }
     const r=54,cx=70,cy=70,circ=2*Math.PI*r;
@@ -4767,6 +4798,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     });
     donutEl.innerHTML = svg;
     legendEl.innerHTML = legendHtml;
+    legendEl.scrollTop = 0;
+    updateLegendScrollThumb('pointsDonutLegendList', 'pointsLegendThumb');
   }
 
   // 还元推移柱状图:积分只有一根jade柱子、不用再跟收支的柱子拼一组,也不需要isIncome切换(积分本来就只来自收入),
@@ -5110,6 +5143,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       const color = colorForKey(k,i);
       return `<span class="item clickable" data-key="${escapeHtml(k)}" style="--legend-bg:${tintColor(color,0.82)};"><span class="legend-sq" style="background:${color}"></span><span class="legend-label">${labelForKey(k)}</span><span class="legend-pct-track"><span class="legend-pct-fill" style="width:${pct.toFixed(1)}%;background:${color}"></span></span><span class="legend-pct-num">${pct.toFixed(1)}%</span></span>`;
     }).join('');
+    $('trendCatLegend').scrollTop = 0;
     // 点图例弹出这个分类在当前显示区间(日别对比=当月,月别对比=当年)内的出入金明细,
     // 复用首页环状图图例已有的openMonthDetail/monthDetailSheet(内部用e.date.startsWith匹配,
     // 传年月'YYYY-MM'或纯年'YYYY'前缀都能用,不用另外写一套区间筛选)
@@ -5170,6 +5204,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     // 同时把上面"整段时间汇总"的图例先收起来,避免和刚点开的单日明细同时出现看着重复
     $('trendPointInfo').style.display = 'none';
     $('trendCatLegend').style.display = '';
+    updateLegendScrollThumb('trendCatLegend', 'trendLegendThumb');
     svgEl.querySelectorAll('.trend-bar-hit').forEach(hit=>{
       hit.addEventListener('click', ()=>{
         const idx = parseInt(hit.getAttribute('data-idx'), 10);
@@ -5282,6 +5317,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('trendPointInfo').style.display = 'block';
     // 只显示这一天/这个月自己的明细,收起下面整段时间汇总的图例,避免两份数字同时出现
     $('trendCatLegend').style.display = 'none';
+    $('trendLegendThumb').style.display = 'none';
   }
 
   function syncStatsYmSelects(){
