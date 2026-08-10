@@ -363,13 +363,7 @@
      (padding-right)避免金额数字跟这条自画的进度条挤在一起被盖住 */
   .legend-scroll-wrap{position:relative;}
   .legend-scroll-thumb{position:absolute;top:0;right:0;width:3px;border-radius:3px;background:var(--ink-faint);opacity:0.85;pointer-events:none;display:none;}
-  /* touch-action:pan-y——图例每一行本身是可点击的(clickable-legend跳转月度明细),
-     不加这条的话iOS上手指按在这些可点击行上面拖动时,浏览器有时会把这次触摸优先当成
-     "点击手势"处理、不会正确识别成"要滚动这个内层列表",导致只有按在行与行之间没有
-     点击处理的空白缝隙(比如右侧留白区域)才能顺利拖动滚动,按在文字/图标这些点击热区上
-     反而滑不动。显式声明"这里只允许纵向平移手势"，让浏览器不管按在列表的哪个位置、
-     是不是点击热区,只要是上下拖动就优先识别成滚动，不会被点击手势抢走 */
-  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding-right:18px;}
+  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:18px;}
   .empty-chart{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0;}
   .ym-picker{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
   .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:opacity 0.12s ease;}
@@ -425,7 +419,7 @@
   .trend-axis-fixed .axis-tick{position:absolute;right:6px;font-size:9px;color:var(--ink-soft);transform:translateY(-50%);white-space:nowrap;transition:top 0.35s ease;}
   /* 同上,最多露5条(23px单行高+10px间距,量出来的实测值),多的靠拖拽滚动条查看,
      只允许竖向滚动、用同一套自画常驻进度条,道理跟上面首页/积分内訳图例一样 */
-  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;padding-right:18px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
+  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;padding-right:18px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
   .cat-legend-row .item .legend-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
   .cat-legend-row .item .legend-label{flex-shrink:0;min-width:56px;}
