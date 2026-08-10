@@ -359,11 +359,15 @@
      只允许竖向滚动(overflow-x:hidden,横向内容本来就不会溢出,这里显式锁死不需要横向滚动)。
      iOS上系统原生的滚动指示条只有手指正在划的时候才会短暂闪现,松手就淡出,没法用CSS强制
      一直显示;改成自己画一条常驻的滚动进度条(.legend-scroll-thumb,JS按scrollTop/scrollHeight
-     算高度和位置),不依赖也不遮挡系统那条看不见摸不着的原生滚动条。列表本身留出右侧空间
-     (padding-right)避免金额数字跟这条自画的进度条挤在一起被盖住 */
+     算高度和位置)。之前漏了一步:只是"另外画了一条常驻的"，没有把原生那条隐藏掉——
+     真机上手指划动的瞬间,系统原生指示条会跟自画的这条同时出现在右侧同一个位置,两条细线
+     叠在一起+闪现时机对不上,看起来就是"重影"。补上::-webkit-scrollbar{display:none}
+     把原生那条彻底关掉,只留自画的这一条,不会再重叠。列表本身留出右侧空间(padding-right)
+     避免金额数字跟这条自画的进度条挤在一起被盖住 */
   .legend-scroll-wrap{position:relative;}
   .legend-scroll-thumb{position:absolute;top:0;right:0;width:3px;border-radius:3px;background:var(--ink-faint);opacity:0.85;pointer-events:none;display:none;}
-  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:18px;}
+  #homeLegendList, #pointsDonutLegendList{max-height:185px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:18px;scrollbar-width:none;-ms-overflow-style:none;}
+  #homeLegendList::-webkit-scrollbar, #pointsDonutLegendList::-webkit-scrollbar{display:none;width:0;height:0;}
   .empty-chart{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0;}
   .ym-picker{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
   .ym-arrow{width:30px;height:30px;border-radius:50%;border:1px solid var(--grid);background:var(--paper);color:var(--ink-soft);font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:opacity 0.12s ease;}
@@ -419,7 +423,8 @@
   .trend-axis-fixed .axis-tick{position:absolute;right:6px;font-size:9px;color:var(--ink-soft);transform:translateY(-50%);white-space:nowrap;transition:top 0.35s ease;}
   /* 同上,最多露5条(23px单行高+10px间距,量出来的实测值),多的靠拖拽滚动条查看,
      只允许竖向滚动、用同一套自画常驻进度条,道理跟上面首页/积分内訳图例一样 */
-  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;padding-right:18px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+  .cat-legend-row{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:10px;padding-right:18px;border-top:1px dashed var(--grid);max-height:155px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;}
+  .cat-legend-row::-webkit-scrollbar{display:none;width:0;height:0;}
   .cat-legend-row .item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-soft);}
   .cat-legend-row .item .legend-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
   .cat-legend-row .item .legend-label{flex-shrink:0;min-width:56px;}
@@ -2012,7 +2017,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // 显示在设置页最下面,不管是网页/PWA还是原生App都看得到(区别于下面只在原生App里才显示的
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '1.0.1';
-  const DEV_BUILD = 1;
+  const DEV_BUILD = 2;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
