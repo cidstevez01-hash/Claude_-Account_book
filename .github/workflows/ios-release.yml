@@ -2,10 +2,13 @@ name: iOS 发布(GitHub Release + AltStore更新源)
 
 # 手动触发,只在"已经在测试分支上验证过没问题、决定要发布"的时候才点一下(通常是合并进
 # 主分支之后)。跟ios-test-build.yml的区别:这个workflow除了出.ipa,还会:
-# ①发一个内容固定的GitHub Release(标签固定叫ios-latest,每次发布覆盖同一个标签下的文件,
-#   保证下载链接永远不变)②生成/更新一份AltStore更新源JSON(altstore-source.json)一起
-#   传上去。用户在AltStore里把这个JSON的地址加成"更新源"一次,以后每次发新版,AltStore
-#   自己就能查到新版本、点一下重新拉取+签名安装,不用再手动复制ipa下载链接。
+# ①发一个GitHub Release(标签固定叫ios-latest,每次发布覆盖同一个标签下的文件)②生成/
+#   更新一份AltStore更新源JSON(altstore-source.json)一起传上去。用户在AltStore里把
+#   这个JSON的地址加成"更新源"一次,以后每次发新版,AltStore自己就能查到新版本、点一下
+#   重新拉取+签名安装,不用再手动复制ipa下载链接——"下载链接永远不变"这件事保证的是
+#   Release标签页地址和更新源JSON自己的地址,不是.ipa文件本身的地址:.ipa文件名带上了
+#   版本号(方便在GitHub Release页面一眼看出是哪个版本),每次发布都会变,但AltStore走的
+#   是更新源JSON里当次写入的downloadURL字段,不受.ipa文件名变化影响。
 # Sideloadly那条路完全不受影响——它只认.ipa文件本身,不看这个workflow产出的Release/JSON。
 on:
   workflow_dispatch: {}
@@ -15,7 +18,6 @@ permissions:
 
 env:
   ALTSTORE_RELEASE_TAG: ios-latest
-  IPA_FILENAME: pigbang-unsigned.ipa
   MANIFEST_FILENAME: altstore-source.json
   ICON_FILENAME: icon.png
 
@@ -32,8 +34,10 @@ jobs:
 
       - name: 算版本号(跟ios-test-build.yml用同一套算法:VERSION文件的语义版本号+Actions运行号当build号)
         run: |
-          echo "APP_VERSION=$(cat VERSION | tr -d '[:space:]')" >> "$GITHUB_ENV"
+          APP_VERSION="$(cat VERSION | tr -d '[:space:]')"
+          echo "APP_VERSION=${APP_VERSION}" >> "$GITHUB_ENV"
           echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
+          echo "IPA_FILENAME=pigbang-unsigned-v${APP_VERSION}-${{ github.run_number }}.ipa" >> "$GITHUB_ENV"
 
       - name: 安装依赖 + 生成www/(把版本号占位符换成真实版本号)
         run: |
@@ -81,7 +85,7 @@ jobs:
             PROVISIONING_PROFILE="" \
             build
 
-      - name: 打包成.ipa(未签名,文件名固定,配合固定的Release标签让下载链接不变)
+      - name: 打包成.ipa(未签名,文件名带版本号方便区分是哪次发布;Release标签本身固定不变,AltStore走更新源JSON里的downloadURL,不受文件名变化影响)
         run: |
           set -e
           PRODUCTS_DIR="ios/build/Build/Products/Release-iphoneos"
