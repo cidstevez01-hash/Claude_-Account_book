@@ -97,7 +97,10 @@ final class AlarmScheduler: NSObject {
 
     @objc private func appDidBecomeActive() {
         if !isRinging { stopKeepAliveLoop() }
-        if !alarms.isEmpty { startPollingTimer() }
+        if !alarms.isEmpty {
+            startPollingTimer()
+            rescheduleFallbackNotifications()
+        }
     }
 
     // MARK: - 轮询触发检查
@@ -228,29 +231,59 @@ final class AlarmScheduler: NSObject {
     }
 
     // MARK: - 本地通知兜底
+    //
+    // 之前这里每次occurrence只排一条通知,系统一条通知只响一声、震一下就完事,如果后台保活
+    // 循环因为App被用户手动划掉/系统内存紧张整个杀掉而失效,用户体验就是"来了条通知要点进去
+    // 才有反应",不是"闹钟响了"。改成给每个闹钟最近的下一次触发排一串密集通知(隔几秒一条,
+    // 连续响约1分钟),模拟持续响铃/震动的效果——静音模式下声音会被系统吞掉,但震动不受静音键
+    // 影响,照样能连续震醒人,不需要打开App。iOS本身有"最多64条待发通知"的硬限制,预算按"每个
+    // 闹钟的下一次触发优先给足密集通知,更靠后的几次触发退化成单条兜底"来分配。
+    private static let maxPendingNotifications = 64
+    private static let burstNotificationCount = 12
+    private static let burstIntervalSeconds: TimeInterval = 5
 
     private func rescheduleFallbackNotifications() {
         let center = UNUserNotificationCenter.current()
         center.removeAllPendingNotificationRequests()
         var totalScheduled = 0
         let now = Date()
+
+        // 第一轮:每个闹钟的下一次触发,安排一串密集通知
         for alarm in alarms {
-            if totalScheduled >= 56 { break }
-            let occurrences = nextOccurrences(for: alarm, from: now, limit: 6, withinDays: 30)
-            for occ in occurrences {
-                if totalScheduled >= 56 { break }
-                let content = UNMutableNotificationContent()
-                content.title = alarm.label.isEmpty ? alarm.time : alarm.label
-                content.body = alarm.time
-                content.sound = .default
-                let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: occ)
-                let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
-                let identifier = AlarmScheduler.notificationIdPrefix + alarm.id + "_" + String(Int(occ.timeIntervalSince1970))
-                let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-                center.add(request, withCompletionHandler: nil)
+            guard totalScheduled < AlarmScheduler.maxPendingNotifications else { break }
+            guard let nextOcc = nextOccurrences(for: alarm, from: now, limit: 1, withinDays: 30).first else { continue }
+            let budget = min(AlarmScheduler.burstNotificationCount, AlarmScheduler.maxPendingNotifications - totalScheduled)
+            for i in 0..<budget {
+                let fireDate = nextOcc.addingTimeInterval(Double(i) * AlarmScheduler.burstIntervalSeconds)
+                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: fireDate, idSuffix: "_b\(i)")
                 totalScheduled += 1
             }
         }
+
+        // 第二轮:剩余预算覆盖更靠后的几次触发,退化成单条兜底——用户下次打开App时会
+        // 重新走一遍这个函数,把最近的一次重新排成密集通知,这里只是保证"很久不开App"
+        // 也至少还有条提示,不会完全没反应
+        for alarm in alarms {
+            guard totalScheduled < AlarmScheduler.maxPendingNotifications else { break }
+            let occurrences = nextOccurrences(for: alarm, from: now, limit: 6, withinDays: 30)
+            for occ in occurrences.dropFirst() {
+                guard totalScheduled < AlarmScheduler.maxPendingNotifications else { break }
+                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: occ, idSuffix: "_single")
+                totalScheduled += 1
+            }
+        }
+    }
+
+    private func scheduleFallbackNotification(center: UNUserNotificationCenter, alarm: AlarmDef, fireDate: Date, idSuffix: String) {
+        let content = UNMutableNotificationContent()
+        content.title = alarm.label.isEmpty ? alarm.time : alarm.label
+        content.body = alarm.time
+        content.sound = .default
+        let interval = max(1, fireDate.timeIntervalSinceNow)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+        let identifier = AlarmScheduler.notificationIdPrefix + alarm.id + "_" + String(Int(fireDate.timeIntervalSince1970)) + idSuffix
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        center.add(request, withCompletionHandler: nil)
     }
 
     // 算出某个闹钟从from往后、withinDays天以内的最多limit个下一次触发时间点
@@ -385,6 +418,9 @@ final class AlarmScheduler: NSObject {
 
 extension AlarmScheduler: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.alert, .sound])
+        // App在前台时,真正的响铃机制(轮询命中+切换铃声循环播放)已经在响了,这批兜底通知
+        // 密集排的那些如果原样弹出来,会跟真正响铃的声音叠在一起变成"又响又叮咚"很吵——
+        // isRinging为true时就不再展示这条通知了
+        completionHandler(isRinging ? [] : [.alert, .sound])
     }
 }
