@@ -6,7 +6,7 @@
   "main": "dist/plugin.cjs.js",
   "files": [
     "ios/Sources",
-    "AlarmRinger.podspec"
+    "CapacitorAlarmRinger.podspec"
   ],
   "capacitor": {
     "ios": {
