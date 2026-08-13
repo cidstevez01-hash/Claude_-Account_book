@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@capacitor/core": "^6.1.2",
+    "@capacitor/filesystem": "^6.0.4",
     "@capacitor/ios": "^6.1.2",
-    "@capacitor/status-bar": "^6.0.3"
+    "@capacitor/status-bar": "^6.0.3",
+    "capacitor-alarm-ringer": "file:native-plugins/alarm-ringer"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

@@ -54,7 +54,10 @@
   [data-skin="summerB"] #settingsBtn3 .hd-icon,
   [data-skin="summerB"] #themeBtn .hd-icon,
   [data-skin="summerB"] #themeBtn2 .hd-icon,
-  [data-skin="summerB"] #themeBtn3 .hd-icon{width:25.2px;height:25.2px;}
+  [data-skin="summerB"] #themeBtn3 .hd-icon,
+  [data-skin="summerB"] #alarmBtn .hd-icon,
+  [data-skin="summerB"] #alarmBtn2 .hd-icon,
+  [data-skin="summerB"] #alarmBtn3 .hd-icon{width:25.2px;height:25.2px;}
   /* 底部标签栏反馈"显得太空"：三个图标从默认20px放大到27px */
   [data-skin="summerB"] .tab-btn .hd-icon{width:27px;height:27px;}
   [data-skin="summerB"] .fab{box-shadow:0 0 16px -2px var(--seal), 0 3px 0 var(--seal-soft);}
@@ -152,12 +155,6 @@
   .pw-eye-btn{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:none;background:none;padding:0;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:opacity 0.12s ease;}
   .pw-eye-btn:active{opacity:0.4;}
   .pw-eye-btn svg{width:19px;height:19px;}
-  .seal{
-    width:52px;height:52px;border-radius:60% 40% 55% 45%/45% 55% 40% 60%;background:var(--accent);
-    display:flex;align-items:center;justify-content:center;color:#fff;
-    font-family:'Noto Serif SC', serif;font-weight:700;font-size:13px;transform:rotate(-8deg);
-    flex-shrink:0;position:relative;box-shadow:0 3px 0 rgba(58,47,40,0.18);
-  }
   .ledger-card{background:var(--card);border:2px dashed var(--seal);border-radius:26px 12px 24px 12px/12px 24px 12px 26px;padding:22px 20px;box-shadow:0 2px 0 rgba(58,47,40,0.05);margin-bottom:22px;}
   .balance-label{font-size:12px;color:var(--ink-soft);letter-spacing:2px;}
   .balance-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 16px;}
@@ -283,6 +280,30 @@
   .text-row{margin-bottom:14px;}
   .text-row input{width:100%;height:46px;padding:0 14px;border:1px solid var(--grid);border-radius:12px;background:var(--card);font-family:'Noto Sans SC',sans-serif;font-size:15px;color:var(--ink);outline:none;box-sizing:border-box;-webkit-appearance:none;appearance:none;}
   .text-row input:disabled{background:var(--grid);color:var(--ink-soft);opacity:0.85;}
+
+  /* ---- 闹钟(alarms) ---- */
+  .alarm-row{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1.5px dashed var(--grid);}
+  .alarm-row:last-child{border-bottom:none;}
+  .alarm-time{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;width:66px;flex-shrink:0;}
+  .alarm-row.off .alarm-time{color:var(--ink-faint);}
+  .alarm-meta{flex:1;min-width:0;}
+  .alarm-label{font-size:13px;color:var(--ink);font-weight:600;}
+  .alarm-row.off .alarm-label{color:var(--ink-faint);}
+  .alarm-repeat{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  /* toggle-switch:全App目前只有闹钟用到这个组件,给button元素做成iOS风格的圆角滑块开关 */
+  .toggle-switch{position:relative;width:44px;height:26px;border-radius:14px;background:var(--grid);flex-shrink:0;border:none;padding:0;transition:background 0.18s ease;}
+  .toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:transform 0.18s ease;}
+  .toggle-switch.on{background:var(--jade);}
+  .toggle-switch.on::after{transform:translateX(18px);}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .toggle-row-label{font-size:14px;color:var(--ink);}
+  .toggle-row-hint{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+  .sound-picker-row{width:100%;display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 14px;border:1px solid var(--grid);border-radius:12px;background:var(--card);font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);margin-bottom:14px;box-sizing:border-box;}
+  .sound-picker-action{color:var(--seal);font-weight:600;font-size:13px;}
+#alarmRingingOverlay{display:none;position:fixed;inset:0;z-index:999;background:var(--seal);flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+#alarmRingingOverlay.show{display:flex;}
+#alarmRingingLabel{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;color:var(--card);text-align:center;padding:0 24px;}
+#alarmRingingStopBtn{margin-top:12px;height:52px;padding:0 40px;border:none;border-radius:26px;background:var(--card);color:var(--seal);font-family:'Noto Sans SC',sans-serif;font-size:16px;font-weight:700;}
   .row2{display:flex;gap:12px;align-items:stretch;} .row2 .text-row{flex:1;margin-bottom:14px;}
   .converter-rate-line{text-align:center;font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;font-family:'Noto Sans SC',sans-serif;}
   .converter-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--grid);border-radius:14px;padding:11px 14px;margin-bottom:4px;background:var(--card);}
@@ -513,6 +534,7 @@
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
 <defs>
   <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6"/></symbol>
+  <symbol id="ic-alarm" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 13V9M12 13l3 2"/><path d="M5 5 2.5 7.5M19 5l2.5 2.5"/><path d="M9 3.5c1-.8 5-.8 6 0"/></symbol>
   <symbol id="ic-shirt" viewBox="0 0 24 24"><path d="M8 4 4 7.5l2 2.7 2-1.4V20h8V8.8l2 1.4 2-2.7L16 4c0 1.5-1.8 2.8-4 2.8S8 5.5 8 4z"/></symbol>
   <symbol id="ic-book" viewBox="0 0 24 24"><path d="M4 4.5c3-1.4 6-1.4 8 0v13c-2-1.2-5-1.2-8 0z"/><path d="M20 4.5c-3-1.4-6-1.4-8 0v13c2-1.2 5-1.2 8 0z"/></symbol>
   <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M3.5 20.5V9"/><path d="M10 20.5V4"/><path d="M16.5 20.5V12.5"/><path d="M3 20.7h18"/></symbol>
@@ -1623,8 +1645,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       </div>
       <div class="header-right">
         <button type="button" class="icon-btn" id="themeBtn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-shirt"/></svg></button>
+        <button type="button" class="icon-btn" id="alarmBtn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-alarm"/></svg></button>
         <button type="button" class="icon-btn" id="settingsBtn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
-        <div class="seal" id="sealBadge">总</div>
       </div>
     </div>
 
@@ -1686,8 +1708,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       <div><h1 id="statsTitleText" class="papercut">统计</h1></div>
       <div class="header-right">
         <button type="button" class="icon-btn" id="themeBtn2"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-shirt"/></svg></button>
+        <button type="button" class="icon-btn" id="alarmBtn2"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-alarm"/></svg></button>
         <button type="button" class="icon-btn" id="settingsBtn2"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
-        <div class="seal" id="sealBadge2">总</div>
       </div>
     </div>
     <div class="cumulative-range-card">
@@ -1783,8 +1805,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       <div><h1 id="rateTitleText" class="papercut">汇率</h1><div class="month" id="rateSubLabel">日元 → 人民币</div></div>
       <div class="header-right">
         <button type="button" class="icon-btn" id="themeBtn3"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-shirt"/></svg></button>
+        <button type="button" class="icon-btn" id="alarmBtn3"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-alarm"/></svg></button>
         <button type="button" class="icon-btn" id="settingsBtn3"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-gear"/></svg></button>
-        <div class="seal" id="sealBadge3">总</div>
       </div>
     </div>
     <div class="segment" id="rateDirSegment">
@@ -2004,6 +2026,70 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   <button type="button" class="save-btn" id="cumRangeDoneBtn" style="margin-top:14px;"></button>
 </div>
 
+<div class="sheet" id="alarmSheet" style="max-height:88vh;">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h2 id="alarmSheetTitle" style="margin:0;">闹钟</h2>
+    <div style="display:flex;gap:8px;">
+      <button type="button" class="icon-btn" id="alarmAddBtn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-plus"/></svg></button>
+      <button type="button" class="icon-btn" id="alarmSheetCloseBtn">✕</button>
+    </div>
+  </div>
+  <div id="alarmListArea"></div>
+</div>
+
+<div class="sheet" id="alarmFormSheet" style="max-height:92vh;">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+    <button type="button" class="icon-btn" id="alarmFormBackBtn">‹</button>
+    <h2 id="alarmFormTitle" style="margin:0;flex:1;">新建闹钟</h2>
+  </div>
+  <div class="text-row"><input type="time" id="alarmTimeInput"></div>
+  <div class="field-label" id="alarmLabelFieldLabel">标签</div>
+  <div class="text-row"><input type="text" id="alarmLabelInput" placeholder="" maxlength="30"></div>
+  <div class="field-label" id="alarmRepeatFieldLabel">重复</div>
+  <div class="segment" id="alarmRepeatTypeSegment">
+    <button type="button" data-rt="once" id="alarmRtOnceBtn"></button>
+    <button type="button" data-rt="weekly" id="alarmRtWeeklyBtn"></button>
+  </div>
+  <div id="alarmOncePanel">
+    <div class="text-row"><input type="date" id="alarmOnceDateInput"></div>
+  </div>
+  <div id="alarmWeeklyPanel">
+    <div class="sub-wrap" id="alarmPresetChips">
+      <button type="button" class="sub-pill" data-preset="daily" id="alarmPresetDaily"></button>
+      <button type="button" class="sub-pill" data-preset="weekday" id="alarmPresetWeekday"></button>
+      <button type="button" class="sub-pill" data-preset="weekend" id="alarmPresetWeekend"></button>
+    </div>
+    <div class="sub-wrap" id="alarmDayChips" style="margin-bottom:8px;"></div>
+    <div class="toggle-row" id="alarmHolidayRow">
+      <div>
+        <div class="toggle-row-label" id="alarmHolidayLabel">祝日不响</div>
+        <div class="toggle-row-hint" id="alarmHolidayHint">遇日本法定节假日自动跳过</div>
+      </div>
+      <button type="button" class="toggle-switch" id="alarmHolidayToggle"></button>
+    </div>
+  </div>
+  <div class="field-label" id="alarmSoundFieldLabel">铃声</div>
+  <button type="button" class="sound-picker-row" id="alarmSoundPickerBtn">
+    <span id="alarmSoundNameText"></span>
+    <span class="sound-picker-action" id="alarmSoundUploadText"></span>
+  </button>
+  <input type="file" id="alarmSoundFileInput" accept="audio/*" style="display:none;">
+  <div class="toggle-row" style="margin-top:14px;">
+    <div class="toggle-row-label" id="alarmVibrateLabel">震动</div>
+    <button type="button" class="toggle-switch" id="alarmVibrateToggle"></button>
+  </div>
+  <button type="button" class="save-btn" id="alarmSaveBtn" style="margin-top:18px;"></button>
+  <button type="button" class="text-link-btn" id="alarmDeleteBtn" style="display:none;color:var(--seal);"></button>
+</div>
+
+<div id="alarmRingingOverlay">
+  <svg class="hd-icon" viewBox="0 0 24 24" style="width:56px;height:56px;color:var(--card);"><use href="#ic-alarm"/></svg>
+  <div id="alarmRingingLabel"></div>
+  <button type="button" id="alarmRingingStopBtn"></button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
@@ -2023,7 +2109,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '1.1.0';
   const IS_DEV_BUILD = true;
-  const DEV_BUILD = 1;
+  const DEV_BUILD = 2;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2031,7 +2117,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       emptyLine1:'这本账还是空的', emptyLine2:'点右下角记下第一笔吧',
       today:'今天', yesterday:'昨天', thisMonth:'本月', lastMonth:'上月',
       expenseWord:'支出', incomeWord:'收入', newIncrease:'新增', delete:'删除', edit:'编辑', copy:'复制',
-      surplus:'盈', deficit:'亏',
       statsTitle:'统计', dimDay:'日', dimMonth:'月',
       trendDayTitle:'本月每日收支', trendMonthTitle:'本年每月收支',
       ymPickerTitle:'选择年月', ymPickerDoneBtn:'完成',
@@ -2064,6 +2149,20 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cloudSignInBtn:'登录', cloudSignUpBtn:'注册', cloudSignOutBtn:'退出登录',
       goToSignUpBtn:'没有账号？去注册', goToSignInBtn:'已有账号？去登录',
       cloudSyncHelpText:'注册/登录后，账目、分类、设置都会自动实时同步到数据库；换设备用同一账号登录，就能看到最新数据。',
+      wdMon:'一', wdTue:'二', wdWed:'三', wdThu:'四', wdFri:'五', wdSat:'六', wdSun:'日',
+      alarmSheetTitle:'闹钟', alarmNewTitle:'新建闹钟', alarmEditTitle:'编辑闹钟',
+      alarmLabelFieldLabel:'标签', alarmDefaultLabel:'闹钟',
+      alarmRepeatFieldLabel:'重复', alarmRepeatOnce:'仅一次', alarmRepeatWeekly:'周期',
+      alarmPresetDailyLabel:'每天', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'周末',
+      alarmHolidayLabel:'祝日不响', alarmHolidayHint:'遇日本法定节假日自动跳过', alarmHolidaySkipShort:'祝日不响',
+      alarmSoundFieldLabel:'铃声', alarmSoundDefault:'系统默认', alarmSoundUpload:'上传 ›',
+      alarmVibrateLabel:'震动', alarmDeleteBtn:'删除这个闹钟',
+      alarmEmptyLine1:'还没有闹钟', alarmEmptyLine2:'点右上角 + 新建一个',
+      alarmTimeRequired:'请选择时间', alarmWeekdayRequired:'请至少选择一天',
+      alarmSoundTooLong:'音频超过2分钟，无法作为闹钟铃声', alarmSoundUploading:'铃声上传中...',
+      alarmSoundUploadFailed:'铃声上传失败', alarmNativeOnly:'仅原生App内可用',
+      alarmNotifPermDenied:'未获得通知权限，闹钟到点可能无法提醒，请到系统设置里打开',
+      alarmRingingStop:'停止',
       updateTitle:'新版本可用', updateBtn:'更新', updateDesc:'点击更新即可更新到最新<br>版本',
       updating:'更新中...', updateDone:'更新完毕',
       cloudSyncStatusSignedIn:'{email} 已登录，自动实时同步中',
@@ -2089,7 +2188,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       emptyLine1:'この家計簿はまだ空です', emptyLine2:'右下のボタンから記録しましょう',
       today:'今日', yesterday:'昨日', thisMonth:'今月', lastMonth:'先月',
       expenseWord:'支出', incomeWord:'収入', newIncrease:'新規', delete:'削除', edit:'編集', copy:'コピー',
-      surplus:'黒字', deficit:'赤字',
       statsTitle:'集計', dimDay:'日', dimMonth:'月',
       trendDayTitle:'今月の日別収支', trendMonthTitle:'今年の月別収支',
       ymPickerTitle:'年月を選択', ymPickerDoneBtn:'完了',
@@ -2122,6 +2220,20 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cloudSignInBtn:'ログイン', cloudSignUpBtn:'新規登録', cloudSignOutBtn:'ログアウト',
       goToSignUpBtn:'アカウントをお持ちでないですか？新規登録', goToSignInBtn:'すでにアカウントをお持ちですか？ログイン',
       cloudSyncHelpText:'登録・ログインすると、記録・カテゴリ・設定がすべて自動的にデータベースへリアルタイム同期されます。他の端末で同じアカウントにログインすれば最新データがすぐ反映されます。',
+      wdMon:'月', wdTue:'火', wdWed:'水', wdThu:'木', wdFri:'金', wdSat:'土', wdSun:'日',
+      alarmSheetTitle:'アラーム', alarmNewTitle:'アラーム新規作成', alarmEditTitle:'アラーム編集',
+      alarmLabelFieldLabel:'ラベル', alarmDefaultLabel:'アラーム',
+      alarmRepeatFieldLabel:'繰り返し', alarmRepeatOnce:'一回のみ', alarmRepeatWeekly:'周期',
+      alarmPresetDailyLabel:'毎日', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'週末',
+      alarmHolidayLabel:'祝日は鳴らさない', alarmHolidayHint:'日本の祝日は自動的にスキップします', alarmHolidaySkipShort:'祝日オフ',
+      alarmSoundFieldLabel:'着信音', alarmSoundDefault:'デフォルト', alarmSoundUpload:'アップロード ›',
+      alarmVibrateLabel:'バイブレーション', alarmDeleteBtn:'このアラームを削除',
+      alarmEmptyLine1:'アラームがありません', alarmEmptyLine2:'右上の + から新規作成',
+      alarmTimeRequired:'時間を選択してください', alarmWeekdayRequired:'曜日を1つ以上選んでください',
+      alarmSoundTooLong:'音声が2分を超えています。着信音にできません', alarmSoundUploading:'着信音アップロード中...',
+      alarmSoundUploadFailed:'着信音のアップロードに失敗しました', alarmNativeOnly:'ネイティブアプリ内でのみ利用可能',
+      alarmNotifPermDenied:'通知の許可がありません。アラーム時刻に通知できない場合があります。設定から許可してください',
+      alarmRingingStop:'停止',
       updateTitle:'新バージョンあり', updateBtn:'更新', updateDesc:'クリックして最新版に更新します',
       updating:'更新中...', updateDone:'更新が完了しました',
       cloudSyncStatusSignedIn:'{email} でログイン中・自動同期しています',
@@ -2274,6 +2386,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
 
   let entries = [];
+  let alarms = [];
   let settings = {lang:'ja', currency:'JPY', themeSkin:'current'};
   // 主题皮肤(着せ替え):8款四季配色先撤下来只留"基本"过(d279c18),这次按需求
   // 把"夏 · 花火"(用户要的红黄配色)重新加回来,其余7款仍留到下一阶段视需要再做。
@@ -3212,6 +3325,25 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     renderCloudVerifyHint();
     $('cloudSyncHelpText').textContent = t('cloudSyncHelpText');
     renderCloudSyncStatus();
+    $('alarmSheetTitle').textContent = t('alarmSheetTitle');
+    $('alarmFormTitle').textContent = editingAlarmId ? t('alarmEditTitle') : t('alarmNewTitle');
+    $('alarmLabelFieldLabel').textContent = t('alarmLabelFieldLabel');
+    $('alarmLabelInput').placeholder = t('alarmDefaultLabel');
+    $('alarmRepeatFieldLabel').textContent = t('alarmRepeatFieldLabel');
+    $('alarmRtOnceBtn').textContent = t('alarmRepeatOnce');
+    $('alarmRtWeeklyBtn').textContent = t('alarmRepeatWeekly');
+    $('alarmPresetDaily').textContent = t('alarmPresetDailyLabel');
+    $('alarmPresetWeekday').textContent = t('alarmPresetWeekdayLabel');
+    $('alarmPresetWeekend').textContent = t('alarmPresetWeekendLabel');
+    $('alarmHolidayLabel').textContent = t('alarmHolidayLabel');
+    $('alarmHolidayHint').textContent = t('alarmHolidayHint');
+    $('alarmSoundFieldLabel').textContent = t('alarmSoundFieldLabel');
+    $('alarmVibrateLabel').textContent = t('alarmVibrateLabel');
+    $('alarmSaveBtn').textContent = t('saveBtn');
+    $('alarmDeleteBtn').textContent = t('alarmDeleteBtn');
+    $('alarmRingingStopBtn').textContent = t('alarmRingingStop');
+    updateAlarmSoundDisplay();
+    if($('alarmSheet').classList.contains('show')) renderAlarmList();
   }
 
   // ---------- Supabase 实时云同步(改成规范多表,不再是单行大JSON) ----------
@@ -3228,6 +3360,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
 
   let cloudUser = null;
   let cloudRealtimeChannel = null;
+  let alarmsRealtimeChannel = null;
 
   function entryToDbRow(entry){
     return {
@@ -3322,6 +3455,71 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     catch(e){ console.error('本机账目保存失败', e); }
   }
 
+  // ---------- 闹钟(alarms) ----------
+  async function loadAlarms(){
+    try{ const res = LocalStore.get('ledger_alarms'); alarms = res && res.value ? JSON.parse(res.value) : []; }
+    catch(e){ alarms=[]; }
+  }
+  async function saveAlarmsLocalOnly(){
+    try{ await storageSetSafe('ledger_alarms', JSON.stringify(alarms), false); }
+    catch(e){ console.error('本机闹钟保存失败', e); }
+  }
+  function alarmToDbRow(alarm){
+    return {
+      id: String(alarm.id),
+      user_id: cloudUser.id,
+      time: alarm.time,
+      label: alarm.label || null,
+      repeat_type: alarm.repeatType,
+      once_date: alarm.repeatType==='once' ? alarm.onceDate : null,
+      weekdays: alarm.repeatType==='weekly' ? alarm.weekdays : null,
+      skip_jp_holidays: !!alarm.skipJpHolidays,
+      sound_file: alarm.soundFile || null,
+      vibrate: alarm.vibrate!==false,
+      enabled: alarm.enabled!==false,
+      updated_at: new Date().toISOString(),
+    };
+  }
+  function dbRowToAlarm(row){
+    return {
+      id: row.id,
+      time: row.time,
+      label: row.label || '',
+      repeatType: row.repeat_type,
+      onceDate: row.once_date || null,
+      weekdays: row.weekdays || null,
+      skipJpHolidays: !!row.skip_jp_holidays,
+      soundFile: row.sound_file || null,
+      vibrate: row.vibrate!==false,
+      enabled: row.enabled!==false,
+      createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
+      updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : Date.now(),
+    };
+  }
+  async function pushAlarmsBulkUpsert(list){
+    if(!supabaseClient || !cloudUser || !list.length) return;
+    try{
+      const { error } = await supabaseClient.from('alarms').upsert(list.map(alarmToDbRow));
+      if(error) throw error;
+    }catch(e){ console.error('闹钟同步到数据库失败', e); }
+  }
+  function pushAlarmUpsert(alarm){ return pushAlarmsBulkUpsert([alarm]); }
+  async function pushAlarmDelete(id){
+    if(!supabaseClient || !cloudUser) return;
+    try{
+      const { error } = await supabaseClient.from('alarms').delete().eq('id', String(id)).eq('user_id', cloudUser.id);
+      if(error) throw error;
+    }catch(e){ console.error('闹钟删除同步失败', e); }
+  }
+  async function pullAllAlarmsFromCloud(){
+    if(!supabaseClient || !cloudUser) return null;
+    try{
+      const { data, error } = await supabaseClient.from('alarms').select('*').eq('user_id', cloudUser.id);
+      if(error) throw error;
+      return (data||[]).map(dbRowToAlarm);
+    }catch(e){ console.error('拉取闹钟失败', e); return null; }
+  }
+
   function startCloudRealtime(){
     if(!supabaseClient || !cloudUser) return;
     stopCloudRealtime();
@@ -3350,14 +3548,44 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(supabaseClient && cloudRealtimeChannel) supabaseClient.removeChannel(cloudRealtimeChannel);
     cloudRealtimeChannel = null;
   }
+  function startAlarmsRealtime(){
+    if(!supabaseClient || !cloudUser) return;
+    stopAlarmsRealtime();
+    alarmsRealtimeChannel = supabaseClient.channel('alarms_changes_'+cloudUser.id)
+      .on('postgres_changes', { event:'*', schema:'public', table:'alarms', filter:'user_id=eq.'+cloudUser.id }, async (payload)=>{
+        if(payload.eventType === 'DELETE'){
+          const delId = payload.old && payload.old.id;
+          if(delId == null) return;
+          const before = alarms.length;
+          alarms = alarms.filter(a=> String(a.id) !== String(delId));
+          if(alarms.length !== before){ await saveAlarmsLocalOnly(); renderAlarmList(); rearmNativeAlarms(); }
+          return;
+        }
+        if(!payload.new) return;
+        const alarm = dbRowToAlarm(payload.new);
+        const idx = alarms.findIndex(a=> String(a.id) === String(alarm.id));
+        if(idx >= 0 && JSON.stringify(alarms[idx]) === JSON.stringify(alarm)) return;
+        if(idx >= 0) alarms[idx] = alarm; else alarms.push(alarm);
+        await saveAlarmsLocalOnly();
+        renderAlarmList();
+        rearmNativeAlarms();
+        cacheMissingAlarmSounds();
+      })
+      .subscribe();
+  }
+  function stopAlarmsRealtime(){
+    if(supabaseClient && alarmsRealtimeChannel) supabaseClient.removeChannel(alarmsRealtimeChannel);
+    alarmsRealtimeChannel = null;
+  }
   async function handleCloudSignedIn(user){
     cloudUser = user;
     // 登录后这个人自己的自定义细分也能从数据库里读到了(RLS允许读自己的行),重新拉一次分类数据
     // 三个请求互不依赖,并行拉取而不是依次等待,减少总耗时
-    const [, remoteEntries, remoteSettings] = await Promise.all([
+    const [, remoteEntries, remoteSettings, remoteAlarms] = await Promise.all([
       fetchCatalogFromCloud(),
       pullAllEntriesFromCloud(),
       pullSettingsFromCloud(),
+      pullAllAlarmsFromCloud(),
     ]);
     if(remoteEntries && remoteEntries.length > 0){
       // 数据库是唯一权威数据源:云端已有账目就直接采用,不再弹窗询问是否覆盖本机
@@ -3366,6 +3594,12 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     }else{
       // 全新账号,云端还没有账目,把本机现有的推上去作为初始数据
       await pushEntriesBulkUpsert(entries);
+    }
+    if(remoteAlarms && remoteAlarms.length > 0){
+      alarms = remoteAlarms;
+      await saveAlarmsLocalOnly();
+    }else if(alarms.length){
+      await pushAlarmsBulkUpsert(alarms);
     }
     if(remoteSettings){
       settings.lang = remoteSettings.lang || settings.lang;
@@ -3379,7 +3613,11 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     applyStaticI18n();
     renderAll();
     renderRatePage();
+    renderAlarmList();
     startCloudRealtime();
+    startAlarmsRealtime();
+    rearmNativeAlarms();
+    cacheMissingAlarmSounds();
     renderCloudSyncStatus();
   }
   function renderCloudSyncStatus(){
@@ -3395,12 +3633,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       if(data && data.session && data.session.user){
         cloudUser = data.session.user;
         // 三个请求互不依赖,并行拉取而不是依次等待,减少App打开时的等待时间
-        const [, remoteEntries, remoteSettings] = await Promise.all([
+        const [, remoteEntries, remoteSettings, remoteAlarms] = await Promise.all([
           fetchCatalogFromCloud(),
           pullAllEntriesFromCloud(),
           pullSettingsFromCloud(),
+          pullAllAlarmsFromCloud(),
         ]);
         if(remoteEntries){ entries = remoteEntries; await saveEntriesLocalOnly(); }
+        if(remoteAlarms){ alarms = remoteAlarms; await saveAlarmsLocalOnly(); }
         if(remoteSettings){
           settings.lang = remoteSettings.lang || settings.lang;
           settings.currency = remoteSettings.currency || settings.currency;
@@ -3409,11 +3649,15 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
           applyThemeSkin();
           applyStaticI18n();
         }
+        renderAlarmList();
         startCloudRealtime();
+        startAlarmsRealtime();
+        rearmNativeAlarms();
+        cacheMissingAlarmSounds();
         renderCloudSyncStatus();
       }
       supabaseClient.auth.onAuthStateChange((event)=>{
-        if(event==='SIGNED_OUT'){ cloudUser = null; stopCloudRealtime(); renderCloudSyncStatus(); }
+        if(event==='SIGNED_OUT'){ cloudUser = null; stopCloudRealtime(); stopAlarmsRealtime(); renderCloudSyncStatus(); }
       });
     }catch(e){ console.error('云同步会话恢复失败', e); }
   }
@@ -3667,12 +3911,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('monthExpense').textContent = fmtCur(expense, settings.currency);
     $('balanceAmount').textContent = fmtCur(income-expense, settings.currency);
     renderPointsChip('monthPointsRow', points);
-
-    const total = entries.reduce((s,e)=> s + (e.type==='income'?1:-1)*toBase(e.amount, e.currency||'CNY', e.date), 0);
-    const sealText = total>=0 ? t('surplus') : t('deficit');
-    $('sealBadge').textContent = sealText;
-    $('sealBadge2').textContent = sealText;
-    $('sealBadge3').textContent = sealText;
 
     const listArea = $('listArea');
     if(entries.length===0){
@@ -4516,6 +4754,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('monthDetailSheet').classList.remove('show');
     $('ymPickerSheet').classList.remove('show');
     $('cumRangeSheet').classList.remove('show');
+    $('alarmSheet').classList.remove('show');
+    $('alarmFormSheet').classList.remove('show');
+    editingAlarmId = null;
     editingEntryId = null;
     editingSubCode = null;
     editingTagCode = null;
@@ -4573,6 +4814,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   $('themeBtn').addEventListener('click', openThemePicker);
   $('themeBtn2').addEventListener('click', openThemePicker);
   $('themeBtn3').addEventListener('click', openThemePicker);
+  $('alarmBtn').addEventListener('click', openAlarmSheet);
+  $('alarmBtn2').addEventListener('click', openAlarmSheet);
+  $('alarmBtn3').addEventListener('click', openAlarmSheet);
   $('themeSheetBackBtn').addEventListener('click', closeThemePicker);
   $('themeSaveBtn').addEventListener('click', async ()=>{
     settings.themeSkin = pendingThemeSkin;
@@ -4580,6 +4824,347 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     await saveSettings();
     closeThemePicker();
     showToast(t('themeSavedToast'));
+  });
+
+  // ---------- 闹钟(alarms) UI ----------
+  let editingAlarmId = null;
+  let alarmFormRepeatType = 'weekly';
+  let alarmFormWeekdays = [];
+  let alarmFormSoundFile = null; // Supabase Storage对象路径,null=默认铃声
+  function weekdayShortLabel(n){
+    const arr = [t('wdMon'), t('wdTue'), t('wdWed'), t('wdThu'), t('wdFri'), t('wdSat'), t('wdSun')];
+    return arr[n-1] || '';
+  }
+  function formatAlarmRepeatSummary(alarm){
+    if(alarm.repeatType==='once'){
+      const d = alarm.onceDate ? new Date(alarm.onceDate+'T00:00:00') : null;
+      const dateText = d ? (d.getMonth()+1)+'月'+d.getDate()+'日' : '';
+      return t('alarmRepeatOnce') + (dateText ? ' · '+dateText : '');
+    }
+    const days = (alarm.weekdays||[]).slice().sort((a,b)=>a-b);
+    let base;
+    if(days.length===7) base = t('alarmPresetDailyLabel');
+    else if(days.length===5 && [1,2,3,4,5].every(d=>days.includes(d))) base = t('alarmPresetWeekdayLabel');
+    else if(days.length===2 && days.includes(6) && days.includes(7)) base = t('alarmPresetWeekendLabel');
+    else base = days.map(weekdayShortLabel).join('、');
+    return alarm.skipJpHolidays ? base+' · '+t('alarmHolidaySkipShort') : base;
+  }
+  function renderAlarmList(){
+    const area = $('alarmListArea');
+    if(!alarms.length){
+      area.innerHTML = `<div class="empty"><div class="big"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-alarm"/></svg></div><p>${t('alarmEmptyLine1')}<br>${t('alarmEmptyLine2')}</p></div>`;
+      return;
+    }
+    const sorted = alarms.slice().sort((a,b)=> a.time.localeCompare(b.time));
+    area.innerHTML = sorted.map(alarm=>`
+      <div class="alarm-row ${alarm.enabled?'':'off'}" data-id="${alarm.id}">
+        <div class="alarm-time">${escapeHtml(alarm.time)}</div>
+        <div class="alarm-meta">
+          <div class="alarm-label">${escapeHtml(alarm.label || t('alarmDefaultLabel'))}</div>
+          <div class="alarm-repeat">${escapeHtml(formatAlarmRepeatSummary(alarm))}</div>
+        </div>
+        <button type="button" class="toggle-switch ${alarm.enabled?'on':''}" data-id="${alarm.id}"></button>
+      </div>
+    `).join('');
+    area.querySelectorAll('.toggle-switch').forEach(btn=>{
+      btn.addEventListener('click', async (ev)=>{
+        ev.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        const alarm = alarms.find(a=>String(a.id)===String(id));
+        if(!alarm) return;
+        alarm.enabled = !alarm.enabled;
+        alarm.updatedAt = Date.now();
+        await saveAlarmsLocalOnly();
+        renderAlarmList();
+        pushAlarmUpsert(alarm);
+        rearmNativeAlarms();
+      });
+    });
+    area.querySelectorAll('.alarm-row').forEach(row=>{
+      row.addEventListener('click', ()=> openAlarmForm(row.getAttribute('data-id')));
+    });
+  }
+  function openAlarmSheet(){
+    renderAlarmList();
+    $('overlay').classList.add('show');
+    $('alarmSheet').classList.add('show');
+  }
+  function renderAlarmDayChips(){
+    const wrap = $('alarmDayChips');
+    wrap.innerHTML = [1,2,3,4,5,6,7].map(n=>
+      `<button type="button" class="sub-pill ${alarmFormWeekdays.includes(n)?'selected':''}" data-day="${n}">${weekdayShortLabel(n)}</button>`
+    ).join('');
+    wrap.querySelectorAll('.sub-pill').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const n = parseInt(btn.getAttribute('data-day'),10);
+        const idx = alarmFormWeekdays.indexOf(n);
+        if(idx>=0) alarmFormWeekdays.splice(idx,1); else alarmFormWeekdays.push(n);
+        $('alarmPresetChips').querySelectorAll('.sub-pill').forEach(p=>p.classList.remove('selected'));
+        renderAlarmDayChips();
+      });
+    });
+  }
+  function setAlarmPreset(preset){
+    $('alarmPresetChips').querySelectorAll('.sub-pill').forEach(p=> p.classList.toggle('selected', p.getAttribute('data-preset')===preset));
+    if(preset==='daily') alarmFormWeekdays = [1,2,3,4,5,6,7];
+    // "平日"预设:点一下直接把星期设成周一到周五,同时把"祝日不响"开关一起打开——
+    // 不需要用户额外再点一次开关才能拿到"平日响祝日不响"的效果
+    else if(preset==='weekday'){ alarmFormWeekdays = [1,2,3,4,5]; $('alarmHolidayToggle').classList.add('on'); }
+    else if(preset==='weekend') alarmFormWeekdays = [6,7];
+    renderAlarmDayChips();
+  }
+  function setAlarmRepeatType(rt){
+    alarmFormRepeatType = rt;
+    $('alarmRtOnceBtn').classList.toggle('active', rt==='once');
+    $('alarmRtWeeklyBtn').classList.toggle('active', rt==='weekly');
+    $('alarmOncePanel').style.display = rt==='once' ? 'block' : 'none';
+    $('alarmWeeklyPanel').style.display = rt==='weekly' ? 'block' : 'none';
+  }
+  function defaultAlarmTime(){
+    const d = new Date(); d.setMinutes(d.getMinutes()+1);
+    return pad2(d.getHours())+':'+pad2(d.getMinutes());
+  }
+  function updateAlarmSoundDisplay(){
+    $('alarmSoundNameText').textContent = alarmFormSoundFile ? decodeURIComponent(alarmFormSoundFile.split('/').pop()) : t('alarmSoundDefault');
+    $('alarmSoundUploadText').textContent = t('alarmSoundUpload');
+  }
+  function openAlarmForm(alarmId){
+    editingAlarmId = alarmId || null;
+    const alarm = editingAlarmId ? alarms.find(a=>String(a.id)===String(editingAlarmId)) : null;
+    $('alarmFormTitle').textContent = alarm ? t('alarmEditTitle') : t('alarmNewTitle');
+    $('alarmDeleteBtn').style.display = alarm ? 'block' : 'none';
+    $('alarmTimeInput').value = alarm ? alarm.time : defaultAlarmTime();
+    $('alarmLabelInput').value = alarm ? alarm.label : '';
+    alarmFormWeekdays = alarm && alarm.repeatType==='weekly' ? (alarm.weekdays||[]).slice() : [1,2,3,4,5];
+    alarmFormSoundFile = alarm ? alarm.soundFile : null;
+    $('alarmOnceDateInput').value = alarm && alarm.onceDate ? alarm.onceDate : todayStr();
+    $('alarmHolidayToggle').classList.toggle('on', alarm ? !!alarm.skipJpHolidays : false);
+    $('alarmVibrateToggle').classList.toggle('on', alarm ? alarm.vibrate!==false : true);
+    updateAlarmSoundDisplay();
+    setAlarmRepeatType(alarm ? alarm.repeatType : 'weekly');
+    renderAlarmDayChips();
+    $('alarmSheet').classList.remove('show');
+    $('alarmFormSheet').classList.add('show');
+    $('overlay').classList.add('show');
+  }
+  function closeAlarmForm(){
+    $('alarmFormSheet').classList.remove('show');
+    editingAlarmId = null;
+  }
+  $('alarmAddBtn').addEventListener('click', ()=> openAlarmForm(null));
+  $('alarmSheetCloseBtn').addEventListener('click', closeAllSheets);
+  $('alarmFormBackBtn').addEventListener('click', ()=>{ closeAlarmForm(); openAlarmSheet(); });
+  $('alarmRtOnceBtn').addEventListener('click', ()=> setAlarmRepeatType('once'));
+  $('alarmRtWeeklyBtn').addEventListener('click', ()=> setAlarmRepeatType('weekly'));
+  $('alarmPresetDaily').addEventListener('click', ()=> setAlarmPreset('daily'));
+  $('alarmPresetWeekday').addEventListener('click', ()=> setAlarmPreset('weekday'));
+  $('alarmPresetWeekend').addEventListener('click', ()=> setAlarmPreset('weekend'));
+  $('alarmHolidayToggle').addEventListener('click', ()=> $('alarmHolidayToggle').classList.toggle('on'));
+  $('alarmVibrateToggle').addEventListener('click', ()=> $('alarmVibrateToggle').classList.toggle('on'));
+  $('alarmSaveBtn').addEventListener('click', async ()=>{
+    const time = $('alarmTimeInput').value;
+    if(!time){ showToast(t('alarmTimeRequired')); return; }
+    if(alarmFormRepeatType==='weekly' && alarmFormWeekdays.length===0){ showToast(t('alarmWeekdayRequired')); return; }
+    const label = $('alarmLabelInput').value.trim();
+    const now = Date.now();
+    let alarm = editingAlarmId ? alarms.find(a=>String(a.id)===String(editingAlarmId)) : null;
+    if(!alarm){
+      alarm = { id: Date.now()+Math.random().toString(16).slice(2), createdAt: now, enabled: true };
+      alarms.push(alarm);
+    }
+    alarm.time = time;
+    alarm.label = label;
+    alarm.repeatType = alarmFormRepeatType;
+    alarm.onceDate = alarmFormRepeatType==='once' ? $('alarmOnceDateInput').value : null;
+    alarm.weekdays = alarmFormRepeatType==='weekly' ? alarmFormWeekdays.slice() : null;
+    alarm.skipJpHolidays = alarmFormRepeatType==='weekly' ? $('alarmHolidayToggle').classList.contains('on') : false;
+    alarm.soundFile = alarmFormSoundFile;
+    alarm.vibrate = $('alarmVibrateToggle').classList.contains('on');
+    alarm.updatedAt = now;
+    await saveAlarmsLocalOnly();
+    closeAlarmForm();
+    openAlarmSheet();
+    pushAlarmUpsert(alarm);
+    rearmNativeAlarms();
+  });
+  $('alarmDeleteBtn').addEventListener('click', async ()=>{
+    if(!editingAlarmId) return;
+    const id = editingAlarmId;
+    // 云端删除的对象路径要在数组过滤掉这条记录之前先取出来,不然filter完就查不到这条alarm的soundFile了
+    const removedAlarm = alarms.find(a=>String(a.id)===String(id));
+    const removedSoundPath = removedAlarm ? removedAlarm.soundFile : null;
+    alarms = alarms.filter(a=>String(a.id)!==String(id));
+    await saveAlarmsLocalOnly();
+    closeAlarmForm();
+    openAlarmSheet();
+    pushAlarmDelete(id);
+    if(removedSoundPath) deleteAlarmSoundObjectPath(removedSoundPath);
+    rearmNativeAlarms();
+  });
+
+  // ---------- 闹钟铃声:上传到Supabase Storage(跨设备同步) + 缓存到本机响铃用 ----------
+  function getAudioDurationSeconds(file){
+    return new Promise((resolve, reject)=>{
+      const url = URL.createObjectURL(file);
+      const audio = new Audio();
+      audio.preload = 'metadata';
+      audio.onloadedmetadata = ()=>{ URL.revokeObjectURL(url); resolve(audio.duration); };
+      audio.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('无法读取音频时长')); };
+      audio.src = url;
+    });
+  }
+  function blobToBase64(blob){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onloadend = ()=> resolve(String(reader.result).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+  // 只在原生App里才需要本地缓存一份(本机响铃要读本地文件,不联网);网页/PWA本来就不支持
+  // 闹钟响铃这个功能,不用缓存
+  async function cacheAlarmSoundLocally(path, blob){
+    const Cap = window.Capacitor;
+    if(!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;
+    const Filesystem = Cap.Plugins && Cap.Plugins.Filesystem;
+    if(!Filesystem) return;
+    try{
+      const base64 = await blobToBase64(blob);
+      const fileName = path.split('/').pop();
+      await Filesystem.writeFile({ path: 'alarm-sounds/'+fileName, data: base64, directory: 'DATA', recursive: true });
+    }catch(e){ console.error('铃声本地缓存失败', e); }
+  }
+  // 换新设备登录后,闹钟记录本身已经同步过来了,但铃声音频文件还没有——这个函数按需把
+  // 本机还没缓存过的铃声挨个从Storage下载下来存本地,下次响铃就能读到本地文件了
+  async function cacheMissingAlarmSounds(){
+    const Cap = window.Capacitor;
+    if(!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;
+    const Filesystem = Cap.Plugins && Cap.Plugins.Filesystem;
+    if(!Filesystem || !supabaseClient || !cloudUser) return;
+    for(const alarm of alarms){
+      if(!alarm.soundFile) continue;
+      const fileName = alarm.soundFile.split('/').pop();
+      const localPath = 'alarm-sounds/'+fileName;
+      try{ await Filesystem.stat({ path: localPath, directory: 'DATA' }); continue; }
+      catch(e){ /* 本地还没有,往下载 */ }
+      try{
+        const { data, error } = await supabaseClient.storage.from('alarm-sounds').download(alarm.soundFile);
+        if(error) throw error;
+        await cacheAlarmSoundLocally(alarm.soundFile, data);
+      }catch(e){ console.error('铃声下载缓存失败: '+fileName, e); }
+    }
+  }
+  async function deleteAlarmSoundObjectPath(path){
+    if(!supabaseClient || !cloudUser || !path) return;
+    try{ await supabaseClient.storage.from('alarm-sounds').remove([path]); }
+    catch(e){ console.error('删除Storage铃声文件失败', e); }
+  }
+  async function handleAlarmSoundFileSelected(ev){
+    const file = ev.target.files && ev.target.files[0];
+    ev.target.value = ''; // 清空,允许连续两次选同一个文件也能触发change
+    if(!file) return;
+    if(!supabaseClient || !cloudUser){
+      showToast(t('alarmNativeOnly'));
+      return;
+    }
+    let duration;
+    try{ duration = await getAudioDurationSeconds(file); }
+    catch(e){ showToast(t('alarmSoundUploadFailed')); return; }
+    if(duration > 120){ showToast(t('alarmSoundTooLong')); return; }
+    const prevSoundFile = alarmFormSoundFile;
+    $('alarmSoundNameText').textContent = t('alarmSoundUploading');
+    try{
+      const ext = (file.name.split('.').pop() || 'm4a').toLowerCase();
+      const path = cloudUser.id+'/'+Date.now()+'.'+ext;
+      const { error } = await supabaseClient.storage.from('alarm-sounds').upload(path, file, { upsert:false });
+      if(error) throw error;
+      if(prevSoundFile) deleteAlarmSoundObjectPath(prevSoundFile);
+      alarmFormSoundFile = path;
+      await cacheAlarmSoundLocally(path, file);
+    }catch(e){
+      console.error('铃声上传失败', e);
+      showToast(t('alarmSoundUploadFailed'));
+    }
+    updateAlarmSoundDisplay();
+  }
+  $('alarmSoundPickerBtn').addEventListener('click', ()=> $('alarmSoundFileInput').click());
+  $('alarmSoundFileInput').addEventListener('change', handleAlarmSoundFileSelected);
+
+  // ---------- 闹钟原生层桥接:目前只在装了自研AlarmRinger插件的原生构建里才真正生效,
+  // 插件不存在(网页/PWA、或者还没接入这个插件的原生构建)时全部安全跳过,不报错 ----------
+  // 通知权限直接问AlarmRinger插件自己(它内部用UNUserNotificationCenter申请),不依赖
+  // 单独的@capacitor/local-notifications——真正的响铃机制走的是插件自己的后台音频循环,
+  // 系统通知只是兜底,没必要再多引入一个插件
+  async function ensureNotificationPermission(){
+    const Cap = window.Capacitor;
+    if(!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return true;
+    const AlarmRinger = Cap.Plugins && Cap.Plugins.AlarmRinger;
+    if(!AlarmRinger) return true;
+    try{
+      const cur = await AlarmRinger.checkNotificationPermission();
+      if(cur.granted) return true;
+      const req = await AlarmRinger.requestNotificationPermission();
+      if(!req.granted){ showToast(t('alarmNotifPermDenied')); return false; }
+      return true;
+    }catch(e){ console.error('通知权限申请失败', e); return true; }
+  }
+  // 把当前所有"开启"的闹钟整批推给原生插件重新武装——每次闹钟数据有任何变化(增/删/改/开关切换/
+  // 云端同步拉回新数据)都会调用,插件那边负责把上一批全部清空再按这批重新排程,不用本地这边
+  // 精细计算"哪条变了才更新哪条"
+  async function rearmNativeAlarms(){
+    const Cap = window.Capacitor;
+    if(!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;
+    const AlarmRinger = Cap.Plugins && Cap.Plugins.AlarmRinger;
+    if(!AlarmRinger) return;
+    await ensureNotificationPermission();
+    const Filesystem = Cap.Plugins && Cap.Plugins.Filesystem;
+    try{
+      const enabledAlarms = alarms.filter(a=>a.enabled);
+      const payload = [];
+      for(const a of enabledAlarms){
+        let soundUri = null;
+        if(a.soundFile && Filesystem){
+          try{
+            const fileName = a.soundFile.split('/').pop();
+            const res = await Filesystem.getUri({ path: 'alarm-sounds/'+fileName, directory: 'DATA' });
+            soundUri = res.uri;
+          }catch(e){ /* 本地还没缓存到,插件那边会退回到内置蜂鸣音兜底 */ }
+        }
+        payload.push({
+          id: String(a.id), time: a.time, label: a.label || '',
+          repeatType: a.repeatType, onceDate: a.onceDate, weekdays: a.weekdays,
+          skipJpHolidays: a.skipJpHolidays, soundUri, vibrate: a.vibrate!==false,
+        });
+      }
+      await AlarmRinger.setAlarms({ alarms: payload, jpHolidays: Array.from(jpHolidaySet) });
+    }catch(e){ console.error('闹钟武装失败', e); }
+  }
+  // 正在响铃时的全屏遮罩:闹钟触发那一刻(App在前台)或者用户点通知/图标把App带到前台时
+  // (冷启动也会在init()里主动查一次),都要能看到这个界面并点"停止"把铃声关掉
+  function showRingingOverlay(state){
+    $('alarmRingingLabel').textContent = state.label || t('alarmDefaultLabel');
+    $('alarmRingingOverlay').classList.add('show');
+  }
+  function hideRingingOverlay(){
+    $('alarmRingingOverlay').classList.remove('show');
+  }
+  function wireAlarmRingerListener(){
+    const Cap = window.Capacitor;
+    if(!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;
+    const AlarmRinger = Cap.Plugins && Cap.Plugins.AlarmRinger;
+    if(!AlarmRinger) return;
+    AlarmRinger.addListener('ringingChanged', (state)=>{
+      if(state.ringing) showRingingOverlay(state); else hideRingingOverlay();
+    });
+    AlarmRinger.getRingingState().then((state)=>{
+      if(state && state.ringing) showRingingOverlay(state);
+    }).catch(()=>{});
+  }
+  $('alarmRingingStopBtn').addEventListener('click', async ()=>{
+    const Cap = window.Capacitor;
+    const AlarmRinger = Cap && Cap.Plugins && Cap.Plugins.AlarmRinger;
+    if(AlarmRinger){ try{ await AlarmRinger.stopRinging(); }catch(e){ console.error(e); } }
+    hideRingingOverlay();
   });
 
   $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); });
@@ -5723,10 +6308,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     await step('loadRateCache', loadRateCache);
     await step('loadJpHolidayCache', loadJpHolidayCache);
     await step('loadEntries', loadEntries);
+    await step('loadAlarms', loadAlarms);
     // 先用本机缓存数据渲染一次首屏,不等云端同步完成才出现内容——云同步走网络,可能要一两秒,
     // 首屏用本机数据先出来,同步完成/生成固定收支后下面还会再正确渲染一次
     await step('renderAll(本机数据优先渲染)', renderAll);
     await step('renderRatePage(本机数据优先渲染)', renderRatePage);
+    await step('renderAlarmList(本机数据优先渲染)', renderAlarmList);
+    await step('rearmNativeAlarms(本机数据优先武装)', rearmNativeAlarms);
+    await step('wireAlarmRingerListener', wireAlarmRingerListener);
     // initCloudSync 必须放在生成固定收支之前:
     // 如果先生成本月固定收支再等云端同步,云端此时还没有这条新记录、cloudUser 也还没设好,
     // pushEntriesBulkUpsert() 会因为 cloudUser 还是空的而静默跳过推送,随后 initCloudSync 拉回旧的云端账目又会把本机整个替换掉,
