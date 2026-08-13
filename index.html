@@ -2080,7 +2080,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     <span id="alarmSoundNameText"></span>
     <span class="sound-picker-action" id="alarmSoundUploadText"></span>
   </button>
-  <input type="file" id="alarmSoundFileInput" accept="audio/*" style="display:none;">
+  <input type="file" id="alarmSoundFileInput" style="display:none;">
   <div class="toggle-row" style="margin-top:14px;">
     <div class="toggle-row-label" id="alarmVibrateLabel">震动</div>
     <button type="button" class="toggle-switch" id="alarmVibrateToggle"></button>
@@ -2129,8 +2129,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // (这行都是网页/PWA/原生App共通显示的,区别于下面只在原生App里才显示的
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.0';
-  const IS_DEV_BUILD = false;
-  const DEV_BUILD = 4;
+  const IS_DEV_BUILD = true;
+  const DEV_BUILD = 1;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
