@@ -282,8 +282,11 @@
   .text-row input:disabled{background:var(--grid);color:var(--ink-soft);opacity:0.85;}
 
   /* ---- 闹钟(alarms) ---- */
-  .alarm-row{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1.5px dashed var(--grid);}
-  .alarm-row:last-child{border-bottom:none;}
+  .alarm-row-wrap{position:relative;overflow:hidden;}
+  .alarm-swipe-del{position:absolute;top:0;right:0;bottom:0;width:76px;border:none;background:var(--seal);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:600;font-family:'Noto Sans SC',sans-serif;}
+  .alarm-swipe-del .hd-icon{width:18px;height:18px;color:#fff;}
+  .alarm-row{position:relative;z-index:1;background:var(--paper);display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1.5px dashed var(--grid);touch-action:pan-y;}
+  .alarm-row-wrap:last-child .alarm-row{border-bottom:none;}
   .alarm-time{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;width:66px;flex-shrink:0;}
   .alarm-row.off .alarm-time{color:var(--ink-faint);}
   .alarm-meta{flex:1;min-width:0;}
@@ -303,13 +306,19 @@
 .time-wheel{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:200px;margin:8px 0 18px;}
 .time-wheel-col{width:64px;height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:80px 0;box-sizing:border-box;}
 .time-wheel-col::-webkit-scrollbar{display:none;}
-.time-wheel-item{height:40px;line-height:40px;text-align:center;font-family:"Noto Serif SC","Songti SC",serif;font-variant-numeric:tabular-nums;font-size:16px;color:var(--ink-faint);opacity:0.55;scroll-snap-align:center;}
-.time-wheel-item.selected{font-size:28px;font-weight:700;color:var(--ink);opacity:1;}
-.time-wheel-colon{font-size:26px;font-weight:700;color:var(--ink-soft);}
+.time-wheel-item{height:40px;line-height:40px;text-align:center;font-family:"Noto Serif SC","Songti SC",serif;font-variant-numeric:tabular-nums;font-size:22px;color:var(--ink-faint);scroll-snap-align:center;transform-origin:center;transition:transform .08s linear,opacity .08s linear,color .15s ease;will-change:transform,opacity;}
+.time-wheel-item.selected{font-weight:700;color:var(--ink);}
+.time-wheel-colon{font-size:30px;font-weight:700;color:var(--ink-soft);}
 .time-wheel-window{position:absolute;left:0;right:0;top:50%;height:40px;transform:translateY(-50%);border-top:1.5px dashed var(--seal);border-bottom:1.5px dashed var(--seal);pointer-events:none;}
-.alarm-trim-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--grid);outline:none;margin:10px 0 4px;}
-.alarm-trim-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--seal);border:3px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,0.3);cursor:pointer;}
-.alarm-trim-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--seal);border:3px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,0.3);cursor:pointer;}
+.trim-range-text-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+#alarmTrimRangeText{font-size:15px;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;font-family:"Noto Serif SC","Songti SC",serif;}
+.trim-track-wrap{position:relative;height:52px;margin:6px 0 18px;}
+.trim-track{position:absolute;top:16px;left:0;right:0;height:26px;border-radius:14px;background:var(--card);border:1.5px dashed var(--grid);overflow:hidden;}
+.trim-window{position:absolute;top:0;bottom:0;left:0;width:0;background:color-mix(in srgb, var(--seal) 26%, transparent);border-left:2px solid var(--seal);border-right:2px solid var(--seal);transition:left .1s linear,width .1s linear;}
+.trim-track-labels{position:absolute;top:0;left:2px;right:2px;display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-faint);font-variant-numeric:tabular-nums;}
+.trim-range-native{position:absolute;top:0;left:0;width:100%;height:52px;margin:0;opacity:0;-webkit-appearance:none;appearance:none;background:transparent;}
+.trim-range-native::-webkit-slider-thumb{-webkit-appearance:none;width:52px;height:52px;background:transparent;}
+.trim-range-native::-moz-range-thumb{width:52px;height:52px;background:transparent;border:none;}
 #alarmRingingOverlay{display:none;position:fixed;inset:0;z-index:999;background:var(--seal);flex-direction:column;align-items:center;justify-content:center;gap:18px;}
 #alarmRingingOverlay.show{display:flex;}
 #alarmRingingLabel{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;color:var(--card);text-align:center;padding:0 24px;}
@@ -2105,13 +2114,22 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   <div class="sheet-handle"></div>
   <h2 id="alarmTrimTitle" style="margin:0 0 4px;"></h2>
   <div class="toggle-row-hint" id="alarmTrimHint" style="margin-bottom:16px;"></div>
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
-    <span id="alarmTrimRangeText" style="font-size:14px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;"></span>
-    <button type="button" class="icon-btn" id="alarmTrimPreviewBtn" style="width:34px;height:34px;flex-shrink:0;">
+  <div class="trim-range-text-row">
+    <span id="alarmTrimRangeText"></span>
+    <button type="button" class="icon-btn" id="alarmTrimPreviewBtn">
       <svg class="hd-icon" id="alarmTrimPreviewIcon" viewBox="0 0 24 24" style="width:16px;height:16px;"><use href="#ic-play"/></svg>
     </button>
   </div>
-  <input type="range" id="alarmTrimStartSlider" class="alarm-trim-slider" min="0" max="0" step="0.1" value="0">
+  <div class="trim-track-wrap">
+    <div class="trim-track">
+      <div class="trim-window" id="alarmTrimWindowBar"></div>
+    </div>
+    <div class="trim-track-labels">
+      <span>0:00</span>
+      <span id="alarmTrimTotalLabel"></span>
+    </div>
+    <input type="range" id="alarmTrimStartSlider" class="trim-range-native" min="0" max="0" step="0.1" value="0">
+  </div>
   <audio id="alarmTrimAudio" style="display:none;"></audio>
   <button type="button" class="save-btn" id="alarmTrimConfirmBtn" style="margin-top:20px;"></button>
   <button type="button" class="text-link-btn" id="alarmTrimCancelBtn"></button>
@@ -2141,8 +2159,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // (这行都是网页/PWA/原生App共通显示的,区别于下面只在原生App里才显示的
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.1';
-  const IS_DEV_BUILD = false;
-  const DEV_BUILD = 4;
+  const IS_DEV_BUILD = true;
+  const DEV_BUILD = 1;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -4901,13 +4919,16 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     }
     const sorted = alarms.slice().sort((a,b)=> a.time.localeCompare(b.time));
     area.innerHTML = sorted.map(alarm=>`
-      <div class="alarm-row ${alarm.enabled?'':'off'}" data-id="${alarm.id}">
-        <div class="alarm-time">${escapeHtml(alarm.time)}</div>
-        <div class="alarm-meta">
-          <div class="alarm-label">${escapeHtml(alarm.label || t('alarmDefaultLabel'))}</div>
-          <div class="alarm-repeat">${escapeHtml(formatAlarmRepeatSummary(alarm))}</div>
+      <div class="alarm-row-wrap">
+        <button type="button" class="alarm-swipe-del" data-id="${alarm.id}">${iconSvg('trash')}<span>${t('delete')}</span></button>
+        <div class="alarm-row ${alarm.enabled?'':'off'}" data-id="${alarm.id}">
+          <div class="alarm-time">${escapeHtml(alarm.time)}</div>
+          <div class="alarm-meta">
+            <div class="alarm-label">${escapeHtml(alarm.label || t('alarmDefaultLabel'))}</div>
+            <div class="alarm-repeat">${escapeHtml(formatAlarmRepeatSummary(alarm))}</div>
+          </div>
+          <button type="button" class="toggle-switch ${alarm.enabled?'on':''}" data-id="${alarm.id}"></button>
         </div>
-        <button type="button" class="toggle-switch ${alarm.enabled?'on':''}" data-id="${alarm.id}"></button>
       </div>
     `).join('');
     area.querySelectorAll('.toggle-switch').forEach(btn=>{
@@ -4924,9 +4945,90 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
         rearmNativeAlarms();
       });
     });
-    area.querySelectorAll('.alarm-row').forEach(row=>{
-      row.addEventListener('click', ()=> openAlarmForm(row.getAttribute('data-id')));
+    area.querySelectorAll('.alarm-swipe-del').forEach(btn=>{
+      btn.addEventListener('click', async (ev)=>{
+        ev.stopPropagation();
+        if(await deleteAlarmById(btn.getAttribute('data-id'))) renderAlarmList();
+      });
     });
+    area.querySelectorAll('.alarm-row-wrap').forEach(wireAlarmRowSwipe);
+  }
+  // 闹钟行左滑露出删除按钮(仿邮件App那种滑动删除手势,这个App里其它列表没有现成的可以抄,
+  // 单独实现):水平位移量超过一半按钮宽度就吸附成"露出"状态,松手不够就弹回去;判断方向是
+  // 水平还是垂直(避免跟列表本身的上下滚动打架)之前不拦截触摸事件,一旦判定是水平滑动才
+  // preventDefault接管
+  const ALARM_SWIPE_DEL_WIDTH = 76;
+  function closeAllAlarmSwipes(exceptWrap){
+    $('alarmListArea').querySelectorAll('.alarm-row-wrap.swiped').forEach(w=>{
+      if(w===exceptWrap) return;
+      const row = w.querySelector('.alarm-row');
+      row.style.transition = 'transform .2s ease';
+      row.style.transform = 'translateX(0)';
+      w.classList.remove('swiped');
+    });
+  }
+  function wireAlarmRowSwipe(wrap){
+    const row = wrap.querySelector('.alarm-row');
+    let startX=null, startY=null, baseX=0, dragging=false, moved=false;
+    row.addEventListener('touchstart', (ev)=>{
+      startX = ev.touches[0].clientX; startY = ev.touches[0].clientY;
+      baseX = wrap.classList.contains('swiped') ? -ALARM_SWIPE_DEL_WIDTH : 0;
+      dragging = false; moved = false;
+      row.style.transition = 'none';
+    }, {passive:true});
+    row.addEventListener('touchmove', (ev)=>{
+      if(startX===null) return;
+      const dx = ev.touches[0].clientX - startX;
+      const dy = ev.touches[0].clientY - startY;
+      if(!dragging){
+        if(Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        if(Math.abs(dx) <= Math.abs(dy)) return;
+        dragging = true;
+      }
+      ev.preventDefault();
+      moved = true;
+      const x = Math.max(-ALARM_SWIPE_DEL_WIDTH, Math.min(0, baseX + dx));
+      row.style.transform = `translateX(${x}px)`;
+    }, {passive:false});
+    row.addEventListener('touchend', ()=>{
+      startX = null; startY = null;
+      if(!dragging) return;
+      dragging = false;
+      row.style.transition = 'transform .2s ease';
+      const m = /translateX\((-?[\d.]+)px\)/.exec(row.style.transform);
+      const currentX = m ? parseFloat(m[1]) : 0;
+      if(currentX < -ALARM_SWIPE_DEL_WIDTH/2){
+        row.style.transform = `translateX(-${ALARM_SWIPE_DEL_WIDTH}px)`;
+        wrap.classList.add('swiped');
+        closeAllAlarmSwipes(wrap);
+      } else {
+        row.style.transform = 'translateX(0)';
+        wrap.classList.remove('swiped');
+      }
+    });
+    row.addEventListener('click', (ev)=>{
+      if(moved){ moved=false; return; }
+      if(wrap.classList.contains('swiped')){
+        row.style.transition = 'transform .2s ease';
+        row.style.transform = 'translateX(0)';
+        wrap.classList.remove('swiped');
+        return;
+      }
+      openAlarmForm(row.getAttribute('data-id'));
+    });
+  }
+  // 删除闹钟这段逻辑编辑表单里的删除按钮、列表左滑露出的删除按钮两处共用
+  async function deleteAlarmById(id){
+    if(!confirm(t('alarmDeleteConfirm'))) return false;
+    // 云端删除的对象路径要在数组过滤掉这条记录之前先取出来,不然filter完就查不到这条alarm的soundFile了
+    const removedAlarm = alarms.find(a=>String(a.id)===String(id));
+    const removedSoundPath = removedAlarm ? removedAlarm.soundFile : null;
+    alarms = alarms.filter(a=>String(a.id)!==String(id));
+    await saveAlarmsLocalOnly();
+    pushAlarmDelete(id);
+    if(removedSoundPath) deleteAlarmSoundObjectPath(removedSoundPath);
+    rearmNativeAlarms();
+    return true;
   }
   function openAlarmSheet(){
     renderAlarmList();
@@ -4971,9 +5073,19 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   function buildTimeWheelCol(containerId, count){
     $(containerId).innerHTML = Array.from({length:count}, (_,i)=>`<div class="time-wheel-item" data-v="${i}">${pad2(i)}</div>`).join('');
   }
+  // 选中态不是"非此即彼"的硬切换,而是按每个格子离中心的连续距离实时算缩放/透明度——
+  // 越靠近中心越大越清晰,越远越小越淡,划动过程中每一帧都在变,才有真正的滚轮转动感
   function updateTimeWheelSelected(col){
-    const idx = Math.round(col.scrollTop / TIME_WHEEL_ITEM_H);
-    Array.from(col.children).forEach((item,i)=> item.classList.toggle('selected', i===idx));
+    const raw = col.scrollTop / TIME_WHEEL_ITEM_H;
+    const idx = Math.round(raw);
+    Array.from(col.children).forEach((item,i)=>{
+      const dist = Math.abs(i - raw);
+      const scale = Math.max(0.55, 1.35 - dist*0.32);
+      const opacity = Math.max(0.18, 1 - dist*0.38);
+      item.style.transform = `scale(${scale})`;
+      item.style.opacity = opacity;
+      item.classList.toggle('selected', i===idx);
+    });
   }
   function initTimeWheels(){
     buildTimeWheelCol('alarmHourWheel', 24);
@@ -5073,18 +5185,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   });
   $('alarmDeleteBtn').addEventListener('click', async ()=>{
     if(!editingAlarmId) return;
-    if(!confirm(t('alarmDeleteConfirm'))) return;
-    const id = editingAlarmId;
-    // 云端删除的对象路径要在数组过滤掉这条记录之前先取出来,不然filter完就查不到这条alarm的soundFile了
-    const removedAlarm = alarms.find(a=>String(a.id)===String(id));
-    const removedSoundPath = removedAlarm ? removedAlarm.soundFile : null;
-    alarms = alarms.filter(a=>String(a.id)!==String(id));
-    await saveAlarmsLocalOnly();
+    if(!await deleteAlarmById(editingAlarmId)) return;
     closeAlarmForm();
     openAlarmSheet();
-    pushAlarmDelete(id);
-    if(removedSoundPath) deleteAlarmSoundObjectPath(removedSoundPath);
-    rearmNativeAlarms();
   });
 
   // ---------- 闹钟铃声:上传到Supabase Storage(跨设备同步) + 缓存到本机响铃用 ----------
@@ -5146,19 +5249,26 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
   // 上传铃声文件(或裁剪后的Blob)到Storage,替换旧文件,并缓存到本机——不管是"时长本来就够短
   // 直接传"还是"裁剪完再传",最后都走这一个函数
+  // 后缀名->MIME类型,跟Supabase alarm-sounds桶的allowed_mime_types白名单一一对应。
+  // 上传时必须显式传contentType——不传的话交给supabase-js自己读fileOrBlob.type猜,
+  // 很多设备导入/同步来的音频文件浏览器读出来的type是空字符串或者不在白名单里的值
+  // (比如兜底成text/plain),桶那边直接拒收,报的错跟别的失败原因长得一样都是"上传失败",
+  // 不这么写几乎没法诊断真实原因是这个
+  const ALARM_SOUND_EXT_TO_MIME = { mp3:'audio/mpeg', m4a:'audio/x-m4a', mp4:'audio/mp4', wav:'audio/wav', aac:'audio/aac', ogg:'audio/ogg' };
   async function uploadAlarmSoundFile(fileOrBlob, extOverride){
     const prevSoundFile = alarmFormSoundFile;
     $('alarmSoundNameText').textContent = t('alarmSoundUploading');
     try{
       const ext = extOverride || ((fileOrBlob.name ? fileOrBlob.name.split('.').pop() : '') || 'm4a').toLowerCase();
+      const contentType = ALARM_SOUND_EXT_TO_MIME[ext] || fileOrBlob.type || 'audio/mp4';
       const path = cloudUser.id+'/'+Date.now()+'.'+ext;
-      const { error } = await supabaseClient.storage.from('alarm-sounds').upload(path, fileOrBlob, { upsert:false });
+      const { error } = await supabaseClient.storage.from('alarm-sounds').upload(path, fileOrBlob, { upsert:false, contentType });
       if(error) throw error;
       if(prevSoundFile) deleteAlarmSoundObjectPath(prevSoundFile);
       alarmFormSoundFile = path;
       await cacheAlarmSoundLocally(path, fileOrBlob);
     }catch(e){
-      console.error('铃声上传失败', e);
+      console.error('铃声上传失败', e && (e.message || e.error || e));
       showToast(t('alarmSoundUploadFailed'));
     }
     updateAlarmSoundDisplay();
@@ -5197,6 +5307,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   function updateAlarmTrimLabel(){
     const { start, end } = alarmTrimWindow();
     $('alarmTrimRangeText').textContent = formatTrimTime(start)+' - '+formatTrimTime(end)+' / '+formatTrimTime(alarmTrimDuration);
+    if(alarmTrimDuration > 0){
+      $('alarmTrimWindowBar').style.left = (start/alarmTrimDuration*100)+'%';
+      $('alarmTrimWindowBar').style.width = ((end-start)/alarmTrimDuration*100)+'%';
+    }
   }
   function openAlarmTrimSheet(file, duration){
     alarmTrimFile = file;
@@ -5208,6 +5322,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     const slider = $('alarmTrimStartSlider');
     slider.max = String(Math.max(0, duration - 1));
     slider.value = '0';
+    $('alarmTrimTotalLabel').textContent = formatTrimTime(duration);
     updateAlarmTrimLabel();
     $('alarmTrimPreviewIcon').innerHTML = '<use href="#ic-play"/>';
     $('overlay').classList.add('show'); $('alarmTrimSheet').classList.add('show');
