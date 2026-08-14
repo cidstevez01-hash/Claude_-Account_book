@@ -306,6 +306,14 @@
   .toggle-row-hint{font-size:11px;color:var(--ink-faint);margin-top:2px;}
   .sound-picker-row{width:100%;display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 14px;border:1px solid var(--grid);border-radius:12px;background:var(--card);font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);margin-bottom:14px;box-sizing:border-box;}
   .sound-picker-action{color:var(--seal);font-weight:600;font-size:13px;}
+  .sound-row{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:14px 6px 14px 6px;background:var(--card);border:1.5px solid var(--grid);margin-bottom:8px;}
+  .sound-row.selected{border-color:var(--seal);}
+  .sound-radio{width:17px;height:17px;border-radius:50%;border:2px solid var(--grid);flex-shrink:0;position:relative;}
+  .sound-row.selected .sound-radio{border-color:var(--seal);}
+  .sound-row.selected .sound-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--seal);}
+  .sound-name{flex:1;font-size:13.5px;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sound-row-btn{width:26px;height:26px;border-radius:50%;background:var(--paper);border:1px solid var(--grid);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ink-soft);padding:0;}
+  .sound-row-btn.del{color:var(--seal);}
 .time-wheel{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:200px;margin:8px 0 18px;}
 .time-wheel-col{width:64px;height:200px;overflow-x:hidden;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none;padding:80px 0;box-sizing:border-box;}
 .time-wheel-col::-webkit-scrollbar{display:none;}
@@ -2113,6 +2121,17 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   <button type="button" class="text-link-btn" id="alarmDeleteBtn" style="display:none;color:var(--seal);"></button>
 </div>
 
+<div class="sheet" id="alarmSoundListSheet" style="max-height:80vh;">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+    <button type="button" class="icon-btn" id="alarmSoundListBackBtn">‹</button>
+    <h2 id="alarmSoundListTitle" style="margin:0;flex:1;"></h2>
+  </div>
+  <div id="alarmSoundListArea"></div>
+  <button type="button" class="save-btn" id="alarmSoundUploadNewBtn" style="margin-top:14px;"></button>
+  <audio id="alarmSoundListPreviewAudio" style="display:none;"></audio>
+</div>
+
 <div class="sheet" id="alarmTrimSheet" style="max-height:70vh;">
   <div class="sheet-handle"></div>
   <h2 id="alarmTrimTitle" style="margin:0 0 4px;"></h2>
@@ -2164,8 +2183,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // (这行都是网页/PWA/原生App共通显示的,区别于下面只在原生App里才显示的
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.4';
-  const IS_DEV_BUILD = false;
-  const DEV_BUILD = 2;
+  const IS_DEV_BUILD = true;
+  const DEV_BUILD = 1;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2211,7 +2230,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmRepeatFieldLabel:'重复', alarmRepeatOnce:'仅一次', alarmRepeatWeekly:'周期',
       alarmPresetDailyLabel:'每天', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'周末',
       alarmHolidayLabel:'祝日不响', alarmHolidayHint:'遇日本法定节假日自动跳过', alarmHolidaySkipShort:'祝日不响',
-      alarmSoundFieldLabel:'铃声', alarmSoundDefault:'系统默认', alarmSoundUpload:'上传 ›',
+      alarmSoundFieldLabel:'铃声', alarmSoundDefault:'系统默认', alarmSoundUpload:'选择 ›',
+      alarmSoundListTitle:'选择铃声', alarmSoundUploadNewBtn:'上传新铃声',
+      alarmSoundNamePrompt:'给这个铃声起个名字吧(不填就用默认名)', alarmSoundUnnamed:'未命名铃声',
+      alarmSoundDeleteConfirm:'确定删除这个铃声吗？删除后无法恢复，正在用它的闹钟会改回系统默认。',
       alarmVibrateLabel:'震动', alarmDeleteBtn:'删除这个闹钟',
       alarmDeleteConfirm:'确定删除这个闹钟吗？删除后无法恢复。',
       alarmEmptyLine1:'还没有闹钟', alarmEmptyLine2:'点下面的 + 新建一个',
@@ -2285,7 +2307,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmRepeatFieldLabel:'繰り返し', alarmRepeatOnce:'一回のみ', alarmRepeatWeekly:'周期',
       alarmPresetDailyLabel:'毎日', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'週末',
       alarmHolidayLabel:'祝日は鳴らさない', alarmHolidayHint:'日本の祝日は自動的にスキップします', alarmHolidaySkipShort:'祝日オフ',
-      alarmSoundFieldLabel:'着信音', alarmSoundDefault:'デフォルト', alarmSoundUpload:'アップロード ›',
+      alarmSoundFieldLabel:'着信音', alarmSoundDefault:'デフォルト', alarmSoundUpload:'選択 ›',
+      alarmSoundListTitle:'着信音を選択', alarmSoundUploadNewBtn:'新しい着信音をアップロード',
+      alarmSoundNamePrompt:'この着信音に名前を付けてください(空欄ならデフォルト名)', alarmSoundUnnamed:'名称未設定の着信音',
+      alarmSoundDeleteConfirm:'この着信音を削除しますか？削除すると元に戻せません。使用中のアラームはシステムデフォルトに戻ります。',
       alarmVibrateLabel:'バイブレーション', alarmDeleteBtn:'このアラームを削除',
       alarmDeleteConfirm:'このアラームを削除しますか？削除すると元に戻せません。',
       alarmEmptyLine1:'アラームがありません', alarmEmptyLine2:'下の + から新規作成',
@@ -3408,6 +3433,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('alarmTrimHint').textContent = t('alarmTrimHint');
     $('alarmTrimConfirmBtn').textContent = t('alarmTrimConfirmBtn');
     $('alarmTrimCancelBtn').textContent = t('alarmTrimCancelBtn');
+    $('alarmSoundListTitle').textContent = t('alarmSoundListTitle');
+    $('alarmSoundUploadNewBtn').textContent = t('alarmSoundUploadNewBtn');
     updateAlarmSoundDisplay();
     if($('alarmSheet').classList.contains('show')) renderAlarmList();
   }
@@ -4823,6 +4850,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('alarmSheet').classList.remove('show');
     $('alarmFormSheet').classList.remove('show');
     closeAlarmTrimSheet();
+    closeAlarmSoundListSheet();
     editingAlarmId = null;
     editingEntryId = null;
     editingSubCode = null;
@@ -4898,6 +4926,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   let alarmFormRepeatType = 'weekly';
   let alarmFormWeekdays = [];
   let alarmFormSoundFile = null; // Supabase Storage对象路径,null=默认铃声
+  // "我的铃声"列表缓存:[{id, storage_path, name}],铃声现在是可以被多条闹钟共用的资源池,
+  // 不再是"上传一次=只属于当前这条闹钟"
+  let alarmSoundRecords = [];
+  let alarmSoundPreviewPlayingPath = null;
   function weekdayShortLabel(n){
     const arr = [t('wdMon'), t('wdTue'), t('wdWed'), t('wdThu'), t('wdFri'), t('wdSat'), t('wdSun')];
     return arr[n-1] || '';
@@ -5032,13 +5064,11 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // 删除闹钟这段逻辑编辑表单里的删除按钮、列表左滑露出的删除按钮两处共用
   async function deleteAlarmById(id){
     if(!confirm(t('alarmDeleteConfirm'))) return false;
-    // 云端删除的对象路径要在数组过滤掉这条记录之前先取出来,不然filter完就查不到这条alarm的soundFile了
-    const removedAlarm = alarms.find(a=>String(a.id)===String(id));
-    const removedSoundPath = removedAlarm ? removedAlarm.soundFile : null;
+    // 铃声现在是"我的铃声"独立管理的共用资源池,可能还有别的闹钟在用同一个文件,
+    // 删除这条闹钟不该连带把铃声文件也删掉——铃声自己的删除走列表页里单独的删除按钮
     alarms = alarms.filter(a=>String(a.id)!==String(id));
     await saveAlarmsLocalOnly();
     pushAlarmDelete(id);
-    if(removedSoundPath) deleteAlarmSoundObjectPath(removedSoundPath);
     rearmNativeAlarms();
     return true;
   }
@@ -5099,6 +5129,29 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       item.classList.toggle('selected', i===idx);
     });
   }
+  // 参照iOS原生滚轮选择器划过每一格都会有一下轻微"哒"声——用Web Audio API现场合成一个
+  // 极短的方波咔哒声,不用打包任何音频资源文件;只在真实划动(scroll事件)经过新的整格时
+  // 触发一次,程序化设置初始时间(setWheelTime)不触发,避免打开表单那一下也响一声
+  let wheelTickAudioCtx = null;
+  function playWheelTick(){
+    try{
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if(!wheelTickAudioCtx) wheelTickAudioCtx = new AudioCtx();
+      if(wheelTickAudioCtx.state === 'suspended') wheelTickAudioCtx.resume();
+      const ctx = wheelTickAudioCtx;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 1400;
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.018);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.02);
+    }catch(e){ /* 合成音效失败静默忽略,不影响滚轮本身的选值功能 */ }
+  }
+  const wheelLastTickIdx = new WeakMap();
   function initTimeWheels(){
     buildTimeWheelCol('alarmHourWheel', 24);
     buildTimeWheelCol('alarmMinuteWheel', 60);
@@ -5106,7 +5159,15 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       let raf = null;
       col.addEventListener('scroll', ()=>{
         if(raf) return;
-        raf = requestAnimationFrame(()=>{ updateTimeWheelSelected(col); raf = null; });
+        raf = requestAnimationFrame(()=>{
+          updateTimeWheelSelected(col);
+          const idx = Math.round(col.scrollTop / TIME_WHEEL_ITEM_H);
+          if(wheelLastTickIdx.get(col) !== idx){
+            wheelLastTickIdx.set(col, idx);
+            playWheelTick();
+          }
+          raf = null;
+        });
       });
       col.addEventListener('click', (ev)=>{
         const item = ev.target.closest('.time-wheel-item');
@@ -5121,6 +5182,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     minuteCol.scrollTop = m*TIME_WHEEL_ITEM_H;
     updateTimeWheelSelected(hourCol);
     updateTimeWheelSelected(minuteCol);
+    wheelLastTickIdx.set(hourCol, h);
+    wheelLastTickIdx.set(minuteCol, m);
   }
   function getWheelTime(){
     const h = Math.round($('alarmHourWheel').scrollTop / TIME_WHEEL_ITEM_H);
@@ -5131,8 +5194,15 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     const d = new Date(); d.setMinutes(d.getMinutes()+1);
     return pad2(d.getHours())+':'+pad2(d.getMinutes());
   }
+  function alarmSoundNameForPath(path){
+    if(!path) return t('alarmSoundDefault');
+    const rec = alarmSoundRecords.find(r=>r.storage_path===path);
+    // 列表缓存还没拉到这条记录时(比如刚打开编辑页、还没fetch完)先退化显示文件名兜底,
+    // 拉到之后updateAlarmSoundDisplay会被再调一次刷新成真正的名字
+    return rec ? (rec.name || t('alarmSoundUnnamed')) : decodeURIComponent(path.split('/').pop());
+  }
   function updateAlarmSoundDisplay(){
-    $('alarmSoundNameText').textContent = alarmFormSoundFile ? decodeURIComponent(alarmFormSoundFile.split('/').pop()) : t('alarmSoundDefault');
+    $('alarmSoundNameText').textContent = alarmFormSoundFile ? alarmSoundNameForPath(alarmFormSoundFile) : t('alarmSoundDefault');
     $('alarmSoundUploadText').textContent = t('alarmSoundUpload');
   }
   function openAlarmForm(alarmId){
@@ -5150,6 +5220,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('alarmHolidayToggle').classList.toggle('on', alarm ? !!alarm.skipJpHolidays : false);
     $('alarmVibrateToggle').classList.toggle('on', alarm ? alarm.vibrate!==false : true);
     updateAlarmSoundDisplay();
+    // "我的铃声"名字列表异步拉一遍,拉到之后名字可能从文件名兜底变成真正取的名字,
+    // 所以拉完要再刷新一次显示
+    fetchAlarmSoundRecords().then(updateAlarmSoundDisplay);
     setAlarmRepeatType(alarm ? alarm.repeatType : 'weekly');
     renderAlarmDayChips();
     $('alarmSheet').classList.remove('show');
@@ -5253,13 +5326,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       }catch(e){ console.error('铃声下载缓存失败: '+fileName, e); }
     }
   }
-  async function deleteAlarmSoundObjectPath(path){
-    if(!supabaseClient || !cloudUser || !path) return;
-    try{ await supabaseClient.storage.from('alarm-sounds').remove([path]); }
-    catch(e){ console.error('删除Storage铃声文件失败', e); }
-  }
-  // 上传铃声文件(或裁剪后的Blob)到Storage,替换旧文件,并缓存到本机——不管是"时长本来就够短
-  // 直接传"还是"裁剪完再传",最后都走这一个函数
+  // 上传铃声文件(或裁剪后的Blob)到Storage并缓存到本机——不管是"时长本来就够短直接传"
+  // 还是"裁剪完再传",最后都走这一个函数。铃声现在是"我的铃声"共用资源池的一部分,不再是
+  // "上传一次=只属于当前这条闹钟",所以这里不再删除上一个选中的文件(可能被别的闹钟在用)
   // 后缀名->MIME类型,跟Supabase alarm-sounds桶的allowed_mime_types白名单一一对应。
   // 上传时必须显式传contentType——不传的话交给supabase-js自己读fileOrBlob.type猜,
   // 很多设备导入/同步来的音频文件浏览器读出来的type是空字符串或者不在白名单里的值
@@ -5267,7 +5336,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // 不这么写几乎没法诊断真实原因是这个
   const ALARM_SOUND_EXT_TO_MIME = { mp3:'audio/mpeg', m4a:'audio/x-m4a', mp4:'audio/mp4', wav:'audio/wav', aac:'audio/aac', ogg:'audio/ogg' };
   async function uploadAlarmSoundFile(fileOrBlob, extOverride){
-    const prevSoundFile = alarmFormSoundFile;
     $('alarmSoundNameText').textContent = t('alarmSoundUploading');
     try{
       const ext = extOverride || ((fileOrBlob.name ? fileOrBlob.name.split('.').pop() : '') || 'm4a').toLowerCase();
@@ -5275,9 +5343,12 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       const path = cloudUser.id+'/'+Date.now()+'.'+ext;
       const { error } = await supabaseClient.storage.from('alarm-sounds').upload(path, fileOrBlob, { upsert:false, contentType });
       if(error) throw error;
-      if(prevSoundFile) deleteAlarmSoundObjectPath(prevSoundFile);
-      alarmFormSoundFile = path;
       await cacheAlarmSoundLocally(path, fileOrBlob);
+      // 上传成功后弹窗起个名字存进"我的铃声"库,不填就落一个默认名,之后还能改
+      const name = promptAlarmSoundName('');
+      await saveAlarmSoundRecord(path, name);
+      alarmFormSoundFile = path;
+      closeAlarmSoundListSheet();
     }catch(e){
       const detail = e && (e.message || e.error || String(e));
       console.error('铃声上传失败', detail);
@@ -5312,8 +5383,140 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       updateAlarmSoundDisplay();
     }
   }
-  $('alarmSoundPickerBtn').addEventListener('click', ()=> $('alarmSoundFileInput').click());
   $('alarmSoundFileInput').addEventListener('change', handleAlarmSoundFileSelected);
+
+  // ---------- "我的铃声"列表:铃声不再是每条闹钟各传各的,而是一个可以互相复用的资源池,
+  // 这个弹层负责选择/试听/改名/删除 ----------
+  function promptAlarmSoundName(current){
+    const input = window.prompt(t('alarmSoundNamePrompt'), current || '');
+    const trimmed = (input || '').trim();
+    return trimmed || t('alarmSoundUnnamed');
+  }
+  async function fetchAlarmSoundRecords(){
+    if(!supabaseClient || !cloudUser) return alarmSoundRecords;
+    try{
+      const { data, error } = await supabaseClient.from('alarm_sounds').select('*').eq('user_id', cloudUser.id).order('created_at', { ascending:false });
+      if(error) throw error;
+      alarmSoundRecords = data || [];
+    }catch(e){ console.error('拉取我的铃声列表失败', e); }
+    return alarmSoundRecords;
+  }
+  async function saveAlarmSoundRecord(path, name){
+    if(!supabaseClient || !cloudUser) return;
+    const record = { id: genUuid(), user_id: cloudUser.id, storage_path: path, name, created_at: new Date().toISOString() };
+    try{
+      const { error } = await supabaseClient.from('alarm_sounds').insert(record);
+      if(error) throw error;
+      alarmSoundRecords.unshift(record);
+    }catch(e){ console.error('保存铃声名字失败', e); }
+  }
+  async function renameAlarmSoundRecord(record){
+    const newName = promptAlarmSoundName(record.name);
+    if(newName === record.name) return;
+    try{
+      const { error } = await supabaseClient.from('alarm_sounds').update({ name: newName }).eq('id', record.id);
+      if(error) throw error;
+      record.name = newName;
+      if(alarmFormSoundFile === record.storage_path) updateAlarmSoundDisplay();
+    }catch(e){ console.error('改铃声名字失败', e); showToast(t('alarmSoundUploadFailed')); }
+  }
+  async function deleteAlarmSoundRecord(record){
+    if(!confirm(t('alarmSoundDeleteConfirm'))) return false;
+    try{
+      await supabaseClient.storage.from('alarm-sounds').remove([record.storage_path]);
+      const { error } = await supabaseClient.from('alarm_sounds').delete().eq('id', record.id);
+      if(error) throw error;
+      alarmSoundRecords = alarmSoundRecords.filter(r=>r.id!==record.id);
+      if(alarmFormSoundFile === record.storage_path){ alarmFormSoundFile = null; updateAlarmSoundDisplay(); }
+      return true;
+    }catch(e){ console.error('删除铃声失败', e); showToast(t('alarmSoundUploadFailed')); return false; }
+  }
+  async function toggleAlarmSoundPreview(path, btn){
+    const audio = $('alarmSoundListPreviewAudio');
+    if(alarmSoundPreviewPlayingPath === path){
+      audio.pause();
+      alarmSoundPreviewPlayingPath = null;
+      btn.querySelector('use').setAttribute('href', '#ic-play');
+      return;
+    }
+    if(alarmSoundPreviewPlayingPath){
+      const prevBtn = $('alarmSoundListArea').querySelector('.sound-row-btn.play[data-path="'+CSS.escape(alarmSoundPreviewPlayingPath)+'"]');
+      if(prevBtn) prevBtn.querySelector('use').setAttribute('href', '#ic-play');
+    }
+    try{
+      const { data, error } = await supabaseClient.storage.from('alarm-sounds').createSignedUrl(path, 60);
+      if(error) throw error;
+      audio.src = data.signedUrl;
+      audio.play();
+      alarmSoundPreviewPlayingPath = path;
+      btn.querySelector('use').setAttribute('href', '#ic-pause');
+      audio.onended = ()=>{ alarmSoundPreviewPlayingPath = null; btn.querySelector('use').setAttribute('href', '#ic-play'); };
+    }catch(e){ console.error('铃声预览失败', e); showToast(t('alarmSoundUploadFailed')); }
+  }
+  function renderAlarmSoundListSheet(){
+    const area = $('alarmSoundListArea');
+    const rows = [`
+      <div class="sound-row ${!alarmFormSoundFile?'selected':''}" data-path="">
+        <div class="sound-radio"></div>
+        <div class="sound-name">${escapeHtml(t('alarmSoundDefault'))}</div>
+      </div>
+    `];
+    alarmSoundRecords.forEach(rec=>{
+      rows.push(`
+        <div class="sound-row ${alarmFormSoundFile===rec.storage_path?'selected':''}" data-path="${escapeHtml(rec.storage_path)}">
+          <div class="sound-radio"></div>
+          <div class="sound-name">${escapeHtml(rec.name || t('alarmSoundUnnamed'))}</div>
+          <button type="button" class="sound-row-btn play" data-path="${escapeHtml(rec.storage_path)}"><svg class="hd-icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><use href="#ic-play"/></svg></button>
+          <button type="button" class="sound-row-btn edit" data-id="${rec.id}"><svg class="hd-icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><use href="#ic-pencil"/></svg></button>
+          <button type="button" class="sound-row-btn del" data-id="${rec.id}"><svg class="hd-icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><use href="#ic-trash"/></svg></button>
+        </div>
+      `);
+    });
+    area.innerHTML = rows.join('');
+    area.querySelectorAll('.sound-row').forEach(row=>{
+      row.addEventListener('click', (ev)=>{
+        if(ev.target.closest('.sound-row-btn')) return;
+        alarmFormSoundFile = row.getAttribute('data-path') || null;
+        updateAlarmSoundDisplay();
+        closeAlarmSoundListSheet();
+      });
+    });
+    area.querySelectorAll('.sound-row-btn.play').forEach(btn=>{
+      btn.addEventListener('click', async (ev)=>{ ev.stopPropagation(); await toggleAlarmSoundPreview(btn.getAttribute('data-path'), btn); });
+    });
+    area.querySelectorAll('.sound-row-btn.edit').forEach(btn=>{
+      btn.addEventListener('click', async (ev)=>{
+        ev.stopPropagation();
+        const rec = alarmSoundRecords.find(r=>r.id===btn.getAttribute('data-id'));
+        if(!rec) return;
+        await renameAlarmSoundRecord(rec);
+        renderAlarmSoundListSheet();
+      });
+    });
+    area.querySelectorAll('.sound-row-btn.del').forEach(btn=>{
+      btn.addEventListener('click', async (ev)=>{
+        ev.stopPropagation();
+        const rec = alarmSoundRecords.find(r=>r.id===btn.getAttribute('data-id'));
+        if(!rec) return;
+        if(await deleteAlarmSoundRecord(rec)) renderAlarmSoundListSheet();
+      });
+    });
+  }
+  async function openAlarmSoundListSheet(){
+    if(!supabaseClient || !cloudUser){ showToast(t('alarmNativeOnly')); return; }
+    await fetchAlarmSoundRecords();
+    renderAlarmSoundListSheet();
+    $('overlay').classList.add('show');
+    $('alarmSoundListSheet').classList.add('show');
+  }
+  function closeAlarmSoundListSheet(){
+    $('alarmSoundListPreviewAudio').pause();
+    alarmSoundPreviewPlayingPath = null;
+    $('alarmSoundListSheet').classList.remove('show');
+  }
+  $('alarmSoundPickerBtn').addEventListener('click', openAlarmSoundListSheet);
+  $('alarmSoundListBackBtn').addEventListener('click', closeAlarmSoundListSheet);
+  $('alarmSoundUploadNewBtn').addEventListener('click', ()=> $('alarmSoundFileInput').click());
 
   // ---------- 铃声裁剪:选的音频超过2分钟时,不直接拒绝,而是让用户自己选一段
   // ≤2分钟的区间,裁剪成一段新的wav再走正常的上传流程。参考iOS原生视频裁剪的交互:
