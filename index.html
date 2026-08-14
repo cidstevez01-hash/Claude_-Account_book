@@ -287,6 +287,9 @@
   .alarm-swipe-del .hd-icon{width:18px;height:18px;color:#fff;}
   .alarm-row{position:relative;z-index:1;background:var(--paper);display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1.5px dashed var(--grid);touch-action:pan-y;}
   .alarm-row-wrap:last-child .alarm-row{border-bottom:none;}
+  .alarm-add-center-btn{width:58px;height:58px;border-radius:50%;background:var(--seal);color:#fff;border:none;box-shadow:0 4px 0 var(--seal-soft),0 6px 16px rgba(58,47,40,0.28);display:flex;align-items:center;justify-content:center;margin:22px auto 4px;}
+  .alarm-add-center-btn .hd-icon{width:24px;height:24px;}
+  [data-skin="summerB"] .alarm-add-center-btn{box-shadow:0 0 16px -2px var(--seal),0 3px 0 var(--seal-soft);}
   .alarm-time{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;width:66px;flex-shrink:0;}
   .alarm-row.off .alarm-time{color:var(--ink-faint);}
   .alarm-meta{flex:1;min-width:0;}
@@ -2054,10 +2057,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   <div class="sheet-handle"></div>
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
     <h2 id="alarmSheetTitle" style="margin:0;">闹钟</h2>
-    <div style="display:flex;gap:8px;">
-      <button type="button" class="icon-btn" id="alarmAddBtn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-plus"/></svg></button>
-      <button type="button" class="icon-btn" id="alarmSheetCloseBtn">✕</button>
-    </div>
+    <button type="button" class="icon-btn" id="alarmSheetCloseBtn">✕</button>
   </div>
   <div id="alarmListArea"></div>
 </div>
@@ -2165,7 +2165,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.2';
   const IS_DEV_BUILD = true;
-  const DEV_BUILD = 1;
+  const DEV_BUILD = 2;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2214,7 +2214,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmSoundFieldLabel:'铃声', alarmSoundDefault:'系统默认', alarmSoundUpload:'上传 ›',
       alarmVibrateLabel:'震动', alarmDeleteBtn:'删除这个闹钟',
       alarmDeleteConfirm:'确定删除这个闹钟吗？删除后无法恢复。',
-      alarmEmptyLine1:'还没有闹钟', alarmEmptyLine2:'点右上角 + 新建一个',
+      alarmEmptyLine1:'还没有闹钟', alarmEmptyLine2:'点下面的 + 新建一个',
       alarmWeekdayRequired:'请至少选择一天',
       alarmSoundUploading:'铃声上传中...',
       alarmSoundUploadFailed:'铃声上传失败', alarmNativeOnly:'仅原生App内可用',
@@ -2288,7 +2288,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmSoundFieldLabel:'着信音', alarmSoundDefault:'デフォルト', alarmSoundUpload:'アップロード ›',
       alarmVibrateLabel:'バイブレーション', alarmDeleteBtn:'このアラームを削除',
       alarmDeleteConfirm:'このアラームを削除しますか？削除すると元に戻せません。',
-      alarmEmptyLine1:'アラームがありません', alarmEmptyLine2:'右上の + から新規作成',
+      alarmEmptyLine1:'アラームがありません', alarmEmptyLine2:'下の + から新規作成',
       alarmWeekdayRequired:'曜日を1つ以上選んでください',
       alarmSoundUploading:'着信音アップロード中...',
       alarmSoundUploadFailed:'着信音のアップロードに失敗しました', alarmNativeOnly:'ネイティブアプリ内でのみ利用可能',
@@ -4916,10 +4916,16 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     else base = days.map(weekdayShortLabel).join('、');
     return alarm.skipJpHolidays ? base+' · '+t('alarmHolidaySkipShort') : base;
   }
+  function wireAlarmAddCenterBtn(){
+    const btn = $('alarmListArea').querySelector('.alarm-add-center-btn');
+    if(btn) btn.addEventListener('click', ()=> openAlarmForm(null));
+  }
+  const alarmAddCenterBtnHtml = `<button type="button" class="alarm-add-center-btn"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-plus"/></svg></button>`;
   function renderAlarmList(){
     const area = $('alarmListArea');
     if(!alarms.length){
-      area.innerHTML = `<div class="empty"><div class="big"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-alarm"/></svg></div><p>${t('alarmEmptyLine1')}<br>${t('alarmEmptyLine2')}</p></div>`;
+      area.innerHTML = `<div class="empty"><div class="big"><svg class="hd-icon" viewBox="0 0 24 24"><use href="#ic-alarm"/></svg></div><p>${t('alarmEmptyLine1')}<br>${t('alarmEmptyLine2')}</p></div>${alarmAddCenterBtnHtml}`;
+      wireAlarmAddCenterBtn();
       return;
     }
     const sorted = alarms.slice().sort((a,b)=> a.time.localeCompare(b.time));
@@ -4935,7 +4941,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
           <button type="button" class="toggle-switch ${alarm.enabled?'on':''}" data-id="${alarm.id}"></button>
         </div>
       </div>
-    `).join('');
+    `).join('') + alarmAddCenterBtnHtml;
+    wireAlarmAddCenterBtn();
     area.querySelectorAll('.toggle-switch').forEach(btn=>{
       btn.addEventListener('click', async (ev)=>{
         ev.stopPropagation();
@@ -5153,7 +5160,6 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('alarmFormSheet').classList.remove('show');
     editingAlarmId = null;
   }
-  $('alarmAddBtn').addEventListener('click', ()=> openAlarmForm(null));
   $('alarmSheetCloseBtn').addEventListener('click', closeAllSheets);
   $('alarmFormBackBtn').addEventListener('click', ()=>{ closeAlarmForm(); openAlarmSheet(); });
   $('alarmRtOnceBtn').addEventListener('click', ()=> setAlarmRepeatType('once'));
