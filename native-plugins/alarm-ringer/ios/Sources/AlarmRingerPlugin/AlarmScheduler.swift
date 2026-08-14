@@ -41,6 +41,7 @@ final class AlarmScheduler: NSObject {
         super.init()
         loadPersisted()
         UNUserNotificationCenter.current().delegate = self
+        registerNotificationCategory()
         NotificationCenter.default.addObserver(self, selector: #selector(appDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
         if !alarms.isEmpty { startPollingTimer() }
@@ -241,6 +242,20 @@ final class AlarmScheduler: NSObject {
     private static let maxPendingNotifications = 64
     private static let burstNotificationCount = 12
     private static let burstIntervalSeconds: TimeInterval = 5
+    // 通知分类+"停止"这个action的标识符——用户不用点开App,直接长按/下拉通知本身就能把
+    // 这一批还没弹出的密集通知一起撤掉(action的options留空、不带.foreground,点了不会拉起App)
+    static let alarmCategoryIdentifier = "ALARM_RINGER_CATEGORY"
+    static let stopActionIdentifier = "ALARM_RINGER_STOP_ACTION"
+    // 附在每条通知content.userInfo里,标记它属于"哪个闹钟的哪一次触发"这一组,用户点"停止"
+    // 时用这个key把同组里其余还没弹出的通知一起撤掉,不用去解析identifier字符串
+    private static let groupKeyField = "groupKey"
+
+    private func registerNotificationCategory() {
+        // "停止"这两个字中文日文写法完全一样,不需要按语言区分
+        let stopAction = UNNotificationAction(identifier: AlarmScheduler.stopActionIdentifier, title: "停止", options: [])
+        let category = UNNotificationCategory(identifier: AlarmScheduler.alarmCategoryIdentifier, actions: [stopAction], intentIdentifiers: [], options: [])
+        UNUserNotificationCenter.current().setNotificationCategories([category])
+    }
 
     private func rescheduleFallbackNotifications() {
         let center = UNUserNotificationCenter.current()
@@ -252,10 +267,11 @@ final class AlarmScheduler: NSObject {
         for alarm in alarms {
             guard totalScheduled < AlarmScheduler.maxPendingNotifications else { break }
             guard let nextOcc = nextOccurrences(for: alarm, from: now, limit: 1, withinDays: 30).first else { continue }
+            let groupKey = alarm.id + "_" + String(Int(nextOcc.timeIntervalSince1970))
             let budget = min(AlarmScheduler.burstNotificationCount, AlarmScheduler.maxPendingNotifications - totalScheduled)
             for i in 0..<budget {
                 let fireDate = nextOcc.addingTimeInterval(Double(i) * AlarmScheduler.burstIntervalSeconds)
-                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: fireDate, idSuffix: "_b\(i)")
+                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: fireDate, groupKey: groupKey, idSuffix: "_b\(i)")
                 totalScheduled += 1
             }
         }
@@ -268,22 +284,39 @@ final class AlarmScheduler: NSObject {
             let occurrences = nextOccurrences(for: alarm, from: now, limit: 6, withinDays: 30)
             for occ in occurrences.dropFirst() {
                 guard totalScheduled < AlarmScheduler.maxPendingNotifications else { break }
-                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: occ, idSuffix: "_single")
+                let groupKey = alarm.id + "_" + String(Int(occ.timeIntervalSince1970))
+                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: occ, groupKey: groupKey, idSuffix: "_single")
                 totalScheduled += 1
             }
         }
     }
 
-    private func scheduleFallbackNotification(center: UNUserNotificationCenter, alarm: AlarmDef, fireDate: Date, idSuffix: String) {
+    private func scheduleFallbackNotification(center: UNUserNotificationCenter, alarm: AlarmDef, fireDate: Date, groupKey: String, idSuffix: String) {
         let content = UNMutableNotificationContent()
         content.title = alarm.label.isEmpty ? alarm.time : alarm.label
         content.body = alarm.time
         content.sound = .default
+        content.categoryIdentifier = AlarmScheduler.alarmCategoryIdentifier
+        content.userInfo = [AlarmScheduler.groupKeyField: groupKey]
         let interval = max(1, fireDate.timeIntervalSinceNow)
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
-        let identifier = AlarmScheduler.notificationIdPrefix + alarm.id + "_" + String(Int(fireDate.timeIntervalSince1970)) + idSuffix
+        let identifier = AlarmScheduler.notificationIdPrefix + groupKey + idSuffix
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         center.add(request, withCompletionHandler: nil)
+    }
+
+    // 用户在通知上点了"停止":把同一组(同一个闹钟的同一次触发)里其余还没弹出的密集通知
+    // 全部撤掉,不然过几秒后续通知还会一条条冒出来
+    private func cancelNotificationGroup(_ groupKey: String) {
+        let center = UNUserNotificationCenter.current()
+        center.getPendingNotificationRequests { requests in
+            let idsToRemove = requests
+                .filter { ($0.content.userInfo[AlarmScheduler.groupKeyField] as? String) == groupKey }
+                .map { $0.identifier }
+            if !idsToRemove.isEmpty {
+                center.removePendingNotificationRequests(withIdentifiers: idsToRemove)
+            }
+        }
     }
 
     // 算出某个闹钟从from往后、withinDays天以内的最多limit个下一次触发时间点
@@ -422,5 +455,18 @@ extension AlarmScheduler: UNUserNotificationCenterDelegate {
         // 密集排的那些如果原样弹出来,会跟真正响铃的声音叠在一起变成"又响又叮咚"很吵——
         // isRinging为true时就不再展示这条通知了
         completionHandler(isRinging ? [] : [.alert, .sound])
+    }
+
+    // 用户在通知上直接操作(长按/下拉展开点"停止",或者默认点通知本体打开App)的回调。
+    // "停止"这个action注册时options留空、没有.foreground,系统处理它不会把App拉到前台——
+    // 这正是"不用点开App就能关掉"这个诉求要的效果;真要点通知本体才会正常打开App
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.actionIdentifier == AlarmScheduler.stopActionIdentifier {
+            stopRinging()
+            if let groupKey = response.notification.request.content.userInfo[AlarmScheduler.groupKeyField] as? String {
+                cancelNotificationGroup(groupKey)
+            }
+        }
+        completionHandler()
     }
 }
