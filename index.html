@@ -2184,7 +2184,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.4';
   const IS_DEV_BUILD = true;
-  const DEV_BUILD = 1;
+  const DEV_BUILD = 2;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2350,6 +2350,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   let paymentMethods = [];
   let expenseTags = [];
   let incomeTags = [];
+  // 支付方式在某个月固定日期还元率会变(比如メルペイ每月8日9%),优先级比payment_methods
+  // 自己的default_point_rate高;结构:[{payment_method_code, day_of_month, rate}]
+  let paymentPointRules = [];
   const allCatMap = {};
   const payMethodMap = {};
   const allTagMap = {};
@@ -2366,9 +2369,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // 老版本号的本机缓存会被当成无效直接丢弃、强制走一次云端拉取,不会让改了字段名的旧缓存
   // (比如只有key没有code)在没联网/联网失败时被当成正常数据渲染出来,导致选中判断全部匹配不上、
   // 看起来像"选不中"/"锁死"这种诡异的假bug
-  const CATALOG_CACHE_VERSION = 2;
+  const CATALOG_CACHE_VERSION = 3;
   function saveCatalogCache(){
-    storageSetSafe('ledger_catalog_cache', JSON.stringify({v:CATALOG_CACHE_VERSION, expenseCats, incomeCats, paymentMethods, expenseTags, incomeTags}), false).catch(e=> console.error('分类缓存保存失败', e));
+    storageSetSafe('ledger_catalog_cache', JSON.stringify({v:CATALOG_CACHE_VERSION, expenseCats, incomeCats, paymentMethods, expenseTags, incomeTags, paymentPointRules}), false).catch(e=> console.error('分类缓存保存失败', e));
   }
   function loadCatalogCacheFromLocal(){
     try{
@@ -2381,6 +2384,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
         paymentMethods = data.paymentMethods || [];
         expenseTags = data.expenseTags || [];
         incomeTags = data.incomeTags || [];
+        paymentPointRules = data.paymentPointRules || [];
         rebuildCatalogMaps();
         return true;
       }
@@ -2415,7 +2419,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       incomeCats = rowsToCatArray(catRows, subRows, 'income');
       paymentMethods = payRows.slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(p=>({
         id:p.id, code:p.code, zh:p.zh, ja:p.ja, icon:p.icon||undefined,
-        badge: p.badge_bg ? {bg:p.badge_bg, text:p.badge_text} : undefined
+        badge: p.badge_bg ? {bg:p.badge_bg, text:p.badge_text} : undefined,
+        pointRate: p.default_point_rate != null ? p.default_point_rate : null
       }));
       // tags表是后加的,万一还没跑迁移SQL/建表,不能让它拖累分类/支付方式一起加载失败——单独try,失败就标签列表留空
       try{
@@ -2425,6 +2430,12 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
         expenseTags = rowsToTagArray(tagRows, 'expense');
         incomeTags = rowsToTagArray(tagRows, 'income');
       }catch(e){ console.error('拉取标签失败,标签列表暂时为空', e); }
+      // payment_method_point_rules也是后加的表,同样单独try,没跑迁移SQL不影响其它数据加载
+      try{
+        const ruleRes = await supabaseClient.from('payment_method_point_rules').select('*');
+        if(ruleRes.error) throw ruleRes.error;
+        paymentPointRules = ruleRes.data || [];
+      }catch(e){ console.error('拉取支付方式还元率特殊规则失败,暂时按默认还元率算', e); }
       rebuildCatalogMaps();
       saveCatalogCache();
       return true;
@@ -4345,6 +4356,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       btn.addEventListener('click', ()=>{
         selectedPayMethod = paymentMethods.find(p=>p.code===btn.getAttribute('data-code'));
         renderPayGrid();
+        updatePointsAutoFill();
       });
     });
   }
@@ -4751,6 +4763,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
   $('catPickerRow').addEventListener('click', openCatPicker);
   $('catPickerBackBtn').addEventListener('click', closeCatPicker);
+  // 金额/日期变化也会影响积分自动计算的结果(日期影响的是"今天是不是特殊还元率生效那天"),
+  // 跟支付方式切换共用同一套updatePointsAutoFill()
+  $('amountInput').addEventListener('input', updatePointsAutoFill);
+  $('dateInput').addEventListener('change', updatePointsAutoFill);
 
   let editingEntryId = null;
 
@@ -4794,6 +4810,28 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     const isExpense = currentType==='expense';
     $('pointsFieldWrap').style.display = isExpense ? '' : 'none';
     if(!isExpense) $('pointsInput').value = '';
+  }
+  // 某个支付方式在选中日期这天实际生效的还元率——特殊日期规则(比如メルペイ每月8日9%)
+  // 优先级比payment_methods自己的默认还元率高;两者都没有就返回null(没有默认还元率的
+  // 支付方式,积分栏留空,不瞎算)
+  function resolvePointRate(payCode, dateStr){
+    if(!payCode || !dateStr) return null;
+    const day = parseInt(dateStr.split('-')[2], 10);
+    const rule = paymentPointRules.find(r=>r.payment_method_code===payCode && r.day_of_month===day);
+    if(rule) return rule.rate;
+    const pm = payMethodMap[payCode];
+    return (pm && pm.pointRate != null) ? pm.pointRate : null;
+  }
+  // 选支付方式/改金额/改日期都会重新按当前这几项算一遍积分,直接覆盖填进输入框——
+  // 用户之后还能再手动改,但只要金额/支付方式/日期这几项又变了,会再算一遍重新覆盖,
+  // 不单独维护"用户是否手动改过"这个脏标记,保持行为简单可预期
+  function updatePointsAutoFill(){
+    if(currentType !== 'expense' || !selectedPayMethod){ return; }
+    const amount = parseFloat($('amountInput').value);
+    const dateStr = $('dateInput').value || todayStr();
+    const rate = resolvePointRate(selectedPayMethod.code, dateStr);
+    if(rate == null || isNaN(amount) || amount <= 0){ $('pointsInput').value = ''; return; }
+    $('pointsInput').value = String(Math.floor(amount * rate));
   }
   function setTypeSegmentLocked(locked){
     $('typeSegment').classList.toggle('disabled', locked);
@@ -5789,7 +5827,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     hideRingingOverlay();
   });
 
-  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); });
+  $('segExpense').addEventListener('click', ()=>{ currentType='expense'; $('segExpense').classList.add('active'); $('segIncome').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); updatePointsAutoFill(); });
   $('segIncome').addEventListener('click', ()=>{ currentType='income'; $('segIncome').classList.add('active'); $('segExpense').classList.remove('active'); selectedCat=null; selectedTag=null; editingTagCode=null; openTagMenuCode=null; updateCatPickerRowDisplay(); renderTagGrid(); updatePointsFieldVisibility(); });
 
   $('saveBtn').addEventListener('click', async ()=>{
