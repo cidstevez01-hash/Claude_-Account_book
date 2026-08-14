@@ -2164,8 +2164,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // (这行都是网页/PWA/原生App共通显示的,区别于下面只在原生App里才显示的
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.3';
-  const IS_DEV_BUILD = false;
-  const DEV_BUILD = 2;
+  const IS_DEV_BUILD = true;
+  const DEV_BUILD = 1;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -5300,7 +5300,17 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     try{ duration = await getAudioDurationSeconds(file); }
     catch(e){ showToast(t('alarmSoundUploadFailed')); return; }
     if(duration > 120){ openAlarmTrimSheet(file, duration); return; }
-    await uploadAlarmSoundFile(file);
+    // 时长够短不用弹裁剪页,但原始文件本身(比如未压缩录音)体积可能照样超过Storage桶
+    // 上传上限,统一走跟裁剪一样的标准化流程(单声道+降采样)压缩体积,不直接传原文件
+    $('alarmSoundNameText').textContent = t('alarmSoundUploading');
+    try{
+      const blob = await trimAudioToWavBlob(file, 0, duration);
+      await uploadAlarmSoundFile(blob, 'wav');
+    }catch(e){
+      console.error('铃声标准化失败', e && (e.message || e));
+      showToast(t('alarmSoundUploadFailed'));
+      updateAlarmSoundDisplay();
+    }
   }
   $('alarmSoundPickerBtn').addEventListener('click', ()=> $('alarmSoundFileInput').click());
   $('alarmSoundFileInput').addEventListener('change', handleAlarmSoundFileSelected);
@@ -5435,29 +5445,51 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     for(let i=0;i<interleaved.length;i++, offset+=2){ view.setInt16(offset, interleaved[i], true); }
     return new Blob([view], { type: 'audio/wav' });
   }
+  // 铃声用不上原始录音的高保真音质(立体声+高采样率),真机实测发现有的原始文件
+  // (比如未压缩的录音)哪怕裁到2分钟以内,体积照样轻松超过Storage桶10MB的上传上限——
+  // 报错原文是"The object exceeded the maximum allowed size"。统一降到单声道+22050Hz
+  // 采样率(电话音质水平,够用),120秒封顶也才5MB左右,留了一倍多余量
+  const ALARM_SOUND_TARGET_SAMPLE_RATE = 22050;
   async function trimAudioToWavBlob(file, startSec, endSec){
     const arrayBuffer = await file.arrayBuffer();
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    const ctx = new AudioCtx();
+    const decodeCtx = new AudioCtx();
     let audioBuffer;
-    try{ audioBuffer = await ctx.decodeAudioData(arrayBuffer); }
-    finally{ ctx.close(); }
-    const sampleRate = audioBuffer.sampleRate;
+    try{ audioBuffer = await decodeCtx.decodeAudioData(arrayBuffer); }
+    finally{ decodeCtx.close(); }
+    const srcSampleRate = audioBuffer.sampleRate;
     const numChannels = audioBuffer.numberOfChannels;
-    const startSample = Math.max(0, Math.floor(startSec * sampleRate));
-    const endSample = Math.min(audioBuffer.length, Math.floor(endSec * sampleRate));
-    const frameCount = Math.max(0, endSample - startSample);
-    const channelData = [];
-    for(let c=0;c<numChannels;c++) channelData.push(audioBuffer.getChannelData(c));
-    const interleaved = new Int16Array(frameCount * numChannels);
+    const startSample = Math.max(0, Math.floor(startSec * srcSampleRate));
+    const endSample = Math.min(audioBuffer.length, Math.floor(endSec * srcSampleRate));
+    const frameCount = Math.max(1, endSample - startSample);
+
+    // 先在原始采样率下把选中区间截出来、多声道平均混成单声道,再交给OfflineAudioContext重采样。
+    // 这里不取min(target,srcSampleRate)图省事去避免"源本来就低于目标就不用再采样"——
+    // 实测过普通AudioContext.decodeAudioData()解码时就已经把音频重采样成了这个环境的硬件
+    // 默认采样率(常见44100/48000),不会保留源文件真实的低采样率,所以这层判断在实践中一直
+    // 不会命中,干脆直接定死目标采样率更诚实
+    const targetRate = ALARM_SOUND_TARGET_SAMPLE_RATE;
+    const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, Math.ceil(frameCount * targetRate / srcSampleRate), targetRate);
+    const trimmedMono = offlineCtx.createBuffer(1, frameCount, srcSampleRate);
+    const monoData = trimmedMono.getChannelData(0);
     for(let i=0;i<frameCount;i++){
-      for(let c=0;c<numChannels;c++){
-        let s = channelData[c][startSample+i];
-        s = Math.max(-1, Math.min(1, s));
-        interleaved[i*numChannels+c] = s < 0 ? s*0x8000 : s*0x7FFF;
-      }
+      let sum = 0;
+      for(let c=0;c<numChannels;c++) sum += audioBuffer.getChannelData(c)[startSample+i];
+      monoData[i] = sum / numChannels;
     }
-    return encodeWavFromSamples(interleaved, numChannels, sampleRate);
+    const source = offlineCtx.createBufferSource();
+    source.buffer = trimmedMono;
+    source.connect(offlineCtx.destination);
+    source.start(0);
+    const rendered = await offlineCtx.startRendering(); // 交给OfflineAudioContext完成真正的重采样
+
+    const samples = rendered.getChannelData(0);
+    const interleaved = new Int16Array(samples.length);
+    for(let i=0;i<samples.length;i++){
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      interleaved[i] = s < 0 ? s*0x8000 : s*0x7FFF;
+    }
+    return encodeWavFromSamples(interleaved, 1, targetRate);
   }
   $('alarmTrimConfirmBtn').addEventListener('click', async ()=>{
     if(!alarmTrimFile || !supabaseClient || !cloudUser) return;
