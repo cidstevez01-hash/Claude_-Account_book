@@ -2165,7 +2165,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.3';
   const IS_DEV_BUILD = true;
-  const DEV_BUILD = 1;
+  const DEV_BUILD = 2;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -5419,12 +5419,14 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     alarmTrimTail = tail;
     if(alarmTrimPlayheadPos < alarmTrimHead || alarmTrimPlayheadPos > alarmTrimTail) playAlarmTrimFrom(alarmTrimHead);
   });
+  // 拖播放头(不管往前快进还是往后快退,touchmove给的都是手指当前对应的绝对秒数,
+  // 两个方向走的是同一套逻辑):只管跳到新位置,不主动暂停;如果这时候是暂停状态就顺便
+  // 开始播放,已经在播放就让它接着放,不重复调用play()
   wireTrimDrag($('alarmTrimPlayhead'), (sec)=>{
     const audio = $('alarmTrimAudio');
-    audio.pause();
-    setPreviewIcon(false);
     alarmTrimPlayheadPos = Math.max(alarmTrimHead, Math.min(alarmTrimTail, sec));
     audio.currentTime = alarmTrimPlayheadPos;
+    if(audio.paused){ audio.play(); setPreviewIcon(true); }
   });
   $('alarmTrimCancelBtn').addEventListener('click', closeAlarmTrimSheet);
   // 把选中的[start,end]区间解码+截取+重新编码成wav(纯前端实现,不依赖任何第三方库):
