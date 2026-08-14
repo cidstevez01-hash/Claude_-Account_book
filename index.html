@@ -300,6 +300,13 @@
   .toggle-row-hint{font-size:11px;color:var(--ink-faint);margin-top:2px;}
   .sound-picker-row{width:100%;display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 14px;border:1px solid var(--grid);border-radius:12px;background:var(--card);font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);margin-bottom:14px;box-sizing:border-box;}
   .sound-picker-action{color:var(--seal);font-weight:600;font-size:13px;}
+.time-wheel{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:200px;margin:8px 0 18px;}
+.time-wheel-col{width:64px;height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:80px 0;box-sizing:border-box;}
+.time-wheel-col::-webkit-scrollbar{display:none;}
+.time-wheel-item{height:40px;line-height:40px;text-align:center;font-family:"Noto Serif SC","Songti SC",serif;font-variant-numeric:tabular-nums;font-size:16px;color:var(--ink-faint);opacity:0.55;scroll-snap-align:center;}
+.time-wheel-item.selected{font-size:28px;font-weight:700;color:var(--ink);opacity:1;}
+.time-wheel-colon{font-size:26px;font-weight:700;color:var(--ink-soft);}
+.time-wheel-window{position:absolute;left:0;right:0;top:50%;height:40px;transform:translateY(-50%);border-top:1.5px dashed var(--seal);border-bottom:1.5px dashed var(--seal);pointer-events:none;}
 .alarm-trim-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--grid);outline:none;margin:10px 0 4px;}
 .alarm-trim-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--seal);border:3px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,0.3);cursor:pointer;}
 .alarm-trim-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--seal);border:3px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,0.3);cursor:pointer;}
@@ -2049,7 +2056,12 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     <button type="button" class="icon-btn" id="alarmFormBackBtn">‹</button>
     <h2 id="alarmFormTitle" style="margin:0;flex:1;">新建闹钟</h2>
   </div>
-  <div class="text-row"><input type="time" id="alarmTimeInput"></div>
+  <div class="time-wheel">
+    <div class="time-wheel-col" id="alarmHourWheel"></div>
+    <div class="time-wheel-colon">:</div>
+    <div class="time-wheel-col" id="alarmMinuteWheel"></div>
+    <div class="time-wheel-window"></div>
+  </div>
   <div class="field-label" id="alarmLabelFieldLabel">标签</div>
   <div class="text-row"><input type="text" id="alarmLabelInput" placeholder="" maxlength="30"></div>
   <div class="field-label" id="alarmRepeatFieldLabel">重复</div>
@@ -2130,7 +2142,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.0';
   const IS_DEV_BUILD = true;
-  const DEV_BUILD = 3;
+  const DEV_BUILD = 4;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2180,7 +2192,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmVibrateLabel:'震动', alarmDeleteBtn:'删除这个闹钟',
       alarmDeleteConfirm:'确定删除这个闹钟吗？删除后无法恢复。',
       alarmEmptyLine1:'还没有闹钟', alarmEmptyLine2:'点右上角 + 新建一个',
-      alarmTimeRequired:'请选择时间', alarmWeekdayRequired:'请至少选择一天',
+      alarmWeekdayRequired:'请至少选择一天',
       alarmSoundUploading:'铃声上传中...',
       alarmSoundUploadFailed:'铃声上传失败', alarmNativeOnly:'仅原生App内可用',
       alarmNotifPermDenied:'未获得通知权限，闹钟到点可能无法提醒，请到系统设置里打开',
@@ -2254,7 +2266,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmVibrateLabel:'バイブレーション', alarmDeleteBtn:'このアラームを削除',
       alarmDeleteConfirm:'このアラームを削除しますか？削除すると元に戻せません。',
       alarmEmptyLine1:'アラームがありません', alarmEmptyLine2:'右上の + から新規作成',
-      alarmTimeRequired:'時間を選択してください', alarmWeekdayRequired:'曜日を1つ以上選んでください',
+      alarmWeekdayRequired:'曜日を1つ以上選んでください',
       alarmSoundUploading:'着信音アップロード中...',
       alarmSoundUploadFailed:'着信音のアップロードに失敗しました', alarmNativeOnly:'ネイティブアプリ内でのみ利用可能',
       alarmNotifPermDenied:'通知の許可がありません。アラーム時刻に通知できない場合があります。設定から許可してください',
@@ -4952,6 +4964,45 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('alarmOncePanel').style.display = rt==='once' ? 'block' : 'none';
     $('alarmWeeklyPanel').style.display = rt==='weekly' ? 'block' : 'none';
   }
+  // iOS原生风格滚轮时间选择器:两列可滚动列表(时/分),靠CSS scroll-snap-type让手指划完自动
+  // 吸附到整数格,中间用一条印章红虚线窗口框住当前选中项。不用系统<input type="time">是因为
+  // 那个控件在WKWebView里样式跟App的手绘风完全不搭、也不好操作
+  const TIME_WHEEL_ITEM_H = 40;
+  function buildTimeWheelCol(containerId, count){
+    $(containerId).innerHTML = Array.from({length:count}, (_,i)=>`<div class="time-wheel-item" data-v="${i}">${pad2(i)}</div>`).join('');
+  }
+  function updateTimeWheelSelected(col){
+    const idx = Math.round(col.scrollTop / TIME_WHEEL_ITEM_H);
+    Array.from(col.children).forEach((item,i)=> item.classList.toggle('selected', i===idx));
+  }
+  function initTimeWheels(){
+    buildTimeWheelCol('alarmHourWheel', 24);
+    buildTimeWheelCol('alarmMinuteWheel', 60);
+    [$('alarmHourWheel'), $('alarmMinuteWheel')].forEach(col=>{
+      let raf = null;
+      col.addEventListener('scroll', ()=>{
+        if(raf) return;
+        raf = requestAnimationFrame(()=>{ updateTimeWheelSelected(col); raf = null; });
+      });
+      col.addEventListener('click', (ev)=>{
+        const item = ev.target.closest('.time-wheel-item');
+        if(!item) return;
+        col.scrollTo({ top: Number(item.getAttribute('data-v'))*TIME_WHEEL_ITEM_H, behavior:'smooth' });
+      });
+    });
+  }
+  function setWheelTime(h, m){
+    const hourCol = $('alarmHourWheel'), minuteCol = $('alarmMinuteWheel');
+    hourCol.scrollTop = h*TIME_WHEEL_ITEM_H;
+    minuteCol.scrollTop = m*TIME_WHEEL_ITEM_H;
+    updateTimeWheelSelected(hourCol);
+    updateTimeWheelSelected(minuteCol);
+  }
+  function getWheelTime(){
+    const h = Math.round($('alarmHourWheel').scrollTop / TIME_WHEEL_ITEM_H);
+    const m = Math.round($('alarmMinuteWheel').scrollTop / TIME_WHEEL_ITEM_H);
+    return pad2(Math.min(23,Math.max(0,h))) + ':' + pad2(Math.min(59,Math.max(0,m)));
+  }
   function defaultAlarmTime(){
     const d = new Date(); d.setMinutes(d.getMinutes()+1);
     return pad2(d.getHours())+':'+pad2(d.getMinutes());
@@ -4965,7 +5016,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     const alarm = editingAlarmId ? alarms.find(a=>String(a.id)===String(editingAlarmId)) : null;
     $('alarmFormTitle').textContent = alarm ? t('alarmEditTitle') : t('alarmNewTitle');
     $('alarmDeleteBtn').style.display = alarm ? 'block' : 'none';
-    $('alarmTimeInput').value = alarm ? alarm.time : defaultAlarmTime();
+    const timeStr = alarm ? alarm.time : defaultAlarmTime();
+    const [timeH, timeM] = timeStr.split(':').map(Number);
+    setWheelTime(timeH, timeM);
     $('alarmLabelInput').value = alarm ? alarm.label : '';
     alarmFormWeekdays = alarm && alarm.repeatType==='weekly' ? (alarm.weekdays||[]).slice() : [1,2,3,4,5];
     alarmFormSoundFile = alarm ? alarm.soundFile : null;
@@ -4994,8 +5047,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   $('alarmHolidayToggle').addEventListener('click', ()=> $('alarmHolidayToggle').classList.toggle('on'));
   $('alarmVibrateToggle').addEventListener('click', ()=> $('alarmVibrateToggle').classList.toggle('on'));
   $('alarmSaveBtn').addEventListener('click', async ()=>{
-    const time = $('alarmTimeInput').value;
-    if(!time){ showToast(t('alarmTimeRequired')); return; }
+    const time = getWheelTime();
     if(alarmFormRepeatType==='weekly' && alarmFormWeekdays.length===0){ showToast(t('alarmWeekdayRequired')); return; }
     const label = $('alarmLabelInput').value.trim();
     const now = Date.now();
@@ -6457,6 +6509,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     await step('loadJpHolidayCache', loadJpHolidayCache);
     await step('loadEntries', loadEntries);
     await step('loadAlarms', loadAlarms);
+    await step('initTimeWheels', async ()=> initTimeWheels());
     // 先用本机缓存数据渲染一次首屏,不等云端同步完成才出现内容——云同步走网络,可能要一两秒,
     // 首屏用本机数据先出来,同步完成/生成固定收支后下面还会再正确渲染一次
     await step('renderAll(本机数据优先渲染)', renderAll);
