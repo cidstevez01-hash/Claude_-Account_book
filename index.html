@@ -304,7 +304,7 @@
   .sound-picker-row{width:100%;display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 14px;border:1px solid var(--grid);border-radius:12px;background:var(--card);font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);margin-bottom:14px;box-sizing:border-box;}
   .sound-picker-action{color:var(--seal);font-weight:600;font-size:13px;}
 .time-wheel{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:200px;margin:8px 0 18px;}
-.time-wheel-col{width:64px;height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:80px 0;box-sizing:border-box;}
+.time-wheel-col{width:64px;height:200px;overflow-x:hidden;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none;padding:80px 0;box-sizing:border-box;}
 .time-wheel-col::-webkit-scrollbar{display:none;}
 .time-wheel-item{height:40px;line-height:40px;text-align:center;font-family:"Noto Serif SC","Songti SC",serif;font-variant-numeric:tabular-nums;font-size:22px;color:var(--ink-faint);scroll-snap-align:center;transform-origin:center;transition:transform .08s linear,opacity .08s linear,color .15s ease;will-change:transform,opacity;}
 .time-wheel-item.selected{font-weight:700;color:var(--ink);}
@@ -312,13 +312,16 @@
 .time-wheel-window{position:absolute;left:0;right:0;top:50%;height:40px;transform:translateY(-50%);border-top:1.5px dashed var(--seal);border-bottom:1.5px dashed var(--seal);pointer-events:none;}
 .trim-range-text-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
 #alarmTrimRangeText{font-size:15px;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;font-family:"Noto Serif SC","Songti SC",serif;}
-.trim-track-wrap{position:relative;height:52px;margin:6px 0 18px;}
-.trim-track{position:absolute;top:16px;left:0;right:0;height:26px;border-radius:14px;background:var(--card);border:1.5px dashed var(--grid);overflow:hidden;}
-.trim-window{position:absolute;top:0;bottom:0;left:0;width:0;background:color-mix(in srgb, var(--seal) 26%, transparent);border-left:2px solid var(--seal);border-right:2px solid var(--seal);transition:left .1s linear,width .1s linear;}
+.trim-track-wrap{position:relative;height:64px;margin:18px 0 22px;}
+.trim-track{position:absolute;top:19px;left:0;right:0;height:26px;border-radius:14px;background:var(--card);border:1.5px dashed var(--grid);}
+.trim-window{position:absolute;top:0;bottom:0;left:0;width:0;background:color-mix(in srgb, var(--seal) 20%, transparent);border-radius:2px;}
+/* 裁剪头/尾——两个独立可拖拽的手柄,只管裁剪区间,不碰播放;仿iOS原生视频裁剪的黄色抓手样式 */
+.trim-handle{position:absolute;top:-9px;bottom:-9px;width:18px;margin-left:-9px;background:var(--seal);border-radius:9px;box-shadow:0 1px 4px rgba(0,0,0,0.35);touch-action:none;z-index:3;}
+.trim-handle::after{content:'';position:absolute;top:50%;left:50%;width:2px;height:14px;background:#fff;opacity:0.85;transform:translate(-50%,-50%);border-radius:1px;}
+/* 播放头——单独一条竖线+圆点,拖它只改播放位置/预览,不影响裁剪区间本身 */
+.trim-playhead{position:absolute;top:-11px;bottom:-11px;width:3px;margin-left:-1.5px;background:var(--ink);border-radius:2px;z-index:4;touch-action:none;}
+.trim-playhead::before{content:'';position:absolute;top:-5px;left:50%;width:10px;height:10px;background:var(--ink);border-radius:50%;transform:translateX(-50%);}
 .trim-track-labels{position:absolute;top:0;left:2px;right:2px;display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-faint);font-variant-numeric:tabular-nums;}
-.trim-range-native{position:absolute;top:0;left:0;width:100%;height:52px;margin:0;opacity:0;-webkit-appearance:none;appearance:none;background:transparent;}
-.trim-range-native::-webkit-slider-thumb{-webkit-appearance:none;width:52px;height:52px;background:transparent;}
-.trim-range-native::-moz-range-thumb{width:52px;height:52px;background:transparent;border:none;}
 #alarmRingingOverlay{display:none;position:fixed;inset:0;z-index:999;background:var(--seal);flex-direction:column;align-items:center;justify-content:center;gap:18px;}
 #alarmRingingOverlay.show{display:flex;}
 #alarmRingingLabel{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;color:var(--card);text-align:center;padding:0 24px;}
@@ -510,7 +513,7 @@
   .detail-search.has-text .clear-btn{display:inline-flex;}
   .app-toast{position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 92px);transform:translateX(-50%) translateY(12px);background:var(--ink);color:var(--paper);padding:11px 12px 11px 18px;border-radius:12px;font-size:13px;max-width:82%;box-shadow:0 6px 18px rgba(0,0,0,0.25);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;display:flex;align-items:center;gap:10px;cursor:pointer;}
   .app-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
-  .app-toast-text{flex:1;}
+  .app-toast-text{flex:1;white-space:pre-line;}
   .app-toast-close{border:none;background:rgba(255,255,255,0.16);color:var(--paper);width:20px;height:20px;border-radius:50%;font-size:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;}
   .update-edge-tab{position:fixed;top:calc(env(safe-area-inset-top) + 104px);right:0;width:26px;height:41px;
     background:rgba(209,102,90,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
@@ -2121,14 +2124,16 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     </button>
   </div>
   <div class="trim-track-wrap">
-    <div class="trim-track">
+    <div class="trim-track" id="alarmTrimTrack">
       <div class="trim-window" id="alarmTrimWindowBar"></div>
+      <div class="trim-playhead" id="alarmTrimPlayhead"></div>
+      <div class="trim-handle trim-handle-head" id="alarmTrimHeadHandle"></div>
+      <div class="trim-handle trim-handle-tail" id="alarmTrimTailHandle"></div>
     </div>
     <div class="trim-track-labels">
       <span>0:00</span>
       <span id="alarmTrimTotalLabel"></span>
     </div>
-    <input type="range" id="alarmTrimStartSlider" class="trim-range-native" min="0" max="0" step="0.1" value="0">
   </div>
   <audio id="alarmTrimAudio" style="display:none;"></audio>
   <button type="button" class="save-btn" id="alarmTrimConfirmBtn" style="margin-top:20px;"></button>
@@ -2159,7 +2164,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // (这行都是网页/PWA/原生App共通显示的,区别于下面只在原生App里才显示的
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.0.2';
-  const IS_DEV_BUILD = false;
+  const IS_DEV_BUILD = true;
   const DEV_BUILD = 1;
   const I18N = {
     zh:{
@@ -2215,7 +2220,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmSoundUploadFailed:'铃声上传失败', alarmNativeOnly:'仅原生App内可用',
       alarmNotifPermDenied:'未获得通知权限，闹钟到点可能无法提醒，请到系统设置里打开',
       alarmRingingStop:'停止',
-      alarmTrimTitle:'裁剪铃声', alarmTrimHint:'音频超过2分钟，拖动下面的滑块选一段2分钟以内的区间',
+      alarmTrimTitle:'裁剪铃声', alarmTrimHint:'音频超过2分钟，拖动两端的手柄选一段2分钟以内的区间，拖中间的竖线试听',
       alarmTrimConfirmBtn:'裁剪并上传', alarmTrimCancelBtn:'取消',
       updateTitle:'新版本可用', updateBtn:'更新', updateDesc:'点击更新即可更新到最新<br>版本',
       updating:'更新中...', updateDone:'更新完毕',
@@ -2289,7 +2294,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmSoundUploadFailed:'着信音のアップロードに失敗しました', alarmNativeOnly:'ネイティブアプリ内でのみ利用可能',
       alarmNotifPermDenied:'通知の許可がありません。アラーム時刻に通知できない場合があります。設定から許可してください',
       alarmRingingStop:'停止',
-      alarmTrimTitle:'着信音をトリミング', alarmTrimHint:'音声が2分を超えています。下のスライダーで2分以内の範囲を選んでください',
+      alarmTrimTitle:'着信音をトリミング', alarmTrimHint:'音声が2分を超えています。両端のハンドルで2分以内の範囲を選び、中央の縦線で試聴できます',
       alarmTrimConfirmBtn:'トリミングしてアップロード', alarmTrimCancelBtn:'キャンセル',
       updateTitle:'新バージョンあり', updateBtn:'更新', updateDesc:'クリックして最新版に更新します',
       updating:'更新中...', updateDone:'更新が完了しました',
@@ -5268,8 +5273,12 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmFormSoundFile = path;
       await cacheAlarmSoundLocally(path, fileOrBlob);
     }catch(e){
-      console.error('铃声上传失败', e && (e.message || e.error || e));
-      showToast(t('alarmSoundUploadFailed'));
+      const detail = e && (e.message || e.error || String(e));
+      console.error('铃声上传失败', detail);
+      // 之前光提示"上传失败"四个字,不管是mime被拒、桶不存在、RLS没过还是别的原因看起来
+      // 都一样,真机上没法远程调试就完全没法诊断——把原始报错文本也拼进toast里,方便用户
+      // 直接截图告诉我具体是什么错
+      showToast(t('alarmSoundUploadFailed') + (detail ? ('\n'+detail) : ''), 8000);
     }
     updateAlarmSoundDisplay();
   }
@@ -5291,40 +5300,59 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   $('alarmSoundFileInput').addEventListener('change', handleAlarmSoundFileSelected);
 
   // ---------- 铃声裁剪:选的音频超过2分钟时,不直接拒绝,而是让用户自己选一段
-  // ≤2分钟的区间,裁剪成一段新的wav再走正常的上传流程 ----------
+  // ≤2分钟的区间,裁剪成一段新的wav再走正常的上传流程。参考iOS原生视频裁剪的交互:
+  // 裁剪头/尾是两个独立手柄,只管"裁哪一段",不影响播放;播放头是单独一条线,只管
+  // "预览到哪了",两者分开、互不干扰——这是这次重新设计前(单滑块身兼两职)最大的问题 ----------
   let alarmTrimFile = null;
   let alarmTrimDuration = 0;
   let alarmTrimObjectUrl = null;
+  let alarmTrimHead = 0, alarmTrimTail = 0, alarmTrimPlayheadPos = 0;
+  const ALARM_TRIM_MAX_WINDOW = 120;
+  const ALARM_TRIM_MIN_WINDOW = 3;
   function formatTrimTime(sec){
     const m = Math.floor(sec/60), s = Math.floor(sec%60);
     return m+':'+String(s).padStart(2,'0');
   }
-  function alarmTrimWindow(){
-    const start = parseFloat($('alarmTrimStartSlider').value) || 0;
-    const end = Math.min(start + 120, alarmTrimDuration);
-    return { start, end };
+  function trimTrackSecFromClientX(clientX){
+    const rect = $('alarmTrimTrack').getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return ratio * alarmTrimDuration;
   }
-  function updateAlarmTrimLabel(){
-    const { start, end } = alarmTrimWindow();
-    $('alarmTrimRangeText').textContent = formatTrimTime(start)+' - '+formatTrimTime(end)+' / '+formatTrimTime(alarmTrimDuration);
-    if(alarmTrimDuration > 0){
-      $('alarmTrimWindowBar').style.left = (start/alarmTrimDuration*100)+'%';
-      $('alarmTrimWindowBar').style.width = ((end-start)/alarmTrimDuration*100)+'%';
-    }
+  function updateAlarmTrimVisual(){
+    if(alarmTrimDuration <= 0) return;
+    $('alarmTrimRangeText').textContent = formatTrimTime(alarmTrimHead)+' - '+formatTrimTime(alarmTrimTail)+' / '+formatTrimTime(alarmTrimDuration);
+    $('alarmTrimWindowBar').style.left = (alarmTrimHead/alarmTrimDuration*100)+'%';
+    $('alarmTrimWindowBar').style.width = ((alarmTrimTail-alarmTrimHead)/alarmTrimDuration*100)+'%';
+    $('alarmTrimHeadHandle').style.left = (alarmTrimHead/alarmTrimDuration*100)+'%';
+    $('alarmTrimTailHandle').style.left = (alarmTrimTail/alarmTrimDuration*100)+'%';
+    $('alarmTrimPlayhead').style.left = (alarmTrimPlayheadPos/alarmTrimDuration*100)+'%';
+  }
+  function setPreviewIcon(playing){
+    $('alarmTrimPreviewIcon').innerHTML = playing ? '<use href="#ic-pause"/>' : '<use href="#ic-play"/>';
+  }
+  // 播放头跳到指定位置(裁剪区间内)并开始播放——拖动裁剪头/尾导致当前播放位置被甩到
+  // 区间外时用这个自动接回来,不需要用户自己再手动点一下播放
+  function playAlarmTrimFrom(sec){
+    const audio = $('alarmTrimAudio');
+    alarmTrimPlayheadPos = sec;
+    audio.currentTime = sec;
+    audio.play();
+    setPreviewIcon(true);
+    updateAlarmTrimVisual();
   }
   function openAlarmTrimSheet(file, duration){
     alarmTrimFile = file;
     alarmTrimDuration = duration;
+    alarmTrimHead = 0;
+    alarmTrimTail = Math.min(ALARM_TRIM_MAX_WINDOW, duration);
+    alarmTrimPlayheadPos = 0;
     if(alarmTrimObjectUrl) URL.revokeObjectURL(alarmTrimObjectUrl);
     alarmTrimObjectUrl = URL.createObjectURL(file);
     $('alarmTrimAudio').src = alarmTrimObjectUrl;
     $('alarmTrimAudio').pause();
-    const slider = $('alarmTrimStartSlider');
-    slider.max = String(Math.max(0, duration - 1));
-    slider.value = '0';
     $('alarmTrimTotalLabel').textContent = formatTrimTime(duration);
-    updateAlarmTrimLabel();
-    $('alarmTrimPreviewIcon').innerHTML = '<use href="#ic-play"/>';
+    updateAlarmTrimVisual();
+    setPreviewIcon(false);
     $('overlay').classList.add('show'); $('alarmTrimSheet').classList.add('show');
   }
   function closeAlarmTrimSheet(){
@@ -5333,18 +5361,54 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(alarmTrimObjectUrl){ URL.revokeObjectURL(alarmTrimObjectUrl); alarmTrimObjectUrl = null; }
     alarmTrimFile = null;
   }
-  $('alarmTrimStartSlider').addEventListener('input', ()=>{ $('alarmTrimAudio').pause(); $('alarmTrimPreviewIcon').innerHTML = '<use href="#ic-play"/>'; updateAlarmTrimLabel(); });
+  // 播放中持续把播放头推进,碰到裁剪尾就无缝跳回裁剪头继续播放(不暂停),这是"裁剪区间
+  // 内循环预览"的核心;拖播放头/暂停时这个监听器还在,只是currentTime不在推进,无副作用
+  $('alarmTrimAudio').addEventListener('timeupdate', ()=>{
+    const audio = $('alarmTrimAudio');
+    if(audio.paused) return;
+    if(audio.currentTime >= alarmTrimTail){ audio.currentTime = alarmTrimHead; }
+    alarmTrimPlayheadPos = audio.currentTime;
+    updateAlarmTrimVisual();
+  });
   $('alarmTrimPreviewBtn').addEventListener('click', ()=>{
     const audio = $('alarmTrimAudio');
-    if(!audio.paused){ audio.pause(); $('alarmTrimPreviewIcon').innerHTML = '<use href="#ic-play"/>'; return; }
-    const { start, end } = alarmTrimWindow();
-    audio.currentTime = start;
-    audio.play();
-    $('alarmTrimPreviewIcon').innerHTML = '<use href="#ic-pause"/>';
-    const stopAtEnd = ()=>{
-      if(audio.currentTime >= end){ audio.pause(); $('alarmTrimPreviewIcon').innerHTML = '<use href="#ic-play"/>'; audio.removeEventListener('timeupdate', stopAtEnd); }
-    };
-    audio.addEventListener('timeupdate', stopAtEnd);
+    if(!audio.paused){ audio.pause(); setPreviewIcon(false); return; }
+    // 播放头已经跑到裁剪区间外(比如刚拖完裁剪头/尾)就从头开始,否则从当前位置续播
+    const from = (alarmTrimPlayheadPos < alarmTrimHead || alarmTrimPlayheadPos > alarmTrimTail) ? alarmTrimHead : alarmTrimPlayheadPos;
+    playAlarmTrimFrom(from);
+  });
+  // 裁剪头/尾/播放头三个手柄共用的触摸拖拽逻辑,onMove拿到手指当前对应的秒数去更新各自的状态
+  function wireTrimDrag(handleEl, onMove){
+    let dragging = false;
+    handleEl.addEventListener('touchstart', (ev)=>{ dragging = true; ev.stopPropagation(); }, {passive:true});
+    handleEl.addEventListener('touchmove', (ev)=>{
+      if(!dragging) return;
+      ev.preventDefault();
+      onMove(trimTrackSecFromClientX(ev.touches[0].clientX));
+      updateAlarmTrimVisual();
+    }, {passive:false});
+    handleEl.addEventListener('touchend', (ev)=>{ dragging = false; ev.stopPropagation(); }, {passive:true});
+  }
+  wireTrimDrag($('alarmTrimHeadHandle'), (sec)=>{
+    let head = Math.min(sec, alarmTrimTail - ALARM_TRIM_MIN_WINDOW);
+    head = Math.max(head, alarmTrimTail - ALARM_TRIM_MAX_WINDOW, 0);
+    alarmTrimHead = head;
+    // 裁剪头拖过了当前播放位置(播放位置现在落在区间外),自动接回裁剪头继续播放,
+    // 不需要用户自己再点播放——不影响播放暂停的判断放在这,拖尾巴那个手柄同理
+    if(alarmTrimPlayheadPos < alarmTrimHead || alarmTrimPlayheadPos > alarmTrimTail) playAlarmTrimFrom(alarmTrimHead);
+  });
+  wireTrimDrag($('alarmTrimTailHandle'), (sec)=>{
+    let tail = Math.max(sec, alarmTrimHead + ALARM_TRIM_MIN_WINDOW);
+    tail = Math.min(tail, alarmTrimHead + ALARM_TRIM_MAX_WINDOW, alarmTrimDuration);
+    alarmTrimTail = tail;
+    if(alarmTrimPlayheadPos < alarmTrimHead || alarmTrimPlayheadPos > alarmTrimTail) playAlarmTrimFrom(alarmTrimHead);
+  });
+  wireTrimDrag($('alarmTrimPlayhead'), (sec)=>{
+    const audio = $('alarmTrimAudio');
+    audio.pause();
+    setPreviewIcon(false);
+    alarmTrimPlayheadPos = Math.max(alarmTrimHead, Math.min(alarmTrimTail, sec));
+    audio.currentTime = alarmTrimPlayheadPos;
   });
   $('alarmTrimCancelBtn').addEventListener('click', closeAlarmTrimSheet);
   // 把选中的[start,end]区间解码+截取+重新编码成wav(纯前端实现,不依赖任何第三方库):
@@ -5391,7 +5455,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
   $('alarmTrimConfirmBtn').addEventListener('click', async ()=>{
     if(!alarmTrimFile || !supabaseClient || !cloudUser) return;
-    const { start, end } = alarmTrimWindow();
+    const start = alarmTrimHead, end = alarmTrimTail;
     const file = alarmTrimFile;
     closeAlarmTrimSheet();
     $('alarmSoundNameText').textContent = t('alarmSoundUploading');
