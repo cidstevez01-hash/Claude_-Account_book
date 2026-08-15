@@ -289,7 +289,76 @@
   .alarm-row-wrap:last-child .alarm-row{border-bottom:none;}
   .alarm-add-center-btn{width:58px;height:58px;border-radius:50%;background:var(--seal);color:#fff;border:none;box-shadow:0 4px 0 var(--seal-soft),0 6px 16px rgba(58,47,40,0.28);display:flex;align-items:center;justify-content:center;margin:22px auto 4px;}
   .alarm-add-center-btn .hd-icon{width:24px;height:24px;}
-  [data-skin="summerB"] .alarm-add-center-btn{box-shadow:0 0 16px -2px var(--seal),0 3px 0 var(--seal-soft);}
+  /* 闹钟列表每条改成独立发光卡片；"+"按钮反馈"不要实心"，改成空心渐变描边款，
+     不再跟.fab/.save-btn一样用实心底 */
+  [data-skin="summerB"] .alarm-row-wrap{margin-bottom:8px;}
+  [data-skin="summerB"] .alarm-row{
+    background:var(--card);border-radius:14px;border:1.5px solid color-mix(in srgb, var(--seal) 30%, var(--grid));
+    box-shadow:0 0 8px -4px color-mix(in srgb, var(--seal) 45%, transparent);
+  }
+  [data-skin="summerB"] .alarm-time{
+    background:linear-gradient(135deg,#F2C94C,#E85D4A,#F2967F);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  [data-skin="summerB"] .alarm-row.off .alarm-time{
+    background:none;-webkit-text-fill-color:var(--ink-faint);color:var(--ink-faint);
+  }
+  [data-skin="summerB"] .toggle-switch.on{
+    background:linear-gradient(135deg,#F2C94C,#E85D4A);box-shadow:0 0 8px -1px var(--seal);
+  }
+  [data-skin="summerB"] .alarm-add-center-btn{
+    background:var(--card);border:2px solid transparent;
+    background-image:linear-gradient(var(--card),var(--card)),linear-gradient(135deg,#F2C94C,#E85D4A);
+    background-origin:border-box;background-clip:padding-box, border-box;
+    box-shadow:0 0 14px -2px var(--seal);
+  }
+  [data-skin="summerB"] .alarm-add-center-btn .hd-icon{stroke:url(#fw-icon-grad-line);}
+  /* 铃声选择页：虚线卡片+选中态发光加星标点缀，呼应弹窗本身的虚线描边 */
+  [data-skin="summerB"] .sound-row{
+    background:var(--card);border:1.5px dashed color-mix(in srgb, var(--seal) 45%, var(--grid));position:relative;
+  }
+  [data-skin="summerB"] .sound-row.selected{
+    border-style:solid;border-color:var(--seal);
+    background:linear-gradient(135deg, color-mix(in srgb, #F2C94C 14%, var(--card)), color-mix(in srgb, #E85D4A 10%, var(--card)));
+    box-shadow:0 0 16px -3px var(--seal);
+  }
+  [data-skin="summerB"] .sound-row.selected::after{
+    content:'✦';position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    color:#F2C94C;font-size:13px;text-shadow:0 0 6px #F2C94C;
+  }
+  [data-skin="summerB"] .sound-radio{border-color:color-mix(in srgb, var(--seal) 50%, var(--grid));}
+  [data-skin="summerB"] .sound-row.selected .sound-radio{border-color:#F2C94C;}
+  [data-skin="summerB"] .sound-row.selected .sound-radio::after{background:linear-gradient(135deg,#F2C94C,#E85D4A);}
+  [data-skin="summerB"] .sound-row-btn.play{
+    background:radial-gradient(circle at 35% 30%, #F2967F, #E85D4A 60%, #d1665a);border:none;color:#fff;
+  }
+  [data-skin="summerB"] .sound-row-btn.edit,[data-skin="summerB"] .sound-row-btn.del{
+    background:var(--paper);border:1px solid color-mix(in srgb, var(--seal) 35%, var(--grid));
+  }
+  [data-skin="summerB"] .sound-row-btn.del{color:var(--seal);}
+  [data-skin="summerB"] #alarmSoundUploadIconBtn{
+    border-color:var(--seal);color:var(--seal);box-shadow:0 0 8px -2px var(--seal);
+  }
+  /* 闹钟表单页(新建/编辑)：输入框/铃声选择行加描边发光，分段/日期chip和开关改渐变，
+     保存按钮换渐变；时间轮盘数字额外加一层柔光(反馈要求保留) */
+  [data-skin="summerB"] #alarmFormSheet .text-row input{
+    border-color:color-mix(in srgb, var(--seal) 35%, var(--grid));
+    box-shadow:0 0 8px -4px color-mix(in srgb, var(--seal) 40%, transparent);
+  }
+  [data-skin="summerB"] #alarmFormSheet .segment button.active,
+  [data-skin="summerB"] #alarmFormSheet .day-chip.active{
+    background:linear-gradient(135deg,#F2C94C,#E85D4A);color:#fff;box-shadow:0 0 8px -2px var(--seal);
+  }
+  [data-skin="summerB"] #alarmFormSheet .sound-picker-row{
+    border-color:color-mix(in srgb, var(--seal) 35%, var(--grid));
+    box-shadow:0 0 8px -4px color-mix(in srgb, var(--seal) 40%, transparent);
+  }
+  [data-skin="summerB"] #alarmFormSheet .time-wheel-col{
+    text-shadow:0 0 10px color-mix(in srgb, var(--seal) 30%, transparent);
+  }
+  [data-skin="summerB"] #alarmFormSheet .save-btn{
+    background:linear-gradient(135deg,#F2C94C,#E85D4A);box-shadow:0 0 14px -2px var(--seal), 0 3px 0 var(--seal-soft);
+  }
   .alarm-time{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;width:66px;flex-shrink:0;}
   .alarm-row.off .alarm-time{color:var(--ink-faint);}
   .alarm-meta{flex:1;min-width:0;}
@@ -582,6 +651,13 @@
       <stop offset="55%" stop-color="#E85D4A"/>
       <stop offset="100%" stop-color="#F2967F"/>
     </radialGradient>
+  <!-- fw-icon-grad是objectBoundingBox径向渐变，对没有面积的纯直线path(比如
+       ic-plus的两条直线)不生效(SVG规范：零面积包围盒时objectBoundingBox效果
+       不渲染)。line-icon专用这个userSpaceOnUse版本，坐标系对齐24x24的viewBox。 -->
+  <linearGradient id="fw-icon-grad-line" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F2C94C"/>
+      <stop offset="100%" stop-color="#E85D4A"/>
+    </linearGradient>
   <symbol id="ic-gear-fw" viewBox="11.47 11.36 487.07 487.07"><g transform="translate(0.000000,510.000000) scale(0.100000,-0.100000)"
 fill="url(#fw-icon-grad)" stroke="none">
 <path d="M2347 4613 c-16 -15 -5 -44 23 -58 25 -13 30 -22 30 -51 0 -31 11
@@ -1620,6 +1696,88 @@ l-27 28 58 -19 c50 -17 74 -19 173 -14z m-500 -17 c0 -2 -15 -16 -32 -33 l-33
 c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     </g>
   </symbol>
+  <!-- ic-alarm-fw：闹钟按钮在花火皮肤下的图标，云朵造型钟身(不对称，
+       左边凸起小、右边凸起大)，椭圆表盘+闪电造型指针，"Zzz"睡眠字样，
+       AI生成创意线稿+potrace描摹成矢量，跟折扇/孔明灯/金鱼同一套流程。
+       viewBox裁到内容占比~98%，跟其它-fw图标统一。 -->
+  <symbol id="ic-alarm-fw" viewBox="56.90 51.77 906.12 906.12">
+    <g transform="translate(0,1024) scale(0.1,-0.1)" fill="url(#fw-icon-grad)" stroke="none">
+<path d="M7800 8341 c-85 -21 -220 -53 -300 -71 -214 -48 -214 -48 -238 -70
+-49 -46 -29 -122 34 -128 33 -3 462 91 495 109 28 15 27 12 -69 -126 -507
+-731 -507 -730 -462 -775 31 -31 88 -26 334 30 121 27 273 61 336 76 122 27
+150 44 150 91 0 13 -5 33 -10 43 -23 43 -40 43 -238 0 -296 -65 -324 -70 -319
+-56 5 12 380 569 495 735 56 80 60 96 37 140 -26 52 -41 52 -245 2z"/>
+<path d="M8769 7936 c-2 -2 -87 -18 -189 -35 -249 -42 -250 -42 -273 -72 -23
+-32 -16 -62 18 -85 21 -14 34 -14 128 0 57 9 121 16 141 16 l36 0 -117 -172
+c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
+77 11 178 23 225 27 99 8 130 29 130 87 0 69 -31 77 -215 52 -60 -8 -111 -12
+-113 -10 -5 5 19 41 127 190 225 310 248 363 179 405 -34 20 -42 23 -49 16z"/>
+<path d="M5475 7805 c-641 -89 -1156 -503 -1340 -1076 l-37 -117 -52 23 c-74
+32 -147 47 -234 48 -95 2 -261 -7 -237 -12 10 -2 -19 -15 -66 -30 -279 -90
+-497 -286 -607 -546 -39 -94 -44 -100 -69 -86 -10 6 -13 11 -8 11 15 1 -38 29
+-55 29 -13 1 -13 -1 0 -10 12 -9 11 -9 -5 -4 -11 4 -70 10 -131 13 -233 10
+-465 -93 -645 -286 -134 -143 -227 -363 -229 -539 0 -35 -3 -43 -19 -43 -50 0
+-261 -63 -347 -104 -324 -154 -589 -453 -682 -772 -171 -578 83 -1158 668
+-1524 778 -487 2513 -819 4035 -770 1044 33 2149 234 2865 520 683 273 1072
+633 1215 1125 70 242 57 550 -35 779 -39 99 -106 232 -137 274 -13 17 -21 37
+-17 44 4 6 3 8 -3 5 -5 -3 -35 25 -66 62 -66 81 -177 181 -265 240 -67 45
+-277 151 -300 151 -7 0 -11 3 -9 8 3 4 -9 7 -26 8 -18 1 -56 5 -84 9 -61 9
+-58 -3 -41 147 44 406 -144 825 -487 1083 -93 70 -285 162 -393 188 -51 13
+-91 25 -88 27 2 3 -43 6 -100 8 -93 3 -166 -4 -284 -24 l-35 -6 -44 134 c-75
+228 -191 417 -354 578 -48 46 -84 86 -82 89 7 7 -16 31 -25 26 -11 -7 -180
+121 -172 130 4 3 -2 3 -12 -1 -13 -5 -17 -4 -13 3 4 6 1 10 -6 10 -6 -1 -51
+18 -98 41 -47 23 -132 57 -188 76 -58 19 -95 36 -84 38 10 3 -2 4 -27 4 -25 0
+-74 5 -110 12 -102 20 -321 23 -435 7z m426 -171 c178 -34 379 -112 512 -201
+154 -103 357 -325 432 -473 66 -132 135 -340 135 -410 0 -12 13 -35 29 -51 33
+-33 75 -38 120 -15 52 28 200 49 291 42 358 -25 692 -261 850 -600 96 -205
+123 -487 65 -680 -36 -120 -15 -148 127 -165 118 -13 288 -67 372 -118 370
+-221 591 -652 548 -1067 -53 -505 -409 -901 -1063 -1181 -229 -99 -663 -238
+-916 -295 -525 -119 -1103 -203 -1648 -242 -242 -17 -1094 -17 -1325 0 -1300
+96 -2465 391 -3016 762 -72 49 -102 77 -47 44 l28 -16 -24 21 c-12 11 -27 18
+-32 15 -19 -11 -157 108 -240 207 -120 143 -216 327 -260 500 -26 101 -32 358
+-11 449 51 223 209 476 391 624 111 91 339 207 378 192 8 -3 12 -2 9 3 -8 12
+63 31 162 42 134 15 136 18 147 179 21 324 241 592 556 675 101 27 253 18 339
+-19 125 -54 167 -41 196 62 45 158 143 307 276 421 231 198 542 240 801 110
+71 -36 89 -36 126 -1 25 22 33 42 47 112 71 362 334 712 680 903 147 82 309
+137 499 171 112 20 362 20 466 0z"/>
+<path d="M5180 6224 c-252 -24 -426 -55 -614 -110 -895 -265 -1456 -888 -1456
+-1615 0 -728 622 -1366 1555 -1599 385 -96 839 -107 1260 -29 1134 208 1851
+1028 1674 1914 -138 686 -824 1248 -1709 1399 -227 39 -532 56 -710 40z m645
+-173 c769 -134 1344 -526 1567 -1068 137 -335 127 -676 -31 -998 -254 -520
+-845 -886 -1617 -1002 -147 -22 -598 -25 -739 -5 -329 47 -687 164 -934 306
+-126 72 -272 176 -264 189 3 5 1 7 -5 3 -15 -9 -134 97 -222 199 -151 174
+-248 358 -302 572 -32 125 -32 384 0 521 146 633 761 1116 1623 1277 155 29
+240 34 524 30 229 -2 302 -7 400 -24z"/>
+<path d="M5305 5935 c-24 -23 -25 -28 -25 -169 0 -142 0 -145 25 -164 13 -11
+23 -21 20 -23 -3 -3 -107 -392 -128 -476 -6 -26 15 -58 42 -66 10 -2 41 7 68
+22 l48 27 -32 -171 c-18 -93 -33 -182 -33 -196 0 -21 -9 -31 -47 -51 -97 -49
+-142 -182 -94 -276 36 -70 127 -131 196 -132 76 0 158 47 191 111 12 24 21 29
+52 29 39 0 280 -22 440 -41 91 -10 95 -10 118 12 29 27 30 44 3 88 l-20 33 58
+-5 c32 -2 114 -11 182 -18 l123 -13 19 23 c24 29 24 53 1 81 -26 32 -552 109
+-588 85 -35 -23 -38 -50 -10 -92 14 -20 23 -39 21 -41 -5 -5 -283 15 -343 24
+-24 4 -35 12 -46 37 -17 40 -63 87 -98 99 -16 6 -28 16 -28 23 0 7 25 127 55
+268 30 140 55 266 55 279 0 51 -44 62 -112 27 l-41 -21 6 24 c4 12 19 78 34
+145 l27 123 -22 30 c-18 24 -20 34 -12 49 5 11 10 81 10 156 0 131 -1 137 -25
+160 -13 14 -33 25 -45 25 -11 0 -32 -11 -45 -25z m107 -1395 c55 -55 19 -140
+-59 -140 -48 0 -70 14 -83 54 -29 89 76 152 142 86z"/>
+<path d="M3401 4523 c-23 -28 -21 -54 7 -85 20 -24 322 -27 341 -5 23 29 24
+74 2 96 -20 20 -32 21 -175 21 l-155 0 -20 -27z"/>
+<path d="M6977 4532 c-22 -25 -21 -75 1 -95 29 -26 322 -25 345 1 22 25 21 75
+-1 95 -29 26 -322 25 -345 -1z"/>
+<path d="M5305 3455 c-24 -23 -25 -28 -25 -175 0 -147 1 -152 25 -175 32 -33
+68 -32 94 1 19 24 21 40 21 176 0 145 -1 150 -25 173 -31 32 -59 32 -90 0z"/>
+<path d="M8342 5580 c0 -19 2 -27 5 -17 2 9 2 25 0 35 -3 9 -5 1 -5 -18z"/>
+<path d="M1922 5135 c0 -16 2 -22 5 -12 2 9 2 23 0 30 -3 6 -5 -1 -5 -18z"/>
+<path d="M9257 7421 c-186 -18 -197 -23 -197 -88 0 -57 30 -67 151 -54 56 6
+104 9 107 6 2 -2 -62 -104 -143 -227 -129 -194 -176 -281 -159 -297 2 -2 4 1
+4 8 0 7 13 2 31 -13 37 -31 74 -33 288 -11 161 16 181 25 181 82 0 48 -30 75
+-78 68 -95 -15 -212 -20 -212 -10 0 5 19 35 42 65 23 30 71 100 107 155 36 55
+85 126 108 159 45 61 53 98 32 139 -23 43 -13 42 -262 18z"/>
+<path d="M8516 5271 c-4 -7 -5 -15 -2 -18 9 -9 19 4 14 18 -4 11 -6 11 -12 0z"/>
+<path d="M9164 4911 c21 -23 26 -26 26 -11 0 5 -10 15 -22 21 -23 12 -23 12
+-4 -10z"/>
+    </g>
+  </symbol>
   <symbol id="ic-plus" viewBox="0 0 24 24"><path d="M12 4.5v15"/><path d="M4.5 12h15"/></symbol>
   <symbol id="ic-pencil" viewBox="0 0 24 24"><path d="M4 20l1-4.4L15.6 5 19 8.4 8.4 19z"/><path d="M13 7 17 10.5"/></symbol>
   <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
@@ -2126,9 +2284,13 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
     <button type="button" class="icon-btn" id="alarmSoundListBackBtn">‹</button>
     <h2 id="alarmSoundListTitle" style="margin:0;flex:1;"></h2>
+    <button type="button" class="icon-btn" id="alarmSoundUploadIconBtn" title="">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+    </button>
+    <button type="button" class="icon-btn" id="alarmSoundListCloseBtn">✕</button>
   </div>
   <div id="alarmSoundListArea"></div>
-  <button type="button" class="save-btn" id="alarmSoundUploadNewBtn" style="margin-top:14px;"></button>
+  <button type="button" class="save-btn" id="alarmSoundSaveBtn" style="margin-top:14px;"></button>
   <audio id="alarmSoundListPreviewAudio" style="display:none;"></audio>
 </div>
 
@@ -2231,7 +2393,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmPresetDailyLabel:'每天', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'周末',
       alarmHolidayLabel:'祝日不响', alarmHolidayHint:'遇日本法定节假日自动跳过', alarmHolidaySkipShort:'祝日不响',
       alarmSoundFieldLabel:'铃声', alarmSoundDefault:'系统默认', alarmSoundUpload:'选择 ›',
-      alarmSoundListTitle:'选择铃声', alarmSoundUploadNewBtn:'上传新铃声',
+      alarmSoundListTitle:'选择铃声', alarmSoundUploadNewBtn:'上传新铃声', alarmSoundSaveBtn:'保存选择',
       alarmSoundNamePrompt:'给这个铃声起个名字吧(不填就用默认名)', alarmSoundUnnamed:'未命名铃声',
       alarmSoundDeleteConfirm:'确定删除这个铃声吗？删除后无法恢复，正在用它的闹钟会改回系统默认。',
       alarmVibrateLabel:'震动', alarmDeleteBtn:'删除这个闹钟',
@@ -2308,7 +2470,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmPresetDailyLabel:'毎日', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'週末',
       alarmHolidayLabel:'祝日は鳴らさない', alarmHolidayHint:'日本の祝日は自動的にスキップします', alarmHolidaySkipShort:'祝日オフ',
       alarmSoundFieldLabel:'着信音', alarmSoundDefault:'デフォルト', alarmSoundUpload:'選択 ›',
-      alarmSoundListTitle:'着信音を選択', alarmSoundUploadNewBtn:'新しい着信音をアップロード',
+      alarmSoundListTitle:'着信音を選択', alarmSoundUploadNewBtn:'新しい着信音をアップロード', alarmSoundSaveBtn:'選択を保存',
       alarmSoundNamePrompt:'この着信音に名前を付けてください(空欄ならデフォルト名)', alarmSoundUnnamed:'名称未設定の着信音',
       alarmSoundDeleteConfirm:'この着信音を削除しますか？削除すると元に戻せません。使用中のアラームはシステムデフォルトに戻ります。',
       alarmVibrateLabel:'バイブレーション', alarmDeleteBtn:'このアラームを削除',
@@ -2884,6 +3046,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       useEl.setAttribute('href', fw ? '#ic-chart-fw' : '#ic-gear');
     });
     swap('#themeBtn use, #themeBtn2 use, #themeBtn3 use', 'ic-shirt');
+    swap('#alarmBtn use, #alarmBtn2 use, #alarmBtn3 use', 'ic-alarm');
     swap('.tab-btn[data-page="ledger"] use', 'ic-book');
     document.querySelectorAll('.tab-btn[data-page="stats"] use').forEach(useEl => {
       useEl.setAttribute('href', fw ? '#ic-lantern-fw' : '#ic-chart');
@@ -3445,7 +3608,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     $('alarmTrimConfirmBtn').textContent = t('alarmTrimConfirmBtn');
     $('alarmTrimCancelBtn').textContent = t('alarmTrimCancelBtn');
     $('alarmSoundListTitle').textContent = t('alarmSoundListTitle');
-    $('alarmSoundUploadNewBtn').textContent = t('alarmSoundUploadNewBtn');
+    $('alarmSoundUploadIconBtn').title = t('alarmSoundUploadNewBtn');
+    $('alarmSoundSaveBtn').textContent = t('alarmSoundSaveBtn');
     updateAlarmSoundDisplay();
     if($('alarmSheet').classList.contains('show')) renderAlarmList();
   }
@@ -5516,7 +5680,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
         if(ev.target.closest('.sound-row-btn')) return;
         alarmFormSoundFile = row.getAttribute('data-path') || null;
         updateAlarmSoundDisplay();
-        closeAlarmSoundListSheet();
+        renderAlarmSoundListSheet();
       });
     });
     area.querySelectorAll('.sound-row-btn.play').forEach(btn=>{
@@ -5554,7 +5718,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
   $('alarmSoundPickerBtn').addEventListener('click', openAlarmSoundListSheet);
   $('alarmSoundListBackBtn').addEventListener('click', closeAlarmSoundListSheet);
-  $('alarmSoundUploadNewBtn').addEventListener('click', ()=> $('alarmSoundFileInput').click());
+  $('alarmSoundListCloseBtn').addEventListener('click', closeAlarmSoundListSheet);
+  $('alarmSoundSaveBtn').addEventListener('click', closeAlarmSoundListSheet);
+  $('alarmSoundUploadIconBtn').addEventListener('click', ()=> $('alarmSoundFileInput').click());
 
   // ---------- 铃声裁剪:选的音频超过2分钟时,不直接拒绝,而是让用户自己选一段
   // ≤2分钟的区间,裁剪成一段新的wav再走正常的上传流程。参考iOS原生视频裁剪的交互:
