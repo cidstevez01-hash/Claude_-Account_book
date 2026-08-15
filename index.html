@@ -283,8 +283,8 @@
 
   /* ---- 闹钟(alarms) ---- */
   .alarm-row-wrap{position:relative;overflow:hidden;}
-  .alarm-swipe-del{position:absolute;top:0;right:0;bottom:0;width:76px;border:none;background:var(--seal);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:600;font-family:'Noto Sans SC',sans-serif;}
-  .alarm-swipe-del .hd-icon{width:18px;height:18px;color:#fff;}
+  .alarm-swipe-del{position:absolute;top:0;right:0;bottom:0;width:76px;border:none;background:var(--seal);color:#fff;display:flex;align-items:center;justify-content:center;padding-right:8px;}
+  .alarm-swipe-del .hd-icon{width:19px;height:19px;color:#fff;flex-shrink:0;}
   .alarm-row{position:relative;z-index:1;background:var(--paper);display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1.5px dashed var(--grid);touch-action:pan-y;}
   .alarm-row-wrap:last-child .alarm-row{border-bottom:none;}
   .alarm-add-center-btn{width:58px;height:58px;border-radius:50%;background:var(--seal);color:#fff;border:none;box-shadow:0 4px 0 var(--seal-soft),0 6px 16px rgba(58,47,40,0.28);display:flex;align-items:center;justify-content:center;margin:22px auto 4px;}
@@ -5165,7 +5165,7 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
     const sorted = alarms.slice().sort((a,b)=> a.time.localeCompare(b.time));
     area.innerHTML = sorted.map(alarm=>`
       <div class="alarm-row-wrap">
-        <button type="button" class="alarm-swipe-del" data-id="${alarm.id}">${iconSvg('trash')}<span>${t('delete')}</span></button>
+        <button type="button" class="alarm-swipe-del" data-id="${alarm.id}">${iconSvg('trash')}</button>
         <div class="alarm-row ${alarm.enabled?'':'off'}" data-id="${alarm.id}">
           <div class="alarm-time">${escapeHtml(alarm.time)}</div>
           <div class="alarm-meta">
@@ -5194,33 +5194,59 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
     area.querySelectorAll('.alarm-swipe-del').forEach(btn=>{
       btn.addEventListener('click', async (ev)=>{
         ev.stopPropagation();
-        if(await deleteAlarmById(btn.getAttribute('data-id'))) renderAlarmList();
+        if(await deleteAlarmById(btn.getAttribute('data-id'))){
+          await collapseAlarmRow(btn.closest('.alarm-row-wrap'));
+          renderAlarmList();
+        }
       });
     });
     area.querySelectorAll('.alarm-row-wrap').forEach(wireAlarmRowSwipe);
   }
-  // 闹钟行左滑露出删除按钮(仿邮件App那种滑动删除手势,这个App里其它列表没有现成的可以抄,
-  // 单独实现):水平位移量超过一半按钮宽度就吸附成"露出"状态,松手不够就弹回去;判断方向是
+  // 闹钟行左滑露出删除按钮(仿邮件/提醒事项App那种滑动删除手势,这个App里其它列表没有现成的
+  // 可以抄,单独实现):滑过一半按钮宽度就吸附成"露出"状态,松手不够就弹回去；继续往左滑过
+  // 整行宽度的60%再松手，视为"滑到底"的坚决删除动作，直接触发删除(仍然弹确认框，不跳过
+  // 安全提示)，红色删除条的宽度跟着手指位置连续变宽，配合行高塌陷动画一起消失。判断方向是
   // 水平还是垂直(避免跟列表本身的上下滚动打架)之前不拦截触摸事件,一旦判定是水平滑动才
   // preventDefault接管
   const ALARM_SWIPE_DEL_WIDTH = 76;
+  const ALARM_SWIPE_FULL_RATIO = 0.6;
   function closeAllAlarmSwipes(exceptWrap){
     $('alarmListArea').querySelectorAll('.alarm-row-wrap.swiped').forEach(w=>{
       if(w===exceptWrap) return;
       const row = w.querySelector('.alarm-row');
+      const del = w.querySelector('.alarm-swipe-del');
       row.style.transition = 'transform .2s ease';
       row.style.transform = 'translateX(0)';
+      if(del){ del.style.transition = 'width .2s ease'; del.style.width = ALARM_SWIPE_DEL_WIDTH+'px'; }
       w.classList.remove('swiped');
+    });
+  }
+  // 删除时先把这一行的高度/透明度收起来,再触发数据更新+重新渲染,避免整条直接消失显得很突兀
+  function collapseAlarmRow(wrap){
+    return new Promise(resolve=>{
+      const h = wrap.getBoundingClientRect().height;
+      wrap.style.height = h+'px';
+      wrap.style.overflow = 'hidden';
+      // 强制reflow,确保接下来的height:0是从固定高度过渡,而不是被浏览器优化掉
+      void wrap.offsetHeight;
+      wrap.style.transition = 'height .22s ease, opacity .22s ease, margin .22s ease';
+      wrap.style.opacity = '0';
+      wrap.style.marginBottom = '0';
+      wrap.style.height = '0';
+      setTimeout(resolve, 220);
     });
   }
   function wireAlarmRowSwipe(wrap){
     const row = wrap.querySelector('.alarm-row');
-    let startX=null, startY=null, baseX=0, dragging=false, moved=false;
+    const del = wrap.querySelector('.alarm-swipe-del');
+    let startX=null, startY=null, baseX=0, dragging=false, moved=false, maxWidth=ALARM_SWIPE_DEL_WIDTH;
     row.addEventListener('touchstart', (ev)=>{
       startX = ev.touches[0].clientX; startY = ev.touches[0].clientY;
       baseX = wrap.classList.contains('swiped') ? -ALARM_SWIPE_DEL_WIDTH : 0;
+      maxWidth = wrap.clientWidth;
       dragging = false; moved = false;
       row.style.transition = 'none';
+      del.style.transition = 'none';
     }, {passive:true});
     row.addEventListener('touchmove', (ev)=>{
       if(startX===null) return;
@@ -5233,22 +5259,38 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
       }
       ev.preventDefault();
       moved = true;
-      const x = Math.max(-ALARM_SWIPE_DEL_WIDTH, Math.min(0, baseX + dx));
+      const x = Math.max(-maxWidth, Math.min(0, baseX + dx));
       row.style.transform = `translateX(${x}px)`;
+      del.style.width = Math.max(ALARM_SWIPE_DEL_WIDTH, -x)+'px';
     }, {passive:false});
-    row.addEventListener('touchend', ()=>{
+    row.addEventListener('touchend', async ()=>{
       startX = null; startY = null;
       if(!dragging) return;
       dragging = false;
-      row.style.transition = 'transform .2s ease';
       const m = /translateX\((-?[\d.]+)px\)/.exec(row.style.transform);
       const currentX = m ? parseFloat(m[1]) : 0;
-      if(currentX < -ALARM_SWIPE_DEL_WIDTH/2){
+      row.style.transition = 'transform .2s ease';
+      del.style.transition = 'width .2s ease';
+      if(-currentX >= maxWidth*ALARM_SWIPE_FULL_RATIO){
+        row.style.transform = `translateX(-${maxWidth}px)`;
+        del.style.width = maxWidth+'px';
+        const id = row.getAttribute('data-id');
+        if(await deleteAlarmById(id)){
+          await collapseAlarmRow(wrap);
+          renderAlarmList();
+        } else {
+          row.style.transform = 'translateX(0)';
+          del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
+          wrap.classList.remove('swiped');
+        }
+      } else if(currentX < -ALARM_SWIPE_DEL_WIDTH/2){
         row.style.transform = `translateX(-${ALARM_SWIPE_DEL_WIDTH}px)`;
+        del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
         wrap.classList.add('swiped');
         closeAllAlarmSwipes(wrap);
       } else {
         row.style.transform = 'translateX(0)';
+        del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
         wrap.classList.remove('swiped');
       }
     });
@@ -5256,14 +5298,16 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
       if(moved){ moved=false; return; }
       if(wrap.classList.contains('swiped')){
         row.style.transition = 'transform .2s ease';
+        del.style.transition = 'width .2s ease';
         row.style.transform = 'translateX(0)';
+        del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
         wrap.classList.remove('swiped');
         return;
       }
       openAlarmForm(row.getAttribute('data-id'));
     });
   }
-  // 删除闹钟这段逻辑编辑表单里的删除按钮、列表左滑露出的删除按钮两处共用
+  // 删除闹钟这段逻辑编辑表单里的删除按钮、列表左滑露出的删除按钮、滑到底直接删除三处共用
   async function deleteAlarmById(id){
     if(!confirm(t('alarmDeleteConfirm'))) return false;
     // 铃声现在是"我的铃声"独立管理的共用资源池,可能还有别的闹钟在用同一个文件,
