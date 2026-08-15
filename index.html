@@ -345,10 +345,6 @@
     border-color:color-mix(in srgb, var(--seal) 35%, var(--grid));
     box-shadow:0 0 8px -4px color-mix(in srgb, var(--seal) 40%, transparent);
   }
-  [data-skin="summerB"] #alarmFormSheet .segment button.active,
-  [data-skin="summerB"] #alarmFormSheet .day-chip.active{
-    background:linear-gradient(135deg,#F2C94C,#E85D4A);color:#fff;box-shadow:0 0 8px -2px var(--seal);
-  }
   [data-skin="summerB"] #alarmFormSheet .sound-picker-row{
     border-color:color-mix(in srgb, var(--seal) 35%, var(--grid));
     box-shadow:0 0 8px -4px color-mix(in srgb, var(--seal) 40%, transparent);
@@ -2240,27 +2236,19 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
   <div class="field-label" id="alarmLabelFieldLabel">标签</div>
   <div class="text-row"><input type="text" id="alarmLabelInput" placeholder="" maxlength="30"></div>
   <div class="field-label" id="alarmRepeatFieldLabel">重复</div>
-  <div class="segment" id="alarmRepeatTypeSegment">
-    <button type="button" data-rt="once" id="alarmRtOnceBtn"></button>
-    <button type="button" data-rt="weekly" id="alarmRtWeeklyBtn"></button>
+  <div class="sub-wrap" id="alarmPresetChips">
+    <button type="button" class="sub-pill" data-preset="none" id="alarmPresetNone"></button>
+    <button type="button" class="sub-pill" data-preset="daily" id="alarmPresetDaily"></button>
+    <button type="button" class="sub-pill" data-preset="weekday" id="alarmPresetWeekday"></button>
+    <button type="button" class="sub-pill" data-preset="weekend" id="alarmPresetWeekend"></button>
   </div>
-  <div id="alarmOncePanel">
-    <div class="text-row"><input type="date" id="alarmOnceDateInput"></div>
-  </div>
-  <div id="alarmWeeklyPanel">
-    <div class="sub-wrap" id="alarmPresetChips">
-      <button type="button" class="sub-pill" data-preset="daily" id="alarmPresetDaily"></button>
-      <button type="button" class="sub-pill" data-preset="weekday" id="alarmPresetWeekday"></button>
-      <button type="button" class="sub-pill" data-preset="weekend" id="alarmPresetWeekend"></button>
+  <div class="sub-wrap" id="alarmDayChips" style="margin-bottom:8px;"></div>
+  <div class="toggle-row" id="alarmHolidayRow">
+    <div>
+      <div class="toggle-row-label" id="alarmHolidayLabel">祝日不响</div>
+      <div class="toggle-row-hint" id="alarmHolidayHint">遇日本法定节假日自动跳过</div>
     </div>
-    <div class="sub-wrap" id="alarmDayChips" style="margin-bottom:8px;"></div>
-    <div class="toggle-row" id="alarmHolidayRow">
-      <div>
-        <div class="toggle-row-label" id="alarmHolidayLabel">祝日不响</div>
-        <div class="toggle-row-hint" id="alarmHolidayHint">遇日本法定节假日自动跳过</div>
-      </div>
-      <button type="button" class="toggle-switch" id="alarmHolidayToggle"></button>
-    </div>
+    <button type="button" class="toggle-switch" id="alarmHolidayToggle"></button>
   </div>
   <div class="field-label" id="alarmSoundFieldLabel">铃声</div>
   <button type="button" class="sound-picker-row" id="alarmSoundPickerBtn">
@@ -2386,7 +2374,7 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
       wdMon:'一', wdTue:'二', wdWed:'三', wdThu:'四', wdFri:'五', wdSat:'六', wdSun:'日',
       alarmSheetTitle:'闹钟', alarmNewTitle:'新建闹钟', alarmEditTitle:'编辑闹钟',
       alarmLabelFieldLabel:'标签', alarmDefaultLabel:'闹钟',
-      alarmRepeatFieldLabel:'重复', alarmRepeatOnce:'仅一次', alarmRepeatWeekly:'周期',
+      alarmRepeatFieldLabel:'重复', alarmRepeatOnce:'不重复',
       alarmPresetDailyLabel:'每天', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'周末',
       alarmHolidayLabel:'祝日不响', alarmHolidayHint:'遇日本法定节假日自动跳过', alarmHolidaySkipShort:'祝日不响',
       alarmSoundFieldLabel:'铃声', alarmSoundDefault:'系统默认', alarmSoundUpload:'选择 ›',
@@ -2396,7 +2384,6 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
       alarmVibrateLabel:'震动', alarmDeleteBtn:'删除这个闹钟',
       alarmDeleteConfirm:'确定删除这个闹钟吗？删除后无法恢复。',
       alarmEmptyLine1:'还没有闹钟', alarmEmptyLine2:'点下面的 + 新建一个',
-      alarmWeekdayRequired:'请至少选择一天',
       alarmSoundUploading:'铃声上传中...',
       alarmSoundUploadFailed:'铃声上传失败', alarmNativeOnly:'仅原生App内可用',
       alarmNotifPermDenied:'未获得通知权限，闹钟到点可能无法提醒，请到系统设置里打开',
@@ -2463,7 +2450,7 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
       wdMon:'月', wdTue:'火', wdWed:'水', wdThu:'木', wdFri:'金', wdSat:'土', wdSun:'日',
       alarmSheetTitle:'アラーム', alarmNewTitle:'アラーム新規作成', alarmEditTitle:'アラーム編集',
       alarmLabelFieldLabel:'ラベル', alarmDefaultLabel:'アラーム',
-      alarmRepeatFieldLabel:'繰り返し', alarmRepeatOnce:'一回のみ', alarmRepeatWeekly:'周期',
+      alarmRepeatFieldLabel:'繰り返し', alarmRepeatOnce:'しない',
       alarmPresetDailyLabel:'毎日', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'週末',
       alarmHolidayLabel:'祝日は鳴らさない', alarmHolidayHint:'日本の祝日は自動的にスキップします', alarmHolidaySkipShort:'祝日オフ',
       alarmSoundFieldLabel:'着信音', alarmSoundDefault:'デフォルト', alarmSoundUpload:'選択 ›',
@@ -2473,7 +2460,6 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
       alarmVibrateLabel:'バイブレーション', alarmDeleteBtn:'このアラームを削除',
       alarmDeleteConfirm:'このアラームを削除しますか？削除すると元に戻せません。',
       alarmEmptyLine1:'アラームがありません', alarmEmptyLine2:'下の + から新規作成',
-      alarmWeekdayRequired:'曜日を1つ以上選んでください',
       alarmSoundUploading:'着信音アップロード中...',
       alarmSoundUploadFailed:'着信音のアップロードに失敗しました', alarmNativeOnly:'ネイティブアプリ内でのみ利用可能',
       alarmNotifPermDenied:'通知の許可がありません。アラーム時刻に通知できない場合があります。設定から許可してください',
@@ -3588,8 +3574,7 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
     $('alarmLabelFieldLabel').textContent = t('alarmLabelFieldLabel');
     $('alarmLabelInput').placeholder = t('alarmDefaultLabel');
     $('alarmRepeatFieldLabel').textContent = t('alarmRepeatFieldLabel');
-    $('alarmRtOnceBtn').textContent = t('alarmRepeatOnce');
-    $('alarmRtWeeklyBtn').textContent = t('alarmRepeatWeekly');
+    $('alarmPresetNone').textContent = t('alarmRepeatOnce');
     $('alarmPresetDaily').textContent = t('alarmPresetDailyLabel');
     $('alarmPresetWeekday').textContent = t('alarmPresetWeekdayLabel');
     $('alarmPresetWeekend').textContent = t('alarmPresetWeekendLabel');
@@ -5122,7 +5107,6 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
 
   // ---------- 闹钟(alarms) UI ----------
   let editingAlarmId = null;
-  let alarmFormRepeatType = 'weekly';
   let alarmFormWeekdays = [];
   let alarmFormSoundFile = null; // Supabase Storage对象路径,null=默认铃声
   // "我的铃声"列表缓存:[{id, storage_path, name}],铃声现在是可以被多条闹钟共用的资源池,
@@ -5320,6 +5304,9 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
     $('overlay').classList.add('show');
     $('alarmSheet').classList.add('show');
   }
+  // 不再用页签切换"仅一次/周期"两个视图,统一成一套星期选择：一天都不选就等同于
+  // "不重复"(只在下一次到达这个时间点时响一次),选中任意一天就是周期重复；有没有
+  // 星期决定要不要显示"祝日不响"这个只对周期闹钟有意义的开关
   function renderAlarmDayChips(){
     const wrap = $('alarmDayChips');
     wrap.innerHTML = [1,2,3,4,5,6,7].map(n=>
@@ -5330,26 +5317,47 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
         const n = parseInt(btn.getAttribute('data-day'),10);
         const idx = alarmFormWeekdays.indexOf(n);
         if(idx>=0) alarmFormWeekdays.splice(idx,1); else alarmFormWeekdays.push(n);
-        $('alarmPresetChips').querySelectorAll('.sub-pill').forEach(p=>p.classList.remove('selected'));
+        $('alarmPresetChips').querySelectorAll('.sub-pill').forEach(p=>
+          p.classList.toggle('selected', p.getAttribute('data-preset')==='none' && alarmFormWeekdays.length===0)
+        );
         renderAlarmDayChips();
+        updateAlarmHolidayRowVisibility();
       });
     });
   }
   function setAlarmPreset(preset){
     $('alarmPresetChips').querySelectorAll('.sub-pill').forEach(p=> p.classList.toggle('selected', p.getAttribute('data-preset')===preset));
-    if(preset==='daily') alarmFormWeekdays = [1,2,3,4,5,6,7];
+    if(preset==='none') alarmFormWeekdays = [];
+    else if(preset==='daily') alarmFormWeekdays = [1,2,3,4,5,6,7];
     // "平日"预设:点一下直接把星期设成周一到周五,同时把"祝日不响"开关一起打开——
     // 不需要用户额外再点一次开关才能拿到"平日响祝日不响"的效果
     else if(preset==='weekday'){ alarmFormWeekdays = [1,2,3,4,5]; $('alarmHolidayToggle').classList.add('on'); }
     else if(preset==='weekend') alarmFormWeekdays = [6,7];
     renderAlarmDayChips();
+    updateAlarmHolidayRowVisibility();
   }
-  function setAlarmRepeatType(rt){
-    alarmFormRepeatType = rt;
-    $('alarmRtOnceBtn').classList.toggle('active', rt==='once');
-    $('alarmRtWeeklyBtn').classList.toggle('active', rt==='weekly');
-    $('alarmOncePanel').style.display = rt==='once' ? 'block' : 'none';
-    $('alarmWeeklyPanel').style.display = rt==='weekly' ? 'block' : 'none';
+  function updateAlarmHolidayRowVisibility(){
+    $('alarmHolidayRow').style.display = alarmFormWeekdays.length>0 ? 'flex' : 'none';
+  }
+  // 打开表单时(新建给的默认星期、编辑已有闹钟带过来的星期)要反过来推一下当前算不算
+  // 某个预设,把对应的预设chip点亮,不然chip看起来跟星期选择的状态对不上
+  function syncAlarmPresetHighlight(){
+    const days = alarmFormWeekdays.slice().sort((a,b)=>a-b);
+    let preset = null;
+    if(days.length===0) preset = 'none';
+    else if(days.length===7) preset = 'daily';
+    else if(days.length===5 && [1,2,3,4,5].every(d=>days.includes(d))) preset = 'weekday';
+    else if(days.length===2 && days.includes(6) && days.includes(7)) preset = 'weekend';
+    $('alarmPresetChips').querySelectorAll('.sub-pill').forEach(p=> p.classList.toggle('selected', p.getAttribute('data-preset')===preset));
+  }
+  // "不重复"闹钟不再要求手动选日期,直接算下一次到达这个时间点是哪天(今天这个点还没
+  // 过就是今天,已经过了就是明天),原生端(AlarmScheduler.swift)排期仍然按具体日期匹配,
+  // 所以这里还是要拼出一个onceDate,只是不再需要用户自己选
+  function computeNextOnceDate(h, m){
+    const now = new Date();
+    const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+    if(target <= now) target.setDate(target.getDate()+1);
+    return target.getFullYear()+'-'+pad2(target.getMonth()+1)+'-'+pad2(target.getDate());
   }
   // iOS原生风格滚轮时间选择器:两列可滚动列表(时/分),靠CSS scroll-snap-type让手指划完自动
   // 吸附到整数格,中间用一条印章红虚线窗口框住当前选中项。不用系统<input type="time">是因为
@@ -5459,15 +5467,15 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
     $('alarmLabelInput').value = alarm ? alarm.label : '';
     alarmFormWeekdays = alarm && alarm.repeatType==='weekly' ? (alarm.weekdays||[]).slice() : [1,2,3,4,5];
     alarmFormSoundFile = alarm ? alarm.soundFile : null;
-    $('alarmOnceDateInput').value = alarm && alarm.onceDate ? alarm.onceDate : todayStr();
     $('alarmHolidayToggle').classList.toggle('on', alarm ? !!alarm.skipJpHolidays : false);
     $('alarmVibrateToggle').classList.toggle('on', alarm ? alarm.vibrate!==false : true);
     updateAlarmSoundDisplay();
     // "我的铃声"名字列表异步拉一遍,拉到之后名字可能从文件名兜底变成真正取的名字,
     // 所以拉完要再刷新一次显示
     fetchAlarmSoundRecords().then(updateAlarmSoundDisplay);
-    setAlarmRepeatType(alarm ? alarm.repeatType : 'weekly');
     renderAlarmDayChips();
+    syncAlarmPresetHighlight();
+    updateAlarmHolidayRowVisibility();
     $('alarmSheet').classList.remove('show');
     $('alarmFormSheet').classList.add('show');
     $('overlay').classList.add('show');
@@ -5478,8 +5486,7 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
   }
   $('alarmSheetCloseBtn').addEventListener('click', closeAllSheets);
   $('alarmFormBackBtn').addEventListener('click', ()=>{ closeAlarmForm(); openAlarmSheet(); });
-  $('alarmRtOnceBtn').addEventListener('click', ()=> setAlarmRepeatType('once'));
-  $('alarmRtWeeklyBtn').addEventListener('click', ()=> setAlarmRepeatType('weekly'));
+  $('alarmPresetNone').addEventListener('click', ()=> setAlarmPreset('none'));
   $('alarmPresetDaily').addEventListener('click', ()=> setAlarmPreset('daily'));
   $('alarmPresetWeekday').addEventListener('click', ()=> setAlarmPreset('weekday'));
   $('alarmPresetWeekend').addEventListener('click', ()=> setAlarmPreset('weekend'));
@@ -5487,7 +5494,6 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
   $('alarmVibrateToggle').addEventListener('click', ()=> $('alarmVibrateToggle').classList.toggle('on'));
   $('alarmSaveBtn').addEventListener('click', async ()=>{
     const time = getWheelTime();
-    if(alarmFormRepeatType==='weekly' && alarmFormWeekdays.length===0){ showToast(t('alarmWeekdayRequired')); return; }
     const label = $('alarmLabelInput').value.trim();
     const now = Date.now();
     let alarm = editingAlarmId ? alarms.find(a=>String(a.id)===String(editingAlarmId)) : null;
@@ -5495,12 +5501,14 @@ c-64 -95 -141 -207 -170 -248 -63 -88 -69 -137 -23 -172 25 -18 28 -18 165 1
       alarm = { id: Date.now()+Math.random().toString(16).slice(2), createdAt: now, enabled: true };
       alarms.push(alarm);
     }
+    const isWeekly = alarmFormWeekdays.length>0;
+    const [timeH, timeM] = time.split(':').map(Number);
     alarm.time = time;
     alarm.label = label;
-    alarm.repeatType = alarmFormRepeatType;
-    alarm.onceDate = alarmFormRepeatType==='once' ? $('alarmOnceDateInput').value : null;
-    alarm.weekdays = alarmFormRepeatType==='weekly' ? alarmFormWeekdays.slice() : null;
-    alarm.skipJpHolidays = alarmFormRepeatType==='weekly' ? $('alarmHolidayToggle').classList.contains('on') : false;
+    alarm.repeatType = isWeekly ? 'weekly' : 'once';
+    alarm.onceDate = isWeekly ? null : computeNextOnceDate(timeH, timeM);
+    alarm.weekdays = isWeekly ? alarmFormWeekdays.slice() : null;
+    alarm.skipJpHolidays = isWeekly ? $('alarmHolidayToggle').classList.contains('on') : false;
     alarm.soundFile = alarmFormSoundFile;
     alarm.vibrate = $('alarmVibrateToggle').classList.contains('on');
     alarm.updatedAt = now;
