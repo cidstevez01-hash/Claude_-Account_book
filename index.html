@@ -362,16 +362,9 @@
     background:linear-gradient(135deg, color-mix(in srgb, #F2C94C 14%, var(--card)), color-mix(in srgb, #E85D4A 10%, var(--card)));
     box-shadow:0 0 16px -3px var(--seal);
   }
-  [data-skin="summerB"] .sound-row.selected::after{
-    content:'✦';position:absolute;right:10px;top:50%;transform:translateY(-50%);
-    color:#F2C94C;font-size:13px;text-shadow:0 0 6px #F2C94C;
-  }
   [data-skin="summerB"] .sound-radio{border-color:color-mix(in srgb, var(--seal) 50%, var(--grid));}
   [data-skin="summerB"] .sound-row.selected .sound-radio{border-color:#F2C94C;}
   [data-skin="summerB"] .sound-row.selected .sound-radio::after{background:linear-gradient(135deg,#F2C94C,#E85D4A);}
-  [data-skin="summerB"] .sound-row-btn.play{
-    background:radial-gradient(circle at 35% 30%, #F2967F, #E85D4A 60%, #d1665a);border:none;color:#fff;
-  }
   [data-skin="summerB"] .sound-row-btn.edit,[data-skin="summerB"] .sound-row-btn.del{
     background:var(--paper);border:1px solid color-mix(in srgb, var(--seal) 35%, var(--grid));
   }
@@ -2328,7 +2321,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.0';
   const IS_DEV_BUILD = true;
   const DEV_BUILD_DATE = '20260816';
-  const DEV_BUILD = 7;
+  const DEV_BUILD = 8;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2375,7 +2368,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmPresetDailyLabel:'每天', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'周末',
       alarmHolidayLabel:'祝日不响', alarmHolidayHint:'遇日本法定节假日自动跳过', alarmHolidaySkipShort:'祝日不响',
       alarmSoundFieldLabel:'铃声', alarmSoundDefault:'系统默认', alarmSoundUpload:'选择 ›',
-      alarmSoundListTitle:'选择铃声', alarmSoundUploadNewBtn:'上传新铃声', alarmSoundSaveBtn:'保存选择',
+      alarmSoundListTitle:'选择铃声', alarmSoundUploadNewBtn:'上传新铃声', alarmSoundSaveBtn:'保存',
       alarmSoundNamePrompt:'给这个铃声起个名字吧(不填就用默认名)', alarmSoundUnnamed:'未命名铃声',
       alarmSoundDeleteConfirm:'确定删除这个铃声吗？删除后无法恢复，正在用它的闹钟会改回系统默认。',
       alarmVibrateLabel:'震动', alarmDeleteBtn:'删除这个闹钟',
@@ -2451,7 +2444,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       alarmPresetDailyLabel:'毎日', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'週末',
       alarmHolidayLabel:'祝日は鳴らさない', alarmHolidayHint:'日本の祝日は自動的にスキップします', alarmHolidaySkipShort:'祝日オフ',
       alarmSoundFieldLabel:'着信音', alarmSoundDefault:'デフォルト', alarmSoundUpload:'選択 ›',
-      alarmSoundListTitle:'着信音を選択', alarmSoundUploadNewBtn:'新しい着信音をアップロード', alarmSoundSaveBtn:'選択を保存',
+      alarmSoundListTitle:'着信音を選択', alarmSoundUploadNewBtn:'新しい着信音をアップロード', alarmSoundSaveBtn:'保存',
       alarmSoundNamePrompt:'この着信音に名前を付けてください(空欄ならデフォルト名)', alarmSoundUnnamed:'名称未設定の着信音',
       alarmSoundDeleteConfirm:'この着信音を削除しますか？削除すると元に戻せません。使用中のアラームはシステムデフォルトに戻ります。',
       alarmVibrateLabel:'バイブレーション', alarmDeleteBtn:'このアラームを削除',
@@ -6269,11 +6262,15 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       }
       const unionLeft = Math.min(cur.left, newLeft);
       const unionRight = Math.max(cur.left+cur.width, newLeft+REST_W);
+      // 原来的cubic-bezier(.5,0,.15,1)在75%时间点就已经走完96%的位移，最后25%的
+      // 时长(约110ms)只用来爬完剩下不到4%——这段几乎不可见的"爬行尾巴"就是被
+      // 反馈"凝滯感"的根源。换成没有长尾的标准缓出曲线，运动在时间窗口内匀速
+      // 收尾，不会有停在原地不动的错觉；顺带把时长从440ms缩到320ms，动作更利落。
       const anim = bubble.animate([
         { left:cur.left+'px',  width:cur.width+'px' },
         { left:unionLeft+'px', width:(unionRight-unionLeft)+'px', offset:0.48 },
         { left:newLeft+'px',   width:REST_W+'px' }
-      ], { duration:440, easing:'cubic-bezier(.5,0,.15,1)' });
+      ], { duration:320, easing:'cubic-bezier(.22,1,.36,1)' });
       currentAnim = anim;
       anim.onfinish = () => {
         bubble.style.left = newLeft+'px';
