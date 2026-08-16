@@ -1,0 +1,53 @@
+<svg viewBox="20 0 420 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="10%" y1="10%" x2="95%" y2="90%">
+      <stop offset="0%" stop-color="#F2967F"/>
+      <stop offset="45%" stop-color="#E85D4A"/>
+      <stop offset="100%" stop-color="#D9503C"/>
+    </linearGradient>
+    <linearGradient id="gGold" x1="15%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#F7D774"/>
+      <stop offset="55%" stop-color="#F2A94C"/>
+      <stop offset="100%" stop-color="#E8823C"/>
+    </linearGradient>
+    <radialGradient id="cloudFill" cx="55%" cy="55%" r="65%">
+      <stop offset="0%" stop-color="#3A2A38"/>
+      <stop offset="100%" stop-color="#0E1730"/>
+    </radialGradient>
+  </defs>
+  <path d="M84,254
+    C58,256 44,232 64,216
+    C54,196 76,176 100,180
+    C104,140 148,110 196,120
+    C210,78 268,60 310,88
+    C346,72 382,94 380,128
+    C404,132 416,158 400,178
+    C412,200 398,222 374,220
+    C378,242 356,256 334,248
+    C328,264 302,270 284,258
+    C260,272 220,268 204,250
+    C176,264 138,258 126,238
+    C104,248 84,240 84,254 Z"
+    fill="url(#cloudFill)" stroke="url(#g)" stroke-width="7" stroke-linejoin="round"/>
+  <ellipse cx="238" cy="196" rx="88" ry="62" fill="#11101d" stroke="url(#gGold)" stroke-width="6.5"/>
+  <g stroke="url(#gGold)" stroke-width="6.5" stroke-linecap="round">
+    <line x1="238" y1="130" x2="238" y2="145"/>
+    <line x1="299.6" y1="153.1" x2="288.2" y2="162.1"/>
+    <line x1="322" y1="196" x2="307" y2="196"/>
+    <line x1="299.6" y1="238.9" x2="288.2" y2="229.9"/>
+    <line x1="238" y1="262" x2="238" y2="247"/>
+    <line x1="176.4" y1="238.9" x2="187.8" y2="229.9"/>
+    <line x1="154" y1="196" x2="169" y2="196"/>
+    <line x1="176.4" y1="153.1" x2="187.8" y2="162.1"/>
+  </g>
+  <g stroke="url(#gGold)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M238,196 L226,146 L241,158 L228,110" stroke-width="9"/>
+    <path d="M238,196 L286,212 L306,206 C312,204 316,208 312,212" stroke-width="9"/>
+  </g>
+  <circle cx="238" cy="196" r="7.5" fill="url(#gGold)"/>
+  <g fill="none" stroke="url(#g)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M336,78 L364,78 L336,106 L368,106" stroke-width="9"/>
+    <path d="M364,42 L386,42 L364,64 L388,64" stroke-width="7.5"/>
+    <path d="M384,14 L400,14 L384,30 L402,30" stroke-width="6"/>
+  </g>
+</svg>

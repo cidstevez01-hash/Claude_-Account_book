@@ -1,0 +1,346 @@
+<title>双主题UI原型</title>
+<style>
+  :root{
+    --bg:#EDEAE3; --panel:#FFFFFF; --panel-line:#DDD7CB;
+    --text:#2A2620; --text-soft:#7A7263; --text-faint:#A79E8C;
+    --accent:#C24E3A;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17150F; --panel:#211E17; --panel-line:#37322A;
+      --text:#EFE9DC; --text-soft:#A69C89; --text-faint:#6E6656;
+      --accent:#E8785E;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17150F; --panel:#211E17; --panel-line:#37322A;
+    --text:#EFE9DC; --text-soft:#A69C89; --text-faint:#6E6656;
+    --accent:#E8785E;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Noto Sans SC', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:48px 28px 100px;}
+
+  .page-head{margin-bottom:44px;}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px;}
+  .page-head h1{font-family:'Noto Serif SC', "Songti SC", serif;font-weight:700;font-size:clamp(24px,3.4vw,32px);margin:0 0 10px;text-wrap:balance;}
+  .page-head p{margin:0;color:var(--text-soft);font-size:14.5px;max-width:62ch;}
+  .page-head .hint{
+    display:inline-flex;align-items:center;gap:7px;margin-top:16px;
+    font-size:12.5px;color:var(--accent);font-family:var(--mono);
+    border:1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius:99px;padding:6px 14px;
+  }
+
+  .themes{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;}
+  @media (max-width:900px){ .themes{grid-template-columns:1fr;} }
+
+  .theme-block{}
+  .theme-label{
+    display:flex;align-items:baseline;gap:10px;margin-bottom:16px;
+    padding-bottom:12px;border-bottom:1px solid var(--panel-line);
+  }
+  .theme-label h2{font-family:'Noto Serif SC',"Songti SC",serif;font-size:18px;margin:0;font-weight:700;}
+  .theme-label span{font-family:var(--mono);font-size:11px;color:var(--text-faint);}
+
+  .stage{
+    background:var(--panel);border:1px solid var(--panel-line);border-radius:20px;
+    padding:36px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:16px;
+  }
+
+  /* ---- phone shell ---- */
+  .phone{
+    width:100%;max-width:340px;aspect-ratio:340/660;
+    border-radius:34px;overflow:hidden;position:relative;
+    box-shadow:0 18px 40px -12px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .phone-inner{position:absolute;inset:0;display:flex;flex-direction:column;}
+
+  /* -- light skin tokens -- */
+  .skin-light{
+    --paper:#F7F1E7; --card:#FFFDF8; --ink:#3a2f28; --ink-soft:#a99c86; --ink-faint:#cfc3ac;
+    --seal:#d1665a; --seal-soft:#e2897d; --jade:#7a9b6e; --grid:#e7dcc4; --grid-bg:#e3e7dd; --accent2:#e3b23c;
+  }
+  /* -- summerB skin tokens -- */
+  .skin-dark{
+    --paper:#101B33; --card:#1A2C4D; --ink:#F0E9D8; --ink-soft:#93A6C4; --ink-faint:#33436A;
+    --seal:#E85D4A; --seal-soft:#F2967F; --jade:#4FD1A5; --grid:#2A3D63; --grid-bg:#1F3155; --accent2:#F2C94C;
+  }
+
+  .phone-inner{background:var(--paper);color:var(--ink);font-family:'Noto Sans SC',sans-serif;}
+
+  .ph-header{padding:20px 18px 14px;display:flex;align-items:center;justify-content:space-between;}
+  .ph-header h3{font-family:'Noto Serif SC',serif;font-size:19px;margin:0;font-weight:700;}
+  .ph-gear{
+    width:34px;height:34px;border-radius:50%;border:1.5px solid color-mix(in srgb, var(--seal) 55%, transparent);
+    display:flex;align-items:center;justify-content:center;color:var(--seal);flex-shrink:0;
+  }
+  .ph-gear svg{width:16px;height:16px;}
+
+  .ph-content{flex:1;padding:2px 18px 130px;overflow:hidden;position:relative;}
+  .ph-card{
+    background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;
+    border:1px solid color-mix(in srgb, var(--seal) 22%, var(--grid));
+    box-shadow:0 0 0 1px color-mix(in srgb, var(--ink) 3%, transparent);
+  }
+  .ph-card .lbl{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+  .ph-card .val{font-family:'Noto Serif SC',serif;font-weight:700;font-size:26px;font-variant-numeric:tabular-nums;}
+  .ph-row{display:flex;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px dashed var(--grid);}
+  .ph-row div{font-size:12px;color:var(--ink-soft);}
+  .ph-row .n{font-family:'Noto Serif SC',serif;font-weight:600;font-size:15px;color:var(--ink);margin-top:2px;font-variant-numeric:tabular-nums;}
+
+  .ph-entry{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid color-mix(in srgb, var(--grid) 70%, transparent);}
+  .ph-entry .ic{width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--grid);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--seal);}
+  .ph-entry .ic svg{width:16px;height:16px;}
+  .ph-entry .meta{flex:1;min-width:0;}
+  .ph-entry .meta .t{font-size:13.5px;font-weight:600;}
+  .ph-entry .meta .s{font-size:11px;color:var(--ink-faint);margin-top:1px;}
+  .ph-entry .amt{font-family:'Noto Serif SC',serif;font-weight:600;font-size:14px;color:var(--seal);font-variant-numeric:tabular-nums;}
+
+  /* -- floating glass tab bar -- */
+  .tabbar{
+    position:absolute;left:14px;right:14px;bottom:16px;
+    border-radius:30px;
+    background:color-mix(in srgb, var(--card) 20%, transparent);
+    backdrop-filter:blur(10px) saturate(1.6); -webkit-backdrop-filter:blur(10px) saturate(1.6);
+    box-shadow:0 10px 30px rgba(0,0,0,0.28), 0 0 0 1px color-mix(in srgb, var(--seal) 24%, transparent);
+    display:flex;padding:8px 6px;gap:6px;
+  }
+  .tab-btn{
+    flex:1;background:none;border:none;padding:8px 0 6px;margin:0;border-radius:14px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:10.5px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;
+    position:relative;transition:color .2s ease;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .tab-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .16s ease;position:relative;z-index:1;}
+  .tab-btn span{position:relative;z-index:1;transition:transform .16s ease;}
+  .tab-btn.active{color:var(--seal);}
+  .tab-btn.pressed svg{transform:scale(0.84);}
+  .tab-btn.pressed span{transform:scale(0.92);}
+
+  /* 选中态高亮：圆角矩形("squircle")背景块，完全嵌在栏内(top/bottom固定，不超出栏
+     边界)，靠青色描边+外发光识别，不是浮在栏外的圆形气泡。按钮本身(图标+文字)不动，
+     跟其它tab同一行同一高度，高亮块瞬移到新tab位置(left直接赋值、无transition) */
+  .tab-bubble{
+    position:absolute; left:0; top:4px; bottom:4px; width:78px;
+    border-radius:30px;
+    z-index:0; pointer-events:none; opacity:0;
+    transform-origin:center center;
+    background:color-mix(in srgb, var(--card) 22%, transparent);
+    backdrop-filter:blur(2px) saturate(1.5) url(#glassLens); -webkit-backdrop-filter:blur(2px) saturate(1.5);
+    border:1.5px solid color-mix(in srgb, var(--seal) 55%, transparent);
+    box-shadow:
+      0 0 10px color-mix(in srgb, var(--seal) 38%, transparent),
+      inset 0 1px 1px color-mix(in srgb, white 40%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--seal) 15%, transparent) inset;
+    transition:opacity .18s ease, transform .18s ease;
+  }
+  .tab-bubble.show{opacity:1;}
+
+  .stage-note{font-size:12.5px;color:var(--text-soft);text-align:center;max-width:320px;}
+  .stage-note b{color:var(--text);}
+
+  .controls{
+    display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;
+  }
+  .ctl-btn{
+    font-family:var(--mono);font-size:11px;color:var(--text-soft);
+    background:var(--bg);border:1px solid var(--panel-line);border-radius:8px;
+    padding:6px 11px;cursor:pointer;transition:border-color .15s ease, color .15s ease;
+  }
+  .ctl-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .ctl-btn.on{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, var(--bg));}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--panel-line);color:var(--text-faint);font-size:12px;font-family:var(--mono);}
+</style>
+
+<svg width="0" height="0" style="position:absolute;overflow:hidden;">
+  <filter id="glassLens" x="-40%" y="-40%" width="180%" height="180%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.009 0.05" numOctaves="2" seed="9" result="noise"/>
+    <feGaussianBlur in="noise" stdDeviation="2" result="softNoise"/>
+    <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="38" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="eyebrow">记账本 · 交互式设计原型 · 持续更新</div>
+    <h1>双主题 UI 原型</h1>
+    <p>不用再看静态截图猜效果——这里是真实可交互的版本，跟正式代码用的是同一套颜色变量和动画参数。以后每次设计改动都会更新到这一份，链接不变。</p>
+    <div class="hint">↓ 依次点击"记账→统计→汇率"，看选中指示器滑动拉伸、经过的图标透过玻璃折射变形</div>
+  </div>
+
+  <div class="themes">
+
+    <div class="theme-block">
+      <div class="theme-label"><h2>默认主题</h2><span>current · 米白纸感</span></div>
+      <div class="stage">
+        <div class="phone">
+          <div class="phone-inner skin-light" id="phoneLight">
+            <div class="ph-header">
+              <h3>记账本</h3>
+              <div class="ph-gear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+            </div>
+            <div class="ph-content">
+              <div class="ph-card">
+                <div class="lbl">本月结余（CN¥）</div>
+                <div class="val">¥3,280.00</div>
+                <div class="ph-row">
+                  <div>本月收入<div class="n" style="color:var(--jade)">¥8,000</div></div>
+                  <div>本月支出<div class="n" style="color:var(--seal)">¥4,720</div></div>
+                </div>
+              </div>
+              <div class="ph-card" style="padding:6px 12px;">
+                <div class="ph-entry">
+                  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v4H3z"/><path d="M5 7v13h14V7"/><path d="M9 12h6"/></svg></div>
+                  <div class="meta"><div class="t">超市采购</div><div class="s">8月14日 · 生活</div></div>
+                  <div class="amt">-¥186</div>
+                </div>
+                <div class="ph-entry" style="border-bottom:none;">
+                  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+                  <div class="meta"><div class="t">工资</div><div class="s">8月10日 · 收入</div></div>
+                  <div class="amt" style="color:var(--jade)">+¥8,000</div>
+                </div>
+              </div>
+            </div>
+            <nav class="tabbar" data-phone="light">
+              <button class="tab-btn active" data-page="ledger"><svg viewBox="0 0 24 24"><path d="M4 4.5c3-1.4 6-1.4 8 0v13c-2-1.2-5-1.2-8 0z"/><path d="M20 4.5c-3-1.4-6-1.4-8 0v13c2-1.2 5-1.2 8 0z"/></svg><span>记账</span></button>
+              <button class="tab-btn" data-page="stats"><svg viewBox="0 0 24 24"><path d="M3.5 20.5V9"/><path d="M10 20.5V4"/><path d="M16.5 20.5V12.5"/><path d="M3 20.7h18"/></svg><span>统计</span></button>
+              <button class="tab-btn" data-page="rate"><svg viewBox="0 0 24 24"><path d="M3.5 8h13.5"/><path d="M14 4.2 17.3 8l-3.3 3.8"/><path d="M20.5 16H7"/><path d="M10 12.2 6.7 16l3.3 3.8"/></svg><span>汇率</span></button>
+            </nav>
+          </div>
+        </div>
+        <div class="stage-note">背景是真实的卡片内容，标签栏用的是<b>半透明+模糊</b>，不是纯色实底</div>
+      </div>
+    </div>
+
+    <div class="theme-block">
+      <div class="theme-label"><h2>夏 · 花火</h2><span>summerB · 深藏青</span></div>
+      <div class="stage" style="background:#1b1912;">
+        <div class="phone">
+          <div class="phone-inner skin-dark" id="phoneDark">
+            <div class="ph-header">
+              <h3>记账本</h3>
+              <div class="ph-gear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+            </div>
+            <div class="ph-content">
+              <div class="ph-card">
+                <div class="lbl">本月结余（CN¥）</div>
+                <div class="val">¥3,280.00</div>
+                <div class="ph-row">
+                  <div>本月收入<div class="n" style="color:var(--jade)">¥8,000</div></div>
+                  <div>本月支出<div class="n" style="color:var(--seal)">¥4,720</div></div>
+                </div>
+              </div>
+              <div class="ph-card" style="padding:6px 12px;">
+                <div class="ph-entry">
+                  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v4H3z"/><path d="M5 7v13h14V7"/><path d="M9 12h6"/></svg></div>
+                  <div class="meta"><div class="t">超市采购</div><div class="s">8月14日 · 生活</div></div>
+                  <div class="amt">-¥186</div>
+                </div>
+                <div class="ph-entry" style="border-bottom:none;">
+                  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+                  <div class="meta"><div class="t">工资</div><div class="s">8月10日 · 收入</div></div>
+                  <div class="amt" style="color:var(--jade)">+¥8,000</div>
+                </div>
+              </div>
+            </div>
+            <nav class="tabbar" data-phone="dark">
+              <button class="tab-btn active" data-page="ledger"><svg viewBox="0 0 24 24"><path d="M4 4.5c3-1.4 6-1.4 8 0v13c-2-1.2-5-1.2-8 0z"/><path d="M20 4.5c-3-1.4-6-1.4-8 0v13c2-1.2 5-1.2 8 0z"/></svg><span>记账</span></button>
+              <button class="tab-btn" data-page="stats"><svg viewBox="0 0 24 24"><path d="M3.5 20.5V9"/><path d="M10 20.5V4"/><path d="M16.5 20.5V12.5"/><path d="M3 20.7h18"/></svg><span>统计</span></button>
+              <button class="tab-btn" data-page="rate"><svg viewBox="0 0 24 24"><path d="M3.5 8h13.5"/><path d="M14 4.2 17.3 8l-3.3 3.8"/><path d="M20.5 16H7"/><path d="M10 12.2 6.7 16l3.3 3.8"/></svg><span>汇率</span></button>
+            </nav>
+          </div>
+        </div>
+        <div class="stage-note">深色背景下模糊透出的内容更接近实际使用场景</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    accountbook-20260810-2 · 当前展示：底部悬浮标签栏(毛玻璃)+滑动拉伸选中指示器(经过的图标透过玻璃折射变形) · 后续设计改动会持续更新到这份原型，网址不变
+  </footer>
+
+</div>
+
+<script>
+  // 玻璃气泡指示器：切换标签时左右平移+中途拉伸(经过的中间tab会被盖住，
+  // 透过毛玻璃+SVG位移滤镜看到下面图标发生折射变形)，停下来后收回到固定宽度。
+  function wireTabbar(nav){
+    const bubble = document.createElement('div');
+    bubble.className = 'tab-bubble';
+    nav.appendChild(bubble);
+    const btns = Array.from(nav.querySelectorAll('.tab-btn'));
+    const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const REST_W = 78;
+
+    function centerXOf(btn){
+      const navRect = nav.getBoundingClientRect();
+      const r = btn.getBoundingClientRect();
+      return (r.left - navRect.left) + r.width/2;
+    }
+    function restLeftOf(btn){ return centerXOf(btn) - REST_W/2; }
+
+    function place(btn){
+      bubble.style.left = restLeftOf(btn)+'px';
+      bubble.style.width = REST_W+'px';
+    }
+
+    function slideTo(btn){
+      const newLeft = restLeftOf(btn);
+      const curLeft = parseFloat(bubble.style.left) || newLeft;
+      const curWidth = parseFloat(bubble.style.width) || REST_W;
+      bubble.classList.add('show');
+      bubble.style.left = newLeft+'px';
+      bubble.style.width = REST_W+'px';
+      if(prefersReduced()) return;
+      const unionLeft = Math.min(curLeft, newLeft);
+      const unionRight = Math.max(curLeft+curWidth, newLeft+REST_W);
+      bubble.animate([
+        { left:curLeft+'px',   width:curWidth+'px' },
+        { left:unionLeft+'px', width:(unionRight-unionLeft)+'px', offset:0.48 },
+        { left:newLeft+'px',   width:REST_W+'px' }
+      ], { duration:440, easing:'cubic-bezier(.5,0,.15,1)' });
+    }
+
+    function pressDown(btn){
+      btn.classList.add('pressed');
+      if(btn.classList.contains('active') && !prefersReduced()){
+        bubble.style.transform = 'scale(0.95)';
+      }
+    }
+    function pressRelease(btn){
+      btn.classList.remove('pressed');
+      if(btn.classList.contains('active') && !prefersReduced()){
+        bubble.style.transform = '';
+      }
+    }
+
+    btns.forEach(btn=>{
+      btn.addEventListener('pointerdown', ()=> pressDown(btn));
+      ['pointerup','pointerleave','pointercancel'].forEach(evt=>
+        btn.addEventListener(evt, ()=> pressRelease(btn)));
+      btn.addEventListener('click', ()=>{
+        if(btn.classList.contains('active')) return;
+        btns.forEach(b=> b.classList.remove('active'));
+        btn.classList.add('active');
+        slideTo(btn);
+      });
+    });
+
+    place(nav.querySelector('.tab-btn.active'));
+    bubble.classList.add('show');
+    window.addEventListener('resize', ()=> place(nav.querySelector('.tab-btn.active')));
+  }
+  document.querySelectorAll('.tabbar').forEach(wireTabbar);
+</script>
