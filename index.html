@@ -209,10 +209,17 @@
   .fab{position:fixed;right: max(20px, calc(50% - 240px + 20px));bottom: calc(var(--safe-bottom) + 78px);width:58px;height:58px;border-radius:50%;background:var(--seal);color:#fff;border:none;font-size:28px;box-shadow:0 4px 0 var(--seal-soft), 0 6px 16px rgba(58,47,40,0.28);display:flex;align-items:center;justify-content:center;z-index:20;transform:translateZ(0);-webkit-transform:translateZ(0);}
   .fab .hd-icon{width:24px;height:24px;}
   .fab:active{transform:scale(0.94) translateZ(0);}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:var(--card);border-top:2px dashed var(--grid);display:flex;padding:6px 6px calc(var(--safe-bottom));gap:6px;z-index:15;transform:translateZ(0);-webkit-transform:translateZ(0);}
-  .tab-btn{flex:1;background:none;border:none;padding:8px 0 6px;margin:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;position:relative;transition:background 0.2s ease, color 0.2s ease;}
+  /* 底部导航改成悬浮毛玻璃胶囊(参照LINE App)：整条离屏幕左右/底边都留出间隙、
+     圆角拉满、半透明+backdrop-filter模糊让底下内容隐约透出来，不是简单的实色贴底栏。
+     选中态只靠图标/文字变色表示，不再加背景色块(反馈"矩形气泡效果不要了") */
+  .tabbar{position:fixed;left:14px;right:14px;bottom:calc(var(--safe-bottom) + 12px);max-width:480px;margin:0 auto;
+    background:color-mix(in srgb, var(--card) 20%, transparent);
+    backdrop-filter:blur(10px) saturate(1.6);-webkit-backdrop-filter:blur(10px) saturate(1.6);
+    border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,0.25), 0 0 0 1px color-mix(in srgb, var(--seal) 22%, transparent);
+    display:flex;padding:8px 6px;gap:6px;z-index:15;transform:translateZ(0);-webkit-transform:translateZ(0);}
+  .tab-btn{flex:1;background:none;border:none;padding:8px 0 6px;margin:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;position:relative;transition:color 0.2s ease;}
   .tab-btn .hd-icon{width:20px;height:20px;display:inline-block;transition:transform 0.22s cubic-bezier(.34,1.56,.64,1);}
-  .tab-btn.active{background:rgba(209,102,90,0.16);color:var(--seal);}
+  .tab-btn.active{color:var(--seal);}
   .tab-btn.active .hd-icon{transform:translateY(-1px) scale(1.12);}
   .tab-btn:active{opacity:0.6;}
   .overlay{position:fixed;inset:0;background:rgba(58,47,40,0.45);z-index:30;opacity:0;pointer-events:none;transition:opacity 0.25s ease;}
