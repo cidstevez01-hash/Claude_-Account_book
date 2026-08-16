@@ -215,18 +215,34 @@
   .fab .hd-icon{width:24px;height:24px;}
   .fab:active{transform:scale(0.94) translateZ(0);}
   /* 底部导航改成悬浮毛玻璃胶囊(参照LINE App)：整条离屏幕左右/底边都留出间隙、
-     圆角拉满、半透明+backdrop-filter模糊让底下内容隐约透出来，不是简单的实色贴底栏。
-     选中态只靠图标/文字变色表示，不再加背景色块(反馈"矩形气泡效果不要了") */
+     圆角拉满、半透明+backdrop-filter模糊让底下内容隐约透出来，不是简单的实色贴底栏。 */
   .tabbar{position:fixed;left:14px;right:14px;bottom:calc(var(--safe-bottom) + 12px);max-width:480px;margin:0 auto;
     background:color-mix(in srgb, var(--card) 20%, transparent);
     backdrop-filter:blur(10px) saturate(1.6);-webkit-backdrop-filter:blur(10px) saturate(1.6);
     border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,0.25), 0 0 0 1px color-mix(in srgb, var(--seal) 22%, transparent);
     display:flex;padding:8px 6px;gap:6px;z-index:15;transform:translateZ(0);-webkit-transform:translateZ(0);}
   .tab-btn{flex:1;background:none;border:none;padding:8px 0 6px;margin:0;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink-soft);font-family:'Noto Sans SC',sans-serif;position:relative;transition:color 0.2s ease;}
-  .tab-btn .hd-icon{width:20px;height:20px;display:inline-block;transition:transform 0.22s cubic-bezier(.34,1.56,.64,1);}
+  .tab-btn .hd-icon{width:20px;height:20px;display:inline-block;transition:transform 0.22s cubic-bezier(.34,1.56,.64,1);position:relative;z-index:1;}
+  .tab-btn span{position:relative;z-index:1;}
   .tab-btn.active{color:var(--seal);}
   .tab-btn.active .hd-icon{transform:translateY(-1px) scale(1.12);}
   .tab-btn:active{opacity:0.6;}
+  /* 选中态高亮：圆角矩形("squircle")玻璃背景块，完全嵌在栏内(top/bottom固定，不超出
+     栏边界)，靠青色描边+外发光识别，不是浮在栏外的圆形气泡。按钮本身(图标+文字)不动，
+     跟其它tab同一行同一高度，切换标签时气泡左右滑动+中途拉伸(经过的中间tab被盖住，
+     透过毛玻璃+SVG位移滤镜看到下面图标发生折射变形)，这是原型 `design-assets/
+     prototypes/tabbar-liquid-glass-prototype.html` 里确认过的效果，之前落地时漏了
+     气泡元素本体，只留了图标/文字变色。 */
+  .tab-bubble{position:absolute;left:0;top:4px;bottom:4px;width:78px;
+    border-radius:30px;z-index:0;pointer-events:none;opacity:0;transform-origin:center center;
+    background:color-mix(in srgb, var(--card) 22%, transparent);
+    backdrop-filter:blur(2px) saturate(1.5) url(#glassLens);-webkit-backdrop-filter:blur(2px) saturate(1.5);
+    border:1.5px solid color-mix(in srgb, var(--seal) 55%, transparent);
+    box-shadow:0 0 10px color-mix(in srgb, var(--seal) 38%, transparent),
+      inset 0 1px 1px color-mix(in srgb, white 40%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--seal) 15%, transparent) inset;
+    transition:opacity 0.18s ease, transform 0.18s ease;}
+  .tab-bubble.show{opacity:1;}
   .overlay{position:fixed;inset:0;background:rgba(58,47,40,0.45);z-index:30;opacity:0;pointer-events:none;transition:opacity 0.25s ease;}
   .overlay.show{opacity:1;pointer-events:auto;}
   .sheet{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-radius:26px 26px 0 0;z-index:31;padding: 18px 20px calc(var(--safe-bottom) + 20px);transform:translateY(105%);transition:transform 0.3s cubic-bezier(.32,.72,0,1);max-width:480px;margin:0 auto;max-height:88vh;overflow-y:auto;box-shadow:0 -4px 24px rgba(0,0,0,0.15);border-top:2px dashed var(--seal);}
@@ -640,6 +656,14 @@
 <body>
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
 <defs>
+  <!-- 底部标签栏选中气泡用的玻璃折射滤镜，跟design-assets/prototypes/
+       tabbar-liquid-glass-prototype.html里的定义一致：噪声位移让气泡背后
+       被盖住的图标透过玻璃看起来轻微扭曲变形。 -->
+  <filter id="glassLens" x="-40%" y="-40%" width="180%" height="180%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.009 0.05" numOctaves="2" seed="9" result="noise"/>
+    <feGaussianBlur in="noise" stdDeviation="2" result="softNoise"/>
+    <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="38" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
   <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6"/></symbol>
   <symbol id="ic-alarm" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 13V9M12 13l3 2"/><path d="M5 5 2.5 7.5M19 5l2.5 2.5"/><path d="M9 3.5c1-.8 5-.8 6 0"/></symbol>
   <symbol id="ic-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol>
@@ -2282,7 +2306,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.0';
   const IS_DEV_BUILD = true;
   const DEV_BUILD_DATE = '20260816';
-  const DEV_BUILD = 3;
+  const DEV_BUILD = 4;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -6171,6 +6195,48 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   });
 
   // ---------- Tabs ----------
+  // 标签栏玻璃气泡指示器：跟design-assets/prototypes/tabbar-liquid-glass-prototype.html
+  // 里确认过的效果一致，切换标签时左右滑动+中途拉伸(经过的中间tab被盖住，透过毛玻璃+
+  // SVG位移滤镜看到下面图标发生折射变形)，停下来后收回到固定宽度。
+  const tabBubble = (()=>{
+    const nav = document.querySelector('.tabbar');
+    if(!nav) return null;
+    const bubble = document.createElement('div');
+    bubble.className = 'tab-bubble';
+    nav.appendChild(bubble);
+    const REST_W = 78;
+    const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function restLeftOf(btn){
+      const navRect = nav.getBoundingClientRect();
+      const r = btn.getBoundingClientRect();
+      return (r.left - navRect.left) + r.width/2 - REST_W/2;
+    }
+    function place(btn){
+      if(!btn) return;
+      bubble.style.left = restLeftOf(btn)+'px';
+      bubble.style.width = REST_W+'px';
+      bubble.classList.add('show');
+    }
+    function slideTo(btn){
+      if(!btn) return;
+      const newLeft = restLeftOf(btn);
+      const curLeft = parseFloat(bubble.style.left) || newLeft;
+      const curWidth = parseFloat(bubble.style.width) || REST_W;
+      bubble.classList.add('show');
+      bubble.style.left = newLeft+'px';
+      bubble.style.width = REST_W+'px';
+      if(prefersReduced()) return;
+      const unionLeft = Math.min(curLeft, newLeft);
+      const unionRight = Math.max(curLeft+curWidth, newLeft+REST_W);
+      bubble.animate([
+        { left:curLeft+'px',   width:curWidth+'px' },
+        { left:unionLeft+'px', width:(unionRight-unionLeft)+'px', offset:0.48 },
+        { left:newLeft+'px',   width:REST_W+'px' }
+      ], { duration:440, easing:'cubic-bezier(.5,0,.15,1)' });
+    }
+    window.addEventListener('resize', ()=> place(nav.querySelector('.tab-btn.active')));
+    return { place, slideTo };
+  })();
   function switchToPage(page){
     document.querySelectorAll('.tab-btn').forEach(b=> b.classList.toggle('active', b.getAttribute('data-page')===page));
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -6179,10 +6245,12 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     updateFireworksBg();
     if(page==='stats') renderStats();
     if(page==='rate') renderRatePage();
+    if(tabBubble) tabBubble.slideTo(document.querySelector('.tab-btn[data-page="'+page+'"]'));
   }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click', ()=> switchToPage(btn.getAttribute('data-page')));
   });
+  if(tabBubble) tabBubble.place(document.querySelector('.tab-btn.active'));
 
   function goToHomeDonut(type){
     homeDonutType = type;
