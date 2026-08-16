@@ -2321,7 +2321,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.0';
   const IS_DEV_BUILD = true;
   const DEV_BUILD_DATE = '20260816';
-  const DEV_BUILD = 8;
+  const DEV_BUILD = 9;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -6262,15 +6262,18 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       }
       const unionLeft = Math.min(cur.left, newLeft);
       const unionRight = Math.max(cur.left+cur.width, newLeft+REST_W);
-      // 原来的cubic-bezier(.5,0,.15,1)在75%时间点就已经走完96%的位移，最后25%的
-      // 时长(约110ms)只用来爬完剩下不到4%——这段几乎不可见的"爬行尾巴"就是被
-      // 反馈"凝滯感"的根源。换成没有长尾的标准缓出曲线，运动在时间窗口内匀速
-      // 收尾，不会有停在原地不动的错觉；顺带把时长从440ms缩到320ms，动作更利落。
+      // 缓动曲线试了两版都不对：cubic-bezier(.5,0,.15,1)前段动得快、最后25%时长
+      // 只爬完不到4%位移，长尾巴看着像"停住不动"(凝滯感)；换成cubic-bezier(.22,1,
+      // .36,1)又反过来太猛——前25%时长就已经走完76%位移，肉眼看就是"唰"一下瞬移
+      // 过去，没有过渡感。换成标准的CSS ease(等价于cubic-bezier(.25,.1,.25,1))，
+      // 位移在整个时间窗口里比较均匀地推进(25%时长约41%位移、50%时长约80%位移)，
+      // 全程都能看到明显的移动过程，收尾也不会拖成长尾巴；时长顺带调回380ms给
+      // 眼睛多一点时间跟着动作走。
       const anim = bubble.animate([
         { left:cur.left+'px',  width:cur.width+'px' },
         { left:unionLeft+'px', width:(unionRight-unionLeft)+'px', offset:0.48 },
         { left:newLeft+'px',   width:REST_W+'px' }
-      ], { duration:320, easing:'cubic-bezier(.22,1,.36,1)' });
+      ], { duration:380, easing:'ease' });
       currentAnim = anim;
       anim.onfinish = () => {
         bubble.style.left = newLeft+'px';
