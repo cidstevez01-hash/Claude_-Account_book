@@ -2328,7 +2328,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.0';
   const IS_DEV_BUILD = true;
   const DEV_BUILD_DATE = '20260816';
-  const DEV_BUILD = 6;
+  const DEV_BUILD = 7;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -6232,13 +6232,26 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     nav.appendChild(bubble);
     const REST_W = 78;
     const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let currentAnim = null;
     function restLeftOf(btn){
       const navRect = nav.getBoundingClientRect();
       const r = btn.getBoundingClientRect();
       return (r.left - navRect.left) + r.width/2 - REST_W/2;
     }
+    // 读气泡"当前实际渲染位置"(getBoundingClientRect实时反映WAAPI动画播放中的
+    // 插值状态)，而不是读bubble.style.left/width这两个内联样式——之前的bug就在
+    // 这：内联样式在动画开始时就被立刻改成了目标终点值(留着给动画结束后兜底)，
+    // 快速连续点击(动画还没播完440ms下一次点击就来了)时，新动画会从"上一次点击
+    // 已经写死的终点值"起步，而不是从画面上此刻真正显示的、动画播放到一半的
+    // 位置起步，两者对不上就会看到一跳一跳的不连续跳变。
+    function currentRect(){
+      const navRect = nav.getBoundingClientRect();
+      const b = bubble.getBoundingClientRect();
+      return { left: b.left - navRect.left, width: b.width };
+    }
     function place(btn){
       if(!btn) return;
+      if(currentAnim){ currentAnim.cancel(); currentAnim = null; }
       bubble.style.left = restLeftOf(btn)+'px';
       bubble.style.width = REST_W+'px';
       bubble.classList.add('show');
@@ -6246,32 +6259,43 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     function slideTo(btn){
       if(!btn) return;
       const newLeft = restLeftOf(btn);
-      const curLeft = parseFloat(bubble.style.left) || newLeft;
-      const curWidth = parseFloat(bubble.style.width) || REST_W;
+      const cur = bubble.classList.contains('show') ? currentRect() : { left:newLeft, width:REST_W };
+      if(currentAnim){ currentAnim.cancel(); currentAnim = null; }
       bubble.classList.add('show');
-      bubble.style.left = newLeft+'px';
-      bubble.style.width = REST_W+'px';
-      if(prefersReduced()) return;
-      const unionLeft = Math.min(curLeft, newLeft);
-      const unionRight = Math.max(curLeft+curWidth, newLeft+REST_W);
-      bubble.animate([
-        { left:curLeft+'px',   width:curWidth+'px' },
+      if(prefersReduced()){
+        bubble.style.left = newLeft+'px';
+        bubble.style.width = REST_W+'px';
+        return;
+      }
+      const unionLeft = Math.min(cur.left, newLeft);
+      const unionRight = Math.max(cur.left+cur.width, newLeft+REST_W);
+      const anim = bubble.animate([
+        { left:cur.left+'px',  width:cur.width+'px' },
         { left:unionLeft+'px', width:(unionRight-unionLeft)+'px', offset:0.48 },
         { left:newLeft+'px',   width:REST_W+'px' }
       ], { duration:440, easing:'cubic-bezier(.5,0,.15,1)' });
+      currentAnim = anim;
+      anim.onfinish = () => {
+        bubble.style.left = newLeft+'px';
+        bubble.style.width = REST_W+'px';
+        if(currentAnim===anim) currentAnim = null;
+      };
+      anim.oncancel = () => { if(currentAnim===anim) currentAnim = null; };
     }
     window.addEventListener('resize', ()=> place(nav.querySelector('.tab-btn.active')));
     return { place, slideTo };
   })();
   function switchToPage(page){
     document.querySelectorAll('.tab-btn').forEach(b=> b.classList.toggle('active', b.getAttribute('data-page')===page));
+    // 气泡动画尽早触发(赶在下面统计页/汇率页那些较重的同步渲染之前)，
+    // 避免它们抢占主线程导致动画开头掉帧、看起来卡一下
+    if(tabBubble) tabBubble.slideTo(document.querySelector('.tab-btn[data-page="'+page+'"]'));
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     $('page'+page.charAt(0).toUpperCase()+page.slice(1)).classList.add('active');
     $('fabAdd').style.display = page==='ledger' ? 'flex' : 'none';
     updateFireworksBg();
     if(page==='stats') renderStats();
     if(page==='rate') renderRatePage();
-    if(tabBubble) tabBubble.slideTo(document.querySelector('.tab-btn[data-page="'+page+'"]'));
   }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click', ()=> switchToPage(btn.getAttribute('data-page')));
