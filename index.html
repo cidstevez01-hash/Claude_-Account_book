@@ -311,7 +311,14 @@
 
   /* ---- 闹钟(alarms) ---- */
   .alarm-row-wrap{position:relative;overflow:hidden;}
-  .alarm-swipe-del{position:absolute;top:0;right:0;bottom:0;width:76px;border:none;background:var(--seal);color:#fff;display:flex;align-items:center;justify-content:center;padding-right:8px;}
+  /* 参照iOS原生提醒事项/时钟App的滑动删除：删除键是跟卡片上下左右都留白的
+     独立"药丸/圆形"，不是贴满整行高度、紧贴右边缘的直角矩形色块。静止(刚滑开
+     露出、手指已松开)时收成一个圆形只显示垃圾桶图标；手指还按着连续拖动时，
+     这个药丸跟着拖动距离连续变宽，但因为border-radius远大于自身高度的一半，
+     不管多宽两端始终是半圆封头，不会出现"一边直角一边弧形"。宽度由JS
+     (wireAlarmRowSwipe)按拖动距离/settled状态动态设置，这里只定固定不变的
+     形状(上下左右留白+统一大圆角)。 */
+  .alarm-swipe-del{position:absolute;top:6px;bottom:6px;right:6px;width:48px;border-radius:999px;border:none;background:var(--seal);color:#fff;display:flex;align-items:center;justify-content:center;}
   .alarm-swipe-del .hd-icon{width:19px;height:19px;color:#fff;flex-shrink:0;}
   .alarm-row{position:relative;z-index:1;background:var(--paper);display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1.5px dashed var(--grid);touch-action:pan-y;}
   .alarm-row-wrap:last-child .alarm-row{border-bottom:none;}
@@ -319,7 +326,12 @@
   .alarm-add-center-btn .hd-icon{width:24px;height:24px;}
   /* 闹钟列表每条改成独立发光卡片；"+"按钮反馈"不要实心"，改成空心渐变描边款，
      不再跟.fab/.save-btn一样用实心底 */
-  [data-skin="summerB"] .alarm-row-wrap{margin-bottom:8px;}
+  /* 卡片圆角(14px)只挂在.alarm-row上，左滑露出的.alarm-swipe-del本身是直角矩形，
+     没有跟着圆角走——之前反馈"删除按钮的形状你压根没改啊"就是这个：滑开后方角
+     删除条跟圆角卡片右边缘硬生生撞在一起，很不协调。改成让.alarm-row-wrap本身也
+     带上同样的圆角+overflow:hidden(基础规则里已经有overflow:hidden了)，这样露出来的
+     删除条会被裁成跟卡片一致的圆角形状，不再是方块贴着圆角卡片。 */
+  [data-skin="summerB"] .alarm-row-wrap{margin-bottom:8px;border-radius:14px;}
   [data-skin="summerB"] .alarm-row{
     background:var(--card);border-radius:14px;border:1.5px solid color-mix(in srgb, var(--seal) 30%, var(--grid));
     box-shadow:0 0 8px -4px color-mix(in srgb, var(--seal) 45%, transparent);
@@ -380,7 +392,7 @@
   [data-skin="summerB"] #alarmFormSheet .time-wheel-col{
     text-shadow:0 0 10px color-mix(in srgb, var(--seal) 30%, transparent);
   }
-  .alarm-time{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;width:66px;flex-shrink:0;}
+  .alarm-time{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;flex-shrink:0;white-space:nowrap;}
   .alarm-row.off .alarm-time{color:var(--ink-faint);}
   .alarm-meta{flex:1;min-width:0;}
   .alarm-label{font-size:13px;color:var(--ink);font-weight:600;}
@@ -2306,7 +2318,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.0';
   const IS_DEV_BUILD = true;
   const DEV_BUILD_DATE = '20260816';
-  const DEV_BUILD = 4;
+  const DEV_BUILD = 5;
   const I18N = {
     zh:{
       appTitle:'记账本', tabLedger:'记账', tabStats:'统计', tabRate:'汇率',
@@ -2423,7 +2435,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       goToSignUpBtn:'アカウントをお持ちでないですか？新規登録', goToSignInBtn:'すでにアカウントをお持ちですか？ログイン',
       cloudSyncHelpText:'登録・ログインすると、記録・カテゴリ・設定がすべて自動的にデータベースへリアルタイム同期されます。他の端末で同じアカウントにログインすれば最新データがすぐ反映されます。',
       wdMon:'月', wdTue:'火', wdWed:'水', wdThu:'木', wdFri:'金', wdSat:'土', wdSun:'日',
-      alarmSheetTitle:'アラーム', alarmNewTitle:'アラーム新規作成', alarmEditTitle:'アラーム編集',
+      alarmSheetTitle:'アラーム', alarmNewTitle:'アラームを追加', alarmEditTitle:'アラームを編集',
       alarmLabelFieldLabel:'ラベル', alarmDefaultLabel:'アラーム',
       alarmRepeatFieldLabel:'繰り返し', alarmRepeatOnce:'しない',
       alarmPresetDailyLabel:'毎日', alarmPresetWeekdayLabel:'平日', alarmPresetWeekendLabel:'週末',
@@ -5158,13 +5170,17 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     });
     area.querySelectorAll('.alarm-row-wrap').forEach(wireAlarmRowSwipe);
   }
-  // 闹钟行左滑露出删除按钮(仿邮件/提醒事项App那种滑动删除手势,这个App里其它列表没有现成的
-  // 可以抄,单独实现):滑过一半按钮宽度就吸附成"露出"状态,松手不够就弹回去；继续往左滑过
-  // 整行宽度的60%再松手，视为"滑到底"的坚决删除动作，直接触发删除(仍然弹确认框，不跳过
-  // 安全提示)，红色删除条的宽度跟着手指位置连续变宽，配合行高塌陷动画一起消失。判断方向是
-  // 水平还是垂直(避免跟列表本身的上下滚动打架)之前不拦截触摸事件,一旦判定是水平滑动才
-  // preventDefault接管
-  const ALARM_SWIPE_DEL_WIDTH = 76;
+  // 闹钟行左滑露出删除按钮(参照iOS原生提醒事项/时钟App的滑动删除手势):滑过一半
+  // 露出宽度就吸附成"露出"状态,松手不够就弹回去；继续往左滑过整行宽度的60%再松手，
+  // 视为"滑到底"的坚决删除动作，直接触发删除(仍然弹确认框，不跳过安全提示)。删除键
+  // 是跟卡片上下左右都留白的独立圆形/药丸(CSS里border-radius:999px，形状固定不变)，
+  // 不是贴满整行高度的直角色块——静止(露出但没在拖)时收成ALARM_SWIPE_DEL_CIRCLE_WIDTH
+  // 这么宽的圆形；手指按着连续拖动时宽度跟着拖动距离连续变化，露出的"行让出的空间"
+  // (ALARM_SWIPE_REVEAL_WIDTH，行整体translateX的距离)比圆形本身宽，多出来的部分是
+  // 圆形右对齐留出的空隙，不是圆形自己变形。判断方向是水平还是垂直(避免跟列表本身的
+  // 上下滚动打架)之前不拦截触摸事件,一旦判定是水平滑动才preventDefault接管
+  const ALARM_SWIPE_REVEAL_WIDTH = 76;
+  const ALARM_SWIPE_DEL_CIRCLE_WIDTH = 48;
   const ALARM_SWIPE_FULL_RATIO = 0.6;
   function closeAllAlarmSwipes(exceptWrap){
     $('alarmListArea').querySelectorAll('.alarm-row-wrap.swiped').forEach(w=>{
@@ -5173,7 +5189,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       const del = w.querySelector('.alarm-swipe-del');
       row.style.transition = 'transform .2s ease';
       row.style.transform = 'translateX(0)';
-      if(del){ del.style.transition = 'width .2s ease'; del.style.width = ALARM_SWIPE_DEL_WIDTH+'px'; }
+      if(del){ del.style.transition = 'width .2s ease'; del.style.width = ALARM_SWIPE_DEL_CIRCLE_WIDTH+'px'; }
       w.classList.remove('swiped');
     });
   }
@@ -5195,10 +5211,10 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   function wireAlarmRowSwipe(wrap){
     const row = wrap.querySelector('.alarm-row');
     const del = wrap.querySelector('.alarm-swipe-del');
-    let startX=null, startY=null, baseX=0, dragging=false, moved=false, maxWidth=ALARM_SWIPE_DEL_WIDTH;
+    let startX=null, startY=null, baseX=0, dragging=false, moved=false, maxWidth=ALARM_SWIPE_REVEAL_WIDTH;
     row.addEventListener('touchstart', (ev)=>{
       startX = ev.touches[0].clientX; startY = ev.touches[0].clientY;
-      baseX = wrap.classList.contains('swiped') ? -ALARM_SWIPE_DEL_WIDTH : 0;
+      baseX = wrap.classList.contains('swiped') ? -ALARM_SWIPE_REVEAL_WIDTH : 0;
       maxWidth = wrap.clientWidth;
       dragging = false; moved = false;
       row.style.transition = 'none';
@@ -5217,7 +5233,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       moved = true;
       const x = Math.max(-maxWidth, Math.min(0, baseX + dx));
       row.style.transform = `translateX(${x}px)`;
-      del.style.width = Math.max(ALARM_SWIPE_DEL_WIDTH, -x)+'px';
+      del.style.width = Math.max(ALARM_SWIPE_DEL_CIRCLE_WIDTH, -x)+'px';
     }, {passive:false});
     row.addEventListener('touchend', async ()=>{
       startX = null; startY = null;
@@ -5236,17 +5252,17 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
           renderAlarmList();
         } else {
           row.style.transform = 'translateX(0)';
-          del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
+          del.style.width = ALARM_SWIPE_DEL_CIRCLE_WIDTH+'px';
           wrap.classList.remove('swiped');
         }
-      } else if(currentX < -ALARM_SWIPE_DEL_WIDTH/2){
-        row.style.transform = `translateX(-${ALARM_SWIPE_DEL_WIDTH}px)`;
-        del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
+      } else if(currentX < -ALARM_SWIPE_REVEAL_WIDTH/2){
+        row.style.transform = `translateX(-${ALARM_SWIPE_REVEAL_WIDTH}px)`;
+        del.style.width = ALARM_SWIPE_DEL_CIRCLE_WIDTH+'px';
         wrap.classList.add('swiped');
         closeAllAlarmSwipes(wrap);
       } else {
         row.style.transform = 'translateX(0)';
-        del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
+        del.style.width = ALARM_SWIPE_DEL_CIRCLE_WIDTH+'px';
         wrap.classList.remove('swiped');
       }
     });
@@ -5256,7 +5272,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
         row.style.transition = 'transform .2s ease';
         del.style.transition = 'width .2s ease';
         row.style.transform = 'translateX(0)';
-        del.style.width = ALARM_SWIPE_DEL_WIDTH+'px';
+        del.style.width = ALARM_SWIPE_DEL_CIRCLE_WIDTH+'px';
         wrap.classList.remove('swiped');
         return;
       }
