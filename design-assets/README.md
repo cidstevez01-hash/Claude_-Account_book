@@ -10,7 +10,8 @@
 ## 当前内容
 
 - `icons/ic-alarm-fw/`：闹钟图标（花火皮肤）的存档
-  - `final/ic-alarm-fw.svg`、`final/ic-alarm-fw-symbol.txt`：找回的真原始定版文件（独立可渲染 SVG + 接入 index.html 用的 `<symbol>` 代码块），当前权威版本，已接入 `index.html`
+  - `final/ic-alarm-fw.svg`、`final/ic-alarm-fw-symbol.txt`：当前权威版本，随时对应 `index.html` 实际接入的内容。在找回的真原始定版路径基础上，给外轮廓补了描边（跟折扇/孔明灯等其他花火图标同款处理，让轮廓更粗更明显），配合 `index.html` 里单独放大到33px的图标框（另外两个头部图标是25.2px），解决"轮廓不够明显、图标比另外两个头部按钮小"的问题
+  - `history/v5-before-stroke-reinforcement.svg`、`history/v5-before-stroke-reinforcement-symbol.txt`：加描边、放大之前的版本（找回的真原始定版文件，无描边），已被当前 final 取代
   - `history/confirmed-reference.png`：早前对话生成的确认版参考图缩略图裁出版，原始高清/矢量源文件一度丢失后又找回（见 DEVLOG.md 相关记录）
   - `history/v2.svg`、`history/v3.svg`：手绘贝塞尔曲线尝试版本，已废弃
   - `history/v4-traced.svg`：potrace 逐像素描摹版本，技术上可用但已被找回的真原始文件取代
