@@ -14,6 +14,12 @@
 - **汇报格式固定**：每次汇报设计产出物，**消息最前面先给"名称 · 路径"**，再接效果说明/截图，不要把名字路径埋在后面。
 - **动手做设计前**：先告诉用户这次产出物准备存进 `design-assets/` 哪个目录。
 
+## 图标生成规范(baoyu-image-gen)
+使用 `baoyu-image-gen` 技能生成图标（App 图标、按键图标等）时，始终遵循：
+- **生成阶段**：使用 `--quality normal --ar 1:1`（正方形、低成本档位），不要用 `2k`/`high` 档位，除非用户明确要求更高画质。
+- **最终尺寸**：服务商通常不支持直接生成 200-300px 的小图，所以按正常最小尺寸生成后，用 `baoyu-compress-image` 技能把最终图片缩小到 200-300px 区间(如 256x256)再交付给用户。
+- 不需要用户每次重复提醒这个尺寸要求，每次做图标类任务都按此流程执行。
+
 ## 版本号 / 分支
 - 分支命名固定用 `accountbook-YYYYMMDD`，不是版本号格式，两者不要混用。
 - 版本号定版规则见 `VERSIONS.md` 的"命名规则"一节(开发分支版本号 `YYYYMMDD-dev.N`，跟 `APP_VERSION` 脱钩)。
@@ -29,10 +35,11 @@
 
 ### 发正式版本（合并进主分支发布）
 1. 确认这次要合入主分支发布的内容都已经在开发分支上验证过。
-2. 把 `index.html` 里 `APP_VERSION` 跳到新的语义化版本号（`vMAJOR.MINOR.PATCH`），`IS_DEV_BUILD` 改成 `false`（正式版设置页只显示干净的 `v{APP_VERSION}`，不带 `-dev.N`）。
+2. 把 `index.html` 里 `APP_VERSION` 跳到新的语义化版本号（`vMAJOR.MINOR.PATCH`），`IS_DEV_BUILD` 改成 `false`（正式版设置页只显示干净的 `v{APP_VERSION}`，不带 `-dev.N`）。**`VERSION` 文件也要同步改成同一个版本号**——这是`.github/workflows/ios-release.yml`编译原生ipa时读取的版本号来源，跟`index.html`里的`APP_VERSION`是两处独立的地方，漏改一处就会导致原生App版本号和网页版对不上（这个坑已经踩过一次）。
 3. 在主分支上提交一个 `release: vX.Y.Z` 提交，**不额外拉同名快照分支**（`v1.0.0`~`v2.0.4`是旧规则留下的快照分支，之后不再新增同类分支；需要回滚时直接在主分支提交历史里找对应的 `release: vX.Y.Z` 提交）。
 4. 在 `VERSIONS.md`「正式版本」表里加一行记录。
 5. 同样要先报版本号、等用户明确确认才能推送到主分支——正式发布影响面更大，这一步不能省。
+6. 推送到主分支**不会**自动触发任何GitHub Action——`.github/workflows/`下的iOS相关workflow都是`workflow_dispatch`纯手动触发，要出新的原生ipa/发GitHub Release，需要用户自己去仓库Actions页面手动点"Run workflow"。
 
 ## 其他长期规则
 详见 `DEVLOG.md` 的"⚠️ 长期规则"一节，版本号/分支完整规则见 `VERSIONS.md`。
