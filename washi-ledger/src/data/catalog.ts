@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { mapCategoryIcon, mapPaymentMethodIcon } from '../lib/iconMap'
 import type {
   Category,
   Entry,
@@ -73,7 +74,7 @@ function rowsToCategories(
       type,
       zh: c.zh,
       ja: c.ja,
-      icon: c.icon,
+      icon: mapCategoryIcon(c.icon),
       color: c.color,
       subs: subRows
         .filter((s) => s.cat_code === c.code)
@@ -112,7 +113,7 @@ export async function fetchCatalog(): Promise<Catalog> {
       code: p.code,
       zh: p.zh,
       ja: p.ja,
-      icon: p.icon ?? undefined,
+      icon: mapPaymentMethodIcon(p.icon),
       badge: p.badge_bg ? { bg: p.badge_bg, text: p.badge_text ?? '' } : undefined,
       pointRate: p.default_point_rate ?? null,
     }))

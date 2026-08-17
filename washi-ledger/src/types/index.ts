@@ -32,7 +32,7 @@ export interface PaymentMethod {
   code: string
   zh: string
   ja: string
-  icon?: string
+  icon: string
   badge?: PaymentMethodBadge
   pointRate: number | null
 }
