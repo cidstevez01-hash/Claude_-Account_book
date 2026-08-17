@@ -160,6 +160,17 @@ final class AlarmScheduler: NSObject {
         }
     }
 
+    // 通知点击直接触发响铃时同步登记一下fireKey,避免松开手几秒后轮询定时器又按
+    // 同一个occDate重复判定命中、再响一次
+    private func markFired(alarmId: String, occDate: Date) {
+        let ymd = AlarmScheduler.formatYMD(occDate)
+        if ymd != lastFiredCheckYmd {
+            lastFiredCheckYmd = ymd
+            lastFiredKeys.removeAll()
+        }
+        lastFiredKeys.insert(alarmId + "_" + ymd)
+    }
+
     // MARK: - 响铃/震动
 
     private func startRinging(alarm: AlarmDef) {
@@ -176,18 +187,34 @@ final class AlarmScheduler: NSObject {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .default, options: [])
             try session.setActive(true)
-            if let uriStr = uri, let url = URL(string: uriStr), FileManager.default.fileExists(atPath: url.path) {
-                ringPlayer = try AVAudioPlayer(contentsOf: url)
-            } else {
-                ringPlayer = try AVAudioPlayer(data: AlarmScheduler.makeBeepWavData())
-            }
-            ringPlayer?.numberOfLoops = -1
-            ringPlayer?.volume = 1.0
-            ringPlayer?.prepareToPlay()
-            ringPlayer?.play()
         } catch {
-            print("AlarmRinger: 播放响铃失败 \(error)")
+            print("AlarmRinger: 音频会话激活失败,响铃放弃 \(error)")
+            return
         }
+        // 自定义铃声和内置蜂鸣音分开try——自定义铃声文件损坏/格式不兼容导致加载失败时,
+        // 只退回蜂鸣音兜底,不能让这条异常连累到"完全不响"(之前两者共用一个catch,
+        // 自定义铃声一炸,内置蜂鸣音也跟着不放了)
+        var player: AVAudioPlayer?
+        if let uriStr = uri, let url = URL(string: uriStr), FileManager.default.fileExists(atPath: url.path) {
+            do {
+                player = try AVAudioPlayer(contentsOf: url)
+            } catch {
+                print("AlarmRinger: 自定义铃声加载失败,退回内置蜂鸣音 \(error)")
+            }
+        }
+        if player == nil {
+            do {
+                player = try AVAudioPlayer(data: AlarmScheduler.makeBeepWavData())
+            } catch {
+                print("AlarmRinger: 内置蜂鸣音也加载失败 \(error)")
+                return
+            }
+        }
+        ringPlayer = player
+        ringPlayer?.numberOfLoops = -1
+        ringPlayer?.volume = 1.0
+        ringPlayer?.prepareToPlay()
+        ringPlayer?.play()
     }
 
     private func startVibrateTimer() {
@@ -249,6 +276,10 @@ final class AlarmScheduler: NSObject {
     // 附在每条通知content.userInfo里,标记它属于"哪个闹钟的哪一次触发"这一组,用户点"停止"
     // 时用这个key把同组里其余还没弹出的通知一起撤掉,不用去解析identifier字符串
     private static let groupKeyField = "groupKey"
+    // 直接存alarmId+这次触发的目标时间,用户点通知本体(不是"停止")时不用再猜/解析
+    // groupKey字符串,直接查出是哪个闹钟、这次触发是不是还新鲜,决定要不要立刻进入真响铃
+    private static let alarmIdField = "alarmId"
+    private static let occTimestampField = "occTimestamp"
 
     private func registerNotificationCategory() {
         // "停止"这两个字中文日文写法完全一样,不需要按语言区分
@@ -271,7 +302,7 @@ final class AlarmScheduler: NSObject {
             let budget = min(AlarmScheduler.burstNotificationCount, AlarmScheduler.maxPendingNotifications - totalScheduled)
             for i in 0..<budget {
                 let fireDate = nextOcc.addingTimeInterval(Double(i) * AlarmScheduler.burstIntervalSeconds)
-                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: fireDate, groupKey: groupKey, idSuffix: "_b\(i)")
+                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: fireDate, occDate: nextOcc, groupKey: groupKey, idSuffix: "_b\(i)")
                 totalScheduled += 1
             }
         }
@@ -285,19 +316,23 @@ final class AlarmScheduler: NSObject {
             for occ in occurrences.dropFirst() {
                 guard totalScheduled < AlarmScheduler.maxPendingNotifications else { break }
                 let groupKey = alarm.id + "_" + String(Int(occ.timeIntervalSince1970))
-                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: occ, groupKey: groupKey, idSuffix: "_single")
+                scheduleFallbackNotification(center: center, alarm: alarm, fireDate: occ, occDate: occ, groupKey: groupKey, idSuffix: "_single")
                 totalScheduled += 1
             }
         }
     }
 
-    private func scheduleFallbackNotification(center: UNUserNotificationCenter, alarm: AlarmDef, fireDate: Date, groupKey: String, idSuffix: String) {
+    private func scheduleFallbackNotification(center: UNUserNotificationCenter, alarm: AlarmDef, fireDate: Date, occDate: Date, groupKey: String, idSuffix: String) {
         let content = UNMutableNotificationContent()
         content.title = alarm.label.isEmpty ? alarm.time : alarm.label
         content.body = alarm.time
         content.sound = .default
         content.categoryIdentifier = AlarmScheduler.alarmCategoryIdentifier
-        content.userInfo = [AlarmScheduler.groupKeyField: groupKey]
+        content.userInfo = [
+            AlarmScheduler.groupKeyField: groupKey,
+            AlarmScheduler.alarmIdField: alarm.id,
+            AlarmScheduler.occTimestampField: occDate.timeIntervalSince1970,
+        ]
         let interval = max(1, fireDate.timeIntervalSinceNow)
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
         let identifier = AlarmScheduler.notificationIdPrefix + groupKey + idSuffix
@@ -461,10 +496,22 @@ extension AlarmScheduler: UNUserNotificationCenterDelegate {
     // "停止"这个action注册时options留空、没有.foreground,系统处理它不会把App拉到前台——
     // 这正是"不用点开App就能关掉"这个诉求要的效果;真要点通知本体才会正常打开App
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
         if response.actionIdentifier == AlarmScheduler.stopActionIdentifier {
             stopRinging()
-            if let groupKey = response.notification.request.content.userInfo[AlarmScheduler.groupKeyField] as? String {
+            if let groupKey = userInfo[AlarmScheduler.groupKeyField] as? String {
                 cancelNotificationGroup(groupKey)
+            }
+        } else if !isRinging,
+                  let alarmId = userInfo[AlarmScheduler.alarmIdField] as? String,
+                  let occTimestamp = userInfo[AlarmScheduler.occTimestampField] as? Double {
+            // 点了通知本体(不是"停止")——不再依赖后台轮询定时器凑巧还在20秒判定窗口内才
+            // 触发真响铃,直接按通知自带的alarmId查出这个闹钟。10分钟以内的触发才算数,
+            // 避免误点通知中心里放了很久的陈旧通知也把App拉进响铃状态
+            let occDate = Date(timeIntervalSince1970: occTimestamp)
+            if abs(Date().timeIntervalSince(occDate)) < 600, let alarm = alarms.first(where: { $0.id == alarmId }) {
+                markFired(alarmId: alarmId, occDate: occDate)
+                startRinging(alarm: alarm)
             }
         }
         completionHandler()
