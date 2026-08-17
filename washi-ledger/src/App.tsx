@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { I18nProvider } from './lib/i18n'
 import { DashboardPage } from './features/ledger/DashboardPage'
+import { HistoryPage } from './features/history/HistoryPage'
 import { PlaceholderPage } from './design-system/components/PlaceholderPage'
 
 export default function App() {
@@ -9,7 +10,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<DashboardPage />} />
-          <Route path="/history" element={<PlaceholderPage title="明细" note="照design-assets第二版_13(Transaction History)做" />} />
+          <Route path="/history" element={<HistoryPage />} />
           <Route path="/stats" element={<PlaceholderPage title="统计" note="_12/_38/_39/_41/_42 五个候选稿，需要逐屏确认对应哪个维度" />} />
           <Route path="/add" element={<PlaceholderPage title="记一笔" note="照_21(功能全开版)做：级联分类+支付方式+标签+积分" />} />
           <Route path="/rate" element={<PlaceholderPage title="汇率换算" note="照_6/_35做" />} />

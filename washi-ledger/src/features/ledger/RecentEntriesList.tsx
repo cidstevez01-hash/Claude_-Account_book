@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDay } from '../../data/summary'
+import { EntryCard } from './EntryCard'
+import { dayLabel } from './dayLabel'
 import type { Category, Entry } from '../../types'
 
 interface RecentEntriesListProps {
@@ -10,18 +12,6 @@ interface RecentEntriesListProps {
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
-}
-
-function dayLabel(dateStr: string, t: (k: 'today' | 'yesterday') => string) {
-  const d = new Date(dateStr)
-  const today = new Date()
-  const yesterday = new Date()
-  yesterday.setDate(today.getDate() - 1)
-  const sameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
-  if (sameDay(d, today)) return t('today')
-  if (sameDay(d, yesterday)) return t('yesterday')
-  return dateStr
 }
 
 export function RecentEntriesList({
@@ -66,75 +56,17 @@ export function RecentEntriesList({
             </div>
             {group.entries.map((entry) => {
               const cat = categories.find((c) => c.code === entry.catCode)
-              const isIncome = entry.type === 'income'
-              const expanded = expandedId === entry.id
               return (
-                <div
+                <EntryCard
                   key={entry.id}
-                  className="flex flex-col bg-surface-container-lowest rounded-lg mb-2 border border-outline-variant papercut-shadow overflow-hidden"
-                >
-                  <button
-                    type="button"
-                    className="flex items-center p-3 text-left"
-                    onClick={() => setExpandedId(expanded ? null : entry.id)}
-                  >
-                    <div
-                      className="w-[38px] h-[38px] rounded-full border-2 flex items-center justify-center bg-surface-container-highest mr-3 shrink-0"
-                      style={{ borderColor: isIncome ? 'var(--color-secondary)' : 'var(--color-primary-container)' }}
-                    >
-                      <span
-                        className="material-symbols-outlined text-xl"
-                        style={{
-                          color: isIncome ? 'var(--color-secondary)' : 'var(--color-primary)',
-                          fontVariationSettings: "'FILL' 1",
-                        }}
-                      >
-                        {isIncome ? 'payments' : cat?.icon || 'category'}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-body-lg text-on-surface truncate">{cat ? cat.zh : entry.note || '—'}</p>
-                      <p className="text-body-md text-on-surface-variant text-xs truncate">
-                        {entry.note || cat?.zh || ''}
-                      </p>
-                    </div>
-                    <p
-                      className="font-serif text-entry-amount shrink-0 ml-2"
-                      style={{ color: isIncome ? 'var(--color-secondary)' : 'var(--color-on-surface)' }}
-                    >
-                      {isIncome ? '+' : '-'}¥{entry.amount.toLocaleString()}
-                    </p>
-                  </button>
-
-                  {expanded && (
-                    <div className="flex items-center justify-around py-2 px-md bg-surface-container-low border-t border-dashed border-outline-variant/30">
-                      <button
-                        type="button"
-                        className="flex flex-col items-center gap-1 text-on-surface-variant"
-                        onClick={() => onEdit?.(entry)}
-                      >
-                        <span className="material-symbols-outlined text-[20px]">edit</span>
-                        <span className="text-[10px] font-sans uppercase">编辑</span>
-                      </button>
-                      <button
-                        type="button"
-                        className="flex flex-col items-center gap-1 text-on-surface-variant"
-                        onClick={() => onCopy?.(entry)}
-                      >
-                        <span className="material-symbols-outlined text-[20px]">content_copy</span>
-                        <span className="text-[10px] font-sans uppercase">复制</span>
-                      </button>
-                      <button
-                        type="button"
-                        className="flex flex-col items-center gap-1 text-primary"
-                        onClick={() => onDelete?.(entry)}
-                      >
-                        <span className="material-symbols-outlined text-[20px]">delete</span>
-                        <span className="text-[10px] font-sans uppercase">删除</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                  entry={entry}
+                  category={cat}
+                  expanded={expandedId === entry.id}
+                  onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
+                  onEdit={onEdit}
+                  onCopy={onCopy}
+                  onDelete={onDelete}
+                />
               )
             })}
           </div>

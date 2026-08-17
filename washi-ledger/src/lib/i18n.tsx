@@ -18,6 +18,13 @@ const dict = {
     yesterday: '昨天',
     emptyLine1: '这本账还是空的',
     emptyLine2: '点右下角记下第一笔吧',
+    historySearchPlaceholder: '搜索交易记录...',
+    filterAll: '全部',
+    filterExpense: '支出',
+    filterIncome: '收入',
+    startMonthLabel: '开始月份',
+    endMonthLabel: '结束月份',
+    historyNoResults: '没有符合条件的记录',
   },
   ja: {
     appTitle: '家計簿',
@@ -33,6 +40,13 @@ const dict = {
     yesterday: '昨日',
     emptyLine1: 'まだ記録がありません',
     emptyLine2: '右下の + から記録しましょう',
+    historySearchPlaceholder: '取引を検索...',
+    filterAll: 'すべて',
+    filterExpense: '支出',
+    filterIncome: '収入',
+    startMonthLabel: '開始月',
+    endMonthLabel: '終了月',
+    historyNoResults: '条件に合う記録がありません',
   },
 } as const
 
