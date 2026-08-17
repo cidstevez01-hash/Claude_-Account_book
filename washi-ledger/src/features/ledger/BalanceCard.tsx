@@ -26,9 +26,14 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
         <p className="font-sans text-label-caps text-on-surface-variant uppercase tracking-wider mb-1">
           {t('balanceLabel')}
         </p>
-        <h2 className="font-serif text-hero-balance font-bold text-on-surface flex items-baseline justify-center">
+        <h2 className="font-serif text-hero-balance font-bold text-on-surface flex items-baseline justify-center flex-wrap">
           <span className="text-2xl font-normal mr-1 text-on-surface-variant">¥</span>
           {summary.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {summary.points > 0 && (
+            <span className="ml-2 text-sm font-sans text-outline font-normal">
+              {summary.points.toLocaleString()} Points
+            </span>
+          )}
         </h2>
       </div>
       <div className="flex items-center justify-between border-t-[1.5px] border-dashed border-outline-variant pt-sm">
