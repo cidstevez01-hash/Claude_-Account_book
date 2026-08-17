@@ -32,7 +32,9 @@ export interface PaymentMethod {
   code: string
   zh: string
   ja: string
-  icon: string
+  /** 原样保留旧App数据库里的图标编号(比如'pm-amazon')，渲染时用PaymentMethodIcon
+   * 组件按品牌特殊处理，不是单纯的图标名映射 */
+  icon?: string
   badge?: PaymentMethodBadge
   pointRate: number | null
 }

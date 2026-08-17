@@ -43,26 +43,26 @@ const CATEGORY_ICON_MAP: Record<string, string> = {
 }
 
 /**
- * 支付方式图标——'cash'/'credit'/'bank'这几个是通用概念，能找到对应Material Symbols。
- * 'amazon'/'rakuten'这两个不行——旧App里这两个是真实品牌logo的SVG路径(不是概念图标)，
- * Material Symbols字体里没有品牌logo，翻译不出对应关系。这两个先退回到一个通用的
- * "钱包/商店"图标占位，具体怎么处理品牌识别(比如靠payment_methods表本来就有的
- * badge_bg/badge_text徽章颜色+文字来区分，不一定需要图标本身还原品牌)，需要用户确认，
- * 已经在下面单独提出来问了，不要自己下结论。
+ * 支付方式图标——'pm-cash'/'pm-credit'/'pm-bank'这三个是通用概念，直接映射到对应
+ * Material Symbols就够了。'pm-amazon'/'pm-rakuten'/'pm-merpay'/'pm-paidy'/'pm-suica'
+ * 这五个不行——旧App里这些是真实品牌logo(amazon/rakuten是彩色SVG路径，merpay/
+ * paidy/suica是真实品牌logo的PNG图片，从旧仓库index.html里的BRAND_LOGO_RASTER常量
+ * 解码出来存到src/assets/payment-brands/)，Material Symbols字体没有品牌logo可以
+ * 对应。用户明确要求保留真实图标——这五个不走这张映射表，改用
+ * features/transactions/PaymentMethodIcon.tsx组件特殊渲染(品牌SVG/图片而不是字体)。
  */
-const PAYMENT_METHOD_ICON_MAP: Record<string, string> = {
-  cash: 'payments',
-  credit: 'credit_card',
-  bank: 'account_balance',
-  amazon: 'storefront', // 占位，见上面注释，需要用户确认
-  rakuten: 'storefront', // 占位，见上面注释，需要用户确认
+const PAYMENT_METHOD_GENERIC_ICON_MAP: Record<string, string> = {
+  'pm-cash': 'payments',
+  'pm-credit': 'credit_card',
+  'pm-bank': 'account_balance',
 }
 
 export function mapCategoryIcon(oldIconId: string): string {
   return CATEGORY_ICON_MAP[oldIconId] ?? 'category'
 }
 
-export function mapPaymentMethodIcon(oldIconId: string | undefined | null): string {
-  if (!oldIconId) return 'account_balance_wallet'
-  return PAYMENT_METHOD_ICON_MAP[oldIconId] ?? 'account_balance_wallet'
+/** 只给"通用概念"支付方式图标用——品牌图标不经过这个函数，见上面注释 */
+export function mapGenericPaymentMethodIcon(oldIconId: string | undefined): string | null {
+  if (!oldIconId) return null
+  return PAYMENT_METHOD_GENERIC_ICON_MAP[oldIconId] ?? null
 }

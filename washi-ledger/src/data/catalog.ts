@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { mapCategoryIcon, mapPaymentMethodIcon } from '../lib/iconMap'
+import { mapCategoryIcon } from '../lib/iconMap'
 import type {
   Category,
   Entry,
@@ -113,7 +113,8 @@ export async function fetchCatalog(): Promise<Catalog> {
       code: p.code,
       zh: p.zh,
       ja: p.ja,
-      icon: mapPaymentMethodIcon(p.icon),
+      icon: p.icon ?? undefined, // 原样保留(比如'pm-amazon')，不在这里转换——支付方式图标
+      // 有品牌logo特殊渲染需求(见PaymentMethodIcon组件)，不是单纯的图标名替换
       badge: p.badge_bg ? { bg: p.badge_bg, text: p.badge_text ?? '' } : undefined,
       pointRate: p.default_point_rate ?? null,
     }))
