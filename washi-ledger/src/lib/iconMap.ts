@@ -17,6 +17,7 @@ const CATEGORY_ICON_MAP: Record<string, string> = {
   briefcase: 'work',
   basket: 'shopping_basket',
   box: 'inventory_2',
+  cross: 'medical_services',
   bulb: 'lightbulb',
   cap: 'school',
   controller: 'sports_esports',

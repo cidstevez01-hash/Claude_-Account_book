@@ -19,6 +19,9 @@ interface CategoryRow {
   sort_order: number | null
 }
 
+// 注意：subcategories表实测没有sort_order列(跟categories/payment_methods/tags不一样，
+// 之前假设它也有，2026-08-17拉通真实数据库验证时发现字段不对，改正)。真实列表顺序目前
+// 就是查询返回的顺序，没有专门的排序字段
 interface SubcategoryRow {
   id: string
   code: string
@@ -26,7 +29,6 @@ interface SubcategoryRow {
   zh: string
   ja: string
   is_preset: boolean
-  sort_order: number | null
 }
 
 interface PaymentMethodRow {
