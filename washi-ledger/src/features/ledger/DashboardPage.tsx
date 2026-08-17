@@ -11,6 +11,7 @@ import { useEntries } from '../../hooks/useEntries'
 import { summarizeMonth, categoryBreakdown } from '../../data/summary'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
+import { APP_ICONS } from '../../lib/appIcons'
 
 export function DashboardPage() {
   const { t } = useI18n()
@@ -65,7 +66,7 @@ export function DashboardPage() {
           boxShadow: '0 4px 0 var(--color-primary-container)',
         }}
       >
-        <span className="material-symbols-outlined text-3xl">add</span>
+        <span className="material-symbols-outlined text-3xl">{APP_ICONS.addTransaction}</span>
       </button>
     </AppLayout>
   )

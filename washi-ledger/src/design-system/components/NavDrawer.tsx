@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { APP_ICONS } from '../../lib/appIcons'
 
 interface NavDrawerProps {
   open: boolean
@@ -8,10 +9,10 @@ interface NavDrawerProps {
 // 左侧抽屉导航——照design-assets第二版_33做，放"低频/全局入口"：设置、汇率换算、关于。
 // 主要3个页面(仪表盘/明细/统计)在底部悬浮胶囊导航，这里不重复放。
 const links = [
-  { to: '/rate', icon: 'currency_exchange', label: '汇率换算' },
-  { to: '/settings', icon: 'settings', label: '设置' },
-  { to: '/account', icon: 'person', label: '我的账户' },
-  { to: '/about', icon: 'info', label: '关于' },
+  { to: '/rate', icon: APP_ICONS.rate, label: '汇率换算' },
+  { to: '/settings', icon: APP_ICONS.settings, label: '设置' },
+  { to: '/account', icon: APP_ICONS.account, label: '我的账户' },
+  { to: '/about', icon: APP_ICONS.about, label: '关于' },
 ]
 
 export function NavDrawer({ open, onClose }: NavDrawerProps) {

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
+import { APP_ICONS } from '../../lib/appIcons'
 
 interface AppLayoutProps {
   title: string
@@ -22,7 +23,7 @@ export function AppLayout({ title, children, showMenuButton = true }: AppLayoutP
             className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
             onClick={() => setDrawerOpen(true)}
           >
-            <span className="material-symbols-outlined">menu</span>
+            <span className="material-symbols-outlined">{APP_ICONS.menu}</span>
           </button>
         ) : (
           <div className="w-10" />
