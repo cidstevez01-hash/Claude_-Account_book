@@ -1,0 +1,151 @@
+/* Noto Serif/Sans SC 走Google Fonts CDN(体量太大——1400+ CJK子集文件，早期脚手架阶段不值得
+   自建离线子集方案，先用CDN，后续如果要接Capacitor离线原生壳再评估要不要自建)。
+   Material Symbols Outlined走自托管(见下面@font-face)——这个字体图标集是用户明确要求缓存到
+   本地不依赖CDN的，体积小很多(一个变量字体文件)，值得现在就自托管。
+   @import必须在文件最前面(CSS规范要求，排在@import "tailwindcss"之前会报警告)。 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url("./assets/fonts/material-symbols-outlined.woff2") format("woff2");
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+}
+
+/*
+  设计token——来源于design-assets/prototypes/washi-ledger-stitch-source-v2/
+  两份权威文档:
+  - washi_ledger_liquid_glass/DESIGN.md (整体Material3风格token结构/字体/圆角/间距规则)
+  - washi_ledger_markdown.md + icon_specification_document.md (主色/辅助色最终定案，
+    两份独立文档都写的是#d1665a/橄榄绿/芥末黄，覆盖掉DESIGN.md里没跟上迭代的旧primary值)
+*/
+@theme {
+  --color-surface: #fff8f5;
+  --color-surface-dim: #e9d6cc;
+  --color-surface-bright: #fff8f5;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fff1ea;
+  --color-surface-container: #fdeadf;
+  --color-surface-container-high: #f8e5da;
+  --color-surface-container-highest: #f2dfd4;
+  --color-surface-variant: #f2dfd4;
+  --color-on-surface: #231a13;
+  --color-on-surface-variant: #56423f;
+  --color-inverse-surface: #392e27;
+  --color-inverse-on-surface: #ffede4;
+  --color-outline: #85736d;
+  --color-outline-variant: #dcc0bc;
+
+  --color-background: #fff8f5;
+  --color-on-background: #231a13;
+
+  /* 复古红——主色，见上面文档来源说明 */
+  --color-primary: #d1665a;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #bb554a;
+  --color-on-primary-container: #fffbff;
+  --color-inverse-primary: #ffb4aa;
+  --color-primary-fixed: #ffdad5;
+  --color-primary-fixed-dim: #ffb4aa;
+  --color-on-primary-fixed: #410001;
+  --color-on-primary-fixed-variant: #7f2921;
+
+  /* 橄榄绿——收入 */
+  --color-secondary: #4a6741;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #c9edba;
+  --color-on-secondary-container: #4d6c44;
+  --color-secondary-fixed: #c9edba;
+  --color-secondary-fixed-dim: #add09f;
+  --color-on-secondary-fixed: #052103;
+  --color-on-secondary-fixed-variant: #314e28;
+
+  /* 芥末黄——交通/特定分类强调色 */
+  --color-tertiary: #8b6b00;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #946f00;
+  --color-on-tertiary-container: #fffbff;
+  --color-tertiary-fixed: #ffdf9e;
+  --color-tertiary-fixed-dim: #f2bf48;
+  --color-on-tertiary-fixed: #261a00;
+  --color-on-tertiary-fixed-variant: #5b4300;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --font-serif: "Noto Serif SC", serif;
+  --font-sans: "Noto Sans SC", sans-serif;
+
+  /* DESIGN.md定义的字号规范 */
+  --text-hero-balance: 38px;
+  --text-headline-lg: 26px;
+  --text-headline-md: 19px;
+  --text-input-amount: 32px;
+  --text-stat-figure: 18px;
+  --text-entry-amount: 16px;
+  --text-body-lg: 15px;
+  --text-body-md: 14px;
+  --text-tab-label: 11px;
+  --text-label-caps: 12px;
+
+  --radius-base: 4px;
+  --radius-DEFAULT: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  --spacing-base: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-gutter: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-safe-bottom: 90px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+/* 印章/压印按压反馈——FAB、主要CTA按钮共用 */
+.stamp-shadow {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.stamp-shadow:active {
+  transform: translateY(4px);
+  box-shadow: none !important;
+}
+
+/* 卡片底边"纸张厚度"阴影 */
+.papercut-shadow {
+  box-shadow: 0 2px 0 var(--color-outline-variant);
+}

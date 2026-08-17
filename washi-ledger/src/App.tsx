@@ -1,0 +1,23 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { I18nProvider } from './lib/i18n'
+import { DashboardPage } from './features/ledger/DashboardPage'
+import { PlaceholderPage } from './design-system/components/PlaceholderPage'
+
+export default function App() {
+  return (
+    <I18nProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/history" element={<PlaceholderPage title="明细" note="照design-assets第二版_13(Transaction History)做" />} />
+          <Route path="/stats" element={<PlaceholderPage title="统计" note="_12/_38/_39/_41/_42 五个候选稿，需要逐屏确认对应哪个维度" />} />
+          <Route path="/add" element={<PlaceholderPage title="记一笔" note="照_21(功能全开版)做：级联分类+支付方式+标签+积分" />} />
+          <Route path="/rate" element={<PlaceholderPage title="汇率换算" note="照_6/_35做" />} />
+          <Route path="/settings" element={<PlaceholderPage title="设置" note="照_18做" />} />
+          <Route path="/account" element={<PlaceholderPage title="我的账户" note="照_30/_31/_32做" />} />
+          <Route path="/about" element={<PlaceholderPage title="关于" note="照_19做" />} />
+        </Routes>
+      </BrowserRouter>
+    </I18nProvider>
+  )
+}
