@@ -1,0 +1,196 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Washi Ledger - Account</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style type="text/tailwindcss">
+        @layer utilities {
+            .material-symbols-outlined {
+                font-family: 'Material Symbols Outlined';
+                font-weight: normal;
+                font-style: normal;
+                font-size: 24px;
+                line-height: 1;
+                letter-spacing: normal;
+                text-transform: none;
+                display: inline-block;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                -webkit-font-feature-settings: 'liga';
+                -webkit-font-smoothing: antialiased;
+            }
+            .papercut-shadow {
+                box-shadow: 0 2px 0 var(--tw-shadow-color);
+            }
+            .stamp-shadow {
+                box-shadow: 0 4px 0 var(--tw-shadow-color);
+            }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#9b3e34",
+                        "secondary-fixed-dim": "#add09f",
+                        "on-secondary": "#ffffff",
+                        "background": "#fff8f5",
+                        "surface-dim": "#e9d6cc",
+                        "primary-container": "#bb554a",
+                        "outline-variant": "#dcc0bc",
+                        "surface-tint": "#9f4036",
+                        "on-surface": "#231a13",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary-container": "#fffbff",
+                        "surface-container-low": "#fff1ea",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "on-secondary-container": "#4d6c44",
+                        "secondary-fixed": "#c9edba",
+                        "on-surface-variant": "#56423f",
+                        "surface-container": "#fdeadf",
+                        "inverse-surface": "#392e27",
+                        "on-secondary-fixed": "#052103",
+                        "surface": "#fff8f5",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-background": "#231a13",
+                        "on-primary-fixed": "#410001",
+                        "primary-fixed": "#ffdad5",
+                        "surface-container-high": "#f8e5da",
+                        "tertiary": "#765700",
+                        "secondary-container": "#c9edba",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "tertiary-container": "#946f00",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "on-primary-fixed-variant": "#7f2921",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#ffede4",
+                        "secondary": "#48663e",
+                        "surface-container-highest": "#f2dfd4",
+                        "tertiary-fixed": "#ffdf9e",
+                        "outline": "#89726f",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fff8f5",
+                        "inverse-primary": "#ffb4aa",
+                        "surface-variant": "#f2dfd4",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "sm": "12px",
+                        "safe-bottom": "90px",
+                        "md": "16px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "stat-figure": ["Noto Serif SC"],
+                        "hero-balance": ["Noto Serif SC"],
+                        "label-caps": ["Noto Sans SC"],
+                        "tab-label": ["Noto Sans SC"],
+                        "headline-lg": ["Noto Serif SC"],
+                        "input-amount": ["Noto Serif SC"],
+                        "body-md": ["Noto Sans SC"],
+                        "entry-amount": ["Noto Serif SC"],
+                        "headline-md": ["Noto Serif SC"],
+                        "body-lg": ["Noto Sans SC"]
+                    },
+                    "fontSize": {
+                        "stat-figure": ["18px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "hero-balance": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500" }],
+                        "tab-label": ["11px", { "lineHeight": "12px", "fontWeight": "600" }],
+                        "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "input-amount": ["32px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "entry-amount": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-md": ["19px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "body-lg": ["15px", { "lineHeight": "21px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen relative overflow-x-hidden">
+<!-- Canvas Container -->
+<main class="w-full max-w-[480px] mx-auto min-h-screen flex flex-col pb-safe-bottom">
+<!-- TopAppBar (From JSON) -->
+<header class="w-full top-0 sticky bg-background border-b-[1.5px] border-dashed border-outline-variant z-40">
+<div class="flex justify-between items-center px-gutter py-sm max-w-[480px] mx-auto">
+<button aria-label="Menu" class="text-primary transition-transform active:scale-95 p-2 -ml-2 rounded-full hover:bg-surface-variant/50 focus:outline-none">
+<span aria-hidden="true" class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Washi Ledger</h1>
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant/50">
+<span aria-hidden="true" class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 px-gutter py-lg flex flex-col gap-xl justify-center">
+<!-- Hero / Onboarding Block -->
+<section class="flex flex-col items-center justify-center text-center py-lg relative">
+<!-- Avatar Silhouette -->
+<div class="w-28 h-28 rounded-full border-[1.5px] border-dashed border-primary/40 bg-surface-container-high flex items-center justify-center mb-md relative overflow-hidden shadow-sm papercut-shadow shadow-outline-variant/30">
+<img alt="Guest Silhouette" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply" data-alt="A vintage-style silhouette portrait illustration of an anonymous figure, rendered in a minimalist light-mode aesthetic. The lines are delicate, echoing traditional Japanese ink drawing, set against a soft, frosted beige background. Soft, diffused lighting creates a serene, grounded feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG_L-VnBtDj9scC7thyeFT-F7AQmIrYsG_Rsq8USJpQN91a9rMC9lf9AhKTMLvUUeHs4JSKb5CrYKh4HN-InO23jIDToA5OKckvsM5Y4bGtVTPwy7O0TBBZziaLKPZklgAWbeciD14Pyn8-8DNjMABm8b3Gf6X_Rs1I0kS_3QoV2OkdrDEO9Q9Xw3Ryi1FWKLpJmpdmoVnJQoSuAg08adIA1Hv7zI8R2aDu5RSXKJuobaFf19Ve8C-">
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs">Welcome to Washi Ledger</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg max-w-[280px]">Your personal, handcrafted space for mindful financial tracking.</p>
+<!-- CTA Button -->
+<button class="bg-primary text-on-primary px-xl py-sm rounded-full font-body-lg text-body-lg flex items-center gap-2 stamp-shadow shadow-primary-container transition-transform active:scale-90 hover:opacity-90">
+<span aria-hidden="true" class="material-symbols-outlined text-[20px]">login</span>
+                    Sign In / Register
+                </button>
+</section>
+<!-- Ledger Links / Non-Sensitive Settings -->
+
+</div>
+</main>
+<!-- BottomNavBar (From JSON) -->
+<nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] rounded-full bg-surface/80 backdrop-blur-md border border-white/20 shadow-lg z-50"><div class="flex justify-around items-center px-md py-xs mx-auto">
+  <!-- Item 1: Dashboard -->
+  <button aria-label="Dashboard" class="flex flex-col items-center justify-center text-on-surface-variant p-3 hover:scale-110 transition-transform focus:outline-none">
+    <span aria-hidden="true" class="material-symbols-outlined">grid_view</span>
+  </button>
+  <!-- Item 2: Transactions -->
+  <button aria-label="Transactions" class="flex flex-col items-center justify-center text-on-surface-variant p-3 hover:scale-110 transition-transform focus:outline-none">
+    <span aria-hidden="true" class="material-symbols-outlined">receipt_long</span>
+  </button>
+  <!-- Item 3: Statistics -->
+  <button aria-label="Statistics" class="flex flex-col items-center justify-center text-on-surface-variant p-3 hover:scale-110 transition-transform focus:outline-none">
+    <span aria-hidden="true" class="material-symbols-outlined">analytics</span>
+  </button>
+  <!-- Item 4: Settings (ACTIVE) -->
+  
+</div></nav>
+
+
+
+
+
+
+</body></html>

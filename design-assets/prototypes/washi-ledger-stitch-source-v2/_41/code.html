@@ -1,0 +1,330 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Washi Ledger - Statistics</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "outline": "#89726f",
+                    "secondary-fixed-dim": "#add09f",
+                    "tertiary-fixed-dim": "#f2bf48",
+                    "on-primary-fixed": "#410001",
+                    "on-tertiary-fixed-variant": "#5b4300",
+                    "tertiary": "#765700",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "primary": "#9b3e34",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed": "#052103",
+                    "tertiary-container": "#946f00",
+                    "on-secondary-container": "#4d6c44",
+                    "surface-container-highest": "#f2dfd4",
+                    "tertiary-fixed": "#ffdf9e",
+                    "on-background": "#231a13",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#ffede4",
+                    "inverse-surface": "#392e27",
+                    "primary-fixed": "#ffdad5",
+                    "secondary": "#48663e",
+                    "surface-bright": "#fff8f5",
+                    "on-secondary-fixed-variant": "#314e28",
+                    "surface-variant": "#f2dfd4",
+                    "on-error-container": "#93000a",
+                    "outline-variant": "#dcc0bc",
+                    "surface-tint": "#9f4036",
+                    "on-error": "#ffffff",
+                    "on-surface": "#231a13",
+                    "on-tertiary-container": "#fffbff",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#c9edba",
+                    "background": "#fff8f5",
+                    "primary-container": "#bb554a",
+                    "on-primary-container": "#fffbff",
+                    "surface-container": "#fdeadf",
+                    "surface-container-low": "#fff1ea",
+                    "on-surface-variant": "#56423f",
+                    "on-tertiary-fixed": "#261a00",
+                    "inverse-primary": "#ffb4aa",
+                    "error-container": "#ffdad6",
+                    "surface": "#fff8f5",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#f8e5da",
+                    "surface-dim": "#e9d6cc",
+                    "secondary-container": "#c9edba",
+                    "on-primary-fixed-variant": "#7f2921"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "12px",
+                    "gutter": "16px",
+                    "safe-bottom": "90px",
+                    "xs": "8px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "entry-amount": ["Noto Serif SC"],
+                    "body-md": ["Noto Sans SC"],
+                    "body-lg": ["Noto Sans SC"],
+                    "label-caps": ["Noto Sans SC"],
+                    "tab-label": ["Noto Sans SC"],
+                    "headline-lg": ["Noto Serif SC"],
+                    "headline-md": ["Noto Serif SC"],
+                    "hero-balance": ["Noto Serif SC"],
+                    "stat-figure": ["Noto Serif SC"],
+                    "input-amount": ["Noto Serif SC"]
+            },
+            "fontSize": {
+                    "entry-amount": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["15px", {"lineHeight": "21px", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500"}],
+                    "tab-label": ["11px", {"lineHeight": "12px", "fontWeight": "600"}],
+                    "headline-lg": ["26px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-md": ["19px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "hero-balance": ["38px", {"lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700"}],
+                    "stat-figure": ["18px", {"lineHeight": "22px", "fontWeight": "600"}],
+                    "input-amount": ["32px", {"lineHeight": "38px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Artisanal Paper Texture Overlay */
+        .paper-texture {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        
+        /* Glassmorphism utilities */
+        .liquid-glass {
+            background-color: rgba(242, 223, 212, 0.8); /* surface-container-highest */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        /* Liquid Bubble Animation */
+        .bubble-indicator {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* Material Symbols Setup */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Hide scrollbar for clean horizontal scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Paper Texture Overlay -->
+<div class="fixed inset-0 paper-texture z-0"></div>
+<!-- Top Navigation (Web) -->
+<header class="hidden md:flex fixed top-0 w-full z-40 bg-surface items-center justify-between px-md h-16 max-w-[480px] mx-auto left-1/2 -translate-x-1/2 border-b-[1.5px] border-dashed border-outline-variant">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 flex items-center justify-center p-2">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Washi Ledger</h1>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border-[1.5px] border-outline-variant hover:opacity-80 transition-opacity cursor-pointer flex items-center justify-center text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
+</div>
+</header>
+<!-- Main Content Container -->
+<main class="relative z-10 w-full max-w-[480px] mx-auto pt-4 md:pt-20 pb-safe-bottom px-gutter min-h-screen flex flex-col gap-lg">
+<!-- Mobile Header (Implied from layout, TopAppBar missing for mobile in prompt but structure needed) -->
+<div class="md:hidden flex items-center justify-center w-full mb-2">
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Statistics</h1>
+</div>
+<!-- Top Tab Switcher: Cash Flow / Points -->
+<div class="w-full bg-surface-container rounded-full p-1 flex relative border-[1.5px] border-dashed border-outline-variant/50">
+<!-- Active indicator (JS would move this) -->
+<div class="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-primary-container rounded-full shadow-sm z-0"></div>
+<button class="relative z-10 flex-1 py-2 text-center font-body-lg text-body-lg text-on-primary-container font-semibold">
+                Cash Flow
+            </button>
+<button class="relative z-10 flex-1 py-2 text-center font-body-lg text-body-lg text-on-surface-variant transition-colors hover:text-on-surface">
+                Points
+            </button>
+</div>
+<!-- Sub-filters: Monthly / Daily & Range Selector -->
+<div class="flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<div class="flex gap-2">
+<button class="px-4 py-1.5 rounded-full border-[1.5px] border-primary bg-surface-tint/5 text-primary font-body-md text-body-md transition-all">
+                        Monthly
+                    </button>
+<button class="px-4 py-1.5 rounded-full border border-outline-variant text-on-surface-variant font-body-md text-body-md hover:bg-surface-variant/30 transition-all">
+                        Daily
+                    </button>
+</div>
+<!-- Range Selector (Year) -->
+<button class="flex items-center gap-1 text-on-surface font-body-lg text-body-lg hover:text-primary transition-colors group">
+<span class="">2024</span>
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-y-0.5 transition-transform" data-icon="arrow_drop_down">arrow_drop_down</span>
+</button>
+</div>
+</div>
+<!-- Summary Card (This Month vs Prev Year) -->
+<div class="bg-surface-container-low border-[1.5px] border-dashed border-outline-variant rounded-xl p-md relative overflow-hidden">
+<!-- Washi Tape Decoration -->
+<div class="absolute -top-3 -right-3 w-12 h-6 bg-tertiary/20 rotate-45 transform origin-center"></div>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-1">Total Net Income</p>
+<div class="flex items-end justify-between">
+<div class="font-hero-balance text-hero-balance text-on-surface">
+<span class="text-xl mr-1 opacity-70">¥</span>12,450
+                </div>
+<div class="flex items-center gap-1 text-secondary bg-secondary-fixed/50 px-2 py-1 rounded-md mb-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+<span class="font-stat-figure text-sm font-semibold">+8.5%</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant/70 mt-1 text-xs">vs. Average 2023</p>
+</div>
+<!-- Chart Section (Simplified Dual Bar Representation) -->
+<div class="w-full bg-surface-container-lowest border-b-2 border-outline-variant pb-md">
+<div class="flex justify-between items-end h-40 gap-1 px-2 relative">
+<!-- Y-Axis Grid Lines (decorative) -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20">
+<div class="border-t border-dashed border-outline w-full h-0"></div>
+<div class="border-t border-dashed border-outline w-full h-0"></div>
+<div class="border-t border-dashed border-outline w-full h-0"></div>
+<div class="border-t border-dashed border-outline w-full h-0"></div>
+</div>
+<!-- Bars (Mock Data for Months) -->
+<!-- Jan -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] group relative z-10">
+<div class="w-full flex gap-[1px] items-end justify-center">
+<div class="w-1/2 bg-secondary rounded-t-sm" style="height: 40%"></div>
+<div class="w-1/2 bg-primary rounded-t-sm" style="height: 60%"></div>
+</div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">J</span>
+</div>
+<!-- Feb -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] group relative z-10">
+<div class="w-full flex gap-[1px] items-end justify-center">
+<div class="w-1/2 bg-secondary rounded-t-sm" style="height: 55%"></div>
+<div class="w-1/2 bg-primary rounded-t-sm" style="height: 45%"></div>
+</div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">F</span>
+</div>
+<!-- Mar -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] group relative z-10">
+<div class="w-full flex gap-[1px] items-end justify-center">
+<div class="w-1/2 bg-secondary rounded-t-sm" style="height: 80%"></div>
+<div class="w-1/2 bg-primary rounded-t-sm" style="height: 30%"></div>
+</div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">M</span>
+</div>
+<!-- Apr -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] group relative z-10">
+<div class="w-full flex gap-[1px] items-end justify-center">
+<div class="w-1/2 bg-secondary rounded-t-sm" style="height: 65%"></div>
+<div class="w-1/2 bg-primary rounded-t-sm" style="height: 50%"></div>
+</div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">A</span>
+</div>
+<!-- May -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] group relative z-10">
+<div class="w-full flex gap-[1px] items-end justify-center">
+<div class="w-1/2 bg-secondary rounded-t-sm" style="height: 90%"></div>
+<div class="w-1/2 bg-primary rounded-t-sm" style="height: 40%"></div>
+</div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">M</span>
+</div>
+<!-- Jun -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] group relative z-10">
+<div class="w-full flex gap-[1px] items-end justify-center">
+<div class="w-1/2 bg-secondary rounded-t-sm" style="height: 40%"></div>
+<div class="w-1/2 bg-primary rounded-t-sm" style="height: 70%"></div>
+</div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">J</span>
+</div>
+<!-- Jul -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] group relative z-10">
+<div class="w-full flex gap-[1px] items-end justify-center">
+<div class="w-1/2 bg-secondary rounded-t-sm" style="height: 75%"></div>
+<div class="w-1/2 bg-primary rounded-t-sm" style="height: 35%"></div>
+</div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2 font-bold text-on-surface">J</span>
+</div>
+<!-- Aug - Dec (Faded for future/no data representation) -->
+<div class="flex flex-col items-center justify-end h-full w-[8%] opacity-30">
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">A</span>
+</div>
+<div class="flex flex-col items-center justify-end h-full w-[8%] opacity-30">
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">S</span>
+</div>
+<div class="flex flex-col items-center justify-end h-full w-[8%] opacity-30">
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">O</span>
+</div>
+<div class="flex flex-col items-center justify-end h-full w-[8%] opacity-30">
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">N</span>
+</div>
+<div class="flex flex-col items-center justify-end h-full w-[8%] opacity-30">
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-2">D</span>
+</div>
+</div>
+<!-- Chart Legend Mini -->
+<div class="flex flex-col gap-2 mt-6 px-2"><div class="flex items-center gap-3 py-3 border-b border-dashed border-outline-variant/30">
+    <div class="w-3 h-3 rounded-sm bg-secondary shrink-0"></div>
+    <span class="font-body-md text-on-surface flex-1">Income</span>
+    <span class="font-stat-figure text-xs text-on-surface-variant mr-4">65%</span>
+    <span class="font-entry-amount text-on-surface">¥ 23,500</span>
+  </div>
+  <div class="flex items-center gap-3 py-3 border-b border-dashed border-outline-variant/30">
+    <div class="w-3 h-3 rounded-sm bg-primary shrink-0"></div>
+    <span class="font-body-md text-on-surface flex-1">Expense</span>
+    <span class="font-stat-figure text-xs text-on-surface-variant mr-4">35%</span>
+    <span class="font-entry-amount text-on-surface">¥ 11,050</span>
+  </div></div></div>
+<!-- Legend / Category List -->
+</main>
+<!-- Bottom Navigation Shell (Mobile) -->
+<!-- active item: bar_chart (mapped to Analytics/Stats) -->
+<nav class="md:hidden fixed bottom-xs left-0 right-0 z-50 flex justify-around items-center px-lg py-sm max-w-[480px] mx-auto bg-surface-container/80 dark:bg-surface-container-highest/80 backdrop-blur-md rounded-full shadow-lg border border-outline-variant/30 dark:border-outline/30 w-[90%] left-1/2 -translate-x-1/2">
+<button class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="home" data-weight="regular">home</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="history" data-weight="regular">history</span>
+</button>
+<!-- ADD FAB equivalent / hidden as per instruction context, but keeping structure if needed for spacing, substituting for just 3 items as requested -->
+<button class="bg-primary-container dark:bg-primary-fixed text-on-primary-container dark:text-on-primary-fixed rounded-full p-3 flex items-center justify-center scale-110 transition-all hover:bg-surface-variant/50 duration-200 shadow-md">
+<span class="material-symbols-outlined" data-icon="bar_chart" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+</button>
+</nav>
+
+
+</body></html>

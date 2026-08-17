@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Change Password - Washi Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#052103",
+                        "surface": "#fff8f5",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "on-surface-variant": "#56423f",
+                        "surface-container": "#fdeadf",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-surface": "#231a13",
+                        "on-secondary-container": "#4d6c44",
+                        "surface-tint": "#9f4036",
+                        "surface-container-highest": "#f2dfd4",
+                        "surface-bright": "#fff8f5",
+                        "background": "#fff8f5",
+                        "primary": "#9b3e34",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "outline": "#89726f",
+                        "secondary-fixed-dim": "#add09f",
+                        "surface-container-high": "#f8e5da",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "on-primary-fixed-variant": "#7f2921",
+                        "inverse-primary": "#ffb4aa",
+                        "secondary": "#48663e",
+                        "secondary-fixed": "#c9edba",
+                        "on-primary-fixed": "#410001",
+                        "tertiary-fixed": "#ffdf9e",
+                        "surface-dim": "#e9d6cc",
+                        "on-primary-container": "#fffbff",
+                        "tertiary": "#765700",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#c9edba",
+                        "primary-fixed": "#ffdad5",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#dcc0bc",
+                        "tertiary-container": "#946f00",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#392e27",
+                        "surface-container-low": "#fff1ea",
+                        "on-background": "#231a13",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#fffbff",
+                        "on-error": "#ffffff",
+                        "primary-container": "#bb554a",
+                        "inverse-on-surface": "#ffede4",
+                        "surface-variant": "#f2dfd4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "paper": "4px 12px 12px 4px",
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "safe-bottom": "90px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "xs": "8px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Noto Sans SC"],
+                        "entry-amount": ["Noto Serif SC"],
+                        "input-amount": ["Noto Serif SC"],
+                        "stat-figure": ["Noto Serif SC"],
+                        "headline-lg": ["Noto Serif SC"],
+                        "headline-md": ["Noto Serif SC"],
+                        "body-md": ["Noto Sans SC"],
+                        "tab-label": ["Noto Sans SC"],
+                        "body-lg": ["Noto Sans SC"],
+                        "hero-balance": ["Noto Serif SC"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500" }],
+                        "entry-amount": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "input-amount": ["32px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "stat-figure": ["18px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["19px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "tab-label": ["11px", { "lineHeight": "12px", "fontWeight": "600" }],
+                        "body-lg": ["15px", { "lineHeight": "21px", "fontWeight": "500" }],
+                        "hero-balance": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .paper-shadow {
+            box-shadow: 0 2px 0 var(--tw-shadow-color);
+        }
+        .seal-shadow {
+            box-shadow: 0 4px 0 #9b3e34; /* primary color */
+        }
+        .washi-tape {
+            position: absolute;
+            top: -6px;
+            right: 12px;
+            width: 30px;
+            height: 12px;
+            background-color: #f2bf48; /* tertiary-fixed-dim */
+            transform: rotate(3deg);
+            opacity: 0.8;
+            border-radius: 1px;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen text-on-background selection:bg-surface-variant">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
+<div class="max-w-[480px] mx-auto flex items-center px-md py-xs justify-between min-h-[56px]">
+<a class="text-primary hover:opacity-80 active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full hover:bg-surface-variant" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</a>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight text-center flex-1">Change Password</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<main class="max-w-[480px] mx-auto px-gutter py-xl pb-safe-bottom">
+<div class="bg-surface-container-lowest rounded-paper paper-shadow shadow-outline-variant p-md relative border border-outline-variant">
+<div class="washi-tape"></div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                Ensure your new password is strong and unique to maintain the security of your ledger.
+            </p>
+<form class="space-y-lg flex flex-col">
+<!-- Old Password Field -->
+<div class="flex flex-col group">
+<label class="font-label-caps text-label-caps text-outline mb-base uppercase" for="old_password">Old Password</label>
+<div class="relative flex items-center border-b-2 border-outline-variant focus-within:border-primary transition-colors pb-sm">
+<span class="material-symbols-outlined text-outline mr-sm">lock</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-lg text-body-lg text-on-surface placeholder-outline-variant" id="old_password" placeholder="Enter current password" required="" type="password"/>
+<button class="text-outline hover:text-primary transition-colors ml-sm" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- New Password Field -->
+<div class="flex flex-col group">
+<label class="font-label-caps text-label-caps text-outline mb-base uppercase" for="new_password">New Password</label>
+<div class="relative flex items-center border-b-2 border-outline-variant focus-within:border-primary transition-colors pb-sm">
+<span class="material-symbols-outlined text-outline mr-sm">key</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-lg text-body-lg text-on-surface placeholder-outline-variant" id="new_password" placeholder="Enter new password" required="" type="password"/>
+<button class="text-outline hover:text-primary transition-colors ml-sm" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Confirm New Password Field -->
+<div class="flex flex-col group">
+<label class="font-label-caps text-label-caps text-outline mb-base uppercase" for="confirm_password">Confirm New Password</label>
+<div class="relative flex items-center border-b-2 border-outline-variant focus-within:border-primary transition-colors pb-sm">
+<span class="material-symbols-outlined text-outline mr-sm">done_all</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-lg text-body-lg text-on-surface placeholder-outline-variant" id="confirm_password" placeholder="Re-enter new password" required="" type="password"/>
+</div>
+</div>
+<!-- Dashed Separator -->
+<div class="w-full border-t-[1.5px] border-dashed border-outline-variant my-md"></div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-sm pt-sm mt-auto">
+<button class="flex-1 py-sm px-md rounded-lg font-body-lg text-body-lg text-on-surface-variant bg-surface-variant hover:bg-surface-container-high transition-colors text-center border border-outline-variant" type="button">
+                        Cancel
+                    </button>
+<button class="flex-1 py-sm px-md rounded-lg font-body-lg text-body-lg text-on-primary bg-primary hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all seal-shadow text-center" type="submit">
+                        Confirm
+                    </button>
+</div>
+</form>
+</div>
+</main>
+<script>
+        // Simple password toggle logic
+        document.querySelectorAll('button[type="button"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const icon = this.querySelector('span.material-symbols-outlined');
+                const input = this.previousElementSibling;
+                if(icon && input && input.tagName === 'INPUT') {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.textContent = 'visibility';
+                    } else {
+                        input.type = 'password';
+                        icon.textContent = 'visibility_off';
+                    }
+                }
+            });
+        });
+    </script>
+</body></html>

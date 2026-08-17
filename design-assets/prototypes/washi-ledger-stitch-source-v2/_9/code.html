@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add Transaction</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Noto Serif SC & Noto Sans SC -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-surface": "#231a13",
+                        "inverse-primary": "#ffb4aa",
+                        "on-secondary": "#ffffff",
+                        "background": "#fff8f5",
+                        "outline-variant": "#dcc0bc",
+                        "on-secondary-container": "#4d6c44",
+                        "primary-container": "#bb554a",
+                        "tertiary-container": "#946f00",
+                        "on-primary-fixed-variant": "#7f2921",
+                        "surface": "#fff8f5",
+                        "surface-bright": "#fff8f5",
+                        "inverse-surface": "#392e27",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "secondary-fixed": "#c9edba",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "on-primary-fixed": "#410001",
+                        "primary": "#9b3e34",
+                        "tertiary": "#765700",
+                        "secondary": "#48663e",
+                        "on-surface-variant": "#56423f",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#e9d6cc",
+                        "surface-container-highest": "#f2dfd4",
+                        "tertiary-fixed": "#ffdf9e",
+                        "surface-container-low": "#fff1ea",
+                        "surface-container": "#fdeadf",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#f2dfd4",
+                        "primary-fixed": "#ffdad5",
+                        "on-primary-container": "#fffbff",
+                        "secondary-fixed-dim": "#add09f",
+                        "secondary-container": "#c9edba",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "on-background": "#231a13",
+                        "outline": "#89726f",
+                        "surface-container-high": "#f8e5da",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-tint": "#9f4036",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#ffede4",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#052103"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "base": "4px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "16px",
+                        "safe-bottom": "90px",
+                        "xs": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Noto Serif SC"],
+                        "headline-lg": ["Noto Serif SC"],
+                        "entry-amount": ["Noto Serif SC"],
+                        "body-lg": ["Noto Sans SC"],
+                        "tab-label": ["Noto Sans SC"],
+                        "body-md": ["Noto Sans SC"],
+                        "input-amount": ["Noto Serif SC"],
+                        "stat-figure": ["Noto Serif SC"],
+                        "label-caps": ["Noto Sans SC"],
+                        "hero-balance": ["Noto Serif SC"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["19px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "headline-lg": ["26px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "entry-amount": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "body-lg": ["15px", {"lineHeight": "21px", "fontWeight": "500"}],
+                        "tab-label": ["11px", {"lineHeight": "12px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "input-amount": ["48px", {"lineHeight": "54px", "fontWeight": "600"}],
+                        "stat-figure": ["18px", {"lineHeight": "22px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500"}],
+                        "hero-balance": ["38px", {"lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom Utilities for Artisanal Minimalism */
+        .papercut-shadow {
+            box-shadow: 0 2px 0 var(--tw-shadow-color);
+        }
+        .stamp-shadow {
+            box-shadow: 0 4px 0 var(--tw-shadow-color);
+        }
+        .stamp-shadow:active {
+            box-shadow: 0 0px 0 var(--tw-shadow-color);
+            transform: translateY(4px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Hide number input arrows */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
+<div class="max-w-[480px] mx-auto min-h-screen relative flex flex-col">
+<!-- TopAppBar (Transactional Context: Close action, no global nav) -->
+<header class="bg-background flex justify-between items-center px-md w-full h-16 sticky top-0 z-10 border-b-[1.5px] border-dashed border-outline-variant shadow-none">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity p-2 -ml-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 400;">close</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface">Record</h1>
+<div class="w-10"></div> <!-- Spacer for center alignment -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-md py-lg flex flex-col gap-xl overflow-y-auto hide-scrollbar pb-safe-bottom">
+<!-- Section 1: Amount Input -->
+<section class="flex flex-col items-center pt-md">
+<!-- Segmented Control (Pill Buttons) -->
+<div class="flex gap-xs mb-lg p-[2px] bg-surface-container rounded-full border border-outline-variant/30">
+<button class="px-lg py-[6px] rounded-full font-body-lg text-body-lg text-on-primary bg-primary shadow-sm transition-all duration-200">Expense</button>
+<button class="px-lg py-[6px] rounded-full font-body-lg text-body-lg text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200">Income</button>
+</div>
+<!-- Large Amount Input (Borderless with Ink Line) -->
+<div class="flex items-baseline justify-center border-b-[2px] border-on-surface pb-xs px-sm w-full max-w-[280px]">
+<span class="font-hero-balance text-hero-balance text-on-surface-variant mr-xs">¥</span>
+<input autofocus="" class="bg-transparent border-none outline-none font-input-amount text-input-amount text-on-surface text-center w-full p-0 focus:ring-0 placeholder:text-outline-variant/50" placeholder="0.00" type="number"/>
+</div>
+</section>
+<!-- Section 2: Category Grid -->
+<section class="flex flex-col gap-sm">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase px-xs">Category</h2>
+<div class="grid grid-cols-4 gap-sm">
+<!-- Active Tile (Food) -->
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-primary-fixed border-[2px] border-primary text-on-primary-fixed rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all scale-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span class="font-tab-label text-tab-label">Food</span>
+</button>
+<!-- Inactive Tiles -->
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-surface border-[1.5px] border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all">
+<span class="material-symbols-outlined">local_mall</span>
+<span class="font-tab-label text-tab-label">Grocery</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-surface border-[1.5px] border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="font-tab-label text-tab-label">Transit</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-surface border-[1.5px] border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all">
+<span class="material-symbols-outlined">movie</span>
+<span class="font-tab-label text-tab-label">Fun</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-surface border-[1.5px] border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-tab-label text-tab-label">Bills</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-surface border-[1.5px] border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="font-tab-label text-tab-label">Shopping</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-surface border-[1.5px] border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="font-tab-label text-tab-label">Health</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-sm bg-surface border-[1.5px] border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface rounded-tl-xl rounded-tr-base rounded-br-xl rounded-bl-base transition-all">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="font-tab-label text-tab-label">Other</span>
+</button>
+</div>
+</section>
+<!-- Section 3: Ledger Details Card -->
+<section class="bg-surface rounded-xl p-md papercut-shadow shadow-outline-variant border border-surface-variant relative overflow-hidden mt-sm">
+<!-- Washi Tape Decorative Element -->
+<div class="absolute -top-3 -right-6 w-24 h-6 bg-tertiary-fixed/40 rotate-45 transform origin-center mix-blend-multiply pointer-events-none"></div>
+<div class="flex flex-col">
+<!-- Date Picker Row -->
+<button class="flex items-center gap-sm py-sm border-b-[1.5px] border-dashed border-outline-variant text-left w-full hover:bg-surface-variant/20 transition-colors rounded-t-lg">
+<span class="material-symbols-outlined text-outline">calendar_today</span>
+<span class="font-body-md text-body-md text-on-surface flex-1">Today, Oct 24</span>
+<span class="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
+</button>
+<!-- Notes Field -->
+<div class="flex items-start gap-sm pt-md pb-xs">
+<span class="material-symbols-outlined text-outline mt-[2px]">edit_note</span>
+<textarea class="w-full bg-transparent border-none outline-none font-body-md text-body-md text-on-surface resize-none p-0 focus:ring-0 placeholder:text-outline-variant" placeholder="Add a memo..." rows="2"></textarea>
+</div>
+</div>
+</section>
+<!-- Spacer to push button to bottom if screen is tall -->
+<div class="flex-1 min-h-[40px]"></div>
+<!-- Section 4: Action Button -->
+<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md py-[18px] rounded-xl stamp-shadow shadow-on-primary-fixed-variant transition-all flex justify-center items-center gap-2 mt-auto">
+<span>Save Transaction</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">check_circle</span>
+</button>
+</main>
+<!-- Bottom Inset Gradient to mask content scrolling behind safe area -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] h-12 bg-gradient-to-t from-background to-transparent pointer-events-none z-0"></div>
+</div>
+</body></html>

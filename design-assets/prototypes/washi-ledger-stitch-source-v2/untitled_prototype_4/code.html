@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Washi Ledger - Sign In</title>
+<!-- Google Fonts: Noto Serif SC (Headlines/Figures) & Noto Sans SC (Body) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#9b3e34",
+                    "secondary-fixed-dim": "#add09f",
+                    "on-secondary": "#ffffff",
+                    "background": "#fff8f5",
+                    "surface-dim": "#e9d6cc",
+                    "primary-container": "#bb554a",
+                    "outline-variant": "#dcc0bc",
+                    "surface-tint": "#9f4036",
+                    "on-surface": "#231a13",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary-container": "#fffbff",
+                    "surface-container-low": "#fff1ea",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#f2bf48",
+                    "on-secondary-container": "#4d6c44",
+                    "secondary-fixed": "#c9edba",
+                    "on-surface-variant": "#56423f",
+                    "surface-container": "#fdeadf",
+                    "inverse-surface": "#392e27",
+                    "on-secondary-fixed": "#052103",
+                    "surface": "#fff8f5",
+                    "on-tertiary-fixed": "#261a00",
+                    "on-background": "#231a13",
+                    "on-primary-fixed": "#410001",
+                    "primary-fixed": "#ffdad5",
+                    "surface-container-high": "#f8e5da",
+                    "tertiary": "#765700",
+                    "secondary-container": "#c9edba",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#5b4300",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#314e28",
+                    "tertiary-container": "#946f00",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "on-primary-fixed-variant": "#7f2921",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#ffede4",
+                    "secondary": "#48663e",
+                    "surface-container-highest": "#f2dfd4",
+                    "tertiary-fixed": "#ffdf9e",
+                    "outline": "#89726f",
+                    "on-tertiary": "#ffffff",
+                    "surface-bright": "#fff8f5",
+                    "inverse-primary": "#ffb4aa",
+                    "surface-variant": "#f2dfd4",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "sm": "12px",
+                    "safe-bottom": "90px",
+                    "md": "16px",
+                    "xs": "8px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "stat-figure": ["Noto Serif SC"],
+                    "hero-balance": ["Noto Serif SC"],
+                    "label-caps": ["Noto Sans SC"],
+                    "tab-label": ["Noto Sans SC"],
+                    "headline-lg": ["Noto Serif SC"],
+                    "input-amount": ["Noto Serif SC"],
+                    "body-md": ["Noto Sans SC"],
+                    "entry-amount": ["Noto Serif SC"],
+                    "headline-md": ["Noto Serif SC"],
+                    "body-lg": ["Noto Sans SC"]
+            },
+            "fontSize": {
+                    "stat-figure": ["18px", { "lineHeight": "22px", "fontWeight": "600" }],
+                    "hero-balance": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700" }],
+                    "label-caps": ["12px", { "lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500" }],
+                    "tab-label": ["11px", { "lineHeight": "12px", "fontWeight": "600" }],
+                    "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                    "input-amount": ["32px", { "lineHeight": "38px", "fontWeight": "600" }],
+                    "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                    "entry-amount": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                    "headline-md": ["19px", { "lineHeight": "24px", "fontWeight": "700" }],
+                    "body-lg": ["15px", { "lineHeight": "21px", "fontWeight": "500" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Soft Paper Texture Background */
+        body {
+            background-color: theme('colors.background');
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(233, 214, 204, 0.1) 0%, rgba(233, 214, 204, 0.4) 100%),
+                url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23dcc0bc' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* Material Symbols Weight Customization */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Washi Tape Mix Blend */
+        .washi-tape {
+            mix-blend-mode: multiply;
+            opacity: 0.85;
+        }
+
+        /* Ledger Edge Binding Holes */
+        .ledger-binding {
+            background-image: radial-gradient(circle, theme('colors.background') 4px, transparent 4px);
+            background-size: 100% 24px;
+            background-position: center;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex items-center justify-center p-gutter font-body-md text-on-background relative overflow-hidden">
+<!-- Subtle atmospheric animated background element (optional depth) -->
+<div class="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-tr from-surface-dim to-transparent"></div>
+<!-- Main Container -->
+<main class="w-full max-w-[420px] relative z-10">
+<!-- Brand Header Section -->
+<header class="text-center mb-10">
+<!-- Seal/Stamp Logo -->
+<div class="inline-flex items-center justify-center w-20 h-20 rounded-full border-2 border-primary text-primary mb-4 relative before:absolute before:inset-1 before:border before:border-primary/50 before:rounded-full">
+<span class="material-symbols-outlined text-[40px] relative z-10" style="font-variation-settings: 'FILL' 1;">
+                    import_contacts
+                </span>
+</div>
+<h1 class="font-hero-balance text-hero-balance text-primary">Washi Ledger</h1>
+<p class="font-body-md text-body-md text-outline mt-2 tracking-wide">YOUR PERSONAL FINANCIAL TECHO</p>
+</header>
+<!-- The Ledger Card (Level 1 Elevation) -->
+<div class="bg-surface-container-lowest rounded-xl relative shadow-[0_2px_0_theme(colors.outline-variant)] flex border border-outline-variant/30">
+<!-- Ledger Binding Margin (Decorative) -->
+<div class="w-8 border-r-1.5 border-dashed border-outline-variant/50 relative flex-shrink-0">
+<div class="absolute inset-y-4 left-0 right-0 ledger-binding opacity-60"></div>
+</div>
+<!-- Card Content -->
+<div class="flex-grow p-lg pt-xl pb-xl relative">
+<!-- Washi Tape Decorative Element -->
+<div class="absolute -top-3 right-4 w-16 h-5 bg-tertiary-fixed-dim rotate-3 washi-tape shadow-sm rounded-sm z-20"></div>
+<form action="#" class="space-y-6" method="POST">
+<!-- Email Input -->
+<div class="relative group">
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-1 uppercase tracking-wider" for="email">Email Address</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-0 text-outline-variant group-focus-within:text-primary transition-colors">
+                                mail
+                            </span>
+<input class="w-full bg-transparent border-0 border-b-2 border-outline-variant pl-8 pr-0 py-sm text-body-lg font-body-lg text-on-background focus:ring-0 focus:border-primary transition-colors placeholder:text-outline-variant/60" id="email" name="email" placeholder="name@example.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="relative group">
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-1 uppercase tracking-wider" for="password">Passphrase</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-0 text-outline-variant group-focus-within:text-primary transition-colors">
+                                lock
+                            </span>
+<input class="w-full bg-transparent border-0 border-b-2 border-outline-variant pl-8 pr-10 py-sm text-body-lg font-body-lg text-on-background focus:ring-0 focus:border-primary transition-colors placeholder:text-outline-variant/60" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-0 p-2 text-outline-variant hover:text-on-surface-variant transition-colors focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[20px]">
+                                    visibility_off
+                                </span>
+</button>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-4">
+<!-- Primary Button (Level 2 - The Stamp) -->
+<button class="w-full bg-primary text-on-primary rounded-full py-sm px-lg font-body-lg text-body-lg font-medium flex justify-center items-center gap-2 shadow-[0_4px_0_theme(colors.primary-container)] active:translate-y-[4px] active:shadow-[0_0px_0_theme(colors.primary-container)] transition-all duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-container-lowest" type="submit">
+<span>Open Ledger</span>
+<span class="material-symbols-outlined text-[18px]">
+                                arrow_forward
+                            </span>
+</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Footer Links -->
+<div class="mt-8 flex justify-between items-center px-4">
+<a class="font-body-md text-body-md text-outline hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-0.5" href="#">
+                Forgot Passphrase?
+            </a>
+<a class="font-body-md text-body-md text-primary font-medium hover:text-surface-tint transition-colors border-b border-transparent hover:border-surface-tint pb-0.5" href="#">
+                Register Now
+            </a>
+</div>
+</main>
+</body></html>

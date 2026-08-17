@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ledger - Reports and Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-surface": "#231a13",
+                        "inverse-primary": "#ffb4aa",
+                        "on-secondary": "#ffffff",
+                        "background": "#fff8f5",
+                        "outline-variant": "#dcc0bc",
+                        "on-secondary-container": "#4d6c44",
+                        "primary-container": "#bb554a",
+                        "tertiary-container": "#946f00",
+                        "on-primary-fixed-variant": "#7f2921",
+                        "surface": "#fff8f5",
+                        "surface-bright": "#fff8f5",
+                        "inverse-surface": "#392e27",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "secondary-fixed": "#c9edba",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "on-primary-fixed": "#410001",
+                        "primary": "#9b3e34",
+                        "tertiary": "#765700",
+                        "secondary": "#48663e",
+                        "on-surface-variant": "#56423f",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#e9d6cc",
+                        "surface-container-highest": "#f2dfd4",
+                        "tertiary-fixed": "#ffdf9e",
+                        "surface-container-low": "#fff1ea",
+                        "surface-container": "#fdeadf",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#f2dfd4",
+                        "primary-fixed": "#ffdad5",
+                        "on-primary-container": "#fffbff",
+                        "secondary-fixed-dim": "#add09f",
+                        "secondary-container": "#c9edba",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "on-background": "#231a13",
+                        "outline": "#89726f",
+                        "surface-container-high": "#f8e5da",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-tint": "#9f4036",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#ffede4",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#052103"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "16px",
+                        "safe-bottom": "90px",
+                        "xs": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Noto Serif SC"],
+                        "headline-lg": ["Noto Serif SC"],
+                        "entry-amount": ["Noto Serif SC"],
+                        "body-lg": ["Noto Sans SC"],
+                        "tab-label": ["Noto Sans SC"],
+                        "body-md": ["Noto Sans SC"],
+                        "input-amount": ["Noto Serif SC"],
+                        "stat-figure": ["Noto Serif SC"],
+                        "label-caps": ["Noto Sans SC"],
+                        "hero-balance": ["Noto Serif SC"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["19px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "entry-amount": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "body-lg": ["15px", { "lineHeight": "21px", "fontWeight": "500" }],
+                        "tab-label": ["11px", { "lineHeight": "12px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "input-amount": ["32px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "stat-figure": ["18px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500" }],
+                        "hero-balance": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .papercut-shadow {
+            box-shadow: 0 2px 0 var(--tw-shadow-color);
+        }
+        .liquid-glass {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md text-body-md min-h-screen pb-safe-bottom flex flex-col items-center">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background docked full-width top-0 border-b-[1.5px] border-dashed border-outline-variant flat no shadows flex justify-between items-center px-md w-full h-16 sticky z-40 max-w-[480px]">
+<button class="text-primary dark:text-inverse-primary hover:opacity-80 transition-opacity p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-inverse-primary text-center flex-1">
+            Ledger
+        </div>
+<button class="text-on-surface-variant dark:text-surface-variant hover:opacity-80 transition-opacity p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-[480px] px-gutter py-lg space-y-xl">
+<!-- Month/Year Selector -->
+<section class="flex justify-between items-center bg-surface-container-low rounded-lg p-sm border border-outline-variant papercut-shadow shadow-outline-variant/30">
+<button class="p-2 text-on-surface hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<h2 class="font-headline-md text-headline-md text-on-surface">October 2023</h2>
+<button class="p-2 text-on-surface hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</section>
+<!-- Chart Section (Bento Grid Style) -->
+<section class="bg-surface-container rounded-xl p-md border-[1.5px] border-dashed border-outline-variant relative">
+<!-- Washi Tape -->
+<div class="absolute -top-3 -right-3 w-12 h-6 bg-tertiary transform rotate-12 opacity-80"></div>
+<div class="flex flex-col items-center mb-md">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-xs">Total Spend</h3>
+<div class="font-hero-balance text-hero-balance text-primary">$4,250.00</div>
+</div>
+<!-- Placeholder for Chart (CSS Pie Chart representation) -->
+<div class="flex justify-center items-center py-md">
+<div class="w-48 h-48 rounded-full bg-surface-container-high border-2 border-outline-variant relative overflow-hidden flex items-center justify-center">
+<!-- CSS Conic Gradient for Pie Chart -->
+<div class="absolute inset-0 rounded-full" style="background: conic-gradient(
+                        theme('colors.primary') 0% 45%, 
+                        theme('colors.tertiary-fixed-dim') 45% 70%, 
+                        theme('colors.secondary-fixed-dim') 70% 85%, 
+                        theme('colors.outline-variant') 85% 100%
+                    );"></div>
+<div class="w-32 h-32 bg-surface-container rounded-full z-10 flex items-center justify-center">
+<span class="font-stat-figure text-stat-figure text-on-surface">4 Categories</span>
+</div>
+</div>
+</div>
+<!-- Legend summary -->
+<div class="grid grid-cols-2 gap-sm mt-md border-t-[1.5px] border-dashed border-outline-variant pt-sm">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="font-body-md text-body-md text-on-surface-variant">Housing</span>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></div>
+<span class="font-body-md text-body-md text-on-surface-variant">Food</span>
+</div>
+</div>
+</section>
+<!-- Category Breakdown List -->
+<section class="space-y-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">Category Breakdown</h3>
+<!-- List Item 1 -->
+<div class="flex items-center justify-between p-sm bg-surface rounded-lg border-b-[1.5px] border-outline-variant papercut-shadow shadow-outline-variant/20">
+<div class="flex items-center space-x-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface">Housing</div>
+<div class="font-body-md text-body-md text-on-surface-variant">45% of total</div>
+</div>
+</div>
+<div class="font-entry-amount text-entry-amount text-on-surface">$1,912.50</div>
+</div>
+<!-- List Item 2 -->
+<div class="flex items-center justify-between p-sm bg-surface rounded-lg border-b-[1.5px] border-outline-variant papercut-shadow shadow-outline-variant/20">
+<div class="flex items-center space-x-sm">
+<div class="w-10 h-10 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center border border-tertiary/20">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface">Food &amp; Dining</div>
+<div class="font-body-md text-body-md text-on-surface-variant">25% of total</div>
+</div>
+</div>
+<div class="font-entry-amount text-entry-amount text-on-surface">$1,062.50</div>
+</div>
+<!-- List Item 3 -->
+<div class="flex items-center justify-between p-sm bg-surface rounded-lg border-b-[1.5px] border-outline-variant papercut-shadow shadow-outline-variant/20">
+<div class="flex items-center space-x-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center border border-secondary/20">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface">Transportation</div>
+<div class="font-body-md text-body-md text-on-surface-variant">15% of total</div>
+</div>
+</div>
+<div class="font-entry-amount text-entry-amount text-on-surface">$637.50</div>
+</div>
+<!-- List Item 4 -->
+<div class="flex items-center justify-between p-sm bg-surface rounded-lg border-b-[1.5px] border-outline-variant papercut-shadow shadow-outline-variant/20">
+<div class="flex items-center space-x-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center border border-outline-variant/50">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface">Shopping</div>
+<div class="font-body-md text-body-md text-on-surface-variant">15% of total</div>
+</div>
+</div>
+<div class="font-entry-amount text-entry-amount text-on-surface">$637.50</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface/80 dark:bg-inverse-surface/80 text-primary dark:text-inverse-primary font-tab-label text-tab-label font-headline-md text-headline-md text-primary fixed bottom-0 left-1/2 -translate-x-1/2 mb-md w-[calc(100%-32px)] max-w-[480px] rounded-full backdrop-blur-md border border-white/20 shadow-lg fixed bottom-0 w-full z-50 flex justify-around items-center px-lg pb-md pt-xs liquid-glass">
+<a class="text-on-surface-variant dark:text-surface-variant p-3 hover:bg-surface-variant/50 rounded-full flex flex-col items-center" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">grid_view</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant p-3 hover:bg-surface-variant/50 rounded-full flex flex-col items-center" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">history</span>
+</a>
+<!-- Active Tab: Analytics -->
+<a class="bg-secondary-container text-on-secondary-container rounded-full p-3 scale-110 transition-all hover:bg-surface-variant/50 flex flex-col items-center shadow-md" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant p-3 hover:bg-surface-variant/50 rounded-full flex flex-col items-center" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">settings</span>
+</a>
+</nav>
+</body></html>

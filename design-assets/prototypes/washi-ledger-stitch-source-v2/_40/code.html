@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Washi Ledger - Category Detail</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts for Noto Serif SC & Noto Sans SC -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#ffb4aa",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#ffdad5",
+                      "inverse-on-surface": "#ffede4",
+                      "secondary-fixed": "#c9edba",
+                      "primary": "#9b3e34",
+                      "tertiary": "#765700",
+                      "error": "#ba1a1a",
+                      "background": "#fff8f5",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#56423f",
+                      "on-error": "#ffffff",
+                      "surface-container-highest": "#f2dfd4",
+                      "on-surface": "#231a13",
+                      "on-tertiary-fixed-variant": "#5b4300",
+                      "on-primary-fixed-variant": "#7f2921",
+                      "tertiary-fixed": "#ffdf9e",
+                      "on-background": "#231a13",
+                      "on-primary-fixed": "#410001",
+                      "on-secondary-fixed-variant": "#314e28",
+                      "surface-variant": "#f2dfd4",
+                      "surface-tint": "#9f4036",
+                      "surface-container-low": "#fff1ea",
+                      "primary-container": "#bb554a",
+                      "inverse-primary": "#ffb4aa",
+                      "inverse-surface": "#392e27",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-container": "#946f00",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#add09f",
+                      "on-tertiary-container": "#fffbff",
+                      "outline": "#89726f",
+                      "surface-container-high": "#f8e5da",
+                      "on-tertiary-fixed": "#261a00",
+                      "surface-dim": "#e9d6cc",
+                      "surface": "#fff8f5",
+                      "tertiary-fixed-dim": "#f2bf48",
+                      "secondary": "#48663e",
+                      "surface-container": "#fdeadf",
+                      "on-secondary-fixed": "#052103",
+                      "surface-bright": "#fff8f5",
+                      "on-primary": "#ffffff",
+                      "secondary-container": "#c9edba",
+                      "on-primary-container": "#fffbff",
+                      "outline-variant": "#dcc0bc",
+                      "on-error-container": "#93000a",
+                      "on-secondary-container": "#4d6c44"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "safe-bottom": "90px",
+                      "xl": "32px",
+                      "xs": "8px",
+                      "lg": "24px",
+                      "sm": "12px",
+                      "base": "4px",
+                      "gutter": "16px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "input-amount": [
+                              "Noto Serif SC"
+                      ],
+                      "entry-amount": [
+                              "Noto Serif SC"
+                      ],
+                      "body-md": [
+                              "Noto Sans SC"
+                      ],
+                      "tab-label": [
+                              "Noto Sans SC"
+                      ],
+                      "label-caps": [
+                              "Noto Sans SC"
+                      ],
+                      "headline-lg": [
+                              "Noto Serif SC"
+                      ],
+                      "headline-md": [
+                              "Noto Serif SC"
+                      ],
+                      "stat-figure": [
+                              "Noto Serif SC"
+                      ],
+                      "body-lg": [
+                              "Noto Sans SC"
+                      ],
+                      "hero-balance": [
+                              "Noto Serif SC"
+                      ]
+              },
+              "fontSize": {
+                      "input-amount": [
+                              "32px",
+                              {
+                                      "lineHeight": "38px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "entry-amount": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "tab-label": [
+                              "11px",
+                              {
+                                      "lineHeight": "12px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "14px",
+                                      "letterSpacing": "1px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "26px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "19px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "stat-figure": [
+                              "18px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "15px",
+                              {
+                                      "lineHeight": "21px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "hero-balance": [
+                              "38px",
+                              {
+                                      "lineHeight": "42px",
+                                      "letterSpacing": "-0.5px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        /* Custom animations for the modal appearance */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-enter {
+            animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        /* Subtly hide scrollbar for clean ledger look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased h-screen w-screen overflow-hidden flex justify-center">
+<!-- Modal Container: Simulating a mobile device max-width for focus -->
+<div class="w-full max-w-[480px] h-full flex flex-col relative bg-surface animate-enter shadow-2xl">
+<!-- Decorative Washi Tape element (Artisanal Touch) -->
+<div class="absolute top-0 right-8 w-6 h-12 bg-tertiary-fixed-dim/30 rotate-12 origin-top-right rounded-sm z-0 pointer-events-none mix-blend-multiply"></div>
+<!-- Glassmorphic Header -->
+<header class="flex items-center justify-between px-md h-16 w-full z-40 bg-surface/80 backdrop-blur-md border-b-[1.5px] border-dashed border-outline-variant sticky top-0">
+<!-- Invisible spacer for center alignment -->
+<div class="w-10"></div>
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+                Dining
+            </h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 active:scale-90 transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">close</span>
+</button>
+</header>
+<!-- Scrollable Content Area -->
+<main class="flex-1 overflow-y-auto no-scrollbar pb-safe-bottom">
+<!-- Summary Section -->
+<section class="flex flex-col items-center justify-center py-xl px-md relative">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-2">Total for Period</p>
+<div class="flex items-baseline gap-1">
+<span class="font-hero-balance text-hero-balance text-on-surface">¥</span>
+<span class="font-hero-balance text-hero-balance text-on-surface">4,200</span>
+</div>
+<!-- Papercut effect separation -->
+<div class="w-24 h-[1.5px] bg-outline-variant mt-6 border-b border-dashed border-outline-variant"></div>
+</section>
+<!-- Transaction List -->
+<section class="px-md pb-lg">
+<!-- Group 1 -->
+<div class="mb-6">
+<div class="sticky top-16 z-30 bg-surface/90 py-2 mb-2 backdrop-blur-sm">
+<span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-sm">Today, Oct 24</span>
+</div>
+<ul class="flex flex-col gap-0">
+<!-- Transaction Item -->
+<li class="flex items-center justify-between py-sm border-b-[1.5px] border-dashed border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/30 text-primary">
+<span class="material-symbols-outlined text-[20px]">ramen_dining</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Ichiran Ramen</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Lunch</span>
+</div>
+</div>
+<span class="font-entry-amount text-entry-amount text-on-surface group-hover:scale-105 transition-transform origin-right">¥ 980</span>
+</li>
+<!-- Transaction Item -->
+<li class="flex items-center justify-between py-sm border-b-[1.5px] border-dashed border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/30 text-primary">
+<span class="material-symbols-outlined text-[20px]">local_cafe</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Blue Bottle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Coffee</span>
+</div>
+</div>
+<span class="font-entry-amount text-entry-amount text-on-surface group-hover:scale-105 transition-transform origin-right">¥ 650</span>
+</li>
+</ul>
+</div>
+<!-- Group 2 -->
+<div class="mb-6">
+<div class="sticky top-16 z-30 bg-surface/90 py-2 mb-2 backdrop-blur-sm">
+<span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-sm">Yesterday, Oct 23</span>
+</div>
+<ul class="flex flex-col gap-0">
+<!-- Transaction Item -->
+<li class="flex items-center justify-between py-sm border-b-[1.5px] border-dashed border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/30 text-primary">
+<span class="material-symbols-outlined text-[20px]">restaurant_menu</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Sushi Dai</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Dinner</span>
+</div>
+</div>
+<span class="font-entry-amount text-entry-amount text-on-surface group-hover:scale-105 transition-transform origin-right">¥ 2,150</span>
+</li>
+<!-- Transaction Item -->
+<li class="flex items-center justify-between py-sm border-b-[1.5px] border-dashed border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/30 text-primary">
+<span class="material-symbols-outlined text-[20px]">bakery_dining</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Asano Bakery</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Breakfast</span>
+</div>
+</div>
+<span class="font-entry-amount text-entry-amount text-on-surface group-hover:scale-105 transition-transform origin-right">¥ 420</span>
+</li>
+</ul>
+</div>
+</section>
+</main>
+<!-- Bottom gradient to fade out content softly (simulating page end) -->
+<div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-surface to-transparent pointer-events-none z-20"></div>
+</div>
+</body></html>

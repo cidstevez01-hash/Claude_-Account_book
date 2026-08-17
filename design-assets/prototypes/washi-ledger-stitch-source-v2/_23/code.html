@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Washi Ledger - Preferences</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts for Typography Hierarchy -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#dcc0bc",
+                    "primary-fixed": "#ffdad5",
+                    "on-tertiary-container": "#fffbff",
+                    "inverse-primary": "#ffb4aa",
+                    "surface-container": "#fdeadf",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "error": "#ba1a1a",
+                    "outline": "#89726f",
+                    "on-secondary-container": "#4d6c44",
+                    "secondary": "#48663e",
+                    "tertiary-fixed-dim": "#f2bf48",
+                    "error-container": "#ffdad6",
+                    "primary": "#9b3e34",
+                    "on-surface": "#231a13",
+                    "on-tertiary-fixed-variant": "#5b4300",
+                    "primary-container": "#bb554a",
+                    "on-surface-variant": "#56423f",
+                    "surface-container-low": "#fff1ea",
+                    "surface-tint": "#9f4036",
+                    "secondary-fixed-dim": "#add09f",
+                    "secondary-fixed": "#c9edba",
+                    "inverse-surface": "#392e27",
+                    "surface": "#fff8f5",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#314e28",
+                    "surface-container-high": "#f8e5da",
+                    "surface-container-highest": "#f2dfd4",
+                    "on-tertiary-fixed": "#261a00",
+                    "surface-bright": "#fff8f5",
+                    "surface-dim": "#e9d6cc",
+                    "on-primary-fixed": "#410001",
+                    "on-background": "#231a13",
+                    "on-primary-container": "#fffbff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed": "#052103",
+                    "secondary-container": "#c9edba",
+                    "tertiary-container": "#946f00",
+                    "on-error-container": "#93000a",
+                    "background": "#fff8f5",
+                    "tertiary": "#765700",
+                    "inverse-on-surface": "#ffede4",
+                    "tertiary-fixed": "#ffdf9e",
+                    "surface-variant": "#f2dfd4",
+                    "on-primary-fixed-variant": "#7f2921",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "safe-bottom": "90px",
+                    "xs": "8px",
+                    "sm": "12px",
+                    "md": "16px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Noto Sans SC"],
+                    "headline-lg": ["Noto Serif SC"],
+                    "headline-md": ["Noto Serif SC"],
+                    "body-md": ["Noto Sans SC"],
+                    "input-amount": ["Noto Serif SC"],
+                    "stat-figure": ["Noto Serif SC"],
+                    "entry-amount": ["Noto Serif SC"],
+                    "tab-label": ["Noto Sans SC"],
+                    "label-caps": ["Noto Sans SC"],
+                    "hero-balance": ["Noto Serif SC"]
+            },
+            "fontSize": {
+                    "body-lg": ["15px", {"lineHeight": "21px", "fontWeight": "500"}],
+                    "headline-lg": ["26px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-md": ["19px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "input-amount": ["32px", {"lineHeight": "38px", "fontWeight": "600"}],
+                    "stat-figure": ["18px", {"lineHeight": "22px", "fontWeight": "600"}],
+                    "entry-amount": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "tab-label": ["11px", {"lineHeight": "12px", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500"}],
+                    "hero-balance": ["38px", {"lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Minimal custom CSS for specific structural tweaks not easily done with utilities */
+        .papercut-shadow {
+            box-shadow: 0 2px 0 var(--tw-shadow-color);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container relative">
+<!-- TopAppBar (From Shared Components) -->
+<header class="fixed top-0 w-full z-40 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
+<div class="flex items-center justify-between px-md h-16 w-full max-w-[480px] mx-auto">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform" data-icon="menu">menu</button>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Washi Ledger</h1>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform cursor-pointer">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A close-up, soft-focus portrait of a person in a minimalist, well-lit studio setting. The lighting is warm and natural, creating a calm and professional mood. The color palette features neutral tones with a subtle hint of sage green, matching a modern, artisanal Japanese aesthetic. The framing is tight, serving well as a user profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf_VLBqkJQH4neBDuuy6KnnN0v-pOJYXW2sDVbvf_pI5PjQ1AKSAp99x6ijzrm0VIGm4BO-_TJ0VEnSztu51LcfzHzCD1F-V_Ubb3EtD2P3KEVU1m50cVQijgqNqh61IOT71KmmC5UKP37vKFVBoJlLe52Wia_C2xrYhpW0uhV7CRHSO-7i8pDKKJ64yJHt-N1AC6AOwk6DNMgKNuJQVBTZwwKI6ds5yLHLBGHx-4Siac0PrrBXJr6"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-[480px] mx-auto pt-[80px] pb-safe-bottom px-md flex flex-col gap-xl">
+<!-- Section Header context -->
+<div class="mb-2">
+<h2 class="font-headline-md text-headline-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">tune</span>
+                Preferences
+            </h2>
+</div>
+<!-- Section 1: Payment Methods -->
+<section class="relative">
+<!-- Washi Tape Detail -->
+<div class="absolute -top-3 -right-2 w-10 h-4 bg-tertiary-fixed-dim rotate-[15deg] opacity-90 z-10 rounded-sm shadow-sm"></div>
+<div class="flex items-end justify-between mb-sm">
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold">Payment Methods</h3>
+<button class="font-label-caps text-label-caps text-primary hover:opacity-80 transition-opacity flex items-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[16px]">add_circle</span> Add
+                </button>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Method: Cash -->
+<div class="bg-surface-container-lowest rounded-xl border-[1.5px] border-dashed border-outline-variant p-md flex items-center justify-between papercut-shadow shadow-surface-variant transition-transform active:scale-[0.98]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-[2px] border-secondary flex items-center justify-center text-secondary bg-secondary-container/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Cash Wallet</span>
+<span class="font-body-md text-body-md text-secondary">Default</span>
+</div>
+</div>
+<div class="font-stat-figure text-stat-figure text-secondary">
+                        ¥12,450
+                    </div>
+</div>
+<!-- Method: Bank Account -->
+<div class="bg-surface-container-lowest rounded-xl border-[1.5px] border-dashed border-outline-variant p-md flex items-center justify-between papercut-shadow shadow-surface-variant transition-transform active:scale-[0.98]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-[2px] border-primary flex items-center justify-center text-primary bg-primary-container/10">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Main Bank</span>
+<span class="font-body-md text-body-md text-on-surface-variant">••• 4092</span>
+</div>
+</div>
+<div class="font-stat-figure text-stat-figure text-on-surface">
+                        ¥285,000
+                    </div>
+</div>
+<!-- Method: Credit Card -->
+<div class="bg-surface-container-lowest rounded-xl border-[1.5px] border-dashed border-outline-variant p-md flex items-center justify-between papercut-shadow shadow-surface-variant transition-transform active:scale-[0.98]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-[2px] border-tertiary flex items-center justify-center text-tertiary bg-tertiary-container/10">
+<span class="material-symbols-outlined">credit_card</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Visa Platinum</span>
+<span class="font-body-md text-body-md text-on-surface-variant">••• 8810</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<div class="font-stat-figure text-stat-figure text-primary">
+                            -¥42,100
+                        </div>
+<span class="font-tab-label text-tab-label text-outline uppercase tracking-wider">Balance</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Tags Management -->
+<section class="mt-sm">
+<div class="flex items-end justify-between mb-sm">
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold">Transaction Tags</h3>
+</div>
+<div class="bg-surface-container-low rounded-xl border-[1.5px] border-outline-variant p-md shadow-sm">
+<div class="flex flex-wrap gap-xs">
+<!-- Tag Items -->
+<div class="px-sm py-1.5 rounded-full border border-outline bg-surface flex items-center gap-1 group cursor-pointer hover:border-primary transition-colors">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Groceries</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-error transition-colors">close</span>
+</div>
+<div class="px-sm py-1.5 rounded-full border border-outline bg-surface flex items-center gap-1 group cursor-pointer hover:border-primary transition-colors">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Transport</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-error transition-colors">close</span>
+</div>
+<div class="px-sm py-1.5 rounded-full border border-outline bg-surface flex items-center gap-1 group cursor-pointer hover:border-primary transition-colors">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Dining Out</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-error transition-colors">close</span>
+</div>
+<div class="px-sm py-1.5 rounded-full border border-outline bg-surface flex items-center gap-1 group cursor-pointer hover:border-primary transition-colors">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Utilities</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-error transition-colors">close</span>
+</div>
+<div class="px-sm py-1.5 rounded-full border border-outline bg-surface flex items-center gap-1 group cursor-pointer hover:border-primary transition-colors">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Coffee</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-error transition-colors">close</span>
+</div>
+<!-- Add Tag Button -->
+<button class="px-sm py-1.5 rounded-full border-[1.5px] border-dashed border-primary bg-primary-container/5 text-primary flex items-center gap-1 hover:bg-primary-container/10 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span class="font-body-md text-body-md font-medium">New Tag</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (From Shared Components - Liquid Glass) -->
+<!-- Keeping all items inactive as this is a sub-page context relative to the primary tabs, but rendering it to satisfy layout request -->
+<nav class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] rounded-full bg-surface-container/80 backdrop-blur-md border border-outline-variant/30 shadow-lg z-50 flex justify-around items-center px-lg py-sm max-w-[480px]">
+<button class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+</button>
+<button class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+</button>
+<button class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+</button>
+</nav>
+</body></html>

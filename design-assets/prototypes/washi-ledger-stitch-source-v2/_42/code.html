@@ -1,0 +1,308 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Washi Ledger - Statistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "outline": "#89726f",
+                        "secondary-fixed-dim": "#add09f",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "on-primary-fixed": "#410001",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "tertiary": "#765700",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "primary": "#9b3e34",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#052103",
+                        "tertiary-container": "#946f00",
+                        "on-secondary-container": "#4d6c44",
+                        "surface-container-highest": "#f2dfd4",
+                        "tertiary-fixed": "#ffdf9e",
+                        "on-background": "#231a13",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#ffede4",
+                        "inverse-surface": "#392e27",
+                        "primary-fixed": "#ffdad5",
+                        "secondary": "#48663e",
+                        "surface-bright": "#fff8f5",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "surface-variant": "#f2dfd4",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#dcc0bc",
+                        "surface-tint": "#9f4036",
+                        "on-error": "#ffffff",
+                        "on-surface": "#231a13",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#c9edba",
+                        "background": "#fff8f5",
+                        "primary-container": "#bb554a",
+                        "on-primary-container": "#fffbff",
+                        "surface-container": "#fdeadf",
+                        "surface-container-low": "#fff1ea",
+                        "on-surface-variant": "#56423f",
+                        "on-tertiary-fixed": "#261a00",
+                        "inverse-primary": "#ffb4aa",
+                        "error-container": "#ffdad6",
+                        "surface": "#fff8f5",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#f8e5da",
+                        "surface-dim": "#e9d6cc",
+                        "secondary-container": "#c9edba",
+                        "on-primary-fixed-variant": "#7f2921"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "md": "16px",
+                        "base": "4px",
+                        "sm": "12px",
+                        "gutter": "16px",
+                        "safe-bottom": "90px",
+                        "xs": "8px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "entry-amount": ["Noto Serif SC"],
+                        "body-md": ["Noto Sans SC"],
+                        "body-lg": ["Noto Sans SC"],
+                        "label-caps": ["Noto Sans SC"],
+                        "tab-label": ["Noto Sans SC"],
+                        "headline-lg": ["Noto Serif SC"],
+                        "headline-md": ["Noto Serif SC"],
+                        "hero-balance": ["Noto Serif SC"],
+                        "stat-figure": ["Noto Serif SC"],
+                        "input-amount": ["Noto Serif SC"]
+                    },
+                    "fontSize": {
+                        "entry-amount": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["15px", { "lineHeight": "21px", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500" }],
+                        "tab-label": ["11px", { "lineHeight": "12px", "fontWeight": "600" }],
+                        "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["19px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "hero-balance": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700" }],
+                        "stat-figure": ["18px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "input-amount": ["32px", { "lineHeight": "38px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: var(--background, #fff8f5);
+            background-image: 
+                linear-gradient(to right, rgba(220, 192, 188, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(220, 192, 188, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .washi-tape {
+            position: absolute;
+            top: -6px;
+            right: 12px;
+            width: 30px;
+            height: 12px;
+            background-color: #f2bf48;
+            opacity: 0.8;
+            transform: rotate(3deg);
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .paper-card {
+            background-color: var(--surface, #fff8f5);
+            border-bottom: 2px solid var(--outline-variant, #dcc0bc);
+            border-right: 1px solid var(--outline-variant, #dcc0bc);
+            border-left: 1px solid var(--surface-container, #fdeadf);
+            border-top: 1px solid var(--surface-container, #fdeadf);
+            box-shadow: 0 2px 0 rgba(137, 114, 111, 0.05);
+        }
+        
+        .chart-bar-earned {
+            background: linear-gradient(180deg, var(--secondary, #48663e) 0%, var(--secondary-fixed-dim, #add09f) 100%);
+        }
+        
+        .chart-bar-spent {
+            background: linear-gradient(180deg, var(--primary, #9b3e34) 0%, var(--primary-fixed-dim, #ffb4aa) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-surface antialiased min-h-screen pb-safe-bottom flex flex-col md:flex-row">
+<!-- Mobile Top App Bar (From JSON) -->
+<header class="md:hidden bg-surface dark:bg-surface-dim fixed top-0 w-full z-40 border-b-[1.5px] border-dashed border-outline-variant dark:border-outline">
+<div class="flex items-center justify-between px-md h-16 w-full max-w-[480px] mx-auto">
+<button class="p-2 text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface dark:text-on-surface">Statistics</h1>
+<button class="p-2 text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A small circular profile avatar showing a minimalist illustration of a bonsai tree in soft pastel watercolors on a textured paper background. Light and airy aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo5Wsf9zdHAbCZUlp3S8Z2IjQNYNceynIyCYcJG1gWHqoZ5BoXKId3E8tBAyiXVEO79eXviGoazXIabJ6gQN--Gfs7v9NF4dom1B6JRCaCH6-BOjpI948d9JB4ZqxYB5wPTzDb4xt9f2Za9j9D-K-joV9qG0Y-ET_caxjTiiTP2Fx8uLgqko_OxnvadGFnDR0541JEd8trybl0-08tV1tFOxbUSxe56py-l1A8NUkje5K3GnHuZWS5">
+</div>
+</button>
+</div>
+</header>
+<!-- Desktop Side Nav (Adapted NavigationDrawer) -->
+<aside class="hidden md:flex flex-col h-screen sticky top-0 w-80 rounded-r-xl border-r-[1.5px] border-dashed border-outline-variant dark:border-outline shadow-xl bg-surface dark:bg-surface-dim z-40">
+<div class="p-lg border-b border-dashed border-outline-variant/50">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A circular profile avatar showing a minimalist illustration of a bonsai tree in soft pastel watercolors on a textured paper background. Light and airy aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTyoHtIh1d7lPBC6RLbY52U8evMkJm1blKT2kptOf2n3mPZku40XVjGF3aU1rL3WFksd8QuSuMKwfZpek2pMbo0BSMJ4VGZ5javf0WpqGNNaD7vj2IVXLLN2GH3PpJfQ9I_j2IKaOTE47a0HowuNuXmoPIUihUk067YVCwQw8Tq60WWZCm0a37g9bYI1ahlqUIiwkUnFftlV3BxVbTFwGqoGwiGtpm4UPOdvIi_5SDjdTJvxnPc1Un">
+</div>
+<div>
+<h2 class="font-body-lg text-body-lg text-on-surface font-bold">Artisan User</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">ledger_id: 8824</p>
+<span class="inline-block mt-1 px-2 py-0.5 bg-tertiary-container text-on-tertiary-container font-label-caps text-label-caps rounded-full text-[10px]">Premium Member</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-md">
+<a class="flex items-center gap-sm text-on-surface-variant dark:text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-lg text-body-lg">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant dark:text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-lg text-body-lg">Transactions</span>
+</a>
+<a class="flex items-center gap-sm bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary font-bold rounded-lg mx-2 my-1 px-4 py-3 active:opacity-70 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="insights" data-weight="fill" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-body-lg text-body-lg">Statistics</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant dark:text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-lg text-body-lg">Settings</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant dark:text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-lg mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body-lg text-body-lg">Help</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-[480px] md:max-w-3xl mx-auto pt-[80px] md:pt-lg px-gutter pb-safe-bottom">
+<!-- Top Tab Switcher (Cash Flow / Points) -->
+<div class="bg-surface-container/50 backdrop-blur-sm p-1 rounded-full flex relative border border-outline-variant/30 mb-lg shadow-sm">
+<button class="flex-1 py-2 text-center font-body-lg text-body-lg text-on-surface-variant rounded-full transition-colors hover:bg-surface-variant/30">
+                Cash Flow
+            </button>
+<button class="flex-1 py-2 text-center font-body-lg text-body-lg text-on-primary-container bg-primary-container rounded-full shadow-md font-bold transition-all relative">
+                Points
+            </button>
+</div>
+<!-- Filter Section (Monthly / Daily) -->
+<div class="flex justify-between items-center mb-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface">Points Activity</h2>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded-full border-[1.5px] border-dashed border-primary text-primary font-body-md text-body-md bg-primary-fixed/20">Monthly</button>
+<button class="px-3 py-1 rounded-full border border-outline-variant text-on-surface-variant font-body-md text-body-md hover:bg-surface-variant/30">Daily</button>
+</div>
+</div>
+<!-- Chart Card (Papercut style) -->
+<div class="paper-card rounded-xl p-md mb-xl relative">
+<div class="washi-tape"></div>
+<div class="flex justify-between items-end mb-6">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Net Points</p>
+<p class="font-hero-balance text-hero-balance text-primary">+1,240</p>
+</div>
+<div class="text-right">
+<p class="font-body-md text-body-md text-secondary">+2,500 Earned</p>
+<p class="font-body-md text-body-md text-on-surface-variant">-1,260 Spent</p>
+</div>
+</div>
+<!-- Bar Chart Area (Simplified Representation) -->
+<div class="h-48 border-b-[1.5px] border-dashed border-outline-variant flex items-end justify-between px-2 pb-2 gap-2 mt-4 relative">
+<!-- Y-Axis markers -->
+<div class="absolute left-0 top-0 h-full w-full flex flex-col justify-between text-[10px] text-outline-variant font-label-caps text-label-caps -z-10 opacity-50 pointer-events-none">
+<div class="border-b border-dashed border-outline-variant/30 w-full h-0 relative"><span class="absolute -top-3 right-0">3k</span></div>
+<div class="border-b border-dashed border-outline-variant/30 w-full h-0 relative"><span class="absolute -top-3 right-0">2k</span></div>
+<div class="border-b border-dashed border-outline-variant/30 w-full h-0 relative"><span class="absolute -top-3 right-0">1k</span></div>
+<div class="border-b border-dashed border-outline-variant/30 w-full h-0 relative"><span class="absolute -top-3 right-0">0</span></div>
+</div>
+<!-- Bars -->
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full max-w-[24px] h-[60%] chart-bar-earned rounded-t-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full max-w-[24px] h-[30%] chart-bar-spent rounded-b-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-1">Jan</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full max-w-[24px] h-[40%] chart-bar-earned rounded-t-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full max-w-[24px] h-[50%] chart-bar-spent rounded-b-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-1">Feb</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full max-w-[24px] h-[80%] chart-bar-earned rounded-t-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full max-w-[24px] h-[20%] chart-bar-spent rounded-b-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-1">Mar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full max-w-[24px] h-[50%] chart-bar-earned rounded-t-md opacity-80 group-hover:opacity-100 transition-opacity relative">
+<!-- Highlight active month -->
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-container-highest px-2 py-1 rounded shadow-sm text-xs font-bold whitespace-nowrap hidden group-hover:block z-20">Apr</div>
+</div>
+<div class="w-full max-w-[24px] h-[45%] chart-bar-spent rounded-b-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<span class="font-tab-label text-tab-label text-primary font-bold mt-1 bg-primary-fixed/30 px-2 rounded">Apr</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full max-w-[24px] h-[30%] chart-bar-earned rounded-t-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full max-w-[24px] h-[10%] chart-bar-spent rounded-b-md opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<span class="font-tab-label text-tab-label text-on-surface-variant mt-1">May</span>
+</div>
+</div>
+<!-- Custom Legend -->
+<div class="flex justify-center gap-6 mt-4"><div class="flex flex-col w-full mt-md">
+  <div class="flex items-center gap-3 py-3 border-b border-dashed border-outline-variant/30">
+    <div class="w-3 h-3 rounded-sm chart-bar-earned shrink-0"></div>
+    <span class="font-body-md text-on-surface flex-1">Total Earned</span>
+    <span class="font-stat-figure text-xs text-on-surface-variant mr-4">66%</span>
+    <span class="font-stat-figure text-secondary">+2,500</span>
+  </div>
+  <div class="flex items-center gap-3 py-3">
+    <div class="w-3 h-3 rounded-sm chart-bar-spent shrink-0"></div>
+    <span class="font-body-md text-on-surface flex-1">Total Spent</span>
+    <span class="font-stat-figure text-xs text-on-surface-variant mr-4">34%</span>
+    <span class="font-stat-figure text-primary">-1,260</span>
+  </div>
+</div></div>
+</div>
+<!-- Breakdown List -->
+
+
+</main>
+<!-- Mobile Bottom Nav Bar (From JSON) -->
+<nav class="md:hidden fixed bottom-xs left-0 right-0 z-50 flex justify-around items-center px-lg py-sm max-w-[480px] mx-auto bg-surface-container/80 dark:bg-surface-container-highest/80 backdrop-blur-md rounded-full w-[90%] left-1/2 -translate-x-1/2 border border-outline-variant/30 dark:border-outline/30 shadow-lg">
+<a class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</a>
+<!-- Modified specific for the prompt request (Analytics active) -->
+<a class="bg-primary-container dark:bg-primary-fixed text-on-primary-container dark:text-on-primary-fixed rounded-full p-3 flex items-center justify-center scale-110 transition-all active:scale-90 duration-200 shadow-[0_4px_0_var(--primary)]" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+</a>
+</nav>
+
+
+</body></html>

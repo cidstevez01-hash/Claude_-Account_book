@@ -1,0 +1,209 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Washi Ledger - Theme Selection</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed": "#261a00",
+                    "inverse-on-surface": "#ffede4",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#9f4036",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#f2bf48",
+                    "secondary": "#48663e",
+                    "on-surface": "#231a13",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffdf9e",
+                    "surface-dim": "#e9d6cc",
+                    "surface-container-highest": "#f2dfd4",
+                    "on-primary-container": "#fffbff",
+                    "surface-container-high": "#f8e5da",
+                    "outline-variant": "#dcc0bc",
+                    "surface": "#fff8f5",
+                    "inverse-surface": "#392e27",
+                    "on-background": "#231a13",
+                    "surface-container-low": "#fff1ea",
+                    "primary-container": "#bb554a",
+                    "primary": "#9b3e34",
+                    "on-primary-fixed": "#410001",
+                    "secondary-fixed": "#c9edba",
+                    "outline": "#89726f",
+                    "on-secondary-fixed-variant": "#314e28",
+                    "on-tertiary-fixed-variant": "#5b4300",
+                    "on-tertiary-container": "#fffbff",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "secondary-container": "#c9edba",
+                    "on-secondary": "#ffffff",
+                    "surface-container": "#fdeadf",
+                    "surface-variant": "#f2dfd4",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#fff8f5",
+                    "background": "#fff8f5",
+                    "secondary-fixed-dim": "#add09f",
+                    "on-secondary-container": "#4d6c44",
+                    "on-surface-variant": "#56423f",
+                    "tertiary-container": "#946f00",
+                    "tertiary": "#765700",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#052103",
+                    "on-primary-fixed-variant": "#7f2921",
+                    "primary-fixed": "#ffdad5",
+                    "inverse-primary": "#ffb4aa",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "safe-bottom": "90px",
+                    "md": "16px",
+                    "sm": "12px",
+                    "xs": "8px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Noto Serif SC"],
+                    "hero-balance": ["Noto Serif SC"],
+                    "input-amount": ["Noto Serif SC"],
+                    "label-caps": ["Noto Sans SC"],
+                    "stat-figure": ["Noto Serif SC"],
+                    "headline-md": ["Noto Serif SC"],
+                    "tab-label": ["Noto Sans SC"],
+                    "body-md": ["Noto Sans SC"],
+                    "body-lg": ["Noto Sans SC"],
+                    "entry-amount": ["Noto Serif SC"]
+            },
+            "fontSize": {
+                    "headline-lg": ["26px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "hero-balance": ["38px", {"lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700"}],
+                    "input-amount": ["32px", {"lineHeight": "38px", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500"}],
+                    "stat-figure": ["18px", {"lineHeight": "22px", "fontWeight": "600"}],
+                    "headline-md": ["19px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "tab-label": ["11px", {"lineHeight": "12px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["15px", {"lineHeight": "21px", "fontWeight": "500"}],
+                    "entry-amount": ["16px", {"lineHeight": "20px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Artisanal details and smooth transitions */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .theme-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .theme-card.selected {
+            border-color: theme('colors.primary');
+            background-color: theme('colors.surface-container-highest');
+        }
+        .theme-card:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen relative overflow-x-hidden">
+<!-- Mobile Container (Artisanal Notebook bounds) -->
+<div class="max-w-[480px] mx-auto bg-background min-h-screen shadow-2xl relative pb-safe-bottom flex flex-col">
+<!-- TopAppBar (Shared Component) -->
+<header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 bg-surface border-b-[1.5px] border-dashed border-outline-variant items-center justify-between px-md"><div class="w-full flex justify-between items-center px-md py-2 border-b border-dashed border-outline-variant/30"><button class="text-on-surface-variant p-2 rounded-full hover:bg-surface-variant/50 transition-colors"><span class="material-symbols-outlined">menu</span></button><div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-[12px] shadow-sm"><span class="material-symbols-outlined">account_circle</span></div></div><div class="flex items-center h-14 px-md relative"><button class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full absolute left-md" onclick="window.history.back()"><span class="material-symbols-outlined">arrow_back</span></button><h1 class="font-headline-md text-headline-md text-on-surface w-full text-center">Theme Settings</h1></div></header>
+<!-- Main Canvas -->
+<main class="flex-1 pt-[120px] px-gutter flex flex-col gap-lg z-10">
+<!-- Page Header -->
+<!-- Theme Selection List (Bento-style layout) -->
+<div class="grid grid-cols-3 gap-sm justify-items-center" id="theme-list"><!-- Washi Ledger (Selected) --><button class="theme-card selected group relative w-full text-center rounded-xl border-[1.5px] border-dashed border-primary bg-surface-container-highest p-3 flex flex-col items-center gap-2 overflow-hidden shadow-sm"><div class="w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1"><div class="h-1/2 w-full bg-surface-tint"></div><div class="h-1/2 w-full flex"><div class="h-full w-1/2 bg-surface-dim"></div><div class="h-full w-1/2 bg-tertiary-fixed-dim"></div></div></div><div class="flex flex-col items-center"><span class="font-body-md text-body-md text-on-surface leading-tight">Washi Ledger</span><div class="mt-1 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center"><span class="material-symbols-outlined text-[12px] font-bold">check</span></div></div></button><!-- Midnight Ink --><button class="theme-card group relative w-full text-center rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface p-3 flex flex-col items-center gap-2 overflow-hidden"><div class="w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1"><div class="h-1/2 w-full bg-[#1e293b]"></div><div class="h-1/2 w-full flex"><div class="h-full w-1/2 bg-[#0f172a]"></div><div class="h-full w-1/2 bg-[#3b82f6]"></div></div></div><div class="flex flex-col items-center"><span class="font-body-md text-body-md text-on-surface leading-tight">Midnight Ink</span><div class="mt-1 w-5 h-5 rounded-full border border-outline-variant bg-transparent"></div></div></button><!-- Forest Moss --><button class="theme-card group relative w-full text-center rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface p-3 flex flex-col items-center gap-2 overflow-hidden"><div class="w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1"><div class="h-1/2 w-full bg-[#3f6212]"></div><div class="h-1/2 w-full flex"><div class="h-full w-1/2 bg-[#14532d]"></div><div class="h-full w-1/2 bg-[#84cc16]"></div></div></div><div class="flex flex-col items-center"><span class="font-body-md text-body-md text-on-surface leading-tight">Forest Moss</span><div class="mt-1 w-5 h-5 rounded-full border border-outline-variant bg-transparent"></div></div></button><!-- Ocean Glass --><button class="theme-card group relative w-full text-center rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface p-3 flex flex-col items-center gap-2 overflow-hidden"><div class="w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1"><div class="h-1/2 w-full bg-[#0891b2]"></div><div class="h-1/2 w-full flex"><div class="h-full w-1/2 bg-[#164e63]"></div><div class="h-full w-1/2 bg-[#2dd4bf]"></div></div></div><div class="flex flex-col items-center"><span class="font-body-md text-body-md text-on-surface leading-tight">Ocean Glass</span><div class="mt-1 w-5 h-5 rounded-full border border-outline-variant bg-transparent"></div></div></button></div>
+<!-- Spacer to push button down if needed -->
+<div class="flex-1"></div>
+<!-- Save Action Area -->
+<div class="mt-xl mb-xl pb-safe-bottom">
+<button class="w-full bg-primary text-on-primary font-body-lg text-body-lg py-4 rounded-xl shadow-[0_4px_0_var(--tw-colors-primary-fixed-dim)] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2 font-headline-md">
+<span class="material-symbols-outlined" data-icon="save">save</span>
+                    Apply Theme
+                </button>
+</div>
+</main>
+<!-- BottomNavBar (Shared Component) -->
+<nav class="fixed bottom-xs left-1/2 -translate-x-1/2 z-50 flex justify-around items-center px-lg py-sm w-[90%] max-w-[480px] rounded-full bg-surface-container/80 backdrop-blur-md border border-outline-variant/30 shadow-lg"><!-- Dashboard -->
+<button class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 transition-transform duration-200">
+  <span class="material-symbols-outlined">grid_view</span>
+</button>
+<!-- Transactions -->
+<button class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 transition-transform duration-200">
+  <span class="material-symbols-outlined">history</span>
+</button>
+<!-- Statistics -->
+<button class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 transition-transform duration-200">
+  <span class="material-symbols-outlined">bar_chart</span>
+</button></nav>
+</div>
+<!-- Interaction Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.theme-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Remove selected state from all
+                    cards.forEach(c => {
+                        c.classList.remove('selected', 'border-primary', 'bg-surface-container-highest');
+                        c.classList.add('border-outline-variant', 'bg-surface');
+                        const indicator = c.querySelector('.rounded-full:last-child');
+                        indicator.className = 'w-6 h-6 rounded-full border-2 border-outline-variant bg-transparent flex items-center justify-center';
+                        indicator.innerHTML = '';
+                        
+                        const label = c.querySelector('.font-label-caps');
+                        label.classList.remove('text-primary');
+                        label.classList.add('text-on-surface-variant');
+                    });
+
+                    // Add selected state to clicked
+                    card.classList.add('selected', 'border-primary', 'bg-surface-container-highest');
+                    card.classList.remove('border-outline-variant', 'bg-surface');
+                    
+                    const activeIndicator = card.querySelector('.rounded-full:last-child');
+                    activeIndicator.className = 'w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_2px_0_var(--tw-colors-primary-container)]';
+                    activeIndicator.innerHTML = '<span class="material-symbols-outlined text-[16px] font-bold" data-weight="fill" data-icon="check">check</span>';
+                    
+                    const activeLabel = card.querySelector('.font-label-caps');
+                    activeLabel.classList.add('text-primary');
+                    activeLabel.classList.remove('text-on-surface-variant');
+                });
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+</body></html>
