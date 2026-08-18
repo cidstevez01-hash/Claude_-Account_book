@@ -123,6 +123,10 @@ export interface TrendBucket {
   key: string
   label: string
   segments: TrendSegment[]
+  /** 点这根柱子弹出的明细面板用的分类拆分——收支趋势图这个字段跟segments是同一份数据
+   * (反正segments本来就是按分类堆叠的)；积分推移图的柱子视觉上是单色不堆叠，但点开
+   * 还是要看这一天/这个月的积分是从哪些分类来的，所以单独算一份，跟segments不是同一份 */
+  detailSegments: TrendSegment[]
   total: number
 }
 
@@ -140,7 +144,7 @@ function buildTrendBuckets(
   categories: Category[],
   type: EntryType
 ): TrendBucket[] {
-  const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], total: 0 }))
+  const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], detailSegments: [], total: 0 }))
   const byKey = new Map(buckets.map((b) => [b.key, b]))
   for (const e of entries) {
     if (e.type !== type) continue
@@ -161,6 +165,7 @@ function buildTrendBuckets(
       seg.label = cat?.zh ?? seg.key
       seg.color = cat?.color ?? CHART_PALETTE[idx % CHART_PALETTE.length]
     })
+    b.detailSegments = b.segments
   }
   return buckets
 }
@@ -182,39 +187,85 @@ export function monthlyTrendBuckets(entries: Entry[], categories: Category[], ty
   return buildTrendBuckets(skeleton, entries, categories, type)
 }
 
-/** 积分推移柱状图数据——照旧App renderPointsTrendChart()的简化模型：只有一根jade色的柱子，
- * 不用像收支那样按分类堆叠(积分不挂分类，挂支付方式，但推移图只看每日/每月总额，不用
- * 再细分支付方式——支付方式内訳已经在PointsDonutCard那张环状图里看过了) */
-function buildPointsTrendBuckets(skeleton: { key: string; label: string }[], entries: Entry[]): TrendBucket[] {
-  const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], total: 0 }))
+/** 积分推移柱状图数据——照旧App renderPointsTrendChart()的简化模型：柱子本身只有一根
+ * jade色(积分不像收支那样按分类堆叠着画)，但点开某根柱子看到的明细面板还是要按分类拆分——
+ * 照旧App getDailyBucketsForMonth()里pointsByCat的口径(key=e.catCode)，这是"这一天的积分
+ * 是花在哪些分类上赚回来的"，跟PointsDonutCard那张按支付方式分的环状图是两个不同维度 */
+function buildPointsTrendBuckets(
+  skeleton: { key: string; label: string }[],
+  entries: Entry[],
+  categories: Category[]
+): TrendBucket[] {
+  const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], detailSegments: [], total: 0 }))
   const byKey = new Map(buckets.map((b) => [b.key, b]))
   for (const e of entries) {
     if (e.type !== 'expense' || !e.points) continue
     const b = byKey.get(e.date.length === 7 ? e.date.slice(0, 7) : e.date)
     if (!b) continue
     b.total += e.points
+    let seg = b.detailSegments.find((s) => s.key === e.catCode)
+    if (!seg) {
+      seg = { key: e.catCode, label: '', color: '', value: 0 }
+      b.detailSegments.push(seg)
+    }
+    seg.value += e.points
   }
   for (const b of buckets) {
     if (b.total > 0) b.segments = [{ key: 'points', label: '积分', color: 'var(--color-secondary)', value: b.total }]
+    b.detailSegments.sort((a, c) => c.value - a.value)
+    b.detailSegments.forEach((seg, idx) => {
+      const cat = categories.find((c) => c.code === seg.key)
+      seg.label = cat?.zh ?? seg.key
+      seg.color = cat?.color ?? CHART_PALETTE[idx % CHART_PALETTE.length]
+    })
   }
   return buckets
 }
 
-export function dailyPointsTrendBuckets(entries: Entry[], year: number, month: number): TrendBucket[] {
+export function dailyPointsTrendBuckets(entries: Entry[], categories: Category[], year: number, month: number): TrendBucket[] {
   const daysInMonth = new Date(year, month, 0).getDate()
   const skeleton = Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1
     return { key: `${year}-${pad2(month)}-${pad2(d)}`, label: String(d) }
   })
-  return buildPointsTrendBuckets(skeleton, entries)
+  return buildPointsTrendBuckets(skeleton, entries, categories)
 }
 
-export function monthlyPointsTrendBuckets(entries: Entry[], year: number): TrendBucket[] {
+export function monthlyPointsTrendBuckets(entries: Entry[], categories: Category[], year: number): TrendBucket[] {
   const skeleton = Array.from({ length: 12 }, (_, i) => {
     const m = i + 1
     return { key: `${year}-${pad2(m)}`, label: `${m}月` }
   })
-  return buildPointsTrendBuckets(skeleton, entries)
+  return buildPointsTrendBuckets(skeleton, entries, categories)
+}
+
+export interface TrendLegendItem {
+  key: string
+  label: string
+  color: string
+  value: number
+  ratio: number
+}
+
+/** 趋势图下方默认显示的聚合图例——把可见范围内所有柱子的分类段汇总，取金额前8名，
+ * 照旧App renderTrendChart()里"legendKeys = ...slice(0,8)"的逻辑。ratio是对全部分类
+ * 汇总(不只是前8名)算的占比，不是"前8名互相之间"的占比 */
+export function aggregateTrendSegments(buckets: TrendBucket[], limit = 8): TrendLegendItem[] {
+  const totals = new Map<string, { label: string; color: string; value: number }>()
+  let grandTotal = 0
+  for (const b of buckets) {
+    for (const seg of b.segments) {
+      const cur = totals.get(seg.key) ?? { label: seg.label, color: seg.color, value: 0 }
+      cur.value += seg.value
+      totals.set(seg.key, cur)
+      grandTotal += seg.value
+    }
+  }
+  if (grandTotal === 0) return []
+  return Array.from(totals.entries())
+    .sort((a, b) => b[1].value - a[1].value)
+    .slice(0, limit)
+    .map(([key, v]) => ({ key, label: v.label, color: v.color, value: v.value, ratio: v.value / grandTotal }))
 }
 
 export function groupByDay(entries: Entry[]): { date: string; entries: Entry[] }[] {

@@ -3,6 +3,8 @@ import type { TrendBucket } from '../../data/summary'
 interface TrendBarChartProps {
   buckets: TrendBucket[]
   height?: number
+  selectedIndex?: number | null
+  onSelectBucket?: (index: number) => void
 }
 
 const BAR_W = 20
@@ -13,9 +15,10 @@ const GRID_STEPS = 4
 /** 横向可滚动的分段堆叠柱状图——照旧仓库index.html的renderTrendChart()做，但做了
  * 简化：纵轴刻度用"这段时间(整月/整年)里的最大值"算一次固定死，不像旧App那样跟着
  * 横向滚动视口实时重算刻度(那套逻辑接近200行，且需要监听scroll事件动态改DOM属性，
- * 这次没有照搬)；也没有点柱子弹出单日明细的交互(旧App的showTrendPointInfo)。
- * 分段堆叠、颜色、横向滚动这些核心视觉/数据层面照旧App来，不是瞎画的。 */
-export function TrendBarChart({ buckets, height = 180 }: TrendBarChartProps) {
+ * 这次没有照搬)。点柱子高亮+弹出该柱明细(替换下方聚合图例)这个交互已经接上，
+ * 逻辑照旧App的showTrendPointInfo/showPointsTrendDetail——只对total>0的柱子给点击
+ * 热区，没数据的柱子点了没反应 */
+export function TrendBarChart({ buckets, height = 180, selectedIndex = null, onSelectBucket }: TrendBarChartProps) {
   const top = 14
   const base = height - 40
   const maxVal = Math.max(1, ...buckets.map((b) => b.total))
@@ -54,6 +57,18 @@ export function TrendBarChart({ buckets, height = 180 }: TrendBarChartProps) {
               strokeDasharray="2,3"
             />
           ))}
+          {selectedIndex != null && (
+            <rect
+              x={10 + selectedIndex * GROUP_W - 4}
+              y={2}
+              width={BAR_W + 8}
+              height={base - 2}
+              rx={6}
+              fill="var(--color-primary-container)"
+              opacity={0.15}
+              pointerEvents="none"
+            />
+          )}
           {buckets.map((b, i) => {
             const x0 = 10 + i * GROUP_W
             let stackTop = base
@@ -71,6 +86,23 @@ export function TrendBarChart({ buckets, height = 180 }: TrendBarChartProps) {
               </g>
             )
           })}
+          {onSelectBucket &&
+            buckets.map((b, i) => {
+              if (b.total <= 0) return null
+              const x0 = 10 + i * GROUP_W
+              return (
+                <rect
+                  key={`hit-${b.key}`}
+                  x={x0 - 4}
+                  y={0}
+                  width={BAR_W + 8}
+                  height={height}
+                  fill="transparent"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => onSelectBucket(i)}
+                />
+              )
+            })}
         </svg>
       </div>
     </div>
