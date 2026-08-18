@@ -1,0 +1,92 @@
+name: Washi Ledger iOS 测试包(未签名 .ipa)
+
+# 手动触发,跟ios-test-build.yml同一套习惯：不跟着每次push自动跑(iOS编译在macOS
+# runner上跑得慢、还按10倍分钟数扣费)，只有真的要出一个新安装包测试的时候才手动点。
+#
+# 跟根目录那两个iOS workflow(ios-release.yml/ios-test-build.yml)的关键区别：那两个
+# 打包的是仓库根目录的旧版单文件index.html(www/build脚本就是复制index.html)，这个
+# 打包的是washi-ledger/子目录下这次重写的React App(webDir指向washi-ledger/dist)。
+# 两边App Bundle ID不一样(旧App是com.cidstevez01.jiazhangbu，这个是
+# com.cidstevez01.washiledger)，同一台设备上装两个互不冲突，方便对照测试。
+#
+# 现在还没有真实的washi-ledger App图标(design-assets里只有icon_specification_document.md
+# 这份规格文档，没有实际生成的图标文件)，这次先跳过capacitor-assets图标生成这一步，
+# 用Capacitor默认占位图标，等图标真的做出来了再补上这一步。
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build-unsigned-ipa:
+    runs-on: macos-14
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: washi-ledger
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 算版本号(washi-ledger/package.json的语义版本号 + Actions运行号当build号)
+        run: |
+          echo "APP_VERSION=$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
+          echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
+
+      - name: 安装依赖 + 构建网页产物(washi-ledger/dist)
+        run: |
+          npm ci
+          npm run build
+
+      - name: 生成iOS原生工程(washi-ledger/ios/不提交进仓库,每次CI都是全新生成)
+        run: npx cap add ios
+
+      - name: 锁定竖屏+写版本号(Info.plist每次CI全新生成,只能在这一步patch)
+        run: |
+          set -e
+          PLIST=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${APP_VERSION}" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${APP_BUILD_NUMBER}" "$PLIST"
+
+      - name: 同步网页内容+配置到原生工程
+        run: npx cap sync ios
+
+      - name: pod install
+        working-directory: washi-ledger/ios/App
+        run: pod install --repo-update
+
+      - name: 编译(不签名,签名这一步交给Sideloadly/AltStore用你自己的Apple ID在装机时现场做)
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE="" \
+            build
+
+      - name: 打包成.ipa(未签名)
+        run: |
+          set -e
+          PRODUCTS_DIR="ios/build/Build/Products/Release-iphoneos"
+          cd "$PRODUCTS_DIR"
+          mkdir -p Payload
+          cp -r App.app Payload/
+          zip -r "$GITHUB_WORKSPACE/washi-ledger/washi-ledger-unsigned-v${APP_VERSION}-${APP_BUILD_NUMBER}.ipa" Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: washi-ledger-unsigned-ipa-v${{ env.APP_VERSION }}-${{ env.APP_BUILD_NUMBER }}
+          path: washi-ledger/washi-ledger-unsigned-v${{ env.APP_VERSION }}-${{ env.APP_BUILD_NUMBER }}.ipa
+          retention-days: 14
