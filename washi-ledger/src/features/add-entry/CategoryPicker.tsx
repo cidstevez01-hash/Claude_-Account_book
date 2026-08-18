@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { addCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
+import { tintColor } from '../../lib/color'
 import type { Category } from '../../types'
 
 interface CategoryPickerProps {
@@ -12,10 +13,13 @@ interface CategoryPickerProps {
   onCatalogChanged: () => void
 }
 
-/** 两级分类选择器——一级横向滚动分类chip，二级细分3列网格，照design-assets-v2/_21的
- * Bento Layout做。自定义细分支持内联新增/改名/删除，照旧仓库index.html的renderSubGrid()
- * "⋯"菜单逻辑搬：胶囊本体点击=选中，右上角"⋯"收纳编辑/删除，预设细分没有这个菜单
- * (数据库is_preset=true，不允许改/删)。 */
+/** 两级分类选择器——一级4列网格(照旧App`.cat-grid`的真实布局，不是Stitch稿的横向
+ * 滚动chip；图标常态就带各自分类色的浅底+本色描边，不是只有选中才上色，同样照旧App
+ * `catObj.color`+`tintColor()`真实逻辑搬)，二级细分左对齐flex-wrap胶囊(照旧App
+ * `.sub-wrap`真实布局，Stitch稿写的"3列Bento网格"跟旧App实际不符，以旧App为准)。
+ * 自定义细分支持内联新增/改名/删除，照旧仓库index.html的renderSubGrid()"⋯"菜单逻辑搬：
+ * 胶囊本体点击=选中，右上角"⋯"收纳编辑/删除，预设细分没有这个菜单(数据库is_preset=true，
+ * 不允许改/删)。 */
 export function CategoryPicker({
   categories,
   selectedCatCode,
@@ -86,7 +90,7 @@ export function CategoryPicker({
       <div className="flex items-center justify-between px-md mb-sm">
         <h2 className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">分类</h2>
       </div>
-      <div className="flex overflow-x-auto px-md gap-sm pb-4 snap-x">
+      <div className="grid grid-cols-4 gap-sm px-md pb-4">
         {categories.map((cat) => {
           const active = cat.code === selectedCat?.code
           return (
@@ -94,20 +98,30 @@ export function CategoryPicker({
               key={cat.code}
               type="button"
               onClick={() => onSelectCat(cat.code)}
-              className="snap-start shrink-0 flex flex-col items-center justify-center gap-1 p-3 rounded-2xl min-w-[76px] border transition-colors"
+              className="flex flex-col items-center justify-center gap-1 py-2.5 px-1 rounded-2xl border-2 text-center transition-colors"
               style={
                 active
-                  ? { background: cat.color, borderColor: cat.color, color: '#fff' }
+                  ? { background: 'var(--color-primary-fixed)', borderColor: 'var(--color-primary)' }
                   : { background: 'var(--color-surface-container)', borderColor: 'var(--color-outline-variant)' }
               }
             >
               <span
-                className="material-symbols-outlined"
-                style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: tintColor(cat.color, 0.85) }}
               >
-                {cat.icon}
+                <span
+                  className="material-symbols-outlined text-[17px]"
+                  style={{ color: cat.color, fontVariationSettings: "'FILL' 1" }}
+                >
+                  {cat.icon}
+                </span>
               </span>
-              <span className="text-tab-label font-sans">{cat.zh}</span>
+              <span
+                className="text-[11px] font-sans truncate w-full"
+                style={{ color: active ? 'var(--color-primary)' : 'var(--color-on-surface-variant)', fontWeight: active ? 600 : 400 }}
+              >
+                {cat.zh}
+              </span>
             </button>
           )
         })}

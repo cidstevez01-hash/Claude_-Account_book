@@ -1,3 +1,4 @@
+import { tintColor } from '../../lib/color'
 import type { Category, Entry } from '../../types'
 
 interface EntryCardProps {
@@ -19,17 +20,17 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
     <div className="flex flex-col bg-surface-container-lowest rounded-lg mb-2 border border-outline-variant papercut-shadow overflow-hidden">
       <button type="button" className="flex items-center p-3 text-left" onClick={onToggle}>
         <div
-          className="w-[38px] h-[38px] rounded-full border-2 flex items-center justify-center bg-surface-container-highest mr-3 shrink-0"
-          style={{ borderColor: isIncome ? 'var(--color-secondary)' : 'var(--color-primary-container)' }}
+          className="w-[38px] h-[38px] rounded-full flex items-center justify-center mr-3 shrink-0"
+          style={{ background: category ? tintColor(category.color, 0.85) : 'var(--color-surface-container-highest)' }}
         >
           <span
             className="material-symbols-outlined text-xl"
             style={{
-              color: isIncome ? 'var(--color-secondary)' : 'var(--color-primary)',
+              color: category ? category.color : 'var(--color-on-surface-variant)',
               fontVariationSettings: "'FILL' 1",
             }}
           >
-            {isIncome ? 'payments' : category?.icon || 'category'}
+            {category?.icon || (isIncome ? 'payments' : 'category')}
           </span>
         </div>
         <div className="flex-1 min-w-0">
