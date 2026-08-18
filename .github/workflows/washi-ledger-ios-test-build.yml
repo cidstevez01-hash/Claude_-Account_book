@@ -9,9 +9,10 @@ name: Washi Ledger iOS 测试包(未签名 .ipa)
 # 两边App Bundle ID不一样(旧App是com.cidstevez01.jiazhangbu，这个是
 # com.cidstevez01.washiledger)，同一台设备上装两个互不冲突，方便对照测试。
 #
-# 现在还没有真实的washi-ledger App图标(design-assets里只有icon_specification_document.md
-# 这份规格文档，没有实际生成的图标文件)，这次先跳过capacitor-assets图标生成这一步，
-# 用Capacitor默认占位图标，等图标真的做出来了再补上这一步。
+# App图标已定稿(Stitch资产"Washi_Ledger_Final_App_Icon"，M-pig剪影复古红渐变+米色纸质
+# 背景)，源文件存在washi-ledger/assets/icon.jpg，design-assets/icons/washi-ledger-app-icon/
+# 下留了一份存档。这一步用capacitor-assets在CI里现生成iOS全套尺寸图标(不提交生成结果，
+# 跟ios/原生工程一样每次CI全新生成)。
 on:
   workflow_dispatch: {}
 
@@ -41,6 +42,9 @@ jobs:
 
       - name: 生成iOS原生工程(washi-ledger/ios/不提交进仓库,每次CI都是全新生成)
         run: npx cap add ios
+
+      - name: 生成App图标(源文件washi-ledger/assets/icon.jpg，Easy Mode单图生成全套iOS尺寸)
+        run: npx capacitor-assets generate --ios --iconBackgroundColor '#fff8f5' --iconBackgroundColorDark '#231a13'
 
       - name: 锁定竖屏+写版本号(Info.plist每次CI全新生成,只能在这一步patch)
         run: |
