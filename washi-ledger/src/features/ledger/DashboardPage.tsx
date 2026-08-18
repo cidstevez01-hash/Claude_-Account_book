@@ -20,7 +20,7 @@ import { APP_ICONS } from '../../lib/appIcons'
 import type { EntryType } from '../../types'
 
 export function DashboardPage() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { user } = useAuth()
   const { catalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
@@ -49,8 +49,8 @@ export function DashboardPage() {
     setMonthAnchor((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1))
 
   const summary = summarizeMonth(displayEntries, monthAnchor)
-  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor)
-  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor)
+  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor, lang)
+  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor, lang)
 
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return

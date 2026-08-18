@@ -123,7 +123,7 @@ export const dict = {
   ja: {
     appTitle: LEGACY_JA.appTitle,
     tabDashboard: LEGACY_JA.tabLedger, // 用户明确要求用"家計簿"，正好是旧App记账tab的日文
-    tabHistory: '明細', // 新App专属中文侧改了("出入金")，日文沿用旧App detailWord的措辞
+    tabHistory: LEGACY_JA.ledgerSectionTitle, // 旧App zh/ja都是"出入金"(中日通用汉字词，不是detailWord的"明細")
     tabStats: LEGACY_JA.tabStats,
     balanceLabel: LEGACY_JA.balanceLabel,
     monthIncome: LEGACY_JA.monthIncome,

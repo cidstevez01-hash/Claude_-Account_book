@@ -1,4 +1,5 @@
-import type { Category, Entry, EntryType, PaymentMethod } from '../types'
+import type { Category, Entry, EntryType, Lang, PaymentMethod } from '../types'
+import { catLabel, payLabel } from '../lib/catalogLabel'
 
 /** 图表配色兜底盘——照抄旧仓库index.html的CHART_PALETTE，分类有自己的color字段用不到这个，
  * 支付方式没有color字段，只有badge.bg(不是所有支付方式都设了badge)，没有badge时按顺序
@@ -44,7 +45,8 @@ export function categoryBreakdown(
   entries: Entry[],
   categories: Category[],
   type: EntryType,
-  ref: Date = new Date()
+  ref: Date = new Date(),
+  lang: Lang = 'zh'
 ): CategoryShare[] {
   const totals = new Map<string, number>()
   let grandTotal = 0
@@ -59,7 +61,7 @@ export function categoryBreakdown(
       const cat = categories.find((c) => c.code === catCode)
       return {
         catCode,
-        label: cat?.zh ?? catCode,
+        label: cat ? catLabel(cat, lang) : catCode,
         color: cat?.color ?? '#85736d',
         amount,
         ratio: amount / grandTotal,
@@ -87,7 +89,8 @@ export interface PaymentPointsShare {
 export function pointsBreakdownByPaymentMethod(
   entries: Entry[],
   paymentMethods: PaymentMethod[],
-  ref: Date = new Date()
+  ref: Date = new Date(),
+  lang: Lang = 'zh'
 ): PaymentPointsShare[] {
   const totals = new Map<string, number>()
   let grandTotal = 0
@@ -104,7 +107,7 @@ export function pointsBreakdownByPaymentMethod(
       const pm = paymentMethods.find((p) => p.code === payCode)
       return {
         payCode,
-        label: pm?.zh ?? payCode,
+        label: pm ? payLabel(pm, lang) : payCode,
         color: pm?.badge?.bg || CHART_PALETTE[idx % CHART_PALETTE.length],
         points,
         ratio: points / grandTotal,
@@ -142,7 +145,8 @@ function buildTrendBuckets(
   skeleton: { key: string; label: string }[],
   entries: Entry[],
   categories: Category[],
-  type: EntryType
+  type: EntryType,
+  lang: Lang
 ): TrendBucket[] {
   const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], detailSegments: [], total: 0 }))
   const byKey = new Map(buckets.map((b) => [b.key, b]))
@@ -162,7 +166,7 @@ function buildTrendBuckets(
     b.segments.sort((a, c) => c.value - a.value)
     b.segments.forEach((seg, idx) => {
       const cat = categories.find((c) => c.code === seg.key)
-      seg.label = cat?.zh ?? seg.key
+      seg.label = cat ? catLabel(cat, lang) : seg.key
       seg.color = cat?.color ?? CHART_PALETTE[idx % CHART_PALETTE.length]
     })
     b.detailSegments = b.segments
@@ -170,21 +174,34 @@ function buildTrendBuckets(
   return buckets
 }
 
-export function dailyTrendBuckets(entries: Entry[], categories: Category[], type: EntryType, year: number, month: number): TrendBucket[] {
+export function dailyTrendBuckets(
+  entries: Entry[],
+  categories: Category[],
+  type: EntryType,
+  year: number,
+  month: number,
+  lang: Lang = 'zh'
+): TrendBucket[] {
   const daysInMonth = new Date(year, month, 0).getDate()
   const skeleton = Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1
     return { key: `${year}-${pad2(month)}-${pad2(d)}`, label: String(d) }
   })
-  return buildTrendBuckets(skeleton, entries, categories, type)
+  return buildTrendBuckets(skeleton, entries, categories, type, lang)
 }
 
-export function monthlyTrendBuckets(entries: Entry[], categories: Category[], type: EntryType, year: number): TrendBucket[] {
+export function monthlyTrendBuckets(
+  entries: Entry[],
+  categories: Category[],
+  type: EntryType,
+  year: number,
+  lang: Lang = 'zh'
+): TrendBucket[] {
   const skeleton = Array.from({ length: 12 }, (_, i) => {
     const m = i + 1
     return { key: `${year}-${pad2(m)}`, label: `${m}月` }
   })
-  return buildTrendBuckets(skeleton, entries, categories, type)
+  return buildTrendBuckets(skeleton, entries, categories, type, lang)
 }
 
 /** 积分推移柱状图数据——照旧App renderPointsTrendChart()的简化模型：柱子本身只有一根
@@ -194,7 +211,8 @@ export function monthlyTrendBuckets(entries: Entry[], categories: Category[], ty
 function buildPointsTrendBuckets(
   skeleton: { key: string; label: string }[],
   entries: Entry[],
-  categories: Category[]
+  categories: Category[],
+  lang: Lang
 ): TrendBucket[] {
   const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], detailSegments: [], total: 0 }))
   const byKey = new Map(buckets.map((b) => [b.key, b]))
@@ -215,28 +233,39 @@ function buildPointsTrendBuckets(
     b.detailSegments.sort((a, c) => c.value - a.value)
     b.detailSegments.forEach((seg, idx) => {
       const cat = categories.find((c) => c.code === seg.key)
-      seg.label = cat?.zh ?? seg.key
+      seg.label = cat ? catLabel(cat, lang) : seg.key
       seg.color = cat?.color ?? CHART_PALETTE[idx % CHART_PALETTE.length]
     })
   }
   return buckets
 }
 
-export function dailyPointsTrendBuckets(entries: Entry[], categories: Category[], year: number, month: number): TrendBucket[] {
+export function dailyPointsTrendBuckets(
+  entries: Entry[],
+  categories: Category[],
+  year: number,
+  month: number,
+  lang: Lang = 'zh'
+): TrendBucket[] {
   const daysInMonth = new Date(year, month, 0).getDate()
   const skeleton = Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1
     return { key: `${year}-${pad2(month)}-${pad2(d)}`, label: String(d) }
   })
-  return buildPointsTrendBuckets(skeleton, entries, categories)
+  return buildPointsTrendBuckets(skeleton, entries, categories, lang)
 }
 
-export function monthlyPointsTrendBuckets(entries: Entry[], categories: Category[], year: number): TrendBucket[] {
+export function monthlyPointsTrendBuckets(
+  entries: Entry[],
+  categories: Category[],
+  year: number,
+  lang: Lang = 'zh'
+): TrendBucket[] {
   const skeleton = Array.from({ length: 12 }, (_, i) => {
     const m = i + 1
     return { key: `${year}-${pad2(m)}`, label: `${m}月` }
   })
-  return buildPointsTrendBuckets(skeleton, entries, categories)
+  return buildPointsTrendBuckets(skeleton, entries, categories, lang)
 }
 
 export interface TrendLegendItem {

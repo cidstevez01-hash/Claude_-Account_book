@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { addCustomTag, updateCustomTag, deleteCustomTag } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
+import { tagLabel } from '../../lib/catalogLabel'
 import type { EntryType, Tag } from '../../types'
 
 interface TagPickerProps {
@@ -16,7 +17,7 @@ interface TagPickerProps {
  * 自定义标签支持内联新增/改名/删除，逻辑照旧仓库index.html的renderTagGrid()搬；
  * 预设标签(is_preset=true)显示锁形小图标，不给编辑/删除入口 */
 export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, onCatalogChanged }: TagPickerProps) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [editingCode, setEditingCode] = useState<string | null>(null) // tag.id 或 '__new__'
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
@@ -104,7 +105,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                       : 'bg-surface-container text-on-surface-variant border-outline-variant'
                   }`}
                 >
-                  #{tag.zh}
+                  #{tagLabel(tag, lang)}
                 </button>
                 <button
                   type="button"
@@ -122,7 +123,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                 <div className="absolute z-20 top-full left-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden">
                   <button
                     type="button"
-                    onClick={() => startEdit(tag.id, tag.zh)}
+                    onClick={() => startEdit(tag.id, tagLabel(tag, lang))}
                     className="flex items-center gap-2 px-3 py-2 text-body-md text-on-surface whitespace-nowrap w-full"
                   >
                     <span className="material-symbols-outlined text-[16px]">edit</span>
@@ -152,7 +153,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                 : 'bg-surface-container text-on-surface-variant border-outline-variant'
             }`}
           >
-            #{tag.zh}
+            #{tagLabel(tag, lang)}
           </button>
         )
       })}

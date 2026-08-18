@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { addCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
+import { catLabel, subLabel } from '../../lib/catalogLabel'
 import type { Category } from '../../types'
 
 interface CategoryPickerProps {
@@ -30,7 +31,7 @@ export function CategoryPicker({
   userId,
   onCatalogChanged,
 }: CategoryPickerProps) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const selectedCat = categories.find((c) => c.code === selectedCatCode) ?? categories[0] ?? null
   const subs = selectedCat?.subs ?? []
 
@@ -122,7 +123,7 @@ export function CategoryPicker({
                 className="text-[11px] font-sans truncate w-full"
                 style={{ color: active ? 'var(--color-primary)' : 'var(--color-on-surface-variant)', fontWeight: active ? 600 : 400 }}
               >
-                {cat.zh}
+                {catLabel(cat, lang)}
               </span>
             </button>
           )
@@ -163,7 +164,7 @@ export function CategoryPicker({
                           : 'border-outline-variant bg-surface-container text-on-surface-variant'
                       }`}
                     >
-                      {sub.zh}
+                      {subLabel(sub, lang)}
                     </button>
                     <button
                       type="button"
@@ -179,7 +180,7 @@ export function CategoryPicker({
                     <div className="absolute z-20 top-full left-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden">
                       <button
                         type="button"
-                        onClick={() => startEdit(sub.id, sub.zh)}
+                        onClick={() => startEdit(sub.id, subLabel(sub, lang))}
                         className="flex items-center gap-2 px-3 py-2 text-body-md text-on-surface whitespace-nowrap w-full"
                       >
                         <span className="material-symbols-outlined text-[16px]">edit</span>
@@ -209,7 +210,7 @@ export function CategoryPicker({
                     : 'border-outline-variant bg-surface-container text-on-surface-variant'
                 }`}
               >
-                {sub.zh}
+                {subLabel(sub, lang)}
               </button>
             )
           })}

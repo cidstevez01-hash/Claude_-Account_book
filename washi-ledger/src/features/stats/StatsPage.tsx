@@ -68,7 +68,7 @@ function pad2(n: number): string {
  * 仍简化成单月导航
  */
 export function StatsPage() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const navigate = useNavigate()
   const { user } = useAuth()
   const { catalog } = useCatalog()
@@ -95,9 +95,9 @@ export function StatsPage() {
   )
 
   const summary = summarizeMonth(displayEntries, monthAnchor)
-  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor)
-  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor)
-  const pointsShares = pointsBreakdownByPaymentMethod(entries, paymentMethods, monthAnchor)
+  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor, lang)
+  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor, lang)
+  const pointsShares = pointsBreakdownByPaymentMethod(entries, paymentMethods, monthAnchor, lang)
 
   const now = new Date()
 
@@ -110,8 +110,8 @@ export function StatsPage() {
   const [selectedTrendIdx, setSelectedTrendIdx] = useState<number | null>(null)
   const trendBuckets =
     trendDim === 'day'
-      ? dailyTrendBuckets(displayEntries, categories, trendType, trendDayYear, trendDayMonth)
-      : monthlyTrendBuckets(displayEntries, categories, trendType, trendMonthYear)
+      ? dailyTrendBuckets(displayEntries, categories, trendType, trendDayYear, trendDayMonth, lang)
+      : monthlyTrendBuckets(displayEntries, categories, trendType, trendMonthYear, lang)
   const trendPeriodLabel = trendDim === 'day' ? `${trendDayYear}年${trendDayMonth}月` : `${trendMonthYear}年`
   const trendAggregate = useMemo(() => aggregateTrendSegments(trendBuckets), [trendBuckets])
 
@@ -142,8 +142,8 @@ export function StatsPage() {
   const [selectedPointsTrendIdx, setSelectedPointsTrendIdx] = useState<number | null>(null)
   const pointsTrendBuckets =
     pointsTrendDim === 'day'
-      ? dailyPointsTrendBuckets(entries, categories, pointsDayYear, pointsDayMonth)
-      : monthlyPointsTrendBuckets(entries, categories, pointsMonthYear)
+      ? dailyPointsTrendBuckets(entries, categories, pointsDayYear, pointsDayMonth, lang)
+      : monthlyPointsTrendBuckets(entries, categories, pointsMonthYear, lang)
   const pointsTrendPeriodLabel =
     pointsTrendDim === 'day' ? `${pointsDayYear}年${pointsDayMonth}月` : `${pointsMonthYear}年`
 

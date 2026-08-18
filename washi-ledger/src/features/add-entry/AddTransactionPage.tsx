@@ -9,6 +9,7 @@ import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { upsertEntry, resolvePointRate } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
+import { payLabel } from '../../lib/catalogLabel'
 import type { Entry, EntryType } from '../../types'
 
 function todayStr() {
@@ -22,7 +23,7 @@ function todayStr() {
  * 标签(TagPicker)的内联新增改名删除也已经接上了，逻辑照旧App renderSubGrid/
  * renderTagGrid的"⋯"菜单搬。 */
 export function AddTransactionPage() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const editId = searchParams.get('editId')
@@ -257,7 +258,7 @@ export function AddTransactionPage() {
                   }`}
                 >
                   <PaymentMethodIcon method={pm} size={18} />
-                  {pm.zh}
+                  {payLabel(pm, lang)}
                 </button>
               )
             })}

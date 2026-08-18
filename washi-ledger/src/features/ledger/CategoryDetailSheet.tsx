@@ -4,6 +4,7 @@ import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from './EntryCard'
 import { dayLabel } from './dayLabel'
 import { useI18n } from '../../lib/i18n'
+import { catLabel } from '../../lib/catalogLabel'
 import type { Category, Entry } from '../../types'
 
 interface CategoryDetailSheetProps {
@@ -35,7 +36,7 @@ export function CategoryDetailSheet({
   onCopy,
   onDelete,
 }: CategoryDetailSheetProps) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   if (!open || !category) return null
@@ -52,7 +53,7 @@ export function CategoryDetailSheet({
             <span className="material-symbols-outlined" style={{ color: category.color }}>
               {category.icon}
             </span>
-            <h2 className="font-serif text-headline-md text-on-surface">{category.zh}</h2>
+            <h2 className="font-serif text-headline-md text-on-surface">{catLabel(category, lang)}</h2>
           </div>
           <button type="button" aria-label={t('closeAria')} onClick={onClose} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
             <span className="material-symbols-outlined">close</span>

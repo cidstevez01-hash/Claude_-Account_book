@@ -4,6 +4,8 @@ import merpayLogo from '../../assets/payment-brands/pm-merpay.png'
 import paidyLogo from '../../assets/payment-brands/pm-paidy.png'
 import suicaLogo from '../../assets/payment-brands/pm-suica.png'
 import { mapGenericPaymentMethodIcon } from '../../lib/iconMap'
+import { useI18n } from '../../lib/i18n'
+import { payLabel } from '../../lib/catalogLabel'
 import type { PaymentMethod } from '../../types'
 
 // 品牌logo原样保留(不走Material Symbols字体)——照旧仓库index.html的BRAND_LOGO_RASTER/
@@ -23,6 +25,7 @@ interface PaymentMethodIconProps {
 }
 
 export function PaymentMethodIcon({ method, size = 20 }: PaymentMethodIconProps) {
+  const { lang } = useI18n()
   // 有徽章配置(badge_bg/badge_text)的优先显示徽章——照旧仓库pmIconHtml()的优先级
   if (method.badge) {
     return (
@@ -39,7 +42,7 @@ export function PaymentMethodIcon({ method, size = 20 }: PaymentMethodIconProps)
     return (
       <img
         src={brandLogo}
-        alt={method.zh}
+        alt={payLabel(method, lang)}
         className="shrink-0 rounded-sm object-contain"
         style={{ width: size, height: size }}
       />

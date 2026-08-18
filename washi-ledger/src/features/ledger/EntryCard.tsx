@@ -1,6 +1,7 @@
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { formatCurrency } from '../../data/currencyDisplay'
+import { catLabel, subLabel } from '../../lib/catalogLabel'
 import type { Category, Entry } from '../../types'
 
 interface EntryCardProps {
@@ -17,11 +18,16 @@ interface EntryCardProps {
  * "Expanded Action Drawer"实现。仪表盘的最近记录列表和明细页的完整列表共用这个组件，
  * 避免同一段UI在两个页面各写一遍。 */
 export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy, onDelete }: EntryCardProps) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const isIncome = entry.type === 'income'
-  // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)
+  // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)；
+  // 名字按当前语言取(catLabel/subLabel)，不是硬编码.zh
   const sub = category?.subs.find((s) => s.code === entry.subCode)
-  const title = category ? (sub ? `${category.zh} · ${sub.zh}` : category.zh) : entry.note || '—'
+  const title = category
+    ? sub
+      ? `${catLabel(category, lang)} · ${subLabel(sub, lang)}`
+      : catLabel(category, lang)
+    : entry.note || '—'
   return (
     <div className="flex flex-col bg-surface-container-lowest rounded-lg mb-2 border border-outline-variant papercut-shadow overflow-hidden">
       <button type="button" className="flex items-center p-3 text-left" onClick={onToggle}>
