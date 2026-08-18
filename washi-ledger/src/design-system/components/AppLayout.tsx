@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -31,7 +32,13 @@ export function AppLayout({ title, children, showMenuButton = true }: AppLayoutP
         <h1 className="font-serif text-headline-lg font-bold text-primary tracking-tight">
           {title}
         </h1>
-        <div className="w-10" />
+        <Link
+          to="/account"
+          aria-label="我的账户"
+          className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
+        >
+          <span className="material-symbols-outlined">{APP_ICONS.account}</span>
+        </Link>
       </header>
 
       <main className="flex-1 pb-32">{children}</main>

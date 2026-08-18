@@ -29,6 +29,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
                     border-r-[1.5px] border-dashed border-outline-variant shadow-xl
                     flex flex-col overflow-y-auto transition-transform duration-300 ease-out
                     ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <nav className="flex-1 py-sm flex flex-col font-body-lg text-body-lg text-on-surface">
           {links.map((link) => (

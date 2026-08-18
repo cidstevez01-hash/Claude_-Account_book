@@ -130,6 +130,12 @@ body {
   background-color: var(--color-background);
   color: var(--color-on-background);
   -webkit-tap-highlight-color: transparent;
+  /* capacitor.config.json里iOS的contentInset设成了"never"(webview不会自动让出
+     状态栏/灵动岛区域)，所以页面顶部要自己用safe-area-inset-top让出空间——
+     不然sticky/普通流内容会被压在状态栏底下，视觉上看着有间距、实际点不到
+     (真机才暴露的坑，模拟器/浏览器预览不会复现)。fixed定位元素不受body padding
+     影响，NavDrawer单独处理。 */
+  padding-top: env(safe-area-inset-top);
 }
 
 #root {
