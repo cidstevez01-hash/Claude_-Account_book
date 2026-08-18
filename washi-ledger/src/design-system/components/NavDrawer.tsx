@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { APP_ICONS } from '../../lib/appIcons'
+import { useAuth } from '../../features/auth/useAuth'
 
 interface NavDrawerProps {
   open: boolean
@@ -16,6 +17,8 @@ const links = [
 ]
 
 export function NavDrawer({ open, onClose }: NavDrawerProps) {
+  const { user } = useAuth()
+
   return (
     <>
       <div
@@ -31,6 +34,17 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
                     ${open ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
+        <div className="flex items-center gap-sm p-md border-b-[1.5px] border-dashed border-outline-variant">
+          <div className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-2xl text-primary">
+              {user ? 'account_circle' : 'menu_book'}
+            </span>
+          </div>
+          <div className="min-w-0">
+            <p className="font-serif text-headline-md text-primary leading-tight">Washi Ledger</p>
+            <p className="text-body-md text-on-surface-variant truncate">{user ? user.email : '未登录'}</p>
+          </div>
+        </div>
         <nav className="flex-1 py-sm flex flex-col font-body-lg text-body-lg text-on-surface">
           {links.map((link) => (
             <NavLink

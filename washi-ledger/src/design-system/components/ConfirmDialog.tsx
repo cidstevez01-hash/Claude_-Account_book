@@ -6,10 +6,15 @@ interface ConfirmDialogProps {
   cancelLabel?: string
   onConfirm: () => void
   onCancel: () => void
+  /** Material Symbols图标名，默认'delete'(删除确认场景) */
+  icon?: string
+  /** 顶部图标底色，默认'error'(删除这类破坏性操作)。退出登录这类中性操作用'neutral' */
+  tone?: 'error' | 'neutral'
 }
 
 /** 通用确认弹窗——照design-assets-v2/_43(Confirm Delete)做，替换掉仪表盘/明细页
- * 删除记录时原本用的原生window.confirm()占位实现 */
+ * 删除记录时原本用的原生window.confirm()占位实现。icon/tone两个可选参数是后来
+ * 加的，让这个弹窗也能给退出登录这类非破坏性确认场景复用，不用再单独做一个组件 */
 export function ConfirmDialog({
   open,
   title,
@@ -18,6 +23,8 @@ export function ConfirmDialog({
   cancelLabel = '取消',
   onConfirm,
   onCancel,
+  icon = 'delete',
+  tone = 'error',
 }: ConfirmDialogProps) {
   if (!open) return null
 
@@ -25,9 +32,13 @@ export function ConfirmDialog({
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-md">
       <div className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[4px]" onClick={onCancel} />
       <div className="relative z-10 w-full max-w-[360px] bg-surface rounded-[20px] shadow-xl flex flex-col items-center p-lg">
-        <div className="w-16 h-16 rounded-full bg-error-container text-on-error-container flex items-center justify-center mb-md">
+        <div
+          className={`w-16 h-16 rounded-full flex items-center justify-center mb-md ${
+            tone === 'error' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-primary'
+          }`}
+        >
           <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-            delete
+            {icon}
           </span>
         </div>
         <h2 className="font-serif text-headline-md text-on-surface mb-1 text-center">{title}</h2>

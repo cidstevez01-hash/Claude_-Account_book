@@ -1,27 +1,27 @@
+import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { useAuth } from '../auth/useAuth'
-import { useEntries } from '../../hooks/useEntries'
 import { supabase } from '../../lib/supabase'
-
-function daysSince(iso: string): number {
-  const start = new Date(iso).getTime()
-  return Math.max(0, Math.floor((Date.now() - start) / (1000 * 60 * 60 * 24)))
-}
 
 /** 我的账户——照design-assets-v2/_30/_31/_32的头像+列表布局做，但去掉了"Pro"徽章、
  * "Premium Subscription"、"Data Backup & Sync"这些设计稿里虚构的功能(我们的数据模型
- * 里没有会员/订阅这回事)。统计区块换成真实能算出来的数字：加入天数(从supabase auth
- * 的user.created_at算)、记录数(entries.length)，不是编的假数据。
+ * 里没有会员/订阅这回事)。"加入天数"/"记录数"这两个统计原本是补的真实数据(不是编的假
+ * 数据)，但用户看了反馈不需要，已去掉——这个页面不用再拉entries了。
  *
  * "Change Password"这个入口(_29)也没做——旧仓库index.html的真实云同步功能里根本没有
- * 改密码这个功能(只有登录/注册/退出登录三个)，不能凭空做一个没有实现的按钮 */
+ * 改密码这个功能(只有登录/注册/退出登录三个)，不能凭空做一个没有实现的按钮
+ *
+ * 退出登录要有确认弹窗，避免误触(退出登录不会清空本地缓存的账目数据，见useEntries.ts
+ * 里的真实缓存/同步逻辑，退出后账目照样能正常看) */
 export function AccountPage() {
   const navigate = useNavigate()
   const { user, loading } = useAuth()
-  const { entries } = useEntries(user?.id ?? null)
+  const [confirmSignOut, setConfirmSignOut] = useState(false)
 
   async function handleSignOut() {
+    setConfirmSignOut(false)
     await supabase.auth.signOut()
     navigate('/')
   }
@@ -55,37 +55,35 @@ export function AccountPage() {
 
   return (
     <AppLayout title="我的账户">
-      <div className="flex flex-col items-center px-md pt-lg pb-md">
+      <div className="flex flex-col items-center px-md pt-lg pb-lg">
         <div className="w-20 h-20 rounded-full border-2 border-primary flex items-center justify-center mb-3">
           <span className="material-symbols-outlined text-4xl text-primary">account_circle</span>
         </div>
-        <h2 className="font-serif text-headline-md text-on-surface">{user.email}</h2>
+        <h2 className="text-body-md text-on-surface-variant">{user.email}</h2>
       </div>
 
-      <div className="flex justify-around px-md py-md border-y border-dashed border-outline-variant mb-md">
-        <div className="text-center">
-          <p className="text-label-caps font-sans text-on-surface-variant uppercase">加入天数</p>
-          <p className="font-serif text-stat-figure text-primary">{daysSince(user.created_at)}</p>
-        </div>
-        <div className="w-px bg-outline-variant" />
-        <div className="text-center">
-          <p className="text-label-caps font-sans text-on-surface-variant uppercase">记录数</p>
-          <p className="font-serif text-stat-figure text-primary">{entries.length}</p>
-        </div>
-      </div>
-
-      <div className="px-md flex flex-col gap-2">
+      <div className="flex justify-center px-md">
         <button
           type="button"
-          onClick={handleSignOut}
-          className="w-full flex items-center gap-sm p-sm rounded-lg border border-primary/40 text-primary"
+          onClick={() => setConfirmSignOut(true)}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-primary/40 text-primary text-body-md active:opacity-60 transition-opacity"
         >
-          <div className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
-            <span className="material-symbols-outlined">logout</span>
-          </div>
-          <span className="text-body-lg">退出登录</span>
+          <span className="material-symbols-outlined text-[18px]">logout</span>
+          退出登录
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmSignOut}
+        title="确定要退出登录吗？"
+        message="退出登录后仍可以查看本机已缓存的账目，重新登录后会自动与云端同步。"
+        confirmLabel="退出登录"
+        cancelLabel="取消"
+        icon="logout"
+        tone="neutral"
+        onConfirm={handleSignOut}
+        onCancel={() => setConfirmSignOut(false)}
+      />
     </AppLayout>
   )
 }

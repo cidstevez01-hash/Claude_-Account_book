@@ -245,6 +245,15 @@ export async function deleteEntry(id: string, userId: string) {
   if (error) throw error
 }
 
+/** 登录时如果云端还没有账目数据(全新账号/数据库还没数据)，把本地缓存现有的记录批量
+ * 推上去做种子数据——照旧仓库index.html的handleCloudSignedIn()真实逻辑
+ * (pushEntriesBulkUpsert)，不是简单互相覆盖 */
+export async function pushEntriesBulkUpsert(entries: Entry[], userId: string) {
+  if (entries.length === 0) return
+  const { error } = await supabase.from('entries').upsert(entries.map((e) => entryToDbRow(e, userId)))
+  if (error) throw error
+}
+
 /** 自定义细分/标签的新增/改名/删除——逻辑照抄旧仓库index.html的addCustomSub/
  * updateCustomSub/deleteCustomSub(细分)和addCustomTag/updateCustomTag/deleteCustomTag
  * (标签)。预设的(is_preset=true)不允许改/删，这几个函数只处理is_preset=false的自定义项，

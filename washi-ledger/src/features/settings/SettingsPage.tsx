@@ -4,6 +4,7 @@ import { useAuth } from '../auth/useAuth'
 import { useSettings } from '../../hooks/useSettings'
 import { useI18n } from '../../lib/i18n'
 import { APP_ICONS } from '../../lib/appIcons'
+import { CURRENCIES } from '../../data/rate'
 import type { Lang } from '../../types'
 
 interface SettingsRowProps {
@@ -32,11 +33,50 @@ function SettingsRow({ icon, label, children, onClick }: SettingsRowProps) {
   )
 }
 
+/** 设置项右侧的下拉选择——照design-assets-v2/_18的真实结构用原生<select>(不是自己拼
+ * 按钮组)，因为货币这类选项不止两个(CURRENCIES有11种)，按钮组这种"每个选项一个按钮"
+ * 的样式选项一多就会挤成一团；<select>本身就是给"任意数量选项"设计的控件，iOS上点开
+ * 是系统原生的滚轮选择器，样式上只去掉默认的箭头图案换成Material Symbols的箭头图标，
+ * 跟这一排其他行的图标风格统一 */
+function SelectRow({
+  icon,
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  icon: string
+  label: string
+  value: string
+  options: { value: string; label: string }[]
+  onChange: (value: string) => void
+}) {
+  return (
+    <SettingsRow icon={icon} label={label}>
+      <div className="relative flex items-center">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="appearance-none bg-transparent border-none text-body-md text-on-surface-variant focus:outline-none focus:ring-0 pr-5 text-right cursor-pointer"
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <span className="material-symbols-outlined text-[16px] pointer-events-none absolute right-0">expand_more</span>
+      </div>
+    </SettingsRow>
+  )
+}
+
 /** 设置页——照design-assets-v2/_18的列表布局做。Currency这项虽然真实存进
  * user_settings.currency(照旧App pushSettingsUpsert逻辑)，但仪表盘/记一笔页
  * 目前还是硬编码显示CNY，还没接到这个设置上——多币种金额展示是更大的一块
- * 工作，这次先只做设置本身的存取，跟数据联动留到以后。Theme这次只有一套
- * Washi Ledger视觉，先做成不可交互的占位行(照types.ts里ThemeSkin的注释) */
+ * 工作，这次先只做设置本身的存取，跟数据联动留到以后。Theme目前只有一套
+ * Washi Ledger视觉，点进去是/theme子页面(照design-assets-v2/_25的Bento卡片
+ * 布局)，只展示这一张真实存在的主题卡，没有编另外几张假主题 */
 export function SettingsPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -51,42 +91,30 @@ export function SettingsPage() {
   return (
     <AppLayout title="设置">
       <div className="px-md pt-md flex flex-col gap-2">
-        <SettingsRow icon="language" label="语言">
-          <div className="flex gap-1">
-            {(['zh', 'ja'] as const).map((l) => (
-              <button
-                key={l}
-                type="button"
-                onClick={() => handleLangChange(l)}
-                className={`px-2 py-1 rounded text-tab-label font-sans ${
-                  lang === l ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant'
-                }`}
-              >
-                {l === 'zh' ? '中文' : '日本語'}
-              </button>
-            ))}
-          </div>
-        </SettingsRow>
+        <SelectRow
+          icon="language"
+          label="语言"
+          value={lang}
+          onChange={(v) => handleLangChange(v as Lang)}
+          options={[
+            { value: 'zh', label: '中文' },
+            { value: 'ja', label: '日本語' },
+          ]}
+        />
 
-        <SettingsRow icon="payments" label="货币">
-          <div className="flex gap-1">
-            {(['CNY', 'JPY'] as const).map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => update({ currency: c })}
-                className={`px-2 py-1 rounded text-tab-label font-sans ${
-                  settings.currency === c ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant'
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </SettingsRow>
+        <SelectRow
+          icon="payments"
+          label="货币"
+          value={settings.currency}
+          onChange={(v) => update({ currency: v })}
+          options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.zh} (${c.code})` }))}
+        />
 
-        <SettingsRow icon="palette" label="主题">
-          <span>Washi Ledger</span>
+        <SettingsRow icon="palette" label="主题" onClick={() => navigate('/theme')}>
+          <div className="flex items-center gap-1">
+            <span>Washi Ledger</span>
+            <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+          </div>
         </SettingsRow>
 
         <SettingsRow icon={APP_ICONS.account} label="我的账户" onClick={() => navigate('/account')}>

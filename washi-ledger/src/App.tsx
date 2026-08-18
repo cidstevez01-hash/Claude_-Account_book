@@ -6,6 +6,7 @@ import { StatsPage } from './features/stats/StatsPage'
 import { AddTransactionPage } from './features/add-entry/AddTransactionPage'
 import { RatePage } from './features/rate/RatePage'
 import { SettingsPage } from './features/settings/SettingsPage'
+import { ThemePage } from './features/settings/ThemePage'
 import { AccountPage } from './features/account/AccountPage'
 import { SignInPage } from './features/auth/SignInPage'
 import { SignUpPage } from './features/auth/SignUpPage'
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/add" element={<AddTransactionPage />} />
           <Route path="/rate" element={<RatePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/theme" element={<ThemePage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/register" element={<SignUpPage />} />
