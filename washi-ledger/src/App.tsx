@@ -3,6 +3,7 @@ import { I18nProvider } from './lib/i18n'
 import { DashboardPage } from './features/ledger/DashboardPage'
 import { HistoryPage } from './features/history/HistoryPage'
 import { StatsPage } from './features/stats/StatsPage'
+import { AddTransactionPage } from './features/add-entry/AddTransactionPage'
 import { PlaceholderPage } from './design-system/components/PlaceholderPage'
 
 export default function App() {
@@ -13,7 +14,7 @@ export default function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/stats" element={<StatsPage />} />
-          <Route path="/add" element={<PlaceholderPage title="记一笔" note="照_21(功能全开版)做：级联分类+支付方式+标签+积分" />} />
+          <Route path="/add" element={<AddTransactionPage />} />
           <Route path="/rate" element={<PlaceholderPage title="汇率换算" note="照_6/_35做" />} />
           <Route path="/settings" element={<PlaceholderPage title="设置" note="照_18做" />} />
           <Route path="/account" element={<PlaceholderPage title="我的账户" note="照_30/_31/_32做" />} />
