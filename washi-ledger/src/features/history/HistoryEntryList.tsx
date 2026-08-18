@@ -41,7 +41,7 @@ export function HistoryEntryList({ entries, categories, onEdit, onCopy, onDelete
               </span>
               <span
                 className="font-serif text-stat-figure"
-                style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-on-surface-variant)' }}
+                style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
               >
                 {dayNet >= 0 ? '+' : '-'}¥{Math.abs(dayNet).toLocaleString()}
               </span>

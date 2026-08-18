@@ -39,7 +39,7 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
         </div>
         <p
           className="font-serif text-entry-amount shrink-0 ml-2"
-          style={{ color: isIncome ? 'var(--color-secondary)' : 'var(--color-on-surface)' }}
+          style={{ color: isIncome ? 'var(--color-secondary)' : 'var(--color-primary)' }}
         >
           {isIncome ? '+' : '-'}¥{entry.amount.toLocaleString()}
         </p>

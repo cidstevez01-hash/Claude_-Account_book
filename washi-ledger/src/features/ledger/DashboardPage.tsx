@@ -63,6 +63,7 @@ export function DashboardPage() {
         expenseShares={expenseShares}
         incomeShares={incomeShares}
         onSelectCategory={(catCode, type) => setDetailSelection({ catCode, type })}
+        resetKey={monthLabel}
       />
       <RecentEntriesList
         entries={entries}

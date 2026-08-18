@@ -212,7 +212,7 @@ export function StatsPage() {
               <p className="font-serif text-stat-figure text-primary">¥{summary.expense.toLocaleString()}</p>
             </div>
           </div>
-          <CategoryDonutCard expenseShares={expenseShares} incomeShares={incomeShares} />
+          <CategoryDonutCard expenseShares={expenseShares} incomeShares={incomeShares} resetKey={monthLabel} />
 
           <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
             <div className="flex items-center justify-between mb-sm">
@@ -243,12 +243,13 @@ export function StatsPage() {
               selectedBucket={selectedTrendIdx != null ? trendBuckets[selectedTrendIdx] : null}
               onSelectCategory={(catCode) => setDetailCatCode(catCode)}
               onClosePoint={() => setSelectedTrendIdx(null)}
+              resetKey={`${trendDim}-${trendType}-${trendPeriodLabel}`}
             />
           </section>
         </>
       ) : (
         <>
-          <PointsDonutCard shares={pointsShares} />
+          <PointsDonutCard shares={pointsShares} resetKey={monthLabel} />
 
           <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
             <h3 className="font-serif text-headline-md text-on-surface mb-sm">还元(获得积分)推移</h3>

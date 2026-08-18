@@ -1,14 +1,17 @@
 import { DonutRing } from '../../design-system/components/DonutRing'
+import { ScrollLegendList } from '../../design-system/components/ScrollLegendList'
 import type { PaymentPointsShare } from '../../data/summary'
 
 interface PointsDonutCardProps {
   shares: PaymentPointsShare[]
+  /** 数据源整体切换时(比如翻月)传一个变化的值进来，图例滚动位置跟着回到顶部 */
+  resetKey?: string | number
 }
 
 /** 积分内訳(按支付方式)——照旧仓库index.html的renderPointsDonut()真实逻辑做，不是
  * Stitch设计稿_39/_42里那个虚构的"Shopping Rewards/Travel Redemptions"分类(数据库里
  * 没有这个维度，积分数据只挂在支付方式上，不能瞎编一套假分类出来) */
-export function PointsDonutCard({ shares }: PointsDonutCardProps) {
+export function PointsDonutCard({ shares, resetKey }: PointsDonutCardProps) {
   const total = shares.reduce((sum, s) => sum + s.points, 0)
 
   return (
@@ -27,21 +30,23 @@ export function PointsDonutCard({ shares }: PointsDonutCardProps) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-y-2 w-full px-2 mt-2">
-            {shares.map((share) => (
-              <div
-                key={share.payCode}
-                className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30"
-              >
-                <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
-                <span className="text-body-md text-on-surface flex-1">{share.label}</span>
-                <span className="text-stat-figure text-xs text-on-surface-variant mr-4">
-                  {Math.round(share.ratio * 100)}%
-                </span>
-                <span className="font-serif text-stat-figure text-on-surface">+{share.points.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
+          <ScrollLegendList key={resetKey}>
+            <div className="flex flex-col gap-y-2 w-full px-2 mt-2">
+              {shares.map((share) => (
+                <div
+                  key={share.payCode}
+                  className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30"
+                >
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
+                  <span className="text-body-md text-on-surface flex-1">{share.label}</span>
+                  <span className="text-stat-figure text-xs text-on-surface-variant mr-4">
+                    {Math.round(share.ratio * 100)}%
+                  </span>
+                  <span className="font-serif text-stat-figure text-on-surface">+{share.points.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </ScrollLegendList>
         </div>
       )}
     </section>
