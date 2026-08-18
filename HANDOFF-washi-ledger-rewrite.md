@@ -74,7 +74,7 @@ washi-ledger/
 
 ## 版本号/分支/CI
 
-- 版本号：`washi-ledger/package.json`的`version`字段，独立于旧App`index.html`的`APP_VERSION`体系，当前`v0.1.0`，记录见`VERSIONS.md`「Washi Ledger重写」一节
+- 版本号：`washi-ledger/package.json`的`version`字段，还没合并/正式发布过，所以沿用"开发分支不用干净`vX.Y.Z`"的规则，格式是`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`(semver prerelease语法承载`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`)，当前`0.0.0-20260818-dev.1`，等真正合并/发布才跳到干净`vMAJOR.MINOR.PATCH`。记录见`VERSIONS.md`「Washi Ledger重写」一节
 - 分支：`washi-ledger-rewrite`，已推送到远程，对`claude/upload-project-github-ww338s`开了PR #1
 - CI：`.github/workflows/washi-ledger-ci.yml`(push/PR改到`washi-ledger/**`时自动typecheck+build)、`.github/workflows/washi-ledger-ios-test-build.yml`(手动触发，出未签名ipa，appId跟旧App的原生打包互不冲突)
 - 每次改动的详细记录见`DEVLOG.md`里`washi-ledger-rewrite`分支那几行（跟`accountbook-YYYYMMDD`那条主线分开记录，见`DEVLOG.md`顶部的说明）
