@@ -5,6 +5,7 @@ import { HistoryPage } from './features/history/HistoryPage'
 import { StatsPage } from './features/stats/StatsPage'
 import { AddTransactionPage } from './features/add-entry/AddTransactionPage'
 import { RatePage } from './features/rate/RatePage'
+import { SettingsPage } from './features/settings/SettingsPage'
 import { PlaceholderPage } from './design-system/components/PlaceholderPage'
 
 export default function App() {
@@ -17,7 +18,7 @@ export default function App() {
           <Route path="/stats" element={<StatsPage />} />
           <Route path="/add" element={<AddTransactionPage />} />
           <Route path="/rate" element={<RatePage />} />
-          <Route path="/settings" element={<PlaceholderPage title="设置" note="照_18做" />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/account" element={<PlaceholderPage title="我的账户" note="照_30/_31/_32做" />} />
           <Route path="/about" element={<PlaceholderPage title="关于" note="照_19做" />} />
         </Routes>
