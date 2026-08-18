@@ -60,6 +60,7 @@ git checkout <对应提交> -- index.html
 |---|---|---|---|
 | 20260818-dev.1 | 2026-08-18 | 十个正式页面全部落地：仪表盘、明细、统计(收支/积分双栏+趋势柱状图)、记一笔(两级分类+支付方式+标签+积分自动计算)、汇率换算(多货币)、设置、我的账户、登录、注册、关于；另加分类明细钻取、确认删除弹窗、自定义细分/标签内联新增改名删除、web端CI(`washi-ledger-ci.yml`)、iOS测试包打包workflow(`washi-ledger-ios-test-build.yml`)。技术栈Vite+React+TypeScript+Tailwind CSS v4，数据库复用旧App同一个Supabase项目(不迁移数据)。已知简化：趋势图纵轴刻度按固定范围算、不跟随横向滚动视口实时重算；汇率只接单一数据源(frankfurter.dev)，没做旧App那套多源兜底；跨月份自定义区间选择器简化成单月/单年导航；原生打包还没有真实App图标，用Capacitor默认占位图标 | washi-ledger-rewrite |
 | 20260818-dev.2 | 2026-08-18 | 定稿App图标：从Stitch项目拉取资产"Washi_Ledger_Final_App_Icon"（M-pig剪影复古红渐变+米色纸质背景，1024×1024），存档进`design-assets/icons/washi-ledger-app-icon/final/`，源文件放`washi-ledger/assets/icon.jpg`；`washi-ledger-ios-test-build.yml`新增`capacitor-assets generate`步骤，CI里现生成iOS全套尺寸图标，不再用Capacitor默认占位图标 | washi-ledger-rewrite |
+| 20260818-dev.3 | 2026-08-18 | 修复真机装上打开白屏——`supabase.ts`模块加载时读不到`VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`就直接throw，而这两个CI workflow(`washi-ledger-ci.yml`/`washi-ledger-ios-test-build.yml`)构建前都没有补上这两个环境变量(`.env`按规矩不进仓库)，导致CI出的`dist`里读到的是undefined，整个React在挂载前就崩溃，只剩原生层背景色。两个workflow各加一步`cp .env.example .env`(该文件本来就存了这个Supabase项目的真实URL+anon key，公开的客户端key，靠RLS兜底) | washi-ledger-rewrite |
 
 ## 命名规则
 

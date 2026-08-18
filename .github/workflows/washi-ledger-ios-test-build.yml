@@ -37,6 +37,7 @@ jobs:
 
       - name: 安装依赖 + 构建网页产物(washi-ledger/dist)
         run: |
+          cp .env.example .env
           npm ci
           npm run build
 
