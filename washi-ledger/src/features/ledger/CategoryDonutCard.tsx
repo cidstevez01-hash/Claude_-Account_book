@@ -6,9 +6,10 @@ import type { EntryType } from '../../types'
 interface CategoryDonutCardProps {
   expenseShares: CategoryShare[]
   incomeShares: CategoryShare[]
+  onSelectCategory?: (catCode: string, type: EntryType) => void
 }
 
-export function CategoryDonutCard({ expenseShares, incomeShares }: CategoryDonutCardProps) {
+export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategory }: CategoryDonutCardProps) {
   const [tab, setTab] = useState<EntryType>('expense')
   const shares = tab === 'expense' ? expenseShares : incomeShares
   const total = shares.reduce((sum, s) => sum + s.amount, 0)
@@ -48,9 +49,11 @@ export function CategoryDonutCard({ expenseShares, incomeShares }: CategoryDonut
 
           <div className="flex flex-col gap-y-2 w-full px-2 mt-2">
             {shares.map((share) => (
-              <div
+              <button
                 key={share.catCode}
-                className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30"
+                type="button"
+                onClick={() => onSelectCategory?.(share.catCode, tab)}
+                className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30 text-left active:opacity-70"
               >
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
                 <span className="text-body-md text-on-surface flex-1">{share.label}</span>
@@ -58,7 +61,7 @@ export function CategoryDonutCard({ expenseShares, incomeShares }: CategoryDonut
                   {Math.round(share.ratio * 100)}%
                 </span>
                 <span className="font-serif text-stat-figure text-on-surface">¥{share.amount.toLocaleString()}</span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
