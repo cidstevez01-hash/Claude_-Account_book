@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { HistoryEntryList } from './HistoryEntryList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -49,12 +50,12 @@ export function HistoryPage() {
     })
   }, [entries, typeFilter, startMonth, endMonth, search, categories])
 
-  async function handleDelete(entryId: string) {
-    if (!user) return
-    // TODO: 换成design-assets-v2/_43(Confirm Delete)的和纸风格确认弹窗，跟仪表盘那边的TODO是同一个坑，
-    // 等那边做了这边跟着换，先用原生confirm保证功能可用
-    if (!window.confirm('确定删除这条记录吗？删除后无法恢复。')) return
-    await deleteEntry(entryId, user.id)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
+  async function confirmDelete() {
+    if (!user || !pendingDeleteId) return
+    await deleteEntry(pendingDeleteId, user.id)
+    setPendingDeleteId(null)
     reload()
   }
 
@@ -137,9 +138,17 @@ export function HistoryPage() {
           categories={categories}
           onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
           onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
-          onDelete={(entry) => handleDelete(entry.id)}
+          onDelete={(entry) => setPendingDeleteId(entry.id)}
         />
       </div>
+
+      <ConfirmDialog
+        open={pendingDeleteId != null}
+        title="确定要删除这条记录吗？"
+        message="删除后将无法恢复此条账单数据，您的账户余额将自动重新计算。"
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </AppLayout>
   )
 }
