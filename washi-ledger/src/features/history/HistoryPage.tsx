@@ -52,6 +52,10 @@ export function HistoryPage() {
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
+  // entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染明细列表
+  // 会闪一下"英文图标名+统一灰色"的半成品画面，等catalog真正到位才渲染正文
+  if (!catalog) return null
+
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return
     await deleteEntry(pendingDeleteId, user.id)

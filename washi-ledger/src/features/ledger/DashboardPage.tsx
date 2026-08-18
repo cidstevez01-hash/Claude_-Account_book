@@ -24,19 +24,27 @@ export function DashboardPage() {
   const navigate = useNavigate()
 
   const [monthAnchor, setMonthAnchor] = useState(() => new Date())
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail
+  // (按分类筛选那条分支)搬：记住点的是哪个分类+当时环状图在看支出还是收入
+  const [detailSelection, setDetailSelection] = useState<{ catCode: string; type: EntryType } | null>(null)
+  const categories = useMemo(
+    () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
+    [catalog]
+  )
+
+  // entries现在是缓存优先(见useEntries.ts)，比只走网络请求的catalog先就绪很多；
+  // 在catalog没就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会
+  // 闪一下"英文图标名+统一灰色"这种半成品画面，等catalog真正到位才渲染正文
+  if (!catalog) return null
+
   const monthLabel = `${monthAnchor.getFullYear()}年${monthAnchor.getMonth() + 1}月`
   const shiftMonth = (delta: number) =>
     setMonthAnchor((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1))
 
   const summary = summarizeMonth(entries, monthAnchor)
-  const categories = useMemo(
-    () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
-    [catalog]
-  )
   const expenseShares = categoryBreakdown(entries, categories, 'expense', monthAnchor)
   const incomeShares = categoryBreakdown(entries, categories, 'income', monthAnchor)
-
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return
@@ -45,9 +53,6 @@ export function DashboardPage() {
     reload()
   }
 
-  // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail
-  // (按分类筛选那条分支)搬：记住点的是哪个分类+当时环状图在看支出还是收入
-  const [detailSelection, setDetailSelection] = useState<{ catCode: string; type: EntryType } | null>(null)
   const detailCategory = categories.find((c) => c.code === detailSelection?.catCode) ?? null
   const detailEntries = detailSelection
     ? entries.filter(

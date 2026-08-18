@@ -115,6 +115,10 @@ export function AddTransactionPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, payCode, date, type])
 
+  // entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染分类/支付方式
+  // 选择器会闪一下"英文图标名+统一灰色"的半成品画面，等catalog真正到位才渲染正文
+  if (!catalog) return null
+
   function touchAmount(v: string) {
     pointsArmed.current = true
     setAmount(v)
