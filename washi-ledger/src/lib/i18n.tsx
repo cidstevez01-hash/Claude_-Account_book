@@ -39,6 +39,12 @@ const dict = {
     memoLabel: '备注',
     memoPlaceholder: '在这里写点备注……',
     saveEntry: '保存记录',
+    ratePairJpyCny: '日元→人民币',
+    ratePairCnyJpy: '人民币→日元',
+    rateUpdatedLabel: '更新时间',
+    refreshRate: '刷新汇率',
+    rateNeverFetched: '还没获取过',
+    rateLoading: '获取中…',
   },
   ja: {
     appTitle: '家計簿',
@@ -75,6 +81,12 @@ const dict = {
     memoLabel: 'メモ',
     memoPlaceholder: 'メモを入力……',
     saveEntry: '保存する',
+    ratePairJpyCny: '円→人民元',
+    ratePairCnyJpy: '人民元→円',
+    rateUpdatedLabel: '更新日時',
+    refreshRate: '為替レート更新',
+    rateNeverFetched: '未取得',
+    rateLoading: '取得中…',
   },
 } as const
 
