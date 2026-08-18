@@ -41,5 +41,11 @@
 5. 同样要先报版本号、等用户明确确认才能推送到主分支——正式发布影响面更大，这一步不能省。
 6. 推送到主分支**不会**自动触发任何GitHub Action——`.github/workflows/`下的iOS相关workflow都是`workflow_dispatch`纯手动触发，要出新的原生ipa/发GitHub Release，需要用户自己去仓库Actions页面手动点"Run workflow"。
 
+## 另一条独立开发线：washi-ledger重写
+- 上面"版本号/分支/发版流程"这几节说的都是旧App(`index.html`，`DEV_BUILD`/`APP_VERSION`那套)，**不适用**于`washi-ledger-rewrite`分支下`washi-ledger/`子目录这个从零重写的新项目——它是独立的Vite+React+TypeScript+Tailwind项目，版本号在`washi-ledger/package.json`里，记录见`VERSIONS.md`「Washi Ledger重写」一节。
+- 推送前依然要报版本号、等用户明确说"推"/"可以推"——这条规矩不分项目，两条线都适用。
+- 完整背景/架构/已完成页面/设计原则见根目录`HANDOFF-washi-ledger-rewrite.md`，接手这条线之前必须先读完，不要凭记忆重新猜方向。
+- 两条线的CI/开发记录分开维护，`DEVLOG.md`里`washi-ledger-rewrite`分支的行单独记录，不跟`accountbook-YYYYMMDD`那条线的行混着理解。
+
 ## 其他长期规则
 详见 `DEVLOG.md` 的"⚠️ 长期规则"一节，版本号/分支完整规则见 `VERSIONS.md`。

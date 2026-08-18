@@ -44,6 +44,14 @@ git checkout <对应提交> -- index.html
 | 20260816-dev.9 | 2026-08-16 | 气泡缓动曲线再调——上一版矫枉过正变成瞬移感，换成标准CSS ease，位移在时间窗口内均匀推进 | accountbook-20260816 |
 | 20260816-dev.10 | 2026-08-16 | 修两个真机闹钟响铃原生bug(自定义铃声失败连累内置蜂鸣音兜底一起哑掉、点通知因15秒轮询窄窗口而"看运气"生效)；讨论后决定后台音频保活方案模拟不出真正可靠的持续响铃，加`ALARM_FEATURE_ENABLED`开关整体暂时封存——三个头部入口隐藏、原生调度/监听整体停用，代码保留 | accountbook-20260816(合并自accountbook-20260816-2) |
 
+## Washi Ledger重写
+
+独立版本号体系，跟上面`accountbook-YYYYMMDD`那条线（`v1.0.0`~`v2.1.2`）是两回事——`v0.1.0`不是接着`v2.1.2`往下延续，是`washi-ledger-rewrite`分支上这次从零重写项目自己的语义化版本号，记在`washi-ledger/package.json`的`version`字段里，不是`index.html`的`APP_VERSION`。详细开发过程见`DEVLOG.md`里`washi-ledger-rewrite`分支那几行，架构背景/设计决策见`HANDOFF-washi-ledger-rewrite.md`。
+
+| 版本 | 日期 | 说明 |
+|---|---|---|
+| v0.1.0 | 2026-08-18 | 第一个阶段性版本。十个正式页面全部落地：仪表盘、明细、统计(收支/积分双栏+趋势柱状图)、记一笔(两级分类+支付方式+标签+积分自动计算)、汇率换算(多货币)、设置、我的账户、登录、注册、关于；另加分类明细钻取、确认删除弹窗、自定义细分/标签内联新增改名删除。技术栈Vite+React+TypeScript+Tailwind CSS v4，数据库复用旧App同一个Supabase项目(不迁移数据)。已知简化：趋势图纵轴刻度按固定范围算、不跟随横向滚动视口实时重算；汇率只接单一数据源(frankfurter.dev)，没做旧App那套多源兜底；跨月份自定义区间选择器简化成单月/单年导航；新增的`washi-ledger-ios-test-build.yml`原生打包workflow还没有真实App图标，用Capacitor默认占位图标。 |
+
 ## 命名规则
 
 - 正式版本：`vMAJOR.MINOR.PATCH`（语义化版本），只是主分支上一次`release: vX.Y.Z`提交里写的版本号，不再额外拉同名分支（`v1.0.0`~`v2.0.4`是旧规则留下的快照分支，之后不会再新增）。
