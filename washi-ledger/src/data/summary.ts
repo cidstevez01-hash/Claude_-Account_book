@@ -1,4 +1,9 @@
-import type { Category, Entry, EntryType } from '../types'
+import type { Category, Entry, EntryType, PaymentMethod } from '../types'
+
+/** 图表配色兜底盘——照抄旧仓库index.html的CHART_PALETTE，分类有自己的color字段用不到这个，
+ * 支付方式没有color字段，只有badge.bg(不是所有支付方式都设了badge)，没有badge时按顺序
+ * 从这个调色盘里取色，跟旧App保持一致的视觉映射 */
+const CHART_PALETTE = ['#d1665a', '#7a9b6e', '#b58838', '#5b7a99', '#7a5c3e', '#8a5b7a', '#4a6b8a', '#c96b5f', '#a99c86']
 
 export function isSameMonth(dateStr: string, ref: Date): boolean {
   const d = new Date(dateStr)
@@ -61,6 +66,50 @@ export function categoryBreakdown(
       }
     })
     .sort((a, b) => b.amount - a.amount)
+}
+
+export interface PaymentPointsShare {
+  payCode: string
+  label: string
+  color: string
+  points: number
+  ratio: number // 0~1
+}
+
+/** 积分内訳(按支付方式)——逻辑照抄旧仓库index.html的renderPointsDonut()：只统计支出记录
+ * 里有积分的(积分是花钱后的返还，只可能来自支出)，按支付方式分组求和，没填支付方式的
+ * 记录归到'cash'。颜色跟旧App一致：优先用支付方式自己的badge.bg，没有就按顺序从
+ * CHART_PALETTE兜底取色，方便同一个支付方式在不同图表里颜色能对上号。
+ *
+ * 跟旧App的差异：旧App用的是页面级"累计残高"自定义日期区间(cumRangeStart/End)，
+ * 这里先简化成传入的单个月份，累计区间选择器留到以后再做(跟仪表盘DateRangeBar的
+ * 完整范围选择器是同一类型的deferred scope) */
+export function pointsBreakdownByPaymentMethod(
+  entries: Entry[],
+  paymentMethods: PaymentMethod[],
+  ref: Date = new Date()
+): PaymentPointsShare[] {
+  const totals = new Map<string, number>()
+  let grandTotal = 0
+  for (const e of entries) {
+    if (e.type !== 'expense' || !e.points || !isSameMonth(e.date, ref)) continue
+    const key = e.paymentMethod || 'cash'
+    totals.set(key, (totals.get(key) ?? 0) + e.points)
+    grandTotal += e.points
+  }
+  if (grandTotal === 0) return []
+  return Array.from(totals.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([payCode, points], idx) => {
+      const pm = paymentMethods.find((p) => p.code === payCode)
+      return {
+        payCode,
+        label: pm?.zh ?? payCode,
+        color: pm?.badge?.bg || CHART_PALETTE[idx % CHART_PALETTE.length],
+        points,
+        ratio: points / grandTotal,
+      }
+    })
 }
 
 export function groupByDay(entries: Entry[]): { date: string; entries: Entry[] }[] {

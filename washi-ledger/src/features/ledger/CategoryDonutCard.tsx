@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { DonutRing } from '../../design-system/components/DonutRing'
 import type { CategoryShare } from '../../data/summary'
 import type { EntryType } from '../../types'
 
@@ -7,15 +8,10 @@ interface CategoryDonutCardProps {
   incomeShares: CategoryShare[]
 }
 
-const RADIUS = 40
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS
-
 export function CategoryDonutCard({ expenseShares, incomeShares }: CategoryDonutCardProps) {
   const [tab, setTab] = useState<EntryType>('expense')
   const shares = tab === 'expense' ? expenseShares : incomeShares
   const total = shares.reduce((sum, s) => sum + s.amount, 0)
-
-  let offsetAccum = 0
 
   return (
     <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
@@ -39,28 +35,7 @@ export function CategoryDonutCard({ expenseShares, incomeShares }: CategoryDonut
       ) : (
         <div className="flex flex-col items-center py-2">
           <div className="relative w-48 h-48 mb-3">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r={RADIUS} fill="transparent" stroke="var(--color-surface-variant)" strokeWidth="12" />
-              {shares.map((share) => {
-                const dash = share.ratio * CIRCUMFERENCE
-                const el = (
-                  <circle
-                    key={share.catCode}
-                    cx="50"
-                    cy="50"
-                    r={RADIUS}
-                    fill="transparent"
-                    stroke={share.color}
-                    strokeWidth="12"
-                    strokeLinecap="round"
-                    strokeDasharray={`${dash} ${CIRCUMFERENCE}`}
-                    strokeDashoffset={-offsetAccum}
-                  />
-                )
-                offsetAccum += dash
-                return el
-              })}
-            </svg>
+            <DonutRing shares={shares.map((s) => ({ key: s.catCode, color: s.color, ratio: s.ratio }))} />
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
               <span className="text-[10px] font-sans text-on-surface-variant uppercase">
                 {tab === 'expense' ? 'Total Expenses' : 'Total Income'}
