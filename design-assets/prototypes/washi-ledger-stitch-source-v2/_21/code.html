@@ -1,0 +1,362 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Washi Ledger - Add Transaction</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#dcc0bc",
+                    "primary-fixed": "#ffdad5",
+                    "on-tertiary-container": "#fffbff",
+                    "inverse-primary": "#ffb4aa",
+                    "surface-container": "#fdeadf",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "error": "#ba1a1a",
+                    "outline": "#89726f",
+                    "on-secondary-container": "#4d6c44",
+                    "secondary": "#48663e",
+                    "tertiary-fixed-dim": "#f2bf48",
+                    "error-container": "#ffdad6",
+                    "primary": "#9b3e34",
+                    "on-surface": "#231a13",
+                    "on-tertiary-fixed-variant": "#5b4300",
+                    "primary-container": "#bb554a",
+                    "on-surface-variant": "#56423f",
+                    "surface-container-low": "#fff1ea",
+                    "surface-tint": "#9f4036",
+                    "secondary-fixed-dim": "#add09f",
+                    "secondary-fixed": "#c9edba",
+                    "inverse-surface": "#392e27",
+                    "surface": "#fff8f5",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#314e28",
+                    "surface-container-high": "#f8e5da",
+                    "surface-container-highest": "#f2dfd4",
+                    "on-tertiary-fixed": "#261a00",
+                    "surface-bright": "#fff8f5",
+                    "surface-dim": "#e9d6cc",
+                    "on-primary-fixed": "#410001",
+                    "on-background": "#231a13",
+                    "on-primary-container": "#fffbff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed": "#052103",
+                    "secondary-container": "#c9edba",
+                    "tertiary-container": "#946f00",
+                    "on-error-container": "#93000a",
+                    "background": "#fff8f5",
+                    "tertiary": "#765700",
+                    "inverse-on-surface": "#ffede4",
+                    "tertiary-fixed": "#ffdf9e",
+                    "surface-variant": "#f2dfd4",
+                    "on-primary-fixed-variant": "#7f2921",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "safe-bottom": "90px",
+                    "xs": "8px",
+                    "sm": "12px",
+                    "md": "16px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "body-lg": [
+                            "Noto Sans SC"
+                    ],
+                    "headline-lg": [
+                            "Noto Serif SC"
+                    ],
+                    "headline-md": [
+                            "Noto Serif SC"
+                    ],
+                    "body-md": [
+                            "Noto Sans SC"
+                    ],
+                    "input-amount": [
+                            "Noto Serif SC"
+                    ],
+                    "stat-figure": [
+                            "Noto Serif SC"
+                    ],
+                    "entry-amount": [
+                            "Noto Serif SC"
+                    ],
+                    "tab-label": [
+                            "Noto Sans SC"
+                    ],
+                    "label-caps": [
+                            "Noto Sans SC"
+                    ],
+                    "hero-balance": [
+                            "Noto Serif SC"
+                    ]
+            },
+            "fontSize": {
+                    "body-lg": [
+                            "15px",
+                            {
+                                    "lineHeight": "21px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-lg": [
+                            "26px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-md": [
+                            "19px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "input-amount": [
+                            "32px",
+                            {
+                                    "lineHeight": "38px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "stat-figure": [
+                            "18px",
+                            {
+                                    "lineHeight": "22px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "entry-amount": [
+                            "16px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "tab-label": [
+                            "11px",
+                            {
+                                    "lineHeight": "12px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "1px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "hero-balance": [
+                            "38px",
+                            {
+                                    "lineHeight": "42px",
+                                    "letterSpacing": "-0.5px",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Custom paper rule texture for memo field */
+        .paper-lines {
+            background-image: repeating-linear-gradient(transparent, transparent 31px, var(--tw-colors-outline-variant) 31px, var(--tw-colors-outline-variant) 32px);
+            line-height: 32px;
+            background-attachment: local;
+        }
+
+        /* Input field reset for amount */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen">
+<div class="max-w-[480px] mx-auto bg-surface min-h-screen relative shadow-2xl flex flex-col">
+<!-- Top App Bar (Custom Task-focused) -->
+<header class="flex items-center justify-between px-md h-16 w-full z-40 bg-surface sticky top-0">
+<button class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-surface-variant transition-colors group">
+<span class="material-symbols-outlined text-on-surface group-active:-translate-x-1 transition-transform">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">Record Entry</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<main class="flex-1 overflow-y-auto hide-scrollbar pb-safe-bottom">
+<!-- Transaction Type Segmented Control -->
+<div class="px-md pt-2 pb-6">
+<div class="flex p-1 bg-surface-container-highest rounded-xl border border-outline-variant/30 relative">
+<!-- Sliding background pill indicator would go here via JS, static for pure HTML/CSS structure -->
+<div class="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] bg-surface rounded-lg shadow-sm z-0"></div>
+<button class="flex-1 py-2 text-center rounded-lg text-primary font-label-caps text-label-caps font-bold z-10 relative">EXPENSE</button>
+<button class="flex-1 py-2 text-center rounded-lg text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-variant/50 transition-colors z-10 relative">INCOME</button>
+</div>
+</div>
+<!-- Amount Input Region -->
+<div class="px-md pb-8 flex flex-col items-center">
+<span class="text-on-surface-variant font-label-caps text-label-caps mb-4 tracking-widest">AMOUNT</span>
+<div class="flex items-baseline justify-center border-b-[2px] border-primary pb-2 w-3/4 max-w-[240px] transition-colors focus-within:border-primary-fixed-dim">
+<span class="font-hero-balance text-hero-balance text-primary mr-2 align-baseline">¥</span>
+<input class="bg-transparent border-none outline-none font-hero-balance text-hero-balance text-on-surface w-full text-left p-0 focus:ring-0 leading-none" placeholder="0" type="number" value="2450">
+</div>
+</div>
+<!-- Decorative Ledger Line -->
+<div class="w-full border-b-[1.5px] border-dashed border-outline-variant"></div>
+<!-- Category Section (Bento Layout) -->
+<div class="py-md">
+<div class="flex items-center justify-between px-md mb-sm">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest">CATEGORY</h2>
+<span class="text-primary font-tab-label text-tab-label">Edit</span>
+</div>
+<!-- Level 1: Primary Categories (Horizontal Scroll) -->
+<div class="flex overflow-x-auto px-md gap-sm pb-4 snap-x hide-scrollbar">
+<button class="snap-start flex-shrink-0 flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-primary-container text-on-primary-container min-w-[76px] shadow-[0_2px_0_var(--tw-colors-primary-fixed-variant)] active:translate-y-px active:shadow-none transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span class="font-tab-label text-tab-label">Food</span>
+</button>
+<button class="snap-start flex-shrink-0 flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-surface-container hover:bg-surface-variant border border-outline-variant/50 min-w-[76px] transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">commute</span>
+<span class="font-tab-label text-tab-label text-on-surface-variant">Transit</span>
+</button>
+<button class="snap-start flex-shrink-0 flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-surface-container hover:bg-surface-variant border border-outline-variant/50 min-w-[76px] transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">shopping_bag</span>
+<span class="font-tab-label text-tab-label text-on-surface-variant">Retail</span>
+</button>
+<button class="snap-start flex-shrink-0 flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-surface-container hover:bg-surface-variant border border-outline-variant/50 min-w-[76px] transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">local_cafe</span>
+<span class="font-tab-label text-tab-label text-on-surface-variant">Cafe</span>
+</button>
+<button class="snap-start flex-shrink-0 flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-surface-container hover:bg-surface-variant border border-outline-variant/50 min-w-[76px] transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+<span class="font-tab-label text-tab-label text-on-surface-variant">More</span>
+</button>
+</div>
+<!-- Level 2: Sub-categories Grid -->
+<div class="px-md">
+<div class="grid grid-cols-3 gap-xs">
+<button class="py-2 px-3 rounded-xl border-2 border-primary bg-surface text-primary font-body-md text-body-md font-medium text-center">Lunch</button>
+<button class="py-2 px-3 rounded-xl border border-outline-variant bg-surface-container text-on-surface-variant font-body-md text-body-md hover:bg-surface-variant transition-colors text-center">Dinner</button>
+<button class="py-2 px-3 rounded-xl border border-outline-variant bg-surface-container text-on-surface-variant font-body-md text-body-md hover:bg-surface-variant transition-colors text-center">Snacks</button>
+<button class="py-2 px-3 rounded-xl border border-outline-variant bg-surface-container text-on-surface-variant font-body-md text-body-md hover:bg-surface-variant transition-colors text-center">Groceries</button>
+<button class="py-2 px-3 rounded-xl border border-outline-variant bg-surface-container text-on-surface-variant font-body-md text-body-md hover:bg-surface-variant transition-colors text-center text-primary flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[16px]">add</span> Add</button>
+</div>
+</div>
+</div>
+<!-- Ledger Line -->
+<div class="w-full border-b-[1.5px] border-dashed border-outline-variant"></div>
+<!-- Payment Method & Date (Asymmetric Row) -->
+<div class="py-md px-md flex gap-md">
+<div class="flex-1">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-sm tracking-widest">METHOD</h2>
+<div class="relative group">
+<select class="appearance-none w-full bg-surface-container border border-outline-variant rounded-xl py-3 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+<option value="suica">Suica / Pasmo</option>
+<option value="cash">Cash Wallet</option>
+<option value="credit">Credit Card</option>
+</select>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[20px]">contactless</span>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[20px]">expand_more</span>
+</div>
+</div>
+<div class="w-1/3">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-sm tracking-widest">DATE</h2>
+<div class="bg-surface-container border border-outline-variant rounded-xl py-3 px-3 flex items-center justify-center gap-1 text-on-surface">
+<span class="font-body-md text-body-md font-medium">Today</span>
+</div>
+</div>
+</div>
+<!-- Ledger Line -->
+<div class="w-full border-b-[1.5px] border-dashed border-outline-variant"></div>
+<!-- Tags and Points (Bento Grid) -->
+<div class="px-md py-md grid grid-cols-2 gap-md">
+<div>
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-sm tracking-widest">TAGS</h2>
+<div class="flex flex-wrap gap-2">
+<span class="py-1.5 px-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-tab-label text-tab-label border border-secondary/20 flex items-center gap-1">#work <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-on-surface">close</span></span>
+<button class="py-1.5 px-2.5 rounded-lg bg-transparent text-primary border border-dashed border-primary font-tab-label text-tab-label flex items-center gap-1 hover:bg-primary-fixed transition-colors"><span class="material-symbols-outlined text-[14px]">add</span> Tag</button>
+</div>
+</div>
+<div>
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-sm tracking-widest">POINTS EARNED</h2>
+<div class="flex items-center border-b border-outline-variant pb-2 focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-tertiary mr-2 text-[20px]" style="font-variation-settings: 'FILL' 1;">stars</span>
+<input class="bg-transparent border-none outline-none w-full p-0 font-stat-figure text-stat-figure text-on-surface focus:ring-0" placeholder="0" type="number">
+</div>
+</div>
+</div>
+<!-- Ledger Line -->
+<div class="w-full border-b-[1.5px] border-dashed border-outline-variant"></div>
+<!-- Memo Field -->
+<div class="px-md py-md pb-[120px]">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-xs tracking-widest">MEMO</h2>
+<textarea class="w-full bg-transparent border-none outline-none resize-none h-32 p-0 font-body-lg text-body-lg text-on-surface focus:ring-0 paper-lines" placeholder="Add detailed notes here..."></textarea>
+</div>
+</main>
+<!-- Fixed Bottom Action (The Stamp) -->
+<div class="absolute bottom-0 left-0 right-0 p-md pb-6 bg-gradient-to-t from-surface via-surface to-transparent pointer-events-none z-50">
+<button class="pointer-events-auto w-full h-[58px] bg-primary text-on-primary rounded-xl font-headline-md text-headline-md shadow-[0_4px_0_var(--tw-colors-on-primary-fixed-variant)] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 relative overflow-hidden">
+<span class="material-symbols-outlined">how_to_reg</span>
+                Save Entry
+                
+                <!-- Decorative Washi Tape edge on button -->
+<div class="absolute -top-3 -right-3 w-8 h-8 bg-inverse-primary rotate-45 opacity-20"></div>
+</button>
+</div>
+<nav class="fixed bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] bg-surface-container-highest/90 backdrop-blur-md rounded-full shadow-2xl border border-outline-variant/30 px-6 py-3 flex items-center justify-between z-50">
+  <button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+    <span class="material-symbols-outlined">grid_view</span>
+    <span class="text-tab-label font-tab-label">Dashboard</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-primary transition-colors">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+    <span class="text-tab-label font-tab-label">Transactions</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+    <span class="material-symbols-outlined">bar_chart</span>
+    <span class="text-tab-label font-tab-label">Statistics</span>
+  </button>
+</nav></div>
+
+
+</body></html>

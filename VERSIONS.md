@@ -44,8 +44,27 @@ git checkout <对应提交> -- index.html
 | 20260816-dev.9 | 2026-08-16 | 气泡缓动曲线再调——上一版矫枉过正变成瞬移感，换成标准CSS ease，位移在时间窗口内均匀推进 | accountbook-20260816 |
 | 20260816-dev.10 | 2026-08-16 | 修两个真机闹钟响铃原生bug(自定义铃声失败连累内置蜂鸣音兜底一起哑掉、点通知因15秒轮询窄窗口而"看运气"生效)；讨论后决定后台音频保活方案模拟不出真正可靠的持续响铃，加`ALARM_FEATURE_ENABLED`开关整体暂时封存——三个头部入口隐藏、原生调度/监听整体停用，代码保留 | accountbook-20260816(合并自accountbook-20260816-2) |
 
+## Washi Ledger重写
+
+独立版本号体系，跟上面`accountbook-YYYYMMDD`那条线（`v1.0.0`~`v2.1.2`）是两回事，但**沿用同一套"开发分支不用干净语义化版本号"的命名规则**（见下面「命名规则」一节）：`washi-ledger-rewrite`分支还没合并/正式发布过，现在处于开发阶段，版本号格式是`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`，记在`washi-ledger/package.json`的`version`字段里(用semver的prerelease写法`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`承载，保证仍是合法semver)。等这条分支真正合并/发布，才会跳到干净的`vMAJOR.MINOR.PATCH`并记进「正式版本」表。详细开发过程见`DEVLOG.md`里`washi-ledger-rewrite`分支那几行，架构背景/设计决策见`HANDOFF-washi-ledger-rewrite.md`。
+
+（曾经在2026-08-18当天短暂把这个字段写成过`0.1.0`这种"干净"格式，是记错了规则——开发分支不该用这种格式，已改回`dev.N`格式。）
+
+### 正式版本
+
+还没有——这条线目前还没合并/正式发布过，等真正合并时再在这里加第一行记录。
+
+### 开发版本
+
+| 版本号 | 日期 | 说明 | 分支 |
+|---|---|---|---|
+| 20260818-dev.1 | 2026-08-18 | 十个正式页面全部落地：仪表盘、明细、统计(收支/积分双栏+趋势柱状图)、记一笔(两级分类+支付方式+标签+积分自动计算)、汇率换算(多货币)、设置、我的账户、登录、注册、关于；另加分类明细钻取、确认删除弹窗、自定义细分/标签内联新增改名删除、web端CI(`washi-ledger-ci.yml`)、iOS测试包打包workflow(`washi-ledger-ios-test-build.yml`)。技术栈Vite+React+TypeScript+Tailwind CSS v4，数据库复用旧App同一个Supabase项目(不迁移数据)。已知简化：趋势图纵轴刻度按固定范围算、不跟随横向滚动视口实时重算；汇率只接单一数据源(frankfurter.dev)，没做旧App那套多源兜底；跨月份自定义区间选择器简化成单月/单年导航；原生打包还没有真实App图标，用Capacitor默认占位图标 | washi-ledger-rewrite |
+
 ## 命名规则
 
 - 正式版本：`vMAJOR.MINOR.PATCH`（语义化版本），只是主分支上一次`release: vX.Y.Z`提交里写的版本号，不再额外拉同名分支（`v1.0.0`~`v2.0.4`是旧规则留下的快照分支，之后不会再新增）。
 - 开发分支（主分支以外，日常迭代用）：`accountbook-YYYYMMDD`，年月日命名，例如 `accountbook-20260731`；同一天需要另开一个的话加 `-2`/`-3` 后缀，例如 `accountbook-20260810-2`。这是从 2026-07-31 起最早定下、一直沿用的规则。
   - 2026-08-13～2026-08-14 之间的几个分支（`YYYYMMDD-dev.N` 格式，不带 `accountbook-` 前缀）是中途误改的命名，已经改回来，不再沿用。
+- **核心原则(两条线都适用)：开发分支上还没合并/发布的版本，一律不用干净的`vMAJOR.MINOR.PATCH`格式**，那个格式专属于"已经合并/正式发布"的版本；开发中的版本号长相是`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`(日期+当天第几次)，跟正式版本号一眼就能分清谁是谁。
+  - 旧App(`accountbook-YYYYMMDD`分支)：这两个值是`index.html`里的`DEV_BUILD_DATE`/`DEV_BUILD`两个JS常量。
+  - washi-ledger(`washi-ledger-rewrite`分支)：这条线还没有`accountbook-YYYYMMDD`那样按天开新分支的习惯，长期在同一个`washi-ledger-rewrite`分支上开发，所以版本号只把`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`这串写进`washi-ledger/package.json`的`version`字段（用semver prerelease语法`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`承载）——同一天再推一次，`DEV_BUILD`在当前值上+1；换了新的一天，`DEV_BUILD_DATE`改成当天、`DEV_BUILD`重置成1。等这条分支真正合并/发布，才跳到干净的`vMAJOR.MINOR.PATCH`。

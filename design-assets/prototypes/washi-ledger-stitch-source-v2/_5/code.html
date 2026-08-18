@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Washi Ledger - Navigation Drawer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#48663e",
+                        "surface-container-low": "#fff1ea",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "on-secondary-fixed": "#052103",
+                        "inverse-surface": "#392e27",
+                        "secondary-fixed": "#c9edba",
+                        "on-primary-container": "#fffbff",
+                        "on-surface-variant": "#56423f",
+                        "surface-tint": "#9f4036",
+                        "inverse-on-surface": "#ffede4",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface": "#fff8f5",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "on-surface": "#231a13",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#261a00",
+                        "surface-container-high": "#f8e5da",
+                        "primary": "#9b3e34",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "on-background": "#231a13",
+                        "on-primary-fixed": "#410001",
+                        "surface-dim": "#e9d6cc",
+                        "background": "#fff8f5",
+                        "tertiary-fixed": "#ffdf9e",
+                        "tertiary": "#765700",
+                        "primary-fixed": "#ffdad5",
+                        "outline": "#89726f",
+                        "outline-variant": "#dcc0bc",
+                        "surface-bright": "#fff8f5",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#ffb4aa",
+                        "tertiary-container": "#946f00",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#f2dfd4",
+                        "surface-container-highest": "#f2dfd4",
+                        "primary-container": "#bb554a",
+                        "on-tertiary-container": "#fffbff",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#4d6c44",
+                        "secondary-fixed-dim": "#add09f",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "secondary-container": "#c9edba",
+                        "on-primary-fixed-variant": "#7f2921",
+                        "surface-container": "#fdeadf"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "safe-bottom": "90px",
+                        "md": "16px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "stat-figure": ["Noto Serif SC"],
+                        "headline-lg": ["Noto Serif SC"],
+                        "headline-md": ["Noto Serif SC"],
+                        "hero-balance": ["Noto Serif SC"],
+                        "body-lg": ["Noto Sans SC"],
+                        "input-amount": ["Noto Serif SC"],
+                        "entry-amount": ["Noto Serif SC"],
+                        "tab-label": ["Noto Sans SC"],
+                        "label-caps": ["Noto Sans SC"],
+                        "body-md": ["Noto Sans SC"]
+                    },
+                    "fontSize": {
+                        "stat-figure": ["18px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["19px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "hero-balance": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700" }],
+                        "body-lg": ["15px", { "lineHeight": "21px", "fontWeight": "500" }],
+                        "input-amount": ["32px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "entry-amount": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "tab-label": ["11px", { "lineHeight": "12px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+        }
+        /* Paper texture overlay */
+        .paper-texture {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased text-on-background min-h-screen relative overflow-hidden">
+<!-- Paper Texture -->
+<div class="fixed inset-0 paper-texture z-0"></div>
+<!-- Dummy Background Content (Dashboard representation) -->
+<div class="relative z-10 p-md max-w-[480px] mx-auto opacity-40 blur-sm pointer-events-none transition-all duration-300">
+<!-- TopAppBar Placeholder -->
+<div class="flex items-center justify-between h-16 w-full border-b-[1.5px] border-dashed border-outline-variant mb-lg">
+<span class="material-symbols-outlined text-primary text-2xl">menu</span>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Washi Ledger</h1>
+<div class="w-8 h-8 rounded-full bg-surface-variant border border-outline-variant"></div>
+</div>
+<!-- Dashboard Content Placeholder -->
+<div class="space-y-md">
+<div class="bg-surface-container-lowest p-md rounded-xl border-b-2 border-outline-variant/50 relative overflow-hidden">
+<div class="absolute -top-2 -right-2 w-12 h-4 bg-tertiary rotate-45 transform origin-center"></div>
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-xs">Total Balance</div>
+<div class="font-hero-balance text-hero-balance text-on-surface">¥ 12,450</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between items-center bg-surface p-sm border-b border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface">Lunch</div>
+<div class="font-body-md text-body-md text-on-surface-variant">Today</div>
+</div>
+</div>
+<div class="font-entry-amount text-entry-amount text-primary">- ¥ 1,200</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Overlay Scrim -->
+<div class="fixed inset-0 bg-inverse-surface/20 backdrop-blur-[2px] z-40 transition-opacity duration-300" id="scrim"></div>
+<!-- Navigation Drawer -->
+<aside class="fixed top-0 left-0 bottom-0 z-50 bg-surface h-full w-80 rounded-r-xl border-r-[1.5px] border-dashed border-outline-variant shadow-xl flex flex-col overflow-y-auto transform transition-transform duration-300 ease-out translate-x-0" id="drawer">
+<!-- Drawer Header / Profile Area -->
+<div class="p-lg border-b-[1.5px] border-dashed border-outline-variant flex flex-col items-start bg-surface-container-low/50">
+<div class="w-16 h-16 rounded-full border-2 border-outline-variant p-[2px] mb-md relative">
+<img class="w-full h-full rounded-full object-cover" data-alt="A close-up portrait of a serene artisan individual with a warm expression, soft natural lighting, set against a minimalist light beige background. The overall aesthetic is calming, modern, and aligned with Japanese minimalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQqsAMzrw3BidgqoQbFxjh3XpGEbx6Mhdi3bh_XrWJwhxL_o4ik8mCizvokTGTUugoYtll3GBCeXrN61mg3zKcb97P-DEsNEk_VNh9AV7odmOrUXuCcinjRNc-gyNLOQgYvAI4oJxbb_yAszRVeeS53okTLyH-qWe74ZfAH2zsZTaAfWJNWv_dlkQ2t5wTESyVIw6BmzUsmnANDyQoypod0_40WuYTOoaXBDbKOVXE1OUBiuhy4djq"/>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-secondary rounded-full border-2 border-surface"></div>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Artisan User</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">ledger_id: 8824</p>
+<span class="inline-block px-2 py-1 rounded bg-tertiary-container/10 border border-tertiary/20 font-label-caps text-label-caps text-tertiary">Premium Member</span>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 py-sm flex flex-col font-body-lg text-body-lg text-on-surface">
+<!-- Active Item: Dashboard (Based on prompt context of showing it over dashboard) -->
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container font-bold rounded-lg mx-2 my-1 px-4 py-3 active:opacity-70 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                Dashboard
+            </a>
+<!-- Inactive Items -->
+<a class="flex items-center gap-md text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high transition-colors active:opacity-70 rounded-lg" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+                Transactions
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high transition-colors active:opacity-70 rounded-lg" href="#">
+<span class="material-symbols-outlined">insights</span>
+                Statistics
+            </a>
+<div class="my-sm border-t-[1.5px] border-dashed border-outline-variant/50 mx-4"></div>
+<a class="flex items-center gap-md text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high transition-colors active:opacity-70 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high transition-colors active:opacity-70 rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help
+            </a>
+</nav>
+<!-- Drawer Footer -->
+<div class="p-md border-t-[1.5px] border-dashed border-outline-variant mt-auto bg-surface-container-low/30">
+<button class="flex items-center gap-md w-full text-on-surface-variant mx-2 my-1 px-2 py-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md">Sign Out</span>
+</button>
+</div>
+</aside>
+<script>
+        // Simple script to handle scrim click to simulate closing drawer
+        document.getElementById('scrim').addEventListener('click', function() {
+            const drawer = document.getElementById('drawer');
+            drawer.classList.remove('translate-x-0');
+            drawer.classList.add('-translate-x-full');
+            this.classList.add('opacity-0');
+            this.style.pointerEvents = 'none';
+            
+            // Remove blur from main content
+            const mainContent = document.querySelector('.relative.z-10');
+            mainContent.classList.remove('blur-sm', 'opacity-40');
+        });
+    </script>
+</body></html>

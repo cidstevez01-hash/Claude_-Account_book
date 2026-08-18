@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - Washi Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&amp;family=Noto+Sans+SC:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary": "#ffffff",
+                      "secondary": "#48663e",
+                      "surface-container-low": "#fff1ea",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-fixed-dim": "#f2bf48",
+                      "on-secondary-fixed": "#052103",
+                      "inverse-surface": "#392e27",
+                      "secondary-fixed": "#c9edba",
+                      "on-primary-container": "#fffbff",
+                      "on-surface-variant": "#56423f",
+                      "surface-tint": "#9f4036",
+                      "inverse-on-surface": "#ffede4",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "surface": "#fff8f5",
+                      "primary-fixed-dim": "#ffb4aa",
+                      "on-surface": "#231a13",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed": "#261a00",
+                      "surface-container-high": "#f8e5da",
+                      "primary": "#9b3e34",
+                      "on-tertiary-fixed-variant": "#5b4300",
+                      "on-background": "#231a13",
+                      "on-primary-fixed": "#410001",
+                      "surface-dim": "#e9d6cc",
+                      "background": "#fff8f5",
+                      "tertiary-fixed": "#ffdf9e",
+                      "tertiary": "#765700",
+                      "primary-fixed": "#ffdad5",
+                      "outline": "#89726f",
+                      "outline-variant": "#dcc0bc",
+                      "surface-bright": "#fff8f5",
+                      "on-primary": "#ffffff",
+                      "inverse-primary": "#ffb4aa",
+                      "tertiary-container": "#946f00",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#f2dfd4",
+                      "surface-container-highest": "#f2dfd4",
+                      "primary-container": "#bb554a",
+                      "on-tertiary-container": "#fffbff",
+                      "error": "#ba1a1a",
+                      "on-secondary-container": "#4d6c44",
+                      "secondary-fixed-dim": "#add09f",
+                      "on-secondary-fixed-variant": "#314e28",
+                      "secondary-container": "#c9edba",
+                      "on-primary-fixed-variant": "#7f2921",
+                      "surface-container": "#fdeadf"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "base": "4px",
+                      "xs": "8px",
+                      "lg": "24px",
+                      "gutter": "16px",
+                      "safe-bottom": "90px",
+                      "md": "16px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "stat-figure": [
+                              "Noto Serif SC"
+                      ],
+                      "headline-lg": [
+                              "Noto Serif SC"
+                      ],
+                      "headline-md": [
+                              "Noto Serif SC"
+                      ],
+                      "hero-balance": [
+                              "Noto Serif SC"
+                      ],
+                      "body-lg": [
+                              "Noto Sans SC"
+                      ],
+                      "input-amount": [
+                              "Noto Serif SC"
+                      ],
+                      "entry-amount": [
+                              "Noto Serif SC"
+                      ],
+                      "tab-label": [
+                              "Noto Sans SC"
+                      ],
+                      "label-caps": [
+                              "Noto Sans SC"
+                      ],
+                      "body-md": [
+                              "Noto Sans SC"
+                      ]
+              },
+              "fontSize": {
+                      "stat-figure": [
+                              "18px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "26px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "19px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "hero-balance": [
+                              "38px",
+                              {
+                                      "lineHeight": "42px",
+                                      "letterSpacing": "-0.5px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "15px",
+                              {
+                                      "lineHeight": "21px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "input-amount": [
+                              "32px",
+                              {
+                                      "lineHeight": "38px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "entry-amount": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "tab-label": [
+                              "11px",
+                              {
+                                      "lineHeight": "12px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "14px",
+                                      "letterSpacing": "1px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .paper-texture {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            background-blend-mode: multiply;
+        }
+
+        .ledger-line {
+            border-bottom: 2px solid theme('colors.outline-variant');
+            box-shadow: 0 2px 0 theme('colors.surface-container-high');
+        }
+
+        .glass-panel {
+            background-color: rgba(255, 248, 245, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen flex flex-col items-center pb-safe-bottom paper-texture">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-40 bg-surface dark:bg-surface-dim border-b-[1.5px] border-dashed border-outline-variant dark:border-outline">
+<div class="flex items-center justify-between px-md h-16 w-full max-w-[480px] mx-auto">
+<button aria-label="Menu" class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface dark:text-on-surface text-center flex-1 font-bold">Washi Ledger</h1>
+<button aria-label="User profile avatar" class="hover:opacity-80 transition-opacity active:scale-95 transition-transform w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-primary" style="font-size: 20px;">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-[480px] flex-1 px-gutter pt-24 pb-lg flex flex-col gap-sm">
+<!-- Profile Header Area -->
+<section class="bg-surface-container-lowest rounded-xl p-md ledger-line border-[1.5px] border-dashed border-outline-variant relative overflow-hidden mb-xs">
+<div class="absolute top-0 right-0 w-8 h-8 bg-tertiary-container transform rotate-45 translate-x-4 -translate-y-4 opacity-20"></div>
+<div class="flex items-center gap-md">
+<div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center border-2 border-primary/20">
+<span class="material-symbols-outlined text-primary text-[32px]">person</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Artisan User</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">ledger_id: 8824</p>
+</div>
+</div>
+</section>
+<!-- Settings List -->
+<nav class="flex flex-col gap-2">
+<!-- Account Settings -->
+<a class="group flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest hover:bg-surface-variant/30 active:scale-[0.98] transition-all ledger-line" href="#">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">manage_accounts</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">Account Settings</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<!-- Currency & Region -->
+<a class="group flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest hover:bg-surface-variant/30 active:scale-[0.98] transition-all ledger-line" href="#">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">currency_exchange</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Currency &amp; Region</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-[12px]">JPY (¥) • Japan</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<!-- Data Export & Sync -->
+<a class="group flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest hover:bg-surface-variant/30 active:scale-[0.98] transition-all ledger-line" href="#">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">cloud_sync</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">Data Export &amp; Sync</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<!-- Security -->
+<a class="group flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest hover:bg-surface-variant/30 active:scale-[0.98] transition-all ledger-line" href="#">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">fingerprint</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">Security (PIN/Biometrics)</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<!-- About -->
+<a class="group flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest hover:bg-surface-variant/30 active:scale-[0.98] transition-all ledger-line mt-xs" href="#">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">info</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">About</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant text-[12px]">v2.4.1</span>
+</a>
+</nav>
+<!-- Log Out Button -->
+<div class="mt-lg flex justify-center">
+<button class="px-lg py-sm rounded-full border-[1.5px] border-primary text-primary font-body-lg text-body-lg hover:bg-primary hover:text-on-primary transition-colors active:scale-95 shadow-[0_4px_0_theme('colors.primary-container')] hover:shadow-[0_2px_0_theme('colors.primary-container')] active:translate-y-[2px] active:shadow-none">
+                Sign Out
+            </button>
+</div>
+</main>
+<!-- Navigation Drawer (Hidden by default, used for structural reference) -->
+<aside class="hidden fixed inset-y-0 left-0 z-50 h-full w-80 rounded-r-xl bg-surface dark:bg-surface-dim border-r-[1.5px] border-dashed border-outline-variant dark:border-outline shadow-xl flex flex-col overflow-y-auto transform -translate-x-full transition-transform">
+<div class="p-lg border-b-[1.5px] border-dashed border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-primary">Artisan User</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">ledger_id: 8824</p>
+</div>
+<nav class="flex-1 py-md">
+<a class="block text-on-surface-variant dark:text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-lg flex items-center gap-3" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-lg text-body-lg">Dashboard</span>
+</a>
+<a class="block text-on-surface-variant dark:text-on-surface-variant mx-2 my-1 px-4 py-3 hover:bg-surface-variant/30 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-lg flex items-center gap-3" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-body-lg text-body-lg">Transactions</span>
+</a>
+<a class="block bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary font-bold rounded-lg mx-2 my-1 px-4 py-3 active:opacity-70 transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-body-lg text-body-lg">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- BottomNavBar (Hidden on Settings page as per logic, but included structurally for completeness or if navigated via deep link without context) -->
+<!-- Note: Suppressing based on intent rules: Settings is a task/profile focus. -->
+<nav class="hidden md:hidden fixed bottom-xs left-0 right-0 z-50 flex justify-around items-center px-lg py-sm max-w-[480px] mx-auto bg-surface-container/80 dark:bg-surface-container-highest/80 backdrop-blur-md rounded-full border border-outline-variant/30 dark:border-outline/30 shadow-lg w-[90%] left-1/2 -translate-x-1/2">
+<button class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">home</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">bar_chart</span>
+</button>
+</nav>
+</body></html>

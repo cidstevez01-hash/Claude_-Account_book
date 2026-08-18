@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Washi Ledger - Personal Center</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Noto Serif SC & Noto Sans SC -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#c9edba",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary-container": "#4d6c44",
+                        "tertiary-fixed": "#ffdf9e",
+                        "outline": "#89726f",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#ffb4aa",
+                        "background": "#fff8f5",
+                        "primary": "#9b3e34",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#fffbff",
+                        "on-surface": "#231a13",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "outline-variant": "#dcc0bc",
+                        "primary-fixed": "#ffdad5",
+                        "surface-container-high": "#f8e5da",
+                        "secondary": "#48663e",
+                        "on-primary-fixed": "#410001",
+                        "primary-container": "#bb554a",
+                        "on-tertiary-fixed": "#261a00",
+                        "secondary-fixed-dim": "#add09f",
+                        "surface-bright": "#fff8f5",
+                        "on-primary-fixed-variant": "#7f2921",
+                        "surface-tint": "#9f4036",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#231a13",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#392e27",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "surface-variant": "#f2dfd4",
+                        "inverse-on-surface": "#ffede4",
+                        "surface-container-low": "#fff1ea",
+                        "surface": "#fff8f5",
+                        "on-secondary-fixed": "#052103",
+                        "surface-container": "#fdeadf",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#56423f",
+                        "tertiary": "#765700",
+                        "surface-container-highest": "#f2dfd4",
+                        "surface-dim": "#e9d6cc",
+                        "tertiary-container": "#946f00",
+                        "secondary-fixed": "#c9edba"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "base": "4px",
+                        "safe-bottom": "90px",
+                        "gutter": "16px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "tab-label": ["Noto Sans SC"],
+                        "headline-lg": ["Noto Serif SC"],
+                        "body-md": ["Noto Sans SC"],
+                        "body-lg": ["Noto Sans SC"],
+                        "input-amount": ["Noto Serif SC"],
+                        "stat-figure": ["Noto Serif SC"],
+                        "entry-amount": ["Noto Serif SC"],
+                        "hero-balance": ["Noto Serif SC"],
+                        "label-caps": ["Noto Sans SC"],
+                        "headline-md": ["Noto Serif SC"]
+                    },
+                    "fontSize": {
+                        "tab-label": ["11px", { "lineHeight": "12px", "fontWeight": "600" }],
+                        "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["15px", { "lineHeight": "21px", "fontWeight": "500" }],
+                        "input-amount": ["32px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "stat-figure": ["18px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "entry-amount": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "hero-balance": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500" }],
+                        "headline-md": ["19px", { "lineHeight": "24px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Washi Paper Texture Overlay */
+        .washi-bg {
+            background-color: var(--background, #fff8f5);
+            background-image: 
+                linear-gradient(rgba(242, 223, 212, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(242, 223, 212, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Subtle noise texture for tactile feel */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .paper-card {
+            background-color: theme('colors.surface');
+            border-bottom: 2px solid theme('colors.outline-variant');
+            box-shadow: 0 2px 0 0 rgba(220, 192, 188, 0.3);
+            border-radius: 6px 12px 6px 12px; /* Organic asymmetric corners */
+        }
+        
+        .washi-tape {
+            position: absolute;
+            top: -6px;
+            right: 12px;
+            width: 30px;
+            height: 12px;
+            background-color: theme('colors.tertiary-fixed-dim');
+            opacity: 0.7;
+            transform: rotate(3deg);
+            z-index: 10;
+        }
+
+        .glass-nav {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="washi-bg text-on-surface antialiased min-h-screen pb-safe-bottom">
+<div class="noise-overlay"></div>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b-[1.5px] border-dashed border-outline-variant flat no shadows">
+<div class="flex items-center justify-between px-md h-16 w-full max-w-[480px] mx-auto">
+<button aria-label="Menu" class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform p-2 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Washi Ledger</h1>
+<button aria-label="Profile" class="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<img class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A small, perfectly circular profile picture of an artisanal creator with messy hair and round glasses, illuminated by soft warm studio lighting, against a muted off-white paper texture background, high quality portrait photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpBkccoja6H_Bj3dMdVpkB5G45b7R5mvR-_NTLOrNkd2X9DPUHY5O8vPcOq34MMVe7VjN_3qP_nMnoFgsIvIqPEG79ECVfjImuCTbP8jekeSFQbnA_mpoNl5LkIKlCsxkULICotTR96APBPoGZFF74DuZJscT3jIPj-3JMZMB9LZY7WZRfQJkTchsnb67EVMJMXhkEV0tEzLG4oMRkvJBPoColDWJlMBCx7fh34eiAsnP4tTP5j6Oq"/>
+</button>
+</div>
+</header>
+<!-- Main Content Container -->
+<main class="pt-24 px-gutter max-w-[480px] mx-auto pb-8">
+<!-- Hero Section: Profile -->
+<section class="flex flex-col items-center mb-xl">
+<div class="relative mb-sm">
+<img class="w-24 h-24 rounded-full object-cover border-2 border-primary-container shadow-[0_4px_0_theme('colors.outline-variant')]" data-alt="A large, striking circular portrait of an artisan user, a young Japanese woodworker with intense focus, wearing a simple linen work shirt. The lighting is dramatic yet soft, highlighting the texture of the fabric and skin, set against a calm, minimal beige background. High fashion editorial style photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4XuU5TiV0A2ID6FGuBRSI6O_sgmKAkAXw67MiHYW37y-JzX-2IKMS_JTfb0vr3dW5ubL1wqP4-4PGsaLvufkrQ9Dp2XKFg9dWE048SIDlrvxU6qfFfkKqLLgGJLj8RjZr6kamqMdmrIl6MFY-Ajpl0tRzH8vU7wfN7l-2qXOMfxpKAGj9qrFT3gQTXFXj9JD55muj1p5GdiczoXXaq_VB8zFG4NQvnXbjZT6t3AQVD465QifG4pes"/>
+<!-- Premium Badge -->
+<div class="absolute -bottom-2 -right-2 bg-tertiary-fixed-dim text-on-tertiary-fixed font-label-caps text-label-caps px-2 py-1 rounded-full border border-tertiary flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                    Pro
+                </div>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">Artisan User</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">tag</span>
+                ledger_id: 8824
+            </p>
+</section>
+<!-- Account Stats Row (Ledger Card) -->
+<section class="paper-card relative p-md mb-xl">
+<div class="washi-tape"></div>
+<div class="flex justify-between items-center text-center">
+<div class="flex-1 flex flex-col items-center border-r-[1.5px] border-dashed border-outline-variant/50 pr-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Total Balance</span>
+<span class="font-stat-figure text-stat-figure text-primary">¥24,500</span>
+</div>
+<div class="flex-1 flex flex-col items-center border-r-[1.5px] border-dashed border-outline-variant/50 px-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Days Active</span>
+<span class="font-stat-figure text-stat-figure text-primary">142</span>
+</div>
+<div class="flex-1 flex flex-col items-center pl-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Transactions</span>
+<span class="font-stat-figure text-stat-figure text-primary">893</span>
+</div>
+</div>
+</section>
+<!-- Action List -->
+<section class="flex flex-col gap-sm">
+<h3 class="font-label-caps text-label-caps text-outline uppercase tracking-widest pl-2 mb-1">Account Management</h3>
+<!-- List Item 1 -->
+<button class="w-full flex items-center justify-between p-md bg-surface-container-low border border-outline-variant/40 rounded-lg hover:bg-surface-container transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant border border-outline-variant/30">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">Profile Settings</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+<!-- List Item 2 -->
+<button class="w-full flex items-center justify-between p-md bg-surface-container-low border border-outline-variant/40 rounded-lg hover:bg-surface-container transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant border border-outline-variant/30">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">lock</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">Security &amp; Password</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+<!-- List Item 3 -->
+<button class="w-full flex items-center justify-between p-md bg-surface-container-low border border-outline-variant/40 rounded-lg hover:bg-surface-container transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-tertiary border border-tertiary-fixed-dim/50">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">stars</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">Premium Subscription</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+<!-- List Item 4 -->
+<button class="w-full flex items-center justify-between p-md bg-surface-container-low border border-outline-variant/40 rounded-lg hover:bg-surface-container transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant border border-outline-variant/30">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">cloud_sync</span>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">Data Backup &amp; Sync</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+</section>
+<!-- Danger Zone -->
+<section class="mt-lg pt-lg border-t-[1.5px] border-dashed border-outline-variant"><button class="w-full flex items-center justify-center gap-2 p-md bg-error-container/20 border border-error/20 text-error rounded-lg font-body-lg text-body-lg hover:bg-error-container/40 transition-colors active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                Sign Out
+            </button></section>
+</main>
+<!-- BottomNavBar -->
+<nav class="glass-nav fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] rounded-full border border-outline-variant/30 shadow-lg bg-surface-container/70 dark:bg-surface-container-highest/70 flex justify-around items-center px-lg py-sm z-50">
+<a aria-label="dashboard" class="text-on-surface-variant p-3 hover:bg-secondary-container/50 rounded-full transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+</a>
+<a aria-label="history" class="text-on-surface-variant p-3 hover:bg-secondary-container/50 rounded-full transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+</a>
+<a aria-label="query_stats" class="text-on-surface-variant p-3 hover:bg-secondary-container/50 rounded-full transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">query_stats</span>
+</a>
+<!-- Active Tab: Settings -->
+<a aria-label="settings" class="bg-secondary-container text-on-secondary-container rounded-full p-3 scale-110 shadow-sm active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+</a>
+</nav>
+</body></html>

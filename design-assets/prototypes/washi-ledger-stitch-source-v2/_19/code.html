@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Washi Ledger - About</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@600;700&display=swap');
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#261a00",
+                        "inverse-on-surface": "#ffede4",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#9f4036",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#f2bf48",
+                        "secondary": "#48663e",
+                        "on-surface": "#231a13",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdf9e",
+                        "surface-dim": "#e9d6cc",
+                        "surface-container-highest": "#f2dfd4",
+                        "on-primary-container": "#fffbff",
+                        "surface-container-high": "#f8e5da",
+                        "outline-variant": "#dcc0bc",
+                        "surface": "#fff8f5",
+                        "inverse-surface": "#392e27",
+                        "on-background": "#231a13",
+                        "surface-container-low": "#fff1ea",
+                        "primary-container": "#bb554a",
+                        "primary": "#9b3e34",
+                        "on-primary-fixed": "#410001",
+                        "secondary-fixed": "#c9edba",
+                        "outline": "#89726f",
+                        "on-secondary-fixed-variant": "#314e28",
+                        "on-tertiary-fixed-variant": "#5b4300",
+                        "on-tertiary-container": "#fffbff",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "secondary-container": "#c9edba",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#fdeadf",
+                        "surface-variant": "#f2dfd4",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fff8f5",
+                        "background": "#fff8f5",
+                        "secondary-fixed-dim": "#add09f",
+                        "on-secondary-container": "#4d6c44",
+                        "on-surface-variant": "#56423f",
+                        "tertiary-container": "#946f00",
+                        "tertiary": "#765700",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#052103",
+                        "on-primary-fixed-variant": "#7f2921",
+                        "primary-fixed": "#ffdad5",
+                        "inverse-primary": "#ffb4aa",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "safe-bottom": "90px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "xs": "8px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Noto Serif SC"],
+                        "hero-balance": ["Noto Serif SC"],
+                        "input-amount": ["Noto Serif SC"],
+                        "label-caps": ["Noto Sans SC"],
+                        "stat-figure": ["Noto Serif SC"],
+                        "headline-md": ["Noto Serif SC"],
+                        "tab-label": ["Noto Sans SC"],
+                        "body-md": ["Noto Sans SC"],
+                        "body-lg": ["Noto Sans SC"],
+                        "entry-amount": ["Noto Serif SC"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["26px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "hero-balance": ["38px", {"lineHeight": "42px", "letterSpacing": "-0.5px", "fontWeight": "700"}],
+                        "input-amount": ["32px", {"lineHeight": "38px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "14px", "letterSpacing": "1px", "fontWeight": "500"}],
+                        "stat-figure": ["18px", {"lineHeight": "22px", "fontWeight": "600"}],
+                        "headline-md": ["19px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "tab-label": ["11px", {"lineHeight": "12px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["15px", {"lineHeight": "21px", "fontWeight": "500"}],
+                        "entry-amount": ["16px", {"lineHeight": "20px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen relative flex justify-center">
+<!-- Mobile Container (Max 480px) -->
+<div class="w-full max-w-[480px] min-h-screen relative shadow-none md:shadow-2xl bg-surface mx-auto overflow-x-hidden flex flex-col">
+<!-- TopAppBar (Suppressed contextually per rules as this is a specific settings/info page, but replaced with a localized back-header) -->
+<header class="fixed top-0 w-full max-w-[480px] z-40 bg-surface/90 backdrop-blur-sm px-md h-16 flex items-center justify-between border-b-[1.5px] border-dashed border-outline-variant">
+<button aria-label="Go Back" class="text-on-surface hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface">About</h1>
+<div class="w-6"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 pt-24 pb-safe-bottom px-gutter flex flex-col gap-xl overflow-y-auto">
+<!-- Branding Header -->
+<section class="flex flex-col items-center justify-center pt-lg text-center space-y-md">
+<div class="w-24 h-24 rounded-2xl bg-surface-container-high flex items-center justify-center shadow-sm border border-outline-variant/30 relative overflow-hidden">
+<span class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: 'FILL' 1;">book_4</span>
+</div>
+<div class="space-y-base">
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Washi Ledger</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Version 2.4.1</p>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[80%] pt-sm">
+                    Minimalist ledger with a paper-like feel. Designed to bring calm and clarity to your financial tracking ritual.
+                </p>
+</section>
+<!-- Links Section (Papercut Ledger Cards) -->
+<section class="flex flex-col gap-sm">
+<!-- Link Item -->
+<a class="flex items-center justify-between p-md bg-surface-container-lowest border-b-[1.5px] border-dashed border-outline-variant hover:bg-surface-container-low transition-colors active:bg-surface-variant group" href="#">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">description</span>
+<span class="font-body-lg text-body-lg text-on-surface group-hover:text-primary transition-colors">Terms of Service</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<!-- Link Item -->
+<a class="flex items-center justify-between p-md bg-surface-container-lowest border-b-[1.5px] border-dashed border-outline-variant hover:bg-surface-container-low transition-colors active:bg-surface-variant group" href="#">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">shield</span>
+<span class="font-body-lg text-body-lg text-on-surface group-hover:text-primary transition-colors">Privacy Policy</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<!-- Link Item -->
+<a class="flex items-center justify-between p-md bg-surface-container-lowest border-b-[1.5px] border-dashed border-outline-variant hover:bg-surface-container-low transition-colors active:bg-surface-variant group" href="#">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-tertiary">star</span>
+<span class="font-body-lg text-body-lg text-on-surface group-hover:text-primary transition-colors">Rate the App</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">open_in_new</span>
+</a>
+</section>
+<!-- Copyright / Footer -->
+<footer class="mt-auto pt-lg pb-md text-center">
+<p class="font-body-md text-body-md text-on-surface-variant/70">
+                    © 2024 Artisan Studio.<br/>All rights reserved.
+                </p>
+<div class="flex justify-center gap-sm mt-sm text-outline-variant/50">
+<span class="material-symbols-outlined text-[16px]">eco</span>
+<span class="material-symbols-outlined text-[16px]">water_drop</span>
+<span class="material-symbols-outlined text-[16px]">spa</span>
+</div>
+</footer>
+</main>
+<!-- BottomNavBar (Liquid Glass Tab Bar) -->
+<!-- Note: Navigation shell is strictly visible here as "Settings/About" is often a primary tab destination in ledger apps, or accessed via it. 
+             If 'About' is considered a dead-end sub-page per rules, this should technically be suppressed. However, the prompt specifically requested: "Maintain the floating capsule bottom navigation bar." -->
+<nav class="md:hidden fixed bottom-xs left-0 right-0 z-50 flex justify-around items-center px-lg py-sm max-w-[480px] mx-auto bg-surface-container/80 backdrop-blur-md rounded-full w-[90%] left-1/2 -translate-x-1/2 border border-outline-variant/30 shadow-lg">
+<a class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+</a>
+<a class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+</a>
+<!-- Contextual FAB integrated in nav flow (Primary action) -->
+<button class="bg-primary-container text-on-primary-container rounded-full p-3 flex items-center justify-center scale-110 shadow-[0_4px_0_var(--surface-tint)] active:shadow-none active:translate-y-[4px] transition-all">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<!-- This is the 'About' page, often accessed via settings/more, but mapping to a generic 'bar_chart' (Statistics) or 'settings' if it existed.
+                 Since 'bar_chart' is the closest abstract to app internals in the given array, we'll leave it inactive as 'About' is a sub-page intent. -->
+<a class="text-on-surface-variant p-3 flex items-center justify-center hover:bg-surface-variant/50 rounded-full transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+</a>
+</nav>
+</div>
+</body></html>
