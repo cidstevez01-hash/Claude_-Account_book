@@ -175,7 +175,7 @@ export function AddTransactionPage() {
         <div className="w-10" />
       </header>
 
-      <main className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain pb-40">
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-40">
         <div className="px-md pt-2 pb-6">
           <div className="flex p-1 bg-surface-container-highest rounded-xl border border-outline-variant/30 relative">
             {(['expense', 'income'] as const).map((key) => (

@@ -16,7 +16,7 @@ export function BottomNav() {
   return (
     <nav
       className="fixed bottom-6 inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
-                 flex items-center justify-around px-lg py-xs
+                 flex items-center px-lg py-xs
                  bg-surface/80 backdrop-blur-md border border-white/20 rounded-full shadow-lg"
     >
       {items.map((item) => (
@@ -25,7 +25,7 @@ export function BottomNav() {
           to={item.to}
           end={item.to === '/'}
           className={({ isActive }) =>
-            `flex flex-col items-center gap-1 py-2 px-3 transition-colors active:opacity-60 ${
+            `flex-1 flex flex-col items-center gap-1 py-2 transition-colors active:opacity-60 ${
               isActive ? 'text-primary' : 'text-on-surface-variant'
             }`
           }

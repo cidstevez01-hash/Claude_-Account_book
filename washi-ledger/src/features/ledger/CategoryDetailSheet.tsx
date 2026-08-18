@@ -54,7 +54,7 @@ export function CategoryDetailSheet({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-md py-md">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-md py-md">
           <div className="flex flex-col items-center mb-md">
             <span className="text-label-caps font-sans text-on-surface-variant uppercase">
               {monthLabel} · TOTAL

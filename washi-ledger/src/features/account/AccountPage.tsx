@@ -30,7 +30,7 @@ export function AccountPage() {
 
   if (!user) {
     return (
-      <AppLayout title="我的账户">
+      <AppLayout title="我的账户" leftButton="home">
         <div className="flex flex-col items-center gap-md px-md py-xl text-center">
           <span className="material-symbols-outlined text-5xl text-outline">account_circle</span>
           <p className="text-body-lg text-on-surface-variant">登录后可以在多个设备间同步账本</p>

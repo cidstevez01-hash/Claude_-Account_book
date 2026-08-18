@@ -30,7 +30,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
       <aside
         className={`fixed top-0 left-0 bottom-0 z-50 w-[78%] max-w-[320px] bg-surface
                     border-r-[1.5px] border-dashed border-outline-variant shadow-xl
-                    flex flex-col overflow-y-auto transition-transform duration-300 ease-out
+                    flex flex-col overflow-y-auto overflow-x-hidden transition-transform duration-300 ease-out
                     ${open ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >

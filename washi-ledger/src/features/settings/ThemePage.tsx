@@ -27,7 +27,7 @@ export function ThemePage() {
         </h1>
       </header>
 
-      <main className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-md pt-lg">
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain px-md pt-lg">
         <div className="w-32 mx-auto">
           <div className="w-full text-center rounded-xl border-[1.5px] border-dashed border-primary bg-surface-container-highest p-3 flex flex-col items-center gap-2 shadow-sm">
             <div className="w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1">

@@ -3,7 +3,7 @@
    Material Symbols Outlined走自托管(见下面@font-face)——这个字体图标集是用户明确要求缓存到
    本地不依赖CDN的，体积小很多(一个变量字体文件)，值得现在就自托管。
    @import必须在文件最前面(CSS规范要求，排在@import "tailwindcss"之前会报警告)。 */
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
 @font-face {

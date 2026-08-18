@@ -9,7 +9,7 @@ interface DateRangeBarProps {
  * (点开弹出日历/自定义起止)是后续工作，不在这一轮范围内。 */
 export function DateRangeBar({ monthLabel, onPrevMonth, onNextMonth }: DateRangeBarProps) {
   return (
-    <div className="mx-md mb-2">
+    <div className="mx-md mt-md mb-2">
       <div className="flex items-center gap-2 w-full">
         <button
           type="button"
