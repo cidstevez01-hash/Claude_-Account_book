@@ -9,7 +9,7 @@ import { SettingsPage } from './features/settings/SettingsPage'
 import { AccountPage } from './features/account/AccountPage'
 import { SignInPage } from './features/auth/SignInPage'
 import { SignUpPage } from './features/auth/SignUpPage'
-import { PlaceholderPage } from './design-system/components/PlaceholderPage'
+import { AboutPage } from './features/about/AboutPage'
 
 export default function App() {
   return (
@@ -25,7 +25,7 @@ export default function App() {
           <Route path="/account" element={<AccountPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/register" element={<SignUpPage />} />
-          <Route path="/about" element={<PlaceholderPage title="关于" note="照_19做" />} />
+          <Route path="/about" element={<AboutPage />} />
         </Routes>
       </BrowserRouter>
     </I18nProvider>
