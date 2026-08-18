@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- maximum-scale=1锁死缩放——照旧仓库根目录index.html同款viewport配置(那边同样是
+         Capacitor原生壳，这个限制已经验证过不影响正常使用)。之前这里少了maximum-scale，
+         真机上登录页input获得焦点时WKWebView会自动放大到能看清文字的比例，且SPA路由切换
+         不会重新加载页面，缩放状态会一直带到其他页面，导致整个App变成"可以到处拖动/
+         图变形"的样子。 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
     <title>Washi Ledger</title>
   </head>
   <body>
