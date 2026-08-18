@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CategoryPicker } from './CategoryPicker'
+import { TagPicker } from './TagPicker'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -16,10 +17,9 @@ function todayStr() {
 
 /** 记一笔——照design-assets-v2/_21(功能全开版)做布局，表单字段的默认值/联动规则
  * (积分自动计算、切收入清空积分、编辑复制锁定收支类型等)照旧仓库index.html里
- * 记账表单的真实逻辑搬过来，不是照Stitch静态稿猜的。
- *
- * 这次没做、留到以后：自定义细分/标签的内联新增改名删除(旧App renderSubGrid/
- * renderTagGrid里那套"⋯"菜单)，这次只能从已有细分/标签里选。 */
+ * 记账表单的真实逻辑搬过来，不是照Stitch静态稿猜的。自定义细分(CategoryPicker)/
+ * 标签(TagPicker)的内联新增改名删除也已经接上了，逻辑照旧App renderSubGrid/
+ * renderTagGrid的"⋯"菜单搬。 */
 export function AddTransactionPage() {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -31,7 +31,7 @@ export function AddTransactionPage() {
   const typeLocked = mode !== 'add' // 编辑/复制都锁定收支类型，照旧App的setTypeSegmentLocked(true)
 
   const { user } = useAuth()
-  const { catalog } = useCatalog()
+  const { catalog, reload: reloadCatalog } = useCatalog()
   const { entries } = useEntries(user?.id ?? null)
 
   const [type, setType] = useState<EntryType>('expense')
@@ -217,6 +217,8 @@ export function AddTransactionPage() {
             }
           }}
           onSelectSub={setSubCode}
+          userId={user?.id ?? null}
+          onCatalogChanged={reloadCatalog}
         />
 
         <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
@@ -264,25 +266,14 @@ export function AddTransactionPage() {
             <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm tracking-widest uppercase">
               {t('tagsLabel')}
             </h2>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => {
-                const active = tag.code === tagCode
-                return (
-                  <button
-                    key={tag.code}
-                    type="button"
-                    onClick={() => setTagCode(active ? null : tag.code)}
-                    className={`py-1.5 px-2.5 rounded-lg text-tab-label font-sans border transition-colors ${
-                      active
-                        ? 'bg-secondary-container text-on-secondary-container border-secondary/40'
-                        : 'bg-surface-container text-on-surface-variant border-outline-variant'
-                    }`}
-                  >
-                    #{tag.zh}
-                  </button>
-                )
-              })}
-            </div>
+            <TagPicker
+              tags={tags}
+              type={type}
+              selectedTagCode={tagCode}
+              onSelectTag={setTagCode}
+              userId={user?.id ?? null}
+              onCatalogChanged={reloadCatalog}
+            />
           </div>
           {type === 'expense' && (
             <div>

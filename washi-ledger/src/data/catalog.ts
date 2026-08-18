@@ -3,10 +3,18 @@ import { mapCategoryIcon } from '../lib/iconMap'
 import type {
   Category,
   Entry,
+  EntryType,
   PaymentMethod,
   PaymentMethodPointRule,
+  Subcategory,
   Tag,
 } from '../types'
+
+/** 自定义细分/标签的code生成规则——照抄旧仓库index.html的genCustomKey()，
+ * 时间戳+随机串，跟预设的语义化code(比如'bowl'/'ic-tag-work')不会撞 */
+function genCustomKey(): string {
+  return 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)
+}
 
 interface CategoryRow {
   id: string
@@ -234,5 +242,49 @@ export async function upsertEntry(entry: Entry, userId: string) {
 
 export async function deleteEntry(id: string, userId: string) {
   const { error } = await supabase.from('entries').delete().eq('id', id).eq('user_id', userId)
+  if (error) throw error
+}
+
+/** 自定义细分/标签的新增/改名/删除——逻辑照抄旧仓库index.html的addCustomSub/
+ * updateCustomSub/deleteCustomSub(细分)和addCustomTag/updateCustomTag/deleteCustomTag
+ * (标签)。预设的(is_preset=true)不允许改/删，这几个函数只处理is_preset=false的自定义项，
+ * 调用方(UI)要保证只对custom===true的项调用这几个函数 */
+export async function addCustomSubcategory(catCode: string, label: string, userId: string): Promise<Subcategory> {
+  const id = crypto.randomUUID()
+  const code = genCustomKey()
+  const { error } = await supabase
+    .from('subcategories')
+    .insert({ id, code, cat_code: catCode, zh: label, ja: label, is_preset: false, user_id: userId })
+  if (error) throw error
+  return { id, code, zh: label, ja: label, custom: true }
+}
+
+export async function updateCustomSubcategory(id: string, label: string): Promise<void> {
+  const { error } = await supabase.from('subcategories').update({ zh: label, ja: label }).eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteCustomSubcategory(id: string): Promise<void> {
+  const { error } = await supabase.from('subcategories').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function addCustomTag(type: EntryType, label: string, userId: string): Promise<Tag> {
+  const id = crypto.randomUUID()
+  const code = genCustomKey()
+  const { error } = await supabase
+    .from('tags')
+    .insert({ id, code, type, zh: label, ja: label, is_preset: false, user_id: userId })
+  if (error) throw error
+  return { id, code, type, zh: label, ja: label, custom: true }
+}
+
+export async function updateCustomTag(id: string, label: string): Promise<void> {
+  const { error } = await supabase.from('tags').update({ zh: label, ja: label }).eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteCustomTag(id: string): Promise<void> {
+  const { error } = await supabase.from('tags').delete().eq('id', id)
   if (error) throw error
 }

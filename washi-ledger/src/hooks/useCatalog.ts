@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { fetchCatalog, type Catalog } from '../data/catalog'
 
 export function useCatalog() {
   const [catalog, setCatalog] = useState<Catalog | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
+
+  const reload = useCallback(() => {
+    setLoading(true)
+    return fetchCatalog()
+      .then((data) => setCatalog(data))
+      .catch((e) => setError(e))
+      .finally(() => setLoading(false))
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -24,5 +32,5 @@ export function useCatalog() {
     }
   }, [])
 
-  return { catalog, loading, error }
+  return { catalog, loading, error, reload }
 }
