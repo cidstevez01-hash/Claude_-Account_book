@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
-import { useAuth } from '../auth/useAuth'
 import { useSettings } from '../../hooks/useSettings'
 import { useI18n } from '../../lib/i18n'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -71,31 +70,25 @@ function SelectRow({
   )
 }
 
-/** 设置页——照design-assets-v2/_18的列表布局做。Currency这项虽然真实存进
- * user_settings.currency(照旧App pushSettingsUpsert逻辑)，但仪表盘/记一笔页
- * 目前还是硬编码显示CNY，还没接到这个设置上——多币种金额展示是更大的一块
- * 工作，这次先只做设置本身的存取，跟数据联动留到以后。Theme目前只有一套
+/** 设置页——照design-assets-v2/_18的列表布局做。语言/货币都真实存进user_settings
+ * (照旧App pushSettingsUpsert逻辑)，且经SettingsProvider(hooks/useSettings.tsx)
+ * 全局共享——语言切换会立刻影响全局i18n(setLang本质是update({lang}))，货币切换会
+ * 影响明细/仪表盘的金额换算显示(见data/currencyDisplay.ts)。Theme目前只有一套
  * Washi Ledger视觉，点进去是/theme子页面(照design-assets-v2/_25的Bento卡片
  * 布局)，只展示这一张真实存在的主题卡，没有编另外几张假主题 */
 export function SettingsPage() {
   const navigate = useNavigate()
-  const { user } = useAuth()
-  const { lang, setLang } = useI18n()
-  const { settings, update } = useSettings(user?.id ?? null)
-
-  function handleLangChange(next: Lang) {
-    setLang(next)
-    update({ lang: next })
-  }
+  const { lang, setLang, t } = useI18n()
+  const { settings, update } = useSettings()
 
   return (
-    <AppLayout title="设置">
+    <AppLayout title={t('settingsTitle')}>
       <div className="px-md pt-md flex flex-col gap-2">
         <SelectRow
           icon="language"
-          label="语言"
+          label={t('langLabel')}
           value={lang}
-          onChange={(v) => handleLangChange(v as Lang)}
+          onChange={(v) => setLang(v as Lang)}
           options={[
             { value: 'zh', label: '中文' },
             { value: 'ja', label: '日本語' },
@@ -104,24 +97,24 @@ export function SettingsPage() {
 
         <SelectRow
           icon="payments"
-          label="货币"
+          label={t('currencyRowLabel')}
           value={settings.currency}
           onChange={(v) => update({ currency: v })}
           options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.zh} (${c.code})` }))}
         />
 
-        <SettingsRow icon="palette" label="主题" onClick={() => navigate('/theme')}>
+        <SettingsRow icon="palette" label={t('themeLabel')} onClick={() => navigate('/theme')}>
           <div className="flex items-center gap-1">
             <span>Washi Ledger</span>
             <span className="material-symbols-outlined text-[18px]">chevron_right</span>
           </div>
         </SettingsRow>
 
-        <SettingsRow icon={APP_ICONS.account} label="我的账户" onClick={() => navigate('/account')}>
+        <SettingsRow icon={APP_ICONS.account} label={t('accountTitle')} onClick={() => navigate('/account')}>
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
 
-        <SettingsRow icon={APP_ICONS.about} label="关于" onClick={() => navigate('/about')}>
+        <SettingsRow icon={APP_ICONS.about} label={t('aboutTitle')} onClick={() => navigate('/about')}>
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
       </div>

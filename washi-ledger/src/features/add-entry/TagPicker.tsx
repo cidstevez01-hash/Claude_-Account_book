@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { addCustomTag, updateCustomTag, deleteCustomTag } from '../../data/catalog'
+import { useI18n } from '../../lib/i18n'
 import type { EntryType, Tag } from '../../types'
 
 interface TagPickerProps {
@@ -15,6 +16,7 @@ interface TagPickerProps {
  * 自定义标签支持内联新增/改名/删除，逻辑照旧仓库index.html的renderTagGrid()搬；
  * 预设标签(is_preset=true)显示锁形小图标，不给编辑/删除入口 */
 export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, onCatalogChanged }: TagPickerProps) {
+  const { t } = useI18n()
   const [editingCode, setEditingCode] = useState<string | null>(null) // tag.id 或 '__new__'
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
@@ -124,7 +126,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                     className="flex items-center gap-2 px-3 py-2 text-body-md text-on-surface whitespace-nowrap w-full"
                   >
                     <span className="material-symbols-outlined text-[16px]">edit</span>
-                    编辑
+                    {t('editLabel')}
                   </button>
                   <button
                     type="button"
@@ -132,7 +134,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                     className="flex items-center gap-2 px-3 py-2 text-body-md text-primary whitespace-nowrap w-full"
                   >
                     <span className="material-symbols-outlined text-[16px]">delete</span>
-                    删除
+                    {t('deleteLabel')}
                   </button>
                 </div>
               )}
@@ -162,7 +164,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
-            placeholder="新标签"
+            placeholder={t('newTagPlaceholder')}
             className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label font-sans w-20 focus:outline-none"
           />
           <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
@@ -180,7 +182,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
             className="py-1.5 px-2.5 rounded-lg border border-dashed border-primary text-primary text-tab-label font-sans flex items-center gap-1"
           >
             <span className="material-symbols-outlined text-[14px]">add</span>
-            标签
+            {t('tagsLabel')}
           </button>
         )
       )}

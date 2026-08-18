@@ -1,3 +1,5 @@
+import { useI18n } from '../../lib/i18n'
+
 interface ConfirmDialogProps {
   open: boolean
   title: string
@@ -19,14 +21,17 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = '删除',
-  cancelLabel = '取消',
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   onCancel,
   icon = 'delete',
   tone = 'error',
 }: ConfirmDialogProps) {
+  const { t } = useI18n()
   if (!open) return null
+  const finalConfirmLabel = confirmLabel ?? t('deleteLabel')
+  const finalCancelLabel = cancelLabel ?? t('cancelLabel')
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-md">
@@ -50,7 +55,7 @@ export function ConfirmDialog({
             onClick={onCancel}
             className="flex-1 py-2.5 rounded-lg border border-outline text-on-surface text-body-lg active:scale-95 transition-transform"
           >
-            {cancelLabel}
+            {finalCancelLabel}
           </button>
           <button
             type="button"
@@ -58,7 +63,7 @@ export function ConfirmDialog({
             className="flex-1 py-2.5 rounded-lg bg-primary text-on-primary text-body-lg active:scale-95 transition-transform"
             style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
           >
-            {confirmLabel}
+            {finalConfirmLabel}
           </button>
         </div>
       </div>

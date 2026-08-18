@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDay } from '../../data/summary'
+import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from '../ledger/EntryCard'
 import { dayLabel } from '../ledger/dayLabel'
 import type { Category, Entry } from '../../types'
@@ -8,6 +9,10 @@ import type { Category, Entry } from '../../types'
 interface HistoryEntryListProps {
   entries: Entry[]
   categories: Category[]
+  /** 当日净额的显示币种——调用方(HistoryPage)传入前应该已经用
+   * data/currencyDisplay.ts的toDisplayEntries()把entries统一换算成这个币种了，
+   * 这里只管格式化显示，不做换算 */
+  currency: string
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
@@ -15,7 +20,7 @@ interface HistoryEntryListProps {
 
 /** 明细页的按日分组列表——跟仪表盘的RecentEntriesList不同点：不限条数、每日标题
  * 旁边带当日净额(照design-assets-v2/_13)，没有"最近记录/查看全部"标题 */
-export function HistoryEntryList({ entries, categories, onEdit, onCopy, onDelete }: HistoryEntryListProps) {
+export function HistoryEntryList({ entries, categories, currency, onEdit, onCopy, onDelete }: HistoryEntryListProps) {
   const { t } = useI18n()
   const groups = groupByDay(entries)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -43,7 +48,8 @@ export function HistoryEntryList({ entries, categories, onEdit, onCopy, onDelete
                 className="font-serif text-stat-figure"
                 style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
               >
-                {dayNet >= 0 ? '+' : '-'}¥{Math.abs(dayNet).toLocaleString()}
+                {dayNet >= 0 ? '+' : '-'}
+                {formatCurrency(Math.abs(dayNet), currency)}
               </span>
             </div>
             {group.entries.map((entry) => {

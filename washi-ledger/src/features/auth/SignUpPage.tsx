@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useI18n } from '../../lib/i18n'
 
 type Mode = 'signup' | 'verify'
 
@@ -11,6 +12,7 @@ type Mode = 'signup' | 'verify'
  * 真实逻辑照旧App搬：signUp后如果需要邮箱验证，进入验证码输入态(verifyOtp)，
  * 不是注册完直接算完成 */
 export function SignUpPage() {
+  const { t } = useI18n()
   const navigate = useNavigate()
   const [mode, setMode] = useState<Mode>('signup')
   const [email, setEmail] = useState('')
@@ -23,11 +25,11 @@ export function SignUpPage() {
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !password) {
-      setError('请输入邮箱和密码')
+      setError(t('needEmailPasswordError'))
       return
     }
     if (password !== password2) {
-      setError('两次密码不一致')
+      setError(t('passwordMismatchError'))
       return
     }
     setLoading(true)
@@ -51,7 +53,7 @@ export function SignUpPage() {
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault()
     if (!code.trim()) {
-      setError('请输入验证码')
+      setError(t('needVerifyCodeError'))
       return
     }
     setLoading(true)
@@ -83,21 +85,21 @@ export function SignUpPage() {
           className="flex items-center gap-1 text-label-caps font-sans text-on-surface-variant mb-md self-start"
         >
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          返回
+          {t('backLabel')}
         </button>
       )}
 
       <div className="flex flex-col items-center mb-lg">
         <h1 className="font-serif text-headline-lg text-primary">Washi Ledger</h1>
         <p className="text-label-caps font-sans text-on-surface-variant mt-1">
-          {mode === 'signup' ? '开始记录你的生活' : '查收邮箱里的验证码'}
+          {mode === 'signup' ? t('signUpTagline') : t('verifyTagline')}
         </p>
       </div>
 
       {mode === 'signup' ? (
         <form onSubmit={handleSignUp} className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md flex flex-col gap-md">
           <div className="flex flex-col gap-1">
-            <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">邮箱</label>
+            <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('emailLabel')}</label>
             <input
               type="email"
               value={email}
@@ -107,7 +109,7 @@ export function SignUpPage() {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">密码</label>
+            <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('passwordLabel')}</label>
             <input
               type="password"
               value={password}
@@ -117,7 +119,7 @@ export function SignUpPage() {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">确认密码</label>
+            <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('confirmPasswordLabel')}</label>
             <input
               type="password"
               value={password2}
@@ -134,18 +136,21 @@ export function SignUpPage() {
             disabled={loading}
             className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif disabled:opacity-50"
           >
-            {loading ? '注册中…' : '创建账本'}
+            {loading ? t('signUpSubmitLoading') : t('signUpSubmitBtn')}
           </button>
         </form>
       ) : (
         <form onSubmit={handleVerify} className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md flex flex-col gap-md">
-          <p className="text-body-md text-on-surface-variant">验证邮件已发送到 {email}，请输入验证码完成注册</p>
+          <p className="text-body-md text-on-surface-variant">
+            {t('verifyEmailSentPrefix')} {email}
+            {t('verifyEmailSentSuffix')}
+          </p>
           <input
             type="text"
             inputMode="numeric"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder="验证码"
+            placeholder={t('verifyCodePlaceholder')}
             className="bg-transparent border-0 border-b-2 border-outline-variant focus:border-primary outline-none py-1 text-body-lg text-on-surface focus:ring-0 tracking-widest text-center"
           />
           {error && <p className="text-body-md text-primary">{error}</p>}
@@ -154,16 +159,16 @@ export function SignUpPage() {
             disabled={loading}
             className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif disabled:opacity-50"
           >
-            {loading ? '验证中…' : '验证并完成注册'}
+            {loading ? t('verifySubmitLoading') : t('verifySubmitBtn')}
           </button>
         </form>
       )}
 
       {mode === 'signup' && (
         <p className="text-center text-body-md text-on-surface-variant mt-md">
-          已经有账号？{' '}
+          {t('alreadyHaveAccountText')}{' '}
           <Link to="/signin" className="text-primary font-medium">
-            去登录
+            {t('goToSignInLink')}
           </Link>
         </p>
       )}

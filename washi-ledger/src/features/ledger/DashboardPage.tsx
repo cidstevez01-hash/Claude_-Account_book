@@ -10,7 +10,10 @@ import { RecentEntriesList } from './RecentEntriesList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
+import { useSettings } from '../../hooks/useSettings'
+import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { summarizeMonth, categoryBreakdown, isSameMonth } from '../../data/summary'
+import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -21,6 +24,8 @@ export function DashboardPage() {
   const { user } = useAuth()
   const { catalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
+  const { settings } = useSettings()
+  const rates = useDisplayRates(settings.currency)
   const navigate = useNavigate()
 
   const [monthAnchor, setMonthAnchor] = useState(() => new Date())
@@ -32,19 +37,20 @@ export function DashboardPage() {
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
     [catalog]
   )
-
-  // entries现在是缓存优先(见useEntries.ts)，比只走网络请求的catalog先就绪很多；
-  // 在catalog没就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会
-  // 闪一下"英文图标名+统一灰色"这种半成品画面，等catalog真正到位才渲染正文
-  if (!catalog) return null
+  // 每条记录按settings.currency统一换算后再参与后面的求和/占比计算(照旧App
+  // dayTotal用reduce(...+toBase(...))的真实模式，见data/currencyDisplay.ts的说明)
+  const displayEntries = useMemo(
+    () => toDisplayEntries(entries, settings.currency, rates),
+    [entries, settings.currency, rates]
+  )
 
   const monthLabel = `${monthAnchor.getFullYear()}年${monthAnchor.getMonth() + 1}月`
   const shiftMonth = (delta: number) =>
     setMonthAnchor((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1))
 
-  const summary = summarizeMonth(entries, monthAnchor)
-  const expenseShares = categoryBreakdown(entries, categories, 'expense', monthAnchor)
-  const incomeShares = categoryBreakdown(entries, categories, 'income', monthAnchor)
+  const summary = summarizeMonth(displayEntries, monthAnchor)
+  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor)
+  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor)
 
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return
@@ -55,51 +61,66 @@ export function DashboardPage() {
 
   const detailCategory = categories.find((c) => c.code === detailSelection?.catCode) ?? null
   const detailEntries = detailSelection
-    ? entries.filter(
+    ? displayEntries.filter(
         (e) => e.catCode === detailSelection.catCode && e.type === detailSelection.type && isSameMonth(e.date, monthAnchor)
       )
     : []
 
   return (
     <AppLayout title={t('appTitle')}>
-      <DateRangeBar monthLabel={monthLabel} onPrevMonth={() => shiftMonth(-1)} onNextMonth={() => shiftMonth(1)} />
-      <BalanceCard summary={summary} currency="CNY" />
-      <CategoryDonutCard
-        expenseShares={expenseShares}
-        incomeShares={incomeShares}
-        onSelectCategory={(catCode, type) => setDetailSelection({ catCode, type })}
-        resetKey={monthLabel}
-      />
-      <RecentEntriesList
-        entries={entries}
-        categories={categories}
-        onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-        onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
-        onDelete={(entry) => setPendingDeleteId(entry.id)}
-      />
+      {/* entries缓存优先(见useEntries.ts)，比只走网络请求的catalog先就绪很多；catalog没
+          就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会闪一下"英文图标名
+          +统一灰色"的半成品画面——之前用if(!catalog)return null整页提前返回，连header/
+          底部导航都出不来，真机上就是"进App白屏一段时间"；改成只在内容区域挡一个轻量的
+          loading占位，外壳(header/bottom nav)立刻能看到 */}
+      {!catalog ? (
+        <div className="flex items-center justify-center py-24">
+          <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
+        </div>
+      ) : (
+        <>
+          <DateRangeBar monthLabel={monthLabel} onPrevMonth={() => shiftMonth(-1)} onNextMonth={() => shiftMonth(1)} />
+          <BalanceCard summary={summary} currency={settings.currency} />
+          <CategoryDonutCard
+            expenseShares={expenseShares}
+            incomeShares={incomeShares}
+            onSelectCategory={(catCode, type) => setDetailSelection({ catCode, type })}
+            resetKey={monthLabel}
+            currency={settings.currency}
+          />
+          <RecentEntriesList
+            entries={displayEntries}
+            categories={categories}
+            onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
+            onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+            onDelete={(entry) => setPendingDeleteId(entry.id)}
+          />
 
-      <ConfirmDialog
-        open={pendingDeleteId != null}
-        title="确定要删除这条记录吗？"
-        message="删除后将无法恢复此条账单数据，您的账户余额将自动重新计算。"
-        onConfirm={confirmDelete}
-        onCancel={() => setPendingDeleteId(null)}
-      />
+          <ConfirmDialog
+            open={pendingDeleteId != null}
+            title={t('confirmDeleteTitle')}
+            message={t('confirmDeleteMessage')}
+            onConfirm={confirmDelete}
+            onCancel={() => setPendingDeleteId(null)}
+          />
 
-      <CategoryDetailSheet
-        open={detailSelection != null}
-        category={detailCategory}
-        monthLabel={monthLabel}
-        entries={detailEntries}
-        onClose={() => setDetailSelection(null)}
-        onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-        onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
-        onDelete={(entry) => setPendingDeleteId(entry.id)}
-      />
+          <CategoryDetailSheet
+            open={detailSelection != null}
+            category={detailCategory}
+            monthLabel={monthLabel}
+            entries={detailEntries}
+            currency={settings.currency}
+            onClose={() => setDetailSelection(null)}
+            onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
+            onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+            onDelete={(entry) => setPendingDeleteId(entry.id)}
+          />
+        </>
+      )}
 
       <button
         type="button"
-        aria-label="记一笔"
+        aria-label={t('addTitle')}
         onClick={() => navigate('/add')}
         className="stamp-shadow fixed z-40 flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-on-primary"
         style={{

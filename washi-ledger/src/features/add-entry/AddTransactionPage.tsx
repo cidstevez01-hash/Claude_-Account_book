@@ -6,6 +6,7 @@ import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
+import { useSettings } from '../../hooks/useSettings'
 import { upsertEntry, resolvePointRate } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import type { Entry, EntryType } from '../../types'
@@ -33,6 +34,7 @@ export function AddTransactionPage() {
   const { user } = useAuth()
   const { catalog, reload: reloadCatalog } = useCatalog()
   const { entries } = useEntries(user?.id ?? null)
+  const { settings } = useSettings()
 
   const [type, setType] = useState<EntryType>('expense')
   const [amount, setAmount] = useState('')
@@ -115,10 +117,6 @@ export function AddTransactionPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, payCode, date, type])
 
-  // entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染分类/支付方式
-  // 选择器会闪一下"英文图标名+统一灰色"的半成品画面，等catalog真正到位才渲染正文
-  if (!catalog) return null
-
   function touchAmount(v: string) {
     pointsArmed.current = true
     setAmount(v)
@@ -145,7 +143,7 @@ export function AddTransactionPage() {
       id: base ? base.id : `${Date.now()}${Math.random().toString(16).slice(2)}`,
       type,
       amount: amt,
-      currency: base?.currency ?? 'CNY',
+      currency: base?.currency ?? settings.currency,
       catCode: cat.code,
       subCode,
       paymentMethod: payCode ?? 'cash',
@@ -176,6 +174,16 @@ export function AddTransactionPage() {
       </header>
 
       <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-40">
+       {/* entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染分类/支付方式
+           选择器会闪一下"英文图标名+统一灰色"的半成品画面——之前用if(!catalog)return null
+           整页提前返回，连header/返回按钮都出不来，真机上就是"进App白屏一段时间"；改成
+           只在main内容区域挡一个轻量的loading占位，外壳(header)立刻能看到、能点返回 */}
+       {!catalog ? (
+        <div className="flex items-center justify-center h-full py-24">
+          <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
+        </div>
+       ) : (
+        <>
         <div className="px-md pt-2 pb-6">
           <div className="flex p-1 bg-surface-container-highest rounded-xl border border-outline-variant/30 relative">
             {(['expense', 'income'] as const).map((key) => (
@@ -184,7 +192,7 @@ export function AddTransactionPage() {
                 type="button"
                 disabled={typeLocked}
                 onClick={() => setType(key)}
-                className={`flex-1 py-2 text-center rounded-lg text-label-caps font-sans font-bold transition-colors ${
+                className={`flex-1 py-2 text-center rounded-lg text-label-caps font-sans font-normal transition-colors ${
                   type === key ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant'
                 } ${typeLocked ? 'opacity-60' : ''}`}
               >
@@ -320,6 +328,8 @@ export function AddTransactionPage() {
             className="w-full bg-transparent border-none outline-none resize-none h-32 p-0 text-body-lg text-on-surface focus:ring-0"
           />
         </div>
+        </>
+       )}
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-md pb-6 bg-gradient-to-t from-surface via-surface to-transparent">

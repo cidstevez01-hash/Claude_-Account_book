@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { addCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
 import { tintColor } from '../../lib/color'
+import { useI18n } from '../../lib/i18n'
 import type { Category } from '../../types'
 
 interface CategoryPickerProps {
@@ -29,6 +30,7 @@ export function CategoryPicker({
   userId,
   onCatalogChanged,
 }: CategoryPickerProps) {
+  const { t } = useI18n()
   const selectedCat = categories.find((c) => c.code === selectedCatCode) ?? categories[0] ?? null
   const subs = selectedCat?.subs ?? []
 
@@ -88,7 +90,7 @@ export function CategoryPicker({
   return (
     <div className="py-md">
       <div className="flex items-center justify-between px-md mb-sm">
-        <h2 className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">分类</h2>
+        <h2 className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('categoryLabel')}</h2>
       </div>
       <div className="grid grid-cols-4 gap-sm px-md pb-4">
         {categories.map((cat) => {
@@ -181,7 +183,7 @@ export function CategoryPicker({
                         className="flex items-center gap-2 px-3 py-2 text-body-md text-on-surface whitespace-nowrap w-full"
                       >
                         <span className="material-symbols-outlined text-[16px]">edit</span>
-                        编辑
+                        {t('editLabel')}
                       </button>
                       <button
                         type="button"
@@ -189,7 +191,7 @@ export function CategoryPicker({
                         className="flex items-center gap-2 px-3 py-2 text-body-md text-primary whitespace-nowrap w-full"
                       >
                         <span className="material-symbols-outlined text-[16px]">delete</span>
-                        删除
+                        {t('deleteLabel')}
                       </button>
                     </div>
                   )}
@@ -219,7 +221,7 @@ export function CategoryPicker({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
-                placeholder="新细分"
+                placeholder={t('newSubPlaceholder')}
                 className="py-2 px-3 rounded-xl border border-primary bg-surface text-body-md text-on-surface w-24 focus:outline-none"
               />
               <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
@@ -238,7 +240,7 @@ export function CategoryPicker({
                 className="py-2 px-3 rounded-xl border border-dashed border-primary text-primary text-body-md font-sans flex items-center gap-1"
               >
                 <span className="material-symbols-outlined text-[16px]">add</span>
-                添加
+                {t('addLabel')}
               </button>
             )
           )}

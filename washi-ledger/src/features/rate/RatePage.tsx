@@ -58,7 +58,7 @@ export function RatePage() {
   }, [fromCode, search])
 
   return (
-    <AppLayout title="汇率换算">
+    <AppLayout title={t('rateNavLabel')}>
       <div className="px-md pt-md flex flex-col gap-md">
         <div className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md papercut-shadow relative">
           <div className="flex flex-col gap-1">
@@ -66,7 +66,7 @@ export function RatePage() {
               <select
                 value={fromCode}
                 onChange={(e) => setFromCode(e.target.value)}
-                className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-medium"
+                className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold"
               >
                 {CURRENCIES.map((c) => (
                   <option key={c.code} value={c.code}>
@@ -88,7 +88,7 @@ export function RatePage() {
             <button
               type="button"
               onClick={handleSwap}
-              aria-label="交换货币"
+              aria-label={t('swapCurrencyAria')}
               className="w-10 h-10 rounded-full bg-surface border-[1.5px] border-outline-variant flex items-center justify-center text-primary"
             >
               <span className="material-symbols-outlined">swap_vert</span>
@@ -100,7 +100,7 @@ export function RatePage() {
               <select
                 value={toCode}
                 onChange={(e) => setToCode(e.target.value)}
-                className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-medium text-right"
+                className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold text-right"
               >
                 {CURRENCIES.map((c) => (
                   <option key={c.code} value={c.code}>

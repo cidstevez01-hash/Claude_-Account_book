@@ -1,12 +1,6 @@
 import { useI18n } from '../../lib/i18n'
 import type { MonthSummary } from '../../data/summary'
-
-function fmt(amount: number, currency: string) {
-  return `${currency === 'JPY' ? '¥' : '¥'}${amount.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
-}
+import { formatCurrency, symbolFor } from '../../data/currencyDisplay'
 
 interface BalanceCardProps {
   summary: MonthSummary
@@ -27,7 +21,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
           {t('balanceLabel')}
         </p>
         <h2 className="font-serif text-hero-balance font-bold text-on-surface flex items-baseline justify-center flex-wrap">
-          <span className="text-2xl font-normal mr-1 text-on-surface-variant">¥</span>
+          <span className="text-2xl font-normal mr-1 text-on-surface-variant">{symbolFor(currency)}</span>
           {summary.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           {summary.points > 0 && (
             <span className="ml-2 text-sm font-sans text-outline font-normal">
@@ -42,7 +36,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
             <span className="material-symbols-outlined text-sm">arrow_downward</span>
             {t('monthIncome')}
           </p>
-          <p className="font-serif text-stat-figure text-secondary">{fmt(summary.income, currency)}</p>
+          <p className="font-serif text-stat-figure text-secondary">{formatCurrency(summary.income, currency)}</p>
         </div>
         <div className="w-[1.5px] h-10 bg-outline-variant" />
         <div className="flex-1 text-center">
@@ -50,7 +44,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
             <span className="material-symbols-outlined text-sm">arrow_upward</span>
             {t('monthExpense')}
           </p>
-          <p className="font-serif text-stat-figure text-primary">{fmt(summary.expense, currency)}</p>
+          <p className="font-serif text-stat-figure text-primary">{formatCurrency(summary.expense, currency)}</p>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 import { DonutRing } from '../../design-system/components/DonutRing'
 import { ScrollLegendList } from '../../design-system/components/ScrollLegendList'
+import { useI18n } from '../../lib/i18n'
 import type { PaymentPointsShare } from '../../data/summary'
 
 interface PointsDonutCardProps {
@@ -12,14 +13,15 @@ interface PointsDonutCardProps {
  * Stitch设计稿_39/_42里那个虚构的"Shopping Rewards/Travel Redemptions"分类(数据库里
  * 没有这个维度，积分数据只挂在支付方式上，不能瞎编一套假分类出来) */
 export function PointsDonutCard({ shares, resetKey }: PointsDonutCardProps) {
+  const { t } = useI18n()
   const total = shares.reduce((sum, s) => sum + s.points, 0)
 
   return (
     <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
-      <h3 className="font-serif text-headline-md text-on-surface mb-3">积分内訳(按支付方式)</h3>
+      <h3 className="font-serif text-headline-md text-on-surface mb-3">{t('pointsDonutTitle')}</h3>
 
       {shares.length === 0 ? (
-        <p className="text-center text-body-md text-on-surface-variant py-8">这个月还没有积分记录</p>
+        <p className="text-center text-body-md text-on-surface-variant py-8">{t('noPointsThisMonth')}</p>
       ) : (
         <div className="flex flex-col items-center py-2">
           <div className="relative w-48 h-48 mb-3">

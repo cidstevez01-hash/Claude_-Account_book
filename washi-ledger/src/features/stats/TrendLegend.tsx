@@ -1,4 +1,5 @@
 import { ScrollLegendList } from '../../design-system/components/ScrollLegendList'
+import { useI18n } from '../../lib/i18n'
 import type { TrendBucket, TrendLegendItem } from '../../data/summary'
 
 interface TrendLegendProps {
@@ -23,6 +24,7 @@ export function TrendLegend({
   onClosePoint,
   resetKey,
 }: TrendLegendProps) {
+  const { t } = useI18n()
   if (selectedBucket) {
     return (
       <div className="mt-sm">
@@ -33,13 +35,13 @@ export function TrendLegend({
               {valuePrefix}
               {selectedBucket.total.toLocaleString()}
             </span>
-            <button type="button" onClick={onClosePoint} aria-label="关闭" className="text-on-surface-variant">
+            <button type="button" onClick={onClosePoint} aria-label={t('closeAria')} className="text-on-surface-variant">
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
           </div>
         </div>
         {selectedBucket.detailSegments.length === 0 ? (
-          <p className="text-body-md text-on-surface-variant text-center py-2">这天还没有记录</p>
+          <p className="text-body-md text-on-surface-variant text-center py-2">{t('noRecordsThisDay')}</p>
         ) : (
           <ScrollLegendList key={selectedBucket.label} rowHeight={30}>
             <div className="flex flex-col gap-1">

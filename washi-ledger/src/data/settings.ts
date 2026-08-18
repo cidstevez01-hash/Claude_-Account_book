@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { DEFAULT_SETTINGS } from '../lib/localSettings'
 import type { UserSettings } from '../types'
 
 interface UserSettingsRow {
@@ -8,16 +9,14 @@ interface UserSettingsRow {
   theme_skin?: string | null
 }
 
-export const DEFAULT_SETTINGS: UserSettings = { lang: 'zh', currency: 'CNY', themeSkin: 'default' }
-
 export async function fetchUserSettings(userId: string): Promise<UserSettings | null> {
   const { data, error } = await supabase.from('user_settings').select('*').eq('user_id', userId).maybeSingle()
   if (error) throw error
   if (!data) return null
   const row = data as UserSettingsRow
   return {
-    lang: row.lang === 'ja' ? 'ja' : 'zh',
-    currency: row.currency ?? 'CNY',
+    lang: row.lang === 'zh' ? 'zh' : row.lang === 'ja' ? 'ja' : DEFAULT_SETTINGS.lang,
+    currency: row.currency ?? DEFAULT_SETTINGS.currency,
     themeSkin: 'default',
   }
 }

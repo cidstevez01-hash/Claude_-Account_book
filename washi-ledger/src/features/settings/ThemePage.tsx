@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useI18n } from '../../lib/i18n'
 
 /** 主题选择——独立整屏子页面，照design-assets-v2/_25的Bento卡片布局做，但只放了
  * "Washi Ledger"这一张真实存在的主题卡：_25设计稿里画了"Midnight Ink/Forest Moss/
@@ -7,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
  * 只做了真实存在的这一套，选中态常驻显示 */
 export function ThemePage() {
   const navigate = useNavigate()
+  const { t } = useI18n()
 
   return (
     <div
@@ -16,14 +18,14 @@ export function ThemePage() {
       <header className="flex items-center px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
         <button
           type="button"
-          aria-label="返回"
+          aria-label={t('backLabel')}
           onClick={() => navigate(-1)}
           className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface"
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <h1 className="flex-1 text-center font-serif text-headline-md text-on-surface tracking-tight -ml-10">
-          主题
+          {t('themeLabel')}
         </h1>
       </header>
 
@@ -46,7 +48,7 @@ export function ThemePage() {
           </div>
         </div>
         <p className="text-center text-body-md text-on-surface-variant mt-lg">
-          目前只有这一套视觉主题，更多主题以后再加
+          {t('themeOnlyOneHint')}
         </p>
       </main>
     </div>

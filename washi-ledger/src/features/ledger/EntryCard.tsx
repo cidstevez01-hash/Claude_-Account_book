@@ -1,4 +1,6 @@
 import { tintColor } from '../../lib/color'
+import { useI18n } from '../../lib/i18n'
+import { formatCurrency } from '../../data/currencyDisplay'
 import type { Category, Entry } from '../../types'
 
 interface EntryCardProps {
@@ -15,7 +17,11 @@ interface EntryCardProps {
  * "Expanded Action Drawer"实现。仪表盘的最近记录列表和明细页的完整列表共用这个组件，
  * 避免同一段UI在两个页面各写一遍。 */
 export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy, onDelete }: EntryCardProps) {
+  const { t } = useI18n()
   const isIncome = entry.type === 'income'
+  // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)
+  const sub = category?.subs.find((s) => s.code === entry.subCode)
+  const title = category ? (sub ? `${category.zh} · ${sub.zh}` : category.zh) : entry.note || '—'
   return (
     <div className="flex flex-col bg-surface-container-lowest rounded-lg mb-2 border border-outline-variant papercut-shadow overflow-hidden">
       <button type="button" className="flex items-center p-3 text-left" onClick={onToggle}>
@@ -34,14 +40,15 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
           </span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-body-lg text-on-surface truncate">{category ? category.zh : entry.note || '—'}</p>
-          <p className="text-body-md text-on-surface-variant text-xs truncate">{entry.note || category?.zh || ''}</p>
+          <p className="font-sans text-body-lg font-medium text-on-surface truncate">{title}</p>
+          {entry.note && <p className="text-body-md text-on-surface-variant text-xs truncate">{entry.note}</p>}
         </div>
         <p
           className="font-serif text-entry-amount shrink-0 ml-2"
           style={{ color: isIncome ? 'var(--color-secondary)' : 'var(--color-primary)' }}
         >
-          {isIncome ? '+' : '-'}¥{entry.amount.toLocaleString()}
+          {isIncome ? '+' : '-'}
+          {formatCurrency(entry.amount, entry.currency)}
         </p>
       </button>
 
@@ -53,7 +60,7 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
             onClick={() => onEdit?.(entry)}
           >
             <span className="material-symbols-outlined text-[20px]">edit</span>
-            <span className="text-[10px] font-sans uppercase">编辑</span>
+            <span className="text-[10px] font-sans uppercase">{t('editLabel')}</span>
           </button>
           <button
             type="button"
@@ -61,7 +68,7 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
             onClick={() => onCopy?.(entry)}
           >
             <span className="material-symbols-outlined text-[20px]">content_copy</span>
-            <span className="text-[10px] font-sans uppercase">复制</span>
+            <span className="text-[10px] font-sans uppercase">{t('copyLabel')}</span>
           </button>
           <button
             type="button"
@@ -69,7 +76,7 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
             onClick={() => onDelete?.(entry)}
           >
             <span className="material-symbols-outlined text-[20px]">delete</span>
-            <span className="text-[10px] font-sans uppercase">删除</span>
+            <span className="text-[10px] font-sans uppercase">{t('deleteLabel')}</span>
           </button>
         </div>
       )}

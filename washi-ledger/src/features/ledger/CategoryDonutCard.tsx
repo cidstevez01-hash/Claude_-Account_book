@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { DonutRing } from '../../design-system/components/DonutRing'
 import { ScrollLegendList } from '../../design-system/components/ScrollLegendList'
+import { useI18n } from '../../lib/i18n'
+import { formatCurrency } from '../../data/currencyDisplay'
 import type { CategoryShare } from '../../data/summary'
 import type { EntryType } from '../../types'
 
@@ -11,9 +13,14 @@ interface CategoryDonutCardProps {
   /** 数据源整体切换时(比如翻月)传一个变化的值进来，图例滚动位置跟着回到顶部——
    * 照旧App resetScroll=true的场景("翻月"也算)，不只是切支出/收入这一种情况 */
   resetKey?: string | number
+  /** 传入的shares.amount已经是按这个币种换算好的(调用方用toDisplayEntries()统一
+   * 转换过)，这里只管用对应币种符号格式化显示，不做换算。默认CNY是兼容旧调用点，
+   * 实际调用方都应该显式传settings.currency */
+  currency?: string
 }
 
-export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategory, resetKey }: CategoryDonutCardProps) {
+export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategory, resetKey, currency = 'CNY' }: CategoryDonutCardProps) {
+  const { t } = useI18n()
   const [tab, setTab] = useState<EntryType>('expense')
   const shares = tab === 'expense' ? expenseShares : incomeShares
   const total = shares.reduce((sum, s) => sum + s.amount, 0)
@@ -30,13 +37,13 @@ export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategor
               tab === key ? 'text-primary border-primary' : 'text-on-surface-variant border-transparent'
             }`}
           >
-            {key === 'expense' ? '支出' : '收入'}
+            {key === 'expense' ? t('typeExpense') : t('typeIncome')}
           </button>
         ))}
       </div>
 
       {shares.length === 0 ? (
-        <p className="text-center text-body-md text-on-surface-variant py-8">这个月还没有记录</p>
+        <p className="text-center text-body-md text-on-surface-variant py-8">{t('noRecordsThisMonth')}</p>
       ) : (
         <div className="flex flex-col items-center py-2">
           <div className="relative w-48 h-48 mb-3">
@@ -46,7 +53,7 @@ export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategor
                 {tab === 'expense' ? 'Total Expenses' : 'Total Income'}
               </span>
               <span className="font-serif text-stat-figure text-primary">
-                ¥{total.toLocaleString()}
+                {formatCurrency(total, currency)}
               </span>
             </div>
           </div>
@@ -65,7 +72,7 @@ export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategor
                   <span className="text-stat-figure text-xs text-on-surface-variant mr-4">
                     {Math.round(share.ratio * 100)}%
                   </span>
-                  <span className="font-serif text-stat-figure text-on-surface">¥{share.amount.toLocaleString()}</span>
+                  <span className="font-serif text-stat-figure text-on-surface">{formatCurrency(share.amount, currency)}</span>
                 </button>
               ))}
             </div>

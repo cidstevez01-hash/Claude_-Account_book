@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
 import { APP_ICONS } from '../../lib/appIcons'
+import { useI18n } from '../../lib/i18n'
 
 interface AppLayoutProps {
   title: string
@@ -15,6 +16,7 @@ interface AppLayoutProps {
 export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const navigate = useNavigate()
+  const { t } = useI18n()
 
   return (
     <div
@@ -25,7 +27,7 @@ export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutPro
         {leftButton === 'menu' ? (
           <button
             type="button"
-            aria-label="菜单"
+            aria-label={t('menuAria')}
             className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
             onClick={() => setDrawerOpen(true)}
           >
@@ -34,7 +36,7 @@ export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutPro
         ) : (
           <button
             type="button"
-            aria-label="返回仪表盘"
+            aria-label={t('backToDashboardAria')}
             className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
             onClick={() => navigate('/')}
           >
@@ -46,7 +48,7 @@ export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutPro
         </h1>
         <Link
           to="/account"
-          aria-label="我的账户"
+          aria-label={t('accountTitle')}
           className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
         >
           <span className="material-symbols-outlined">{APP_ICONS.account}</span>

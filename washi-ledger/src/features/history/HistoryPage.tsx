@@ -6,6 +6,9 @@ import { HistoryEntryList } from './HistoryEntryList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
+import { useSettings } from '../../hooks/useSettings'
+import { useDisplayRates } from '../../hooks/useDisplayRates'
+import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import type { EntryType } from '../../types'
@@ -22,11 +25,18 @@ export function HistoryPage() {
   const { user } = useAuth()
   const { catalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
+  const { settings } = useSettings()
+  const rates = useDisplayRates(settings.currency)
   const navigate = useNavigate()
 
   const categories = useMemo(
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
     [catalog]
+  )
+  // 每条记录按settings.currency统一换算后再筛选/分组显示(见data/currencyDisplay.ts)
+  const displayEntries = useMemo(
+    () => toDisplayEntries(entries, settings.currency, rates),
+    [entries, settings.currency, rates]
   )
 
   const [search, setSearch] = useState('')
@@ -36,7 +46,7 @@ export function HistoryPage() {
 
   const filtered = useMemo(() => {
     const keyword = search.trim().toLowerCase()
-    return entries.filter((e) => {
+    return displayEntries.filter((e) => {
       if (typeFilter !== 'all' && e.type !== typeFilter) return false
       const month = e.date.slice(0, 7)
       if (startMonth && month < startMonth) return false
@@ -48,13 +58,9 @@ export function HistoryPage() {
       }
       return true
     })
-  }, [entries, typeFilter, startMonth, endMonth, search, categories])
+  }, [displayEntries, typeFilter, startMonth, endMonth, search, categories])
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-
-  // entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染明细列表
-  // 会闪一下"英文图标名+统一灰色"的半成品画面，等catalog真正到位才渲染正文
-  if (!catalog) return null
 
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return
@@ -136,20 +142,30 @@ export function HistoryPage() {
         </div>
       </section>
 
+      {/* catalog未就绪前(entries缓存优先比catalog先就绪，见useEntries.ts)先不渲染
+          明细列表——分类名/颜色/图标全部找不到对应数据会闪一下半成品画面；只挡列表
+          区域，上面的搜索/筛选/日期区间栏不依赖catalog，照常显示 */}
       <div className="mt-lg">
-        <HistoryEntryList
-          entries={filtered}
-          categories={categories}
-          onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-          onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
-          onDelete={(entry) => setPendingDeleteId(entry.id)}
-        />
+        {!catalog ? (
+          <div className="flex items-center justify-center py-24">
+            <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
+          </div>
+        ) : (
+          <HistoryEntryList
+            entries={filtered}
+            categories={categories}
+            currency={settings.currency}
+            onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
+            onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+            onDelete={(entry) => setPendingDeleteId(entry.id)}
+          />
+        )}
       </div>
 
       <ConfirmDialog
         open={pendingDeleteId != null}
-        title="确定要删除这条记录吗？"
-        message="删除后将无法恢复此条账单数据，您的账户余额将自动重新计算。"
+        title={t('confirmDeleteTitle')}
+        message={t('confirmDeleteMessage')}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDeleteId(null)}
       />

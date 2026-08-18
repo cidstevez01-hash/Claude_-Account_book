@@ -38,7 +38,7 @@ export function BottomNav() {
               >
                 {item.icon}
               </span>
-              <span className="text-tab-label font-sans font-semibold">{t(item.labelKey)}</span>
+              <span className="text-tab-label font-sans font-normal">{t(item.labelKey)}</span>
             </>
           )}
         </NavLink>

@@ -12,6 +12,8 @@ import { TrendBarChart } from '../../design-system/components/TrendBarChart'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
+import { useSettings } from '../../hooks/useSettings'
+import { useDisplayRates } from '../../hooks/useDisplayRates'
 import {
   summarizeMonth,
   categoryBreakdown,
@@ -22,6 +24,7 @@ import {
   monthlyPointsTrendBuckets,
   aggregateTrendSegments,
 } from '../../data/summary'
+import { toDisplayEntries, formatCurrency, symbolFor } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import type { EntryType } from '../../types'
@@ -70,6 +73,8 @@ export function StatsPage() {
   const { user } = useAuth()
   const { catalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
+  const { settings } = useSettings()
+  const rates = useDisplayRates(settings.currency)
 
   const [tab, setTab] = useState<StatsTab>('cashflow')
   const [monthAnchor, setMonthAnchor] = useState(() => new Date())
@@ -82,10 +87,16 @@ export function StatsPage() {
     [catalog]
   )
   const paymentMethods = catalog?.paymentMethods ?? []
+  // 每条记录按settings.currency统一换算后再参与求和/趋势图计算(见data/currencyDisplay.ts)；
+  // 积分不是货币，pointsBreakdownByPaymentMethod/积分推移图继续吃原始entries，不用换算
+  const displayEntries = useMemo(
+    () => toDisplayEntries(entries, settings.currency, rates),
+    [entries, settings.currency, rates]
+  )
 
-  const summary = summarizeMonth(entries, monthAnchor)
-  const expenseShares = categoryBreakdown(entries, categories, 'expense', monthAnchor)
-  const incomeShares = categoryBreakdown(entries, categories, 'income', monthAnchor)
+  const summary = summarizeMonth(displayEntries, monthAnchor)
+  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor)
+  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor)
   const pointsShares = pointsBreakdownByPaymentMethod(entries, paymentMethods, monthAnchor)
 
   const now = new Date()
@@ -99,8 +110,8 @@ export function StatsPage() {
   const [selectedTrendIdx, setSelectedTrendIdx] = useState<number | null>(null)
   const trendBuckets =
     trendDim === 'day'
-      ? dailyTrendBuckets(entries, categories, trendType, trendDayYear, trendDayMonth)
-      : monthlyTrendBuckets(entries, categories, trendType, trendMonthYear)
+      ? dailyTrendBuckets(displayEntries, categories, trendType, trendDayYear, trendDayMonth)
+      : monthlyTrendBuckets(displayEntries, categories, trendType, trendMonthYear)
   const trendPeriodLabel = trendDim === 'day' ? `${trendDayYear}年${trendDayMonth}月` : `${trendMonthYear}年`
   const trendAggregate = useMemo(() => aggregateTrendSegments(trendBuckets), [trendBuckets])
 
@@ -156,14 +167,10 @@ export function StatsPage() {
   const detailCategory = categories.find((c) => c.code === detailCatCode) ?? null
   const detailRangePrefix = trendDim === 'day' ? `${trendDayYear}-${pad2(trendDayMonth)}` : `${trendMonthYear}`
   const detailEntries = detailCatCode
-    ? entries.filter((e) => e.catCode === detailCatCode && e.type === trendType && e.date.startsWith(detailRangePrefix))
+    ? displayEntries.filter((e) => e.catCode === detailCatCode && e.type === trendType && e.date.startsWith(detailRangePrefix))
     : []
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-
-  // entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染统计正文
-  // 会闪一下"英文图标名+统一灰色"的半成品画面，等catalog真正到位才渲染正文
-  if (!catalog) return null
 
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return
@@ -183,24 +190,32 @@ export function StatsPage() {
           <button
             type="button"
             onClick={() => setTab('cashflow')}
-            className={`relative z-10 flex-1 py-2 text-center text-body-lg font-semibold ${
+            className={`relative z-10 flex-1 py-2 text-center text-body-lg font-normal ${
               tab === 'cashflow' ? 'text-on-primary-container' : 'text-on-surface-variant'
             }`}
           >
-            收支
+            {t('statsTabMoney')}
           </button>
           <button
             type="button"
             onClick={() => setTab('points')}
-            className={`relative z-10 flex-1 py-2 text-center text-body-lg font-semibold ${
+            className={`relative z-10 flex-1 py-2 text-center text-body-lg font-normal ${
               tab === 'points' ? 'text-on-primary-container' : 'text-on-surface-variant'
             }`}
           >
-            积分
+            {t('statsTabPoints')}
           </button>
         </div>
       </div>
 
+      {/* catalog未就绪前只挡数据区域，顶部tab胶囊(不依赖catalog)照常显示——原理同
+          DashboardPage.tsx，见那边的注释 */}
+      {!catalog ? (
+        <div className="flex items-center justify-center py-24">
+          <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
+        </div>
+      ) : (
+      <>
       <div className="mb-md">
         <MonthNavBar monthLabel={monthLabel} onPrevMonth={() => shiftMonth(-1)} onNextMonth={() => shiftMonth(1)} />
       </div>
@@ -210,25 +225,25 @@ export function StatsPage() {
           <div className="flex gap-sm px-md mb-lg">
             <div className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-sm text-center">
               <p className="text-label-caps font-sans text-on-surface-variant uppercase">{t('monthIncome')}</p>
-              <p className="font-serif text-stat-figure text-secondary">¥{summary.income.toLocaleString()}</p>
+              <p className="font-serif text-stat-figure text-secondary">{formatCurrency(summary.income, settings.currency)}</p>
             </div>
             <div className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-sm text-center">
               <p className="text-label-caps font-sans text-on-surface-variant uppercase">{t('monthExpense')}</p>
-              <p className="font-serif text-stat-figure text-primary">¥{summary.expense.toLocaleString()}</p>
+              <p className="font-serif text-stat-figure text-primary">{formatCurrency(summary.expense, settings.currency)}</p>
             </div>
           </div>
-          <CategoryDonutCard expenseShares={expenseShares} incomeShares={incomeShares} resetKey={monthLabel} />
+          <CategoryDonutCard expenseShares={expenseShares} incomeShares={incomeShares} resetKey={monthLabel} currency={settings.currency} />
 
           <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
             <div className="flex items-center justify-between mb-sm">
-              <h3 className="font-serif text-headline-md text-on-surface">收支趋势</h3>
+              <h3 className="font-serif text-headline-md text-on-surface">{t('statsTrendTitle')}</h3>
               <select
                 value={trendType}
                 onChange={(e) => changeTrendType(e.target.value as EntryType)}
                 className="bg-transparent border-none text-body-md text-on-surface-variant focus:outline-none focus:ring-0"
               >
-                <option value="expense">支出</option>
-                <option value="income">收入</option>
+                <option value="expense">{t('typeExpense')}</option>
+                <option value="income">{t('typeIncome')}</option>
               </select>
             </div>
             <TrendControls
@@ -246,6 +261,7 @@ export function StatsPage() {
             <TrendLegend
               aggregate={trendAggregate}
               selectedBucket={selectedTrendIdx != null ? trendBuckets[selectedTrendIdx] : null}
+              valuePrefix={symbolFor(settings.currency)}
               onSelectCategory={(catCode) => setDetailCatCode(catCode)}
               onClosePoint={() => setSelectedTrendIdx(null)}
               resetKey={`${trendDim}-${trendType}-${trendPeriodLabel}`}
@@ -257,7 +273,7 @@ export function StatsPage() {
           <PointsDonutCard shares={pointsShares} resetKey={monthLabel} />
 
           <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
-            <h3 className="font-serif text-headline-md text-on-surface mb-sm">还元(获得积分)推移</h3>
+            <h3 className="font-serif text-headline-md text-on-surface mb-sm">{t('pointsTrendTitle')}</h3>
             <TrendControls
               dim={pointsTrendDim}
               onDimChange={changePointsTrendDim}
@@ -285,6 +301,7 @@ export function StatsPage() {
         category={detailCategory}
         monthLabel={trendPeriodLabel}
         entries={detailEntries}
+        currency={settings.currency}
         onClose={() => setDetailCatCode(null)}
         onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
         onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
@@ -293,11 +310,13 @@ export function StatsPage() {
 
       <ConfirmDialog
         open={pendingDeleteId != null}
-        title="确定要删除这条记录吗？"
-        message="删除后将无法恢复此条账单数据，您的账户余额将自动重新计算。"
+        title={t('confirmDeleteTitle')}
+        message={t('confirmDeleteMessage')}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDeleteId(null)}
       />
+      </>
+      )}
     </AppLayout>
   )
 }

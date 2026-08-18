@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { groupByDay } from '../../data/summary'
+import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from './EntryCard'
 import { dayLabel } from './dayLabel'
 import { useI18n } from '../../lib/i18n'
@@ -10,6 +11,9 @@ interface CategoryDetailSheetProps {
   category: Category | null
   monthLabel: string
   entries: Entry[]
+  /** 顶部总额的显示币种——调用方应该已经用toDisplayEntries()把entries统一换算成
+   * 这个币种了，这里只管格式化，不做换算 */
+  currency?: string
   onClose: () => void
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
@@ -25,6 +29,7 @@ export function CategoryDetailSheet({
   category,
   monthLabel,
   entries,
+  currency = 'CNY',
   onClose,
   onEdit,
   onCopy,
@@ -49,7 +54,7 @@ export function CategoryDetailSheet({
             </span>
             <h2 className="font-serif text-headline-md text-on-surface">{category.zh}</h2>
           </div>
-          <button type="button" aria-label="关闭" onClick={onClose} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
+          <button type="button" aria-label={t('closeAria')} onClick={onClose} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
             <span className="material-symbols-outlined">close</span>
           </button>
         </header>
@@ -59,7 +64,7 @@ export function CategoryDetailSheet({
             <span className="text-label-caps font-sans text-on-surface-variant uppercase">
               {monthLabel} · TOTAL
             </span>
-            <span className="font-serif text-headline-lg text-on-surface">¥{total.toLocaleString()}</span>
+            <span className="font-serif text-headline-lg text-on-surface">{formatCurrency(total, currency)}</span>
           </div>
           <div className="w-full border-t border-outline-variant mb-md" />
 

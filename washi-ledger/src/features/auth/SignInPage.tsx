@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useI18n } from '../../lib/i18n'
 
 /** 登录——独立整屏页面，不套AppLayout(照HANDOFF确认过的决定：登录/注册是独立页面，
  * 不嵌在设置弹层里)。视觉照design-assets-v2/_1做。真实逻辑照旧仓库index.html的
  * cloudSigninForm提交处理：supabase.auth.signInWithPassword */
 export function SignInPage() {
+  const { t } = useI18n()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,7 +18,7 @@ export function SignInPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !password) {
-      setError('请输入邮箱和密码')
+      setError(t('needEmailPasswordError'))
       return
     }
     setLoading(true)
@@ -46,7 +48,7 @@ export function SignInPage() {
 
       <form onSubmit={handleSubmit} className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md flex flex-col gap-md">
         <div className="flex flex-col gap-1">
-          <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">邮箱</label>
+          <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('emailLabel')}</label>
           <div className="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary py-1">
             <span className="material-symbols-outlined text-outline text-[18px]">mail</span>
             <input
@@ -60,7 +62,7 @@ export function SignInPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">密码</label>
+          <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('passwordLabel')}</label>
           <div className="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary py-1">
             <span className="material-symbols-outlined text-outline text-[18px]">lock</span>
             <input
@@ -83,14 +85,14 @@ export function SignInPage() {
           disabled={loading}
           className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif disabled:opacity-50"
         >
-          {loading ? '登录中…' : '登录'}
+          {loading ? t('signInSubmitLoading') : t('signInBtn')}
         </button>
       </form>
 
       <p className="text-center text-body-md text-on-surface-variant mt-md">
-        还没有账号？{' '}
+        {t('noAccountText')}{' '}
         <Link to="/register" className="text-primary font-medium">
-          去注册
+          {t('goToSignUpLink')}
         </Link>
       </p>
     </div>
