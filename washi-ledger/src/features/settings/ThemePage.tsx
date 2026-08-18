@@ -9,7 +9,10 @@ export function ThemePage() {
   const navigate = useNavigate()
 
   return (
-    <div className="max-w-[480px] mx-auto min-h-screen relative flex flex-col bg-surface">
+    <div
+      className="max-w-[480px] mx-auto min-h-screen relative flex flex-col bg-surface"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <header className="flex items-center px-md h-16 w-full sticky top-0 z-30 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
         <button
           type="button"

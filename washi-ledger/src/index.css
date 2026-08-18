@@ -124,18 +124,28 @@
   --spacing-safe-bottom: 90px;
 }
 
+/* html/body显式钉死height:100%+背景色——照旧仓库index.html的html,body{height:100%}
+   真实写法。这两行看着多余，实际是修复真机上"一滚动就白屏"的关键：body之前没有显式
+   height，靠内容撑开，WKWebView在rubber-band回弹时会露出body/html未着色的原生画布
+   (默认白色)；html,body各自钉死100%高度+背景色之后，回弹露出的也是正确的米色底，
+   不再是白屏。safe-area-inset-top的让空处理也从这里挪到了各页面自己的根容器
+   (AppLayout/AddTransactionPage/SignInPage等)，不再整体撑高body——之前直接在
+   body上加padding-top会让body实际高度必然超出一屏、每个页面不管内容多少都能滚动，
+   这也是诱发上面那个白屏问题更容易复现的一个因素。 */
+html {
+  height: 100%;
+  margin: 0;
+  background-color: var(--color-background);
+}
+
 body {
   margin: 0;
+  height: 100%;
   font-family: var(--font-sans);
   background-color: var(--color-background);
   color: var(--color-on-background);
   -webkit-tap-highlight-color: transparent;
-  /* capacitor.config.json里iOS的contentInset设成了"never"(webview不会自动让出
-     状态栏/灵动岛区域)，所以页面顶部要自己用safe-area-inset-top让出空间——
-     不然sticky/普通流内容会被压在状态栏底下，视觉上看着有间距、实际点不到
-     (真机才暴露的坑，模拟器/浏览器预览不会复现)。fixed定位元素不受body padding
-     影响，NavDrawer单独处理。 */
-  padding-top: env(safe-area-inset-top);
+  overscroll-behavior-y: none;
 }
 
 #root {

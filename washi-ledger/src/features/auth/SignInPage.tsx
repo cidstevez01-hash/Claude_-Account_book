@@ -33,7 +33,10 @@ export function SignInPage() {
   }
 
   return (
-    <div className="max-w-[480px] mx-auto min-h-screen flex flex-col justify-center px-md bg-surface">
+    <div
+      className="max-w-[480px] mx-auto min-h-screen flex flex-col justify-center px-md bg-surface"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <div className="flex flex-col items-center mb-lg">
         <div className="w-16 h-16 rounded-full border-2 border-primary flex items-center justify-center mb-3">
           <span className="material-symbols-outlined text-3xl text-primary">menu_book</span>

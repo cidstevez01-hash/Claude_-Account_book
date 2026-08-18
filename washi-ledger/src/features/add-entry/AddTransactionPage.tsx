@@ -159,7 +159,10 @@ export function AddTransactionPage() {
   const pageTitle = mode === 'edit' ? t('editTitle') : mode === 'copy' ? t('copyTitle') : t('addTitle')
 
   return (
-    <div className="max-w-[480px] mx-auto min-h-screen relative flex flex-col bg-surface">
+    <div
+      className="max-w-[480px] mx-auto min-h-screen relative flex flex-col bg-surface"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <header className="flex items-center justify-between px-md h-16 w-full sticky top-0 z-30 bg-surface">
         <button type="button" aria-label="返回" onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface">
           <span className="material-symbols-outlined">arrow_back</span>

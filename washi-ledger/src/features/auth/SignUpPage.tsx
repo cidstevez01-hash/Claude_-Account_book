@@ -72,7 +72,10 @@ export function SignUpPage() {
   }
 
   return (
-    <div className="max-w-[480px] mx-auto min-h-screen flex flex-col justify-center px-md bg-surface">
+    <div
+      className="max-w-[480px] mx-auto min-h-screen flex flex-col justify-center px-md bg-surface"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       {mode === 'verify' && (
         <button
           type="button"
