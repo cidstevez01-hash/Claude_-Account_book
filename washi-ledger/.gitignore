@@ -13,6 +13,10 @@ dist-ssr
 *.local
 .env
 
+# Capacitor原生工程——每次CI跑iOS打包workflow时用`npx cap add ios`全新生成，不提交进仓库
+ios
+*.ipa
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
