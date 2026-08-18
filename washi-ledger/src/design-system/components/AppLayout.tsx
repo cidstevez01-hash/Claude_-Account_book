@@ -16,10 +16,10 @@ export function AppLayout({ title, children, showMenuButton = true }: AppLayoutP
 
   return (
     <div
-      className="max-w-[480px] mx-auto min-h-screen relative flex flex-col bg-surface"
+      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <header className="flex items-center justify-between px-md h-16 w-full sticky top-0 z-30 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
+      <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
         {showMenuButton ? (
           <button
             type="button"
@@ -44,7 +44,7 @@ export function AppLayout({ title, children, showMenuButton = true }: AppLayoutP
         </Link>
       </header>
 
-      <main className="flex-1 pb-32">{children}</main>
+      <main className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain pb-32">{children}</main>
 
       <BottomNav />
       <NavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />

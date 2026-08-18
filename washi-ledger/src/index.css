@@ -124,32 +124,26 @@
   --spacing-safe-bottom: 90px;
 }
 
-/* html/body显式钉死height:100%+背景色——照旧仓库index.html的html,body{height:100%}
-   真实写法。这两行看着多余，实际是修复真机上"一滚动就白屏"的关键：body之前没有显式
-   height，靠内容撑开，WKWebView在rubber-band回弹时会露出body/html未着色的原生画布
-   (默认白色)；html,body各自钉死100%高度+背景色之后，回弹露出的也是正确的米色底，
-   不再是白屏。safe-area-inset-top的让空处理也从这里挪到了各页面自己的根容器
-   (AppLayout/AddTransactionPage/SignInPage等)，不再整体撑高body——之前直接在
-   body上加padding-top会让body实际高度必然超出一屏、每个页面不管内容多少都能滚动，
-   这也是诱发上面那个白屏问题更容易复现的一个因素。 */
-html {
+/* html/body/#root钉死height:100%+overflow:hidden——外壳整个固定，不滚动。每个页面
+   自己的根容器是position:fixed;inset:0(见AppLayout.tsx等)，真正会滚动的只有页面
+   内部的<main>(overflow-y:auto)，body/html本身不再承担滚动职责。这样处理是因为
+   body本身一旦可滚动，真机WKWebView做rubber-band回弹时会露出body/html未着色的
+   原生画布(默认白色)，之前"一滚动就白屏"的坑就是这么来的——现在body压根不可滚动，
+   连回弹的空间都没有，从根上避免这个问题，不用再靠背景色兜底猜。 */
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
+  overflow: hidden;
   background-color: var(--color-background);
 }
 
 body {
-  margin: 0;
-  height: 100%;
   font-family: var(--font-sans);
-  background-color: var(--color-background);
   color: var(--color-on-background);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
-}
-
-#root {
-  min-height: 100svh;
 }
 
 /* 印章/压印按压反馈——FAB、主要CTA按钮共用 */

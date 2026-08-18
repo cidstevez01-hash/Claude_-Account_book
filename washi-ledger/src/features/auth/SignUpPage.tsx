@@ -73,7 +73,7 @@ export function SignUpPage() {
 
   return (
     <div
-      className="max-w-[480px] mx-auto min-h-screen flex flex-col justify-center px-md bg-surface"
+      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col justify-center px-md bg-surface overflow-y-auto overscroll-y-contain"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {mode === 'verify' && (
