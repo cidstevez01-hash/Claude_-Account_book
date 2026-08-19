@@ -106,8 +106,8 @@ export function categoryBreakdownRange(
 
 // 照旧App renderHomeDonut()的真实配色：标签维度不用分类各自的color，统一用这两个
 // 强调色区分"匹配这个标签"/"其他"，不跟支出红(--seal)撞色
-const TAG_MATCHED_COLOR = '#e3b23c'
-const TAG_OTHER_COLOR = '#c2b8a3'
+export const TAG_MATCHED_COLOR = '#e3b23c'
+export const TAG_OTHER_COLOR = '#c2b8a3'
 
 /** 环状图切到标签维度(#7)时用——按"是否匹配选中的这个标签"把entries分成两组，
  * 不是像分类维度那样按各自的catCode分好几组。照旧App renderHomeDonut()里

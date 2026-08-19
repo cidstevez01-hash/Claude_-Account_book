@@ -15,10 +15,23 @@ interface TagDimensionProps {
   endDate: string
 }
 
+export interface TagGroupSelection {
+  tagCode: string
+  /** true=点的是"其他"那组(没打这个标签的)，false=点的是匹配这个标签的那组——
+   * 照旧App openMonthDetail()的tagExclude参数语义 */
+  tagExclude: boolean
+  tagLabelText: string
+  type: EntryType
+}
+
 interface CategoryDonutCardProps {
   expenseShares: CategoryShare[]
   incomeShares: CategoryShare[]
   onSelectCategory?: (catCode: string, type: EntryType) => void
+  /** 标签维度(#7)下点图例行——照旧App openMonthDetail({tagCode, tagExclude,
+   * tagLabelText, type})真实逻辑，点的是"匹配标签"还是"其他"这两组都能钻取，
+   * 不是像之前那样直接禁用点击 */
+  onSelectTagGroup?: (selection: TagGroupSelection) => void
   /** 数据源整体切换时(比如翻月)传一个变化的值进来，图例滚动位置跟着回到顶部——
    * 照旧App resetScroll=true的场景("翻月"也算)，不只是切支出/收入这一种情况 */
   resetKey?: string | number
@@ -36,6 +49,7 @@ export function CategoryDonutCard({
   expenseShares,
   incomeShares,
   onSelectCategory,
+  onSelectTagGroup,
   resetKey,
   currency = 'CNY',
   tagDimension,
@@ -126,9 +140,19 @@ export function CategoryDonutCard({
                   <button
                     key={share.catCode}
                     type="button"
-                    disabled={!!selectedTag}
-                    onClick={() => onSelectCategory?.(share.catCode, tab)}
-                    className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30 text-left active:opacity-70 disabled:active:opacity-100"
+                    onClick={() => {
+                      if (selectedTag) {
+                        onSelectTagGroup?.({
+                          tagCode: selectedTag.code,
+                          tagExclude: share.catCode === '__other__',
+                          tagLabelText: share.label,
+                          type: tab,
+                        })
+                      } else {
+                        onSelectCategory?.(share.catCode, tab)
+                      }
+                    }}
+                    className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30 text-left active:opacity-70"
                   >
                     <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
                     <span className="text-body-md text-on-surface flex-1">{share.label}</span>

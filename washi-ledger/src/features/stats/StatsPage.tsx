@@ -8,7 +8,7 @@ import { TrendControls } from './TrendControls'
 import { TrendLegend } from './TrendLegend'
 import { PointsDonutCard } from './PointsDonutCard'
 import { CategoryDonutCard } from '../ledger/CategoryDonutCard'
-import { CategoryDetailSheet } from '../ledger/CategoryDetailSheet'
+import { CategoryDetailSheet, type CategoryDetailHeader } from '../ledger/CategoryDetailSheet'
 import { TrendBarChart } from '../../design-system/components/TrendBarChart'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -28,6 +28,7 @@ import {
 import { toDisplayEntries, formatCurrency, symbolFor } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
+import { catLabel } from '../../lib/catalogLabel'
 import type { EntryType } from '../../types'
 
 type StatsTab = 'cashflow' | 'points'
@@ -166,6 +167,9 @@ export function StatsPage() {
   // 点收支趋势图的聚合图例一行——钻取那个分类在当前趋势图可见范围(按日=当月，按月=当年)内的明细
   const [detailCatCode, setDetailCatCode] = useState<string | null>(null)
   const detailCategory = categories.find((c) => c.code === detailCatCode) ?? null
+  const detailHeader: CategoryDetailHeader | null = detailCategory
+    ? { icon: detailCategory.icon, color: detailCategory.color, label: catLabel(detailCategory, lang) }
+    : null
   const detailRangePrefix = trendDim === 'day' ? `${trendDayYear}-${pad2(trendDayMonth)}` : `${trendMonthYear}`
   const detailEntries = detailCatCode
     ? displayEntries.filter((e) => e.catCode === detailCatCode && e.type === trendType && e.date.startsWith(detailRangePrefix))
@@ -297,7 +301,8 @@ export function StatsPage() {
 
       <CategoryDetailSheet
         open={detailCatCode != null}
-        category={detailCategory}
+        header={detailHeader}
+        categories={categories}
         monthLabel={trendPeriodLabel}
         entries={detailEntries}
         currency={settings.currency}

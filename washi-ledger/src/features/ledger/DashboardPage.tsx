@@ -5,21 +5,29 @@ import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { DateRangeBar } from '../../design-system/components/DateRangeBar'
 import { BalanceCard } from './BalanceCard'
-import { CategoryDonutCard } from './CategoryDonutCard'
-import { CategoryDetailSheet } from './CategoryDetailSheet'
+import { CategoryDonutCard, type TagGroupSelection } from './CategoryDonutCard'
+import { CategoryDetailSheet, type CategoryDetailHeader } from './CategoryDetailSheet'
 import { RecentEntriesList } from './RecentEntriesList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
-import { summarizeRange, categoryBreakdownRange } from '../../data/summary'
+import { summarizeRange, categoryBreakdownRange, TAG_MATCHED_COLOR, TAG_OTHER_COLOR } from '../../data/summary'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
+import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
 import { todayStr, firstOfMonthStr, formatDateRangeLabel } from '../../lib/date'
 import type { EntryType } from '../../types'
+
+/** 分类明细钻取(#7扩展)——照旧App openMonthDetail(filter, monthKey)真实逻辑，filter
+ * 本来就同时支持{catCode,type}和{tagCode,tagExclude,tagLabelText,type}两种维度，
+ * 不是只有分类；标签维度下"点匹配的组"和"点其他那组"都要能钻取，不能禁用 */
+type DetailSelection =
+  | { kind: 'category'; catCode: string; type: EntryType }
+  | { kind: 'tag'; tagCode: string; tagExclude: boolean; tagLabelText: string; type: EntryType }
 
 export function DashboardPage() {
   const { t, lang } = useI18n()
@@ -35,9 +43,9 @@ export function DashboardPage() {
   const [startDate, setStartDate] = useState(() => firstOfMonthStr())
   const [endDate, setEndDate] = useState(() => todayStr())
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail
-  // (按分类筛选那条分支)搬：记住点的是哪个分类+当时环状图在看支出还是收入
-  const [detailSelection, setDetailSelection] = useState<{ catCode: string; type: EntryType } | null>(null)
+  // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail搬：
+  // 记住点的是分类还是标签维度、具体是哪一个+当时环状图在看支出还是收入
+  const [detailSelection, setDetailSelection] = useState<DetailSelection | null>(null)
   const categories = useMemo(
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
     [catalog]
@@ -67,16 +75,30 @@ export function DashboardPage() {
     reload()
   }
 
-  const detailCategory = categories.find((c) => c.code === detailSelection?.catCode) ?? null
-  const detailEntries = detailSelection
-    ? displayEntries.filter(
-        (e) =>
-          e.catCode === detailSelection.catCode &&
-          e.type === detailSelection.type &&
-          e.date >= startDate &&
-          e.date <= endDate
-      )
-    : []
+  const detailEntries = useMemo(() => {
+    if (!detailSelection) return []
+    return displayEntries.filter((e) => {
+      if (e.type !== detailSelection.type || e.date < startDate || e.date > endDate) return false
+      if (detailSelection.kind === 'category') return e.catCode === detailSelection.catCode
+      return detailSelection.tagExclude ? e.tagCode !== detailSelection.tagCode : e.tagCode === detailSelection.tagCode
+    })
+  }, [detailSelection, displayEntries, startDate, endDate])
+
+  const detailHeader: CategoryDetailHeader | null = useMemo(() => {
+    if (!detailSelection) return null
+    if (detailSelection.kind === 'category') {
+      const cat = categories.find((c) => c.code === detailSelection.catCode)
+      return cat ? { icon: cat.icon, color: cat.color, label: catLabel(cat, lang) } : null
+    }
+    // Material Symbols没有跟旧App自绘"tag"图标完全对应的名字，"sell"(价签图案)是
+    // 最接近的现成图标；配色沿用donut图例行同一套TAG_MATCHED_COLOR/TAG_OTHER_COLOR，
+    // 跟点进来之前看到的颜色保持一致
+    return {
+      icon: 'sell',
+      color: detailSelection.tagExclude ? TAG_OTHER_COLOR : TAG_MATCHED_COLOR,
+      label: detailSelection.tagLabelText,
+    }
+  }, [detailSelection, categories, lang])
 
   return (
     <AppLayout title={t('appTitle')}>
@@ -105,7 +127,8 @@ export function DashboardPage() {
           <CategoryDonutCard
             expenseShares={expenseShares}
             incomeShares={incomeShares}
-            onSelectCategory={(catCode, type) => setDetailSelection({ catCode, type })}
+            onSelectCategory={(catCode, type) => setDetailSelection({ kind: 'category', catCode, type })}
+            onSelectTagGroup={(sel: TagGroupSelection) => setDetailSelection({ kind: 'tag', ...sel })}
             resetKey={rangeLabel}
             currency={settings.currency}
             tagDimension={{
@@ -134,7 +157,8 @@ export function DashboardPage() {
 
           <CategoryDetailSheet
             open={detailSelection != null}
-            category={detailCategory}
+            header={detailHeader}
+            categories={categories}
             monthLabel={rangeLabel}
             entries={detailEntries}
             currency={settings.currency}
