@@ -121,6 +121,8 @@ export const dict = {
     verifySubmitBtn: '验证并完成注册', // 新App专属(旧App cloudVerifyBtn是"验证并登录"，场景是登录不是注册，故未直接复用)
     catalogLoadErrorHint: '分类数据加载失败，请检查网络后重试', // 新App专属(catalog请求失败时的兜底提示，避免转圈圈转个不停却没有任何反馈)
     retryLabel: '重试', // 新App专属
+    dimCategoryOption: LEGACY_ZH.dimCategory,
+    tagOtherBucket: LEGACY_ZH.tagOtherBucket,
   },
   ja: {
     appTitle: LEGACY_JA.appTitle,
@@ -231,5 +233,7 @@ export const dict = {
     verifySubmitBtn: '確認して登録を完了',
     catalogLoadErrorHint: 'カテゴリデータの読み込みに失敗しました。ネットワークをご確認の上、再試行してください',
     retryLabel: '再試行',
+    dimCategoryOption: LEGACY_JA.dimCategory,
+    tagOtherBucket: LEGACY_JA.tagOtherBucket,
   },
 } as const

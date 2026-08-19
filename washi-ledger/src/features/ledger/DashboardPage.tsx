@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
+import { DateRangeBar } from '../../design-system/components/DateRangeBar'
 import { BalanceCard } from './BalanceCard'
-import { DateRangeBar } from './DateRangeBar'
 import { CategoryDonutCard } from './CategoryDonutCard'
 import { CategoryDetailSheet } from './CategoryDetailSheet'
 import { RecentEntriesList } from './RecentEntriesList'
@@ -13,11 +13,12 @@ import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
-import { summarizeMonth, categoryBreakdown, isSameMonth } from '../../data/summary'
+import { summarizeRange, categoryBreakdownRange } from '../../data/summary'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { APP_ICONS } from '../../lib/appIcons'
+import { todayStr, firstOfMonthStr, formatDateRangeLabel } from '../../lib/date'
 import type { EntryType } from '../../types'
 
 export function DashboardPage() {
@@ -29,7 +30,10 @@ export function DashboardPage() {
   const rates = useDisplayRates(settings.currency)
   const navigate = useNavigate()
 
-  const [monthAnchor, setMonthAnchor] = useState(() => new Date())
+  // 起止日期区间——默认当月1日到今天(#8)，仪表盘结余/环状图/最近明细全部跟着这个区间走，
+  // 不再固定按"当前日历月"算
+  const [startDate, setStartDate] = useState(() => firstOfMonthStr())
+  const [endDate, setEndDate] = useState(() => todayStr())
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail
   // (按分类筛选那条分支)搬：记住点的是哪个分类+当时环状图在看支出还是收入
@@ -45,13 +49,16 @@ export function DashboardPage() {
     [entries, settings.currency, rates]
   )
 
-  const monthLabel = `${monthAnchor.getFullYear()}年${monthAnchor.getMonth() + 1}月`
-  const shiftMonth = (delta: number) =>
-    setMonthAnchor((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1))
+  const rangeLabel = formatDateRangeLabel(startDate, endDate)
 
-  const summary = summarizeMonth(displayEntries, monthAnchor)
-  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor, lang)
-  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor, lang)
+  const summary = summarizeRange(displayEntries, startDate, endDate)
+  const expenseShares = categoryBreakdownRange(displayEntries, categories, 'expense', startDate, endDate, lang)
+  const incomeShares = categoryBreakdownRange(displayEntries, categories, 'income', startDate, endDate, lang)
+  // 最近明细(#6)——只显示当前选中区间内的记录，排序用groupByDayPinned(见RecentEntriesList.tsx)
+  const recentEntries = useMemo(
+    () => displayEntries.filter((e) => e.date >= startDate && e.date <= endDate),
+    [displayEntries, startDate, endDate]
+  )
 
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return
@@ -63,7 +70,11 @@ export function DashboardPage() {
   const detailCategory = categories.find((c) => c.code === detailSelection?.catCode) ?? null
   const detailEntries = detailSelection
     ? displayEntries.filter(
-        (e) => e.catCode === detailSelection.catCode && e.type === detailSelection.type && isSameMonth(e.date, monthAnchor)
+        (e) =>
+          e.catCode === detailSelection.catCode &&
+          e.type === detailSelection.type &&
+          e.date >= startDate &&
+          e.date <= endDate
       )
     : []
 
@@ -80,17 +91,33 @@ export function DashboardPage() {
         <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
       ) : (
         <>
-          <DateRangeBar monthLabel={monthLabel} onPrevMonth={() => shiftMonth(-1)} onNextMonth={() => shiftMonth(1)} />
+          <div className="mx-md mt-md mb-2">
+            <DateRangeBar
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(s, e) => {
+                setStartDate(s)
+                setEndDate(e)
+              }}
+            />
+          </div>
           <BalanceCard summary={summary} currency={settings.currency} />
           <CategoryDonutCard
             expenseShares={expenseShares}
             incomeShares={incomeShares}
             onSelectCategory={(catCode, type) => setDetailSelection({ catCode, type })}
-            resetKey={monthLabel}
+            resetKey={rangeLabel}
             currency={settings.currency}
+            tagDimension={{
+              entries: displayEntries,
+              expenseTags: catalog.expenseTags,
+              incomeTags: catalog.incomeTags,
+              startDate,
+              endDate,
+            }}
           />
           <RecentEntriesList
-            entries={displayEntries}
+            entries={recentEntries}
             categories={categories}
             onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
             onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
@@ -108,7 +135,7 @@ export function DashboardPage() {
           <CategoryDetailSheet
             open={detailSelection != null}
             category={detailCategory}
-            monthLabel={monthLabel}
+            monthLabel={rangeLabel}
             entries={detailEntries}
             currency={settings.currency}
             onClose={() => setDetailSelection(null)}

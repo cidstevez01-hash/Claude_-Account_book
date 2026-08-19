@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
+import { DateRangeBar } from '../../design-system/components/DateRangeBar'
 import { HistoryEntryList } from './HistoryEntryList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -12,14 +13,10 @@ import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
+import { todayStr, firstOfMonthStr } from '../../lib/date'
 import type { EntryType } from '../../types'
 
 type TypeFilter = 'all' | EntryType
-
-function currentMonthStr() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
 
 export function HistoryPage() {
   const { t } = useI18n()
@@ -42,16 +39,16 @@ export function HistoryPage() {
 
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
-  const [startMonth, setStartMonth] = useState(currentMonthStr)
-  const [endMonth, setEndMonth] = useState(currentMonthStr)
+  // 起止日期区间——跟仪表盘顶部(#8)同一个DateRangeBar组件、同一套校验逻辑(#9)，
+  // 默认值也保持一致(当月1日到今天)
+  const [startDate, setStartDate] = useState(() => firstOfMonthStr())
+  const [endDate, setEndDate] = useState(() => todayStr())
 
   const filtered = useMemo(() => {
     const keyword = search.trim().toLowerCase()
     return displayEntries.filter((e) => {
       if (typeFilter !== 'all' && e.type !== typeFilter) return false
-      const month = e.date.slice(0, 7)
-      if (startMonth && month < startMonth) return false
-      if (endMonth && month > endMonth) return false
+      if (e.date < startDate || e.date > endDate) return false
       if (keyword) {
         const cat = categories.find((c) => c.code === e.catCode)
         const haystack = `${cat?.zh ?? ''}${cat?.ja ?? ''}${e.note ?? ''}`.toLowerCase()
@@ -59,7 +56,7 @@ export function HistoryPage() {
       }
       return true
     })
-  }, [displayEntries, typeFilter, startMonth, endMonth, search, categories])
+  }, [displayEntries, typeFilter, startDate, endDate, search, categories])
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
@@ -112,35 +109,15 @@ export function HistoryPage() {
         </div>
       </section>
 
-      <section className="flex items-center gap-2 px-md mt-sm">
-        <div className="flex-1 flex flex-col gap-1">
-          <label className="text-label-caps font-sans text-outline px-1">{t('startMonthLabel')}</label>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">
-              calendar_month
-            </span>
-            <input
-              type="month"
-              value={startMonth}
-              onChange={(e) => setStartMonth(e.target.value)}
-              className="w-full bg-surface-container-low border border-dashed border-outline-variant rounded-lg py-2 pl-10 pr-2 text-body-md text-on-surface focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col gap-1">
-          <label className="text-label-caps font-sans text-outline px-1">{t('endMonthLabel')}</label>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">
-              calendar_month
-            </span>
-            <input
-              type="month"
-              value={endMonth}
-              onChange={(e) => setEndMonth(e.target.value)}
-              className="w-full bg-surface-container-low border border-dashed border-outline-variant rounded-lg py-2 pl-10 pr-2 text-body-md text-on-surface focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-        </div>
+      <section className="px-md mt-sm">
+        <DateRangeBar
+          startDate={startDate}
+          endDate={endDate}
+          onChange={(s, e) => {
+            setStartDate(s)
+            setEndDate(e)
+          }}
+        />
       </section>
 
       {/* catalog未就绪前(entries缓存优先比catalog先就绪，见useEntries.ts)先不渲染

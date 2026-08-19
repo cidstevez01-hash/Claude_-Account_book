@@ -12,6 +12,18 @@
     <title>Washi Ledger</title>
   </head>
   <body>
+    <!-- 底部导航气泡液态玻璃特效(#4)用的SVG折射滤镜——照旧仓库根目录index.html原样搬，
+         噪声位移让气泡背后被盖住的图标透过玻璃看起来轻微扭曲变形，CSS里
+         backdrop-filter: ... url(#glassLens)引用的就是这个滤镜定义，必须挂在文档里 -->
+    <svg width="0" height="0" style="position: absolute; overflow: hidden">
+      <defs>
+        <filter id="glassLens" x="-40%" y="-40%" width="180%" height="180%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.009 0.05" numOctaves="2" seed="9" result="noise" />
+          <feGaussianBlur in="noise" stdDeviation="2" result="softNoise" />
+          <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="38" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+    </svg>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

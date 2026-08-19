@@ -1,5 +1,6 @@
-import type { Category, Entry, EntryType, Lang, PaymentMethod } from '../types'
-import { catLabel, payLabel } from '../lib/catalogLabel'
+import type { Category, Entry, EntryType, Lang, PaymentMethod, Tag } from '../types'
+import { catLabel, payLabel, tagLabel } from '../lib/catalogLabel'
+import { todayStr } from '../lib/date'
 
 /** 图表配色兜底盘——照抄旧仓库index.html的CHART_PALETTE，分类有自己的color字段用不到这个，
  * 支付方式没有color字段，只有badge.bg(不是所有支付方式都设了badge)，没有badge时按顺序
@@ -18,17 +19,27 @@ export interface MonthSummary {
   points: number
 }
 
-export function summarizeMonth(entries: Entry[], ref: Date = new Date()): MonthSummary {
+function summarize(entries: Entry[], inRange: (dateStr: string) => boolean): MonthSummary {
   let income = 0
   let expense = 0
   let points = 0
   for (const e of entries) {
-    if (!isSameMonth(e.date, ref)) continue
+    if (!inRange(e.date)) continue
     if (e.type === 'income') income += e.amount
     else expense += e.amount
     points += e.points ?? 0
   }
   return { balance: income - expense, income, expense, points }
+}
+
+export function summarizeMonth(entries: Entry[], ref: Date = new Date()): MonthSummary {
+  return summarize(entries, (d) => isSameMonth(d, ref))
+}
+
+/** 按任意起止日期区间统计——仪表盘顶部换成真正的起止日期选择器(#8)后，仪表盘的
+ * 结余/收支/环状图都要跟着这个区间走，不再固定按"当前日历月"算 */
+export function summarizeRange(entries: Entry[], startDate: string, endDate: string): MonthSummary {
+  return summarize(entries, (d) => d >= startDate && d <= endDate)
 }
 
 export interface CategoryShare {
@@ -41,17 +52,17 @@ export interface CategoryShare {
 
 /** 仪表盘分类环状图用——按分类聚合某个类型(收入/支出)在给定月份内的金额占比，
  * 照design-assets-v2/_44这屏的"Expenses/Income tabs + donut + legend"实现 */
-export function categoryBreakdown(
+function breakdown(
   entries: Entry[],
   categories: Category[],
   type: EntryType,
-  ref: Date = new Date(),
-  lang: Lang = 'zh'
+  inRange: (dateStr: string) => boolean,
+  lang: Lang
 ): CategoryShare[] {
   const totals = new Map<string, number>()
   let grandTotal = 0
   for (const e of entries) {
-    if (e.type !== type || !isSameMonth(e.date, ref)) continue
+    if (e.type !== type || !inRange(e.date)) continue
     totals.set(e.catCode, (totals.get(e.catCode) ?? 0) + e.amount)
     grandTotal += e.amount
   }
@@ -67,6 +78,68 @@ export function categoryBreakdown(
         ratio: amount / grandTotal,
       }
     })
+    .sort((a, b) => b.amount - a.amount)
+}
+
+export function categoryBreakdown(
+  entries: Entry[],
+  categories: Category[],
+  type: EntryType,
+  ref: Date = new Date(),
+  lang: Lang = 'zh'
+): CategoryShare[] {
+  return breakdown(entries, categories, type, (d) => isSameMonth(d, ref), lang)
+}
+
+/** 按任意起止日期区间聚合分类占比——仪表盘换成起止日期区间选择器(#8)后的配套函数，
+ * 用法/返回结构跟categoryBreakdown完全一样，只是区间判断换成起止日期而不是日历月 */
+export function categoryBreakdownRange(
+  entries: Entry[],
+  categories: Category[],
+  type: EntryType,
+  startDate: string,
+  endDate: string,
+  lang: Lang = 'zh'
+): CategoryShare[] {
+  return breakdown(entries, categories, type, (d) => d >= startDate && d <= endDate, lang)
+}
+
+// 照旧App renderHomeDonut()的真实配色：标签维度不用分类各自的color，统一用这两个
+// 强调色区分"匹配这个标签"/"其他"，不跟支出红(--seal)撞色
+const TAG_MATCHED_COLOR = '#e3b23c'
+const TAG_OTHER_COLOR = '#c2b8a3'
+
+/** 环状图切到标签维度(#7)时用——按"是否匹配选中的这个标签"把entries分成两组，
+ * 不是像分类维度那样按各自的catCode分好几组。照旧App renderHomeDonut()里
+ * homeDonutTagFilter那条分支真实逻辑搬：key='__other__'代表"没打这个标签"的那组，
+ * label/color都固定，不像分类维度那样每组各自不同 */
+export function tagBreakdownRange(
+  entries: Entry[],
+  tag: Tag,
+  type: EntryType,
+  startDate: string,
+  endDate: string,
+  lang: Lang,
+  otherLabel: string
+): CategoryShare[] {
+  const totals = new Map<string, number>()
+  let grandTotal = 0
+  for (const e of entries) {
+    if (e.type !== type || e.date < startDate || e.date > endDate) continue
+    const matched = e.tagCode === tag.code
+    const key = matched ? tag.code : '__other__'
+    totals.set(key, (totals.get(key) ?? 0) + e.amount)
+    grandTotal += e.amount
+  }
+  if (grandTotal === 0) return []
+  return Array.from(totals.entries())
+    .map(([key, amount]) => ({
+      catCode: key,
+      label: key === '__other__' ? otherLabel : tagLabel(tag, lang),
+      color: key === '__other__' ? TAG_OTHER_COLOR : TAG_MATCHED_COLOR,
+      amount,
+      ratio: amount / grandTotal,
+    }))
     .sort((a, b) => b.amount - a.amount)
 }
 
@@ -307,4 +380,26 @@ export function groupByDay(entries: Entry[]): { date: string; entries: Entry[] }
   return Array.from(map.entries())
     .sort((a, b) => (a[0] < b[0] ? 1 : -1))
     .map(([date, list]) => ({ date, entries: list }))
+}
+
+/** 仪表盘"最近明细"用——照旧App`buildDayGroupedHtml()`真实排序逻辑：今天及之前(已经
+ * 发生的)按日期倒序置顶；晚于今天的(比如提前生成的下个月房租/工资这种还没发生的)统一
+ * 沉到最下面，内部按日期升序排(越快发生的排越靠前)，不跟已发生的混在一起纯按日期倒序。
+ * 明细页(History)不用这个特殊排序，用上面的groupByDay纯降序即可 */
+export function groupByDayPinned(entries: Entry[]): { date: string; entries: Entry[] }[] {
+  const today = todayStr()
+  const sorted = [...entries].sort((a, b) => {
+    const aFuture = a.date > today
+    const bFuture = b.date > today
+    if (aFuture !== bFuture) return aFuture ? 1 : -1
+    if (aFuture) return a.date.localeCompare(b.date) || a.createdAt - b.createdAt
+    return b.date.localeCompare(a.date) || b.createdAt - a.createdAt
+  })
+  const map = new Map<string, Entry[]>()
+  for (const e of sorted) {
+    const list = map.get(e.date) ?? []
+    list.push(e)
+    map.set(e.date, list)
+  }
+  return Array.from(map.entries()).map(([date, list]) => ({ date, entries: list }))
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useI18n } from '../../lib/i18n'
-import { groupByDay } from '../../data/summary'
+import { groupByDayPinned } from '../../data/summary'
 import { EntryCard } from './EntryCard'
 import { dayLabel } from './dayLabel'
 import type { Category, Entry } from '../../types'
@@ -23,7 +23,9 @@ export function RecentEntriesList({
   onDelete,
 }: RecentEntriesListProps) {
   const { t } = useI18n()
-  const groups = groupByDay(entries).slice(0, limit)
+  // 传入的entries已经在DashboardPage按顶部时间范围筛选过了，这里只管排序(照旧App
+  // buildDayGroupedHtml的置顶逻辑，见groupByDayPinned的说明)+截取展示条数
+  const groups = groupByDayPinned(entries).slice(0, limit)
   // 点一条记录展开操作抽屉(编辑/复制/删除)，照design-assets-v2/_44的"Expanded Action Drawer"，
   // 同一时间只展开一条，不用给每条记录单独维护一个boolean状态
   const [expandedId, setExpandedId] = useState<string | null>(null)

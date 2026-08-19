@@ -159,3 +159,31 @@ body {
 .papercut-shadow {
   box-shadow: 0 2px 0 var(--color-outline-variant);
 }
+
+/* 底部导航选中气泡——照旧仓库index.html的.tab-bubble真实效果搬：毛玻璃背景+
+   SVG位移滤镜(#glassLens，定义见index.html)透出背后图标的轻微折射变形，位置/
+   宽度由BottomNav.tsx用Web Animations API驱动(见那边tabBubble的place/slideTo)，
+   这里只放静态外观 */
+.tab-bubble {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 0;
+  border-radius: 9999px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: color-mix(in srgb, var(--color-surface) 22%, transparent);
+  backdrop-filter: blur(2px) saturate(1.5) url(#glassLens);
+  -webkit-backdrop-filter: blur(2px) saturate(1.5);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 55%, transparent);
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--color-primary) 38%, transparent),
+    inset 0 1px 1px color-mix(in srgb, white 40%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-primary) 15%, transparent) inset;
+  transition: opacity 0.18s ease;
+}
+.tab-bubble.show {
+  opacity: 1;
+}

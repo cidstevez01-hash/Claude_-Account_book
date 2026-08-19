@@ -1,10 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { DonutRing } from '../../design-system/components/DonutRing'
 import { ScrollLegendList } from '../../design-system/components/ScrollLegendList'
 import { useI18n } from '../../lib/i18n'
 import { formatCurrency } from '../../data/currencyDisplay'
-import type { CategoryShare } from '../../data/summary'
-import type { EntryType } from '../../types'
+import { tagBreakdownRange, type CategoryShare } from '../../data/summary'
+import { tagLabel } from '../../lib/catalogLabel'
+import type { Entry, EntryType, Tag } from '../../types'
+
+interface TagDimensionProps {
+  entries: Entry[]
+  expenseTags: Tag[]
+  incomeTags: Tag[]
+  startDate: string
+  endDate: string
+}
 
 interface CategoryDonutCardProps {
   expenseShares: CategoryShare[]
@@ -17,12 +26,47 @@ interface CategoryDonutCardProps {
    * 转换过)，这里只管用对应币种符号格式化显示，不做换算。默认CNY是兼容旧调用点，
    * 实际调用方都应该显式传settings.currency */
   currency?: string
+  /** 传了这几项才会显示右上角"分类/标签"维度切换下拉框(#7，照旧App renderHomeDonut()的
+   * homeDonutDimSelect真实逻辑)——目前只有仪表盘接了这个，统计页donut卡片没有这个维度
+   * 切换需求，不传就还是纯分类模式，跟原来行为一样 */
+  tagDimension?: TagDimensionProps
 }
 
-export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategory, resetKey, currency = 'CNY' }: CategoryDonutCardProps) {
-  const { t } = useI18n()
+export function CategoryDonutCard({
+  expenseShares,
+  incomeShares,
+  onSelectCategory,
+  resetKey,
+  currency = 'CNY',
+  tagDimension,
+}: CategoryDonutCardProps) {
+  const { t, lang } = useI18n()
   const [tab, setTab] = useState<EntryType>('expense')
-  const shares = tab === 'expense' ? expenseShares : incomeShares
+  const [dimTagCode, setDimTagCode] = useState<string | null>(null)
+
+  const currentTags = tagDimension ? (tab === 'expense' ? tagDimension.expenseTags : tagDimension.incomeTags) : []
+  // 标签维度是"某个具体标签"，切支出/收入tab后这个标签可能在另一边根本不存在——
+  // 照旧App renderDonutDimOptions()的容错逻辑，此时自动退回分类维度，不留一个选不中的空值
+  useEffect(() => {
+    if (dimTagCode && !currentTags.some((tg) => tg.code === dimTagCode)) setDimTagCode(null)
+  }, [dimTagCode, currentTags])
+
+  const categoryShares = tab === 'expense' ? expenseShares : incomeShares
+  const selectedTag = currentTags.find((tg) => tg.code === dimTagCode) ?? null
+  const shares = useMemo(() => {
+    if (tagDimension && selectedTag) {
+      return tagBreakdownRange(
+        tagDimension.entries,
+        selectedTag,
+        tab,
+        tagDimension.startDate,
+        tagDimension.endDate,
+        lang,
+        t('tagOtherBucket')
+      )
+    }
+    return categoryShares
+  }, [tagDimension, selectedTag, tab, lang, t, categoryShares])
   const total = shares.reduce((sum, s) => sum + s.amount, 0)
 
   return (
@@ -42,43 +86,63 @@ export function CategoryDonutCard({ expenseShares, incomeShares, onSelectCategor
         ))}
       </div>
 
-      {shares.length === 0 ? (
-        <p className="text-center text-body-md text-on-surface-variant py-8">{t('noRecordsThisMonth')}</p>
-      ) : (
-        <div className="flex flex-col items-center py-2">
-          <div className="relative w-48 h-48 mb-3">
-            <DonutRing shares={shares.map((s) => ({ key: s.catCode, color: s.color, ratio: s.ratio }))} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] font-sans text-on-surface-variant uppercase">
-                {tab === 'expense' ? 'Total Expenses' : 'Total Income'}
-              </span>
-              <span className="font-serif text-stat-figure text-primary">
-                {formatCurrency(total, currency)}
-              </span>
-            </div>
-          </div>
+      {/* 维度切换下拉框(#7)——照旧App".donut-row .dim-select"真实定位：绝对定位浮在
+          donut右上角本来就空着的地方，不挤占donut/图例的居中布局 */}
+      <div className="relative">
+        {tagDimension && (
+          <select
+            value={dimTagCode ?? ''}
+            onChange={(e) => setDimTagCode(e.target.value || null)}
+            className="absolute top-0 right-0 z-10 appearance-none bg-surface-container border-[1.5px] border-outline-variant rounded-xl pl-3 pr-6 py-1.5 font-sans font-bold text-tab-label text-on-surface-variant bg-[url('data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23a99c86%22 stroke-width=%222.3%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_6px_center] bg-[length:9px]"
+          >
+            <option value="">{t('dimCategoryOption')}</option>
+            {currentTags.map((tg) => (
+              <option key={tg.code} value={tg.code}>
+                {tagLabel(tg, lang)}
+              </option>
+            ))}
+          </select>
+        )}
 
-          <ScrollLegendList key={`${tab}-${resetKey ?? ''}`}>
-            <div className="flex flex-col gap-y-2 w-full px-2 mt-2">
-              {shares.map((share) => (
-                <button
-                  key={share.catCode}
-                  type="button"
-                  onClick={() => onSelectCategory?.(share.catCode, tab)}
-                  className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30 text-left active:opacity-70"
-                >
-                  <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
-                  <span className="text-body-md text-on-surface flex-1">{share.label}</span>
-                  <span className="text-stat-figure text-xs text-on-surface-variant mr-4">
-                    {Math.round(share.ratio * 100)}%
-                  </span>
-                  <span className="font-serif text-stat-figure text-on-surface">{formatCurrency(share.amount, currency)}</span>
-                </button>
-              ))}
+        {shares.length === 0 ? (
+          <p className="text-center text-body-md text-on-surface-variant py-8">{t('noRecordsThisMonth')}</p>
+        ) : (
+          <div className="flex flex-col items-center py-2">
+            <div className="relative w-48 h-48 mb-3">
+              <DonutRing shares={shares.map((s) => ({ key: s.catCode, color: s.color, ratio: s.ratio }))} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] font-sans text-on-surface-variant uppercase">
+                  {tab === 'expense' ? 'Total Expenses' : 'Total Income'}
+                </span>
+                <span className="font-serif text-stat-figure text-primary">
+                  {formatCurrency(total, currency)}
+                </span>
+              </div>
             </div>
-          </ScrollLegendList>
-        </div>
-      )}
+
+            <ScrollLegendList key={`${tab}-${dimTagCode ?? ''}-${resetKey ?? ''}`}>
+              <div className="flex flex-col gap-y-2 w-full px-2 mt-2">
+                {shares.map((share) => (
+                  <button
+                    key={share.catCode}
+                    type="button"
+                    disabled={!!selectedTag}
+                    onClick={() => onSelectCategory?.(share.catCode, tab)}
+                    className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30 text-left active:opacity-70 disabled:active:opacity-100"
+                  >
+                    <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
+                    <span className="text-body-md text-on-surface flex-1">{share.label}</span>
+                    <span className="text-stat-figure text-xs text-on-surface-variant mr-4">
+                      {Math.round(share.ratio * 100)}%
+                    </span>
+                    <span className="font-serif text-stat-figure text-on-surface">{formatCurrency(share.amount, currency)}</span>
+                  </button>
+                ))}
+              </div>
+            </ScrollLegendList>
+          </div>
+        )}
+      </div>
     </section>
   )
 }
