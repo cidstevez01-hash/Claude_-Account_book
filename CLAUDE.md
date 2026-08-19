@@ -47,5 +47,21 @@
 - 完整背景/架构/已完成页面/设计原则见根目录`HANDOFF-washi-ledger-rewrite.md`，接手这条线之前必须先读完，不要凭记忆重新猜方向。
 - 两条线的CI/开发记录分开维护，`DEVLOG.md`里`washi-ledger-rewrite`分支的行单独记录，不跟`accountbook-YYYYMMDD`那条线的行混着理解。
 
+## 需求 / Bug 追踪表(Smartsheet)
+- 用户不再用聊天原文提需求/报 bug，而是写进 Smartsheet 的两张在线表，**每次会话开始处理任务前，应该去读这两张表**，不要只等用户在对话里重复描述。
+- 通过 Smartsheet MCP connector 读写（`mcp__Smartsheet__*` 工具，先调 `get_resource_guide` 拿编排指南）。如果调用被权限拦住且没有弹出确认提示，跟用户说明这是会话权限模式的问题，不是表本身的问题。
+- **workspace**：`washi-ledger 开发追踪`（workspace id `3865640789403524`）
+  https://app.smartsheet.com/workspaces/J6JCcX7cf2WPj93CjWCgPm6Fg4Gj5hG8RXjRQC51
+- **需求表**（sheet id `4497306844876676`）
+  https://app.smartsheet.com/sheets/VJ6rc5vc57cH39pjhjgMVMRj3m8VgMm4qg6CWGh1
+  字段：`id`(自动编号 R-01/R-02...) / `标题` / `模块`(下拉) / `需求内容` / `状态`(下拉) / `更新版本` / `备注`
+  状态流转：**待处理**(初始) → **处理中**(开始处理时改) → **已处理**(处理完毕时改，并回填`更新版本`列的版本号)
+- **Bug 表**（sheet id `3927270329634692`）
+  https://app.smartsheet.com/sheets/fFVq6qrV62wwFGP64CxmH9PJ4V48FhhCpFJCjVj1
+  字段：`id`(自动编号 B-01/B-02...) / `标题` / `模块`(下拉) / `复现步骤` / `当前现象` / `预期现象` / `状态`(下拉) / `发生版本` / `修复版本` / `测试结果`(下拉 passed/failed) / `备注`
+  状态流转：**待处理**(初始) → **处理中** → **已处理**(回填`修复版本`) → **验证中** → 测试结果填 `failed` 时状态打回**待处理**；填 `passed` 时状态改**已解决**
+- 两张表的 `id` 都是新增一行时 Smartsheet 自动生成，不用手动编号。
+- 处理某一行后要把状态字段实际改掉（不是只在对话里说"处理完了"），这样其他会话/用户刷新表就能看到真实进度。
+
 ## 其他长期规则
 详见 `DEVLOG.md` 的"⚠️ 长期规则"一节，版本号/分支完整规则见 `VERSIONS.md`。
