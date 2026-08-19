@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CategoryPicker } from './CategoryPicker'
 import { TagPicker } from './TagPicker'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
+import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
@@ -33,7 +34,7 @@ export function AddTransactionPage() {
   const typeLocked = mode !== 'add' // 编辑/复制都锁定收支类型，照旧App的setTypeSegmentLocked(true)
 
   const { user } = useAuth()
-  const { catalog, reload: reloadCatalog } = useCatalog()
+  const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { entries } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
 
@@ -180,9 +181,7 @@ export function AddTransactionPage() {
            整页提前返回，连header/返回按钮都出不来，真机上就是"进App白屏一段时间"；改成
            只在main内容区域挡一个轻量的loading占位，外壳(header)立刻能看到、能点返回 */}
        {!catalog ? (
-        <div className="flex items-center justify-center h-full py-24">
-          <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
-        </div>
+        <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
        ) : (
         <>
         <div className="px-md pt-2 pb-6">

@@ -33,7 +33,10 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         setCatalog(data)
         saveCachedCatalog(data)
       })
-      .catch((e) => setError(e))
+      .catch((e) => {
+        console.error('拉取分类/支付方式目录数据失败', e)
+        setError(e)
+      })
       .finally(() => setLoading(false))
   }, [])
 

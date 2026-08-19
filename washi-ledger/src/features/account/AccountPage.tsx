@@ -56,7 +56,7 @@ export function AccountPage() {
   }
 
   return (
-    <AppLayout title={t('accountTitle')}>
+    <AppLayout title={t('accountTitle')} leftButton="home">
       <div className="flex flex-col items-center px-md pt-lg pb-lg">
         <div className="w-20 h-20 rounded-full border-2 border-primary flex items-center justify-center mb-3">
           <span className="material-symbols-outlined text-4xl text-primary">account_circle</span>

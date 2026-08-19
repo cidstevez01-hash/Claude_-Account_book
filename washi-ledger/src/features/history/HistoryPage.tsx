@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
+import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { HistoryEntryList } from './HistoryEntryList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -23,7 +24,7 @@ function currentMonthStr() {
 export function HistoryPage() {
   const { t } = useI18n()
   const { user } = useAuth()
-  const { catalog } = useCatalog()
+  const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
@@ -147,9 +148,7 @@ export function HistoryPage() {
           区域，上面的搜索/筛选/日期区间栏不依赖catalog，照常显示 */}
       <div className="mt-lg">
         {!catalog ? (
-          <div className="flex items-center justify-center py-24">
-            <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
-          </div>
+          <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
         ) : (
           <HistoryEntryList
             entries={filtered}

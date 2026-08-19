@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
+import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { MonthNavBar } from './MonthNavBar'
 import { TrendControls } from './TrendControls'
 import { TrendLegend } from './TrendLegend'
@@ -71,7 +72,7 @@ export function StatsPage() {
   const { t, lang } = useI18n()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { catalog } = useCatalog()
+  const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
@@ -211,9 +212,7 @@ export function StatsPage() {
       {/* catalog未就绪前只挡数据区域，顶部tab胶囊(不依赖catalog)照常显示——原理同
           DashboardPage.tsx，见那边的注释 */}
       {!catalog ? (
-        <div className="flex items-center justify-center py-24">
-          <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
-        </div>
+        <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
       ) : (
       <>
       <div className="mb-md">

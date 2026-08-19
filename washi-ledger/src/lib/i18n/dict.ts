@@ -119,6 +119,8 @@ export const dict = {
     verifyCodePlaceholder: '验证码', // 新App专属，比旧App cloudVerifyCodePlaceholder的"6位验证码"更简短
     verifySubmitLoading: '验证中…', // 新App专属
     verifySubmitBtn: '验证并完成注册', // 新App专属(旧App cloudVerifyBtn是"验证并登录"，场景是登录不是注册，故未直接复用)
+    catalogLoadErrorHint: '分类数据加载失败，请检查网络后重试', // 新App专属(catalog请求失败时的兜底提示，避免转圈圈转个不停却没有任何反馈)
+    retryLabel: '重试', // 新App专属
   },
   ja: {
     appTitle: LEGACY_JA.appTitle,
@@ -227,5 +229,7 @@ export const dict = {
     verifyCodePlaceholder: '確認コード',
     verifySubmitLoading: '確認中…',
     verifySubmitBtn: '確認して登録を完了',
+    catalogLoadErrorHint: 'カテゴリデータの読み込みに失敗しました。ネットワークをご確認の上、再試行してください',
+    retryLabel: '再試行',
   },
 } as const

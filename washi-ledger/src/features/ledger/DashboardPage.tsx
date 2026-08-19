@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
+import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { BalanceCard } from './BalanceCard'
 import { DateRangeBar } from './DateRangeBar'
 import { CategoryDonutCard } from './CategoryDonutCard'
@@ -22,7 +23,7 @@ import type { EntryType } from '../../types'
 export function DashboardPage() {
   const { t, lang } = useI18n()
   const { user } = useAuth()
-  const { catalog } = useCatalog()
+  const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
@@ -72,11 +73,11 @@ export function DashboardPage() {
           就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会闪一下"英文图标名
           +统一灰色"的半成品画面——之前用if(!catalog)return null整页提前返回，连header/
           底部导航都出不来，真机上就是"进App白屏一段时间"；改成只在内容区域挡一个轻量的
-          loading占位，外壳(header/bottom nav)立刻能看到 */}
+          loading占位，外壳(header/bottom nav)立刻能看到。catalogLoading为false但catalog
+          仍是null说明请求失败了(比如网络问题)，不能一直转圈圈却什么反馈都没有，
+          CatalogLoadState按这两种状态分别显示转圈圈/错误提示+重试按钮 */}
       {!catalog ? (
-        <div className="flex items-center justify-center py-24">
-          <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
-        </div>
+        <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
       ) : (
         <>
           <DateRangeBar monthLabel={monthLabel} onPrevMonth={() => shiftMonth(-1)} onNextMonth={() => shiftMonth(1)} />
