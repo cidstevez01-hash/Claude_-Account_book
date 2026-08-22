@@ -53,6 +53,8 @@ export const dict = {
     rateLoading: LEGACY_ZH.loadingRate,
     rateSearchPlaceholder: '搜索货币…', // 新App专属(旧App汇率页是固定人民币↔日元，没有货币搜索)
     ratePopularTitle: '热门汇率', // 新App专属
+    rateTrendLabel: '走势', // 新App专属(R-04汇率页重设计新增的趋势图标题，旧App没有这个走势图功能)
+    rateNoHistory: '这段时间没有汇率数据', // 新App专属(周末/节假日frankfurter.dev没有发布数据时的真实提示，不补假数据)
 
     // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
     menuAria: '菜单', // 新App专属(左上角抽屉导航按钮，旧App没有这个汉堡菜单)
@@ -165,6 +167,8 @@ export const dict = {
     rateLoading: LEGACY_JA.loadingRate,
     rateSearchPlaceholder: '通貨を検索…',
     ratePopularTitle: '人気の為替レート',
+    rateTrendLabel: '推移',
+    rateNoHistory: 'この期間のデータはありません',
 
     // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
     menuAria: 'メニュー',

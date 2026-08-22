@@ -43,3 +43,28 @@ export async function fetchRates(base: string): Promise<RateSnapshot> {
   }
   return { base, date: data.date, rates: data.rates, fetchedAt: Date.now() }
 }
+
+export interface RateHistoryPoint {
+  date: string
+  rate: number
+}
+
+/** 汇率走势——frankfurter.dev同一个数据源真实存在的时间序列接口，拉一段真实历史区间的
+ * base兑target汇率画趋势图，不是编的假数据。这是按日更新的央行参考汇率，没有盘中粒度，
+ * 周末/节假日也没有发布——短窗口(比如1D)可能就只有1、2个真实点，如实显示这批点，
+ * 不插值凑数据把图"填满" */
+export async function fetchRateHistory(base: string, target: string, days: number): Promise<RateHistoryPoint[]> {
+  const end = new Date()
+  const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000)
+  const fmt = (d: Date) => d.toISOString().slice(0, 10)
+  const res = await fetch(`https://api.frankfurter.dev/v1/${fmt(start)}..${fmt(end)}?base=${base}&symbols=${target}`)
+  if (!res.ok) throw new Error(`汇率走势接口返回${res.status}`)
+  const data = await res.json()
+  if (!data?.rates || typeof data.rates !== 'object') {
+    throw new Error('汇率走势接口返回格式不符')
+  }
+  return Object.entries(data.rates as Record<string, Record<string, number>>)
+    .map(([date, rates]) => ({ date, rate: rates[target] }))
+    .filter((p) => typeof p.rate === 'number')
+    .sort((a, b) => a.date.localeCompare(b.date))
+}

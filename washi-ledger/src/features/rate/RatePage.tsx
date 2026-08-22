@@ -1,27 +1,43 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
-import { fetchRates, CURRENCIES, type RateSnapshot } from '../../data/rate'
+import { fetchRates, fetchRateHistory, CURRENCIES, type RateSnapshot, type RateHistoryPoint } from '../../data/rate'
 import { useI18n } from '../../lib/i18n'
 
-/** 汇率换算——多货币版，照design-assets-v2/_6/_35的换算卡片+搜索+热门汇率列表布局做。
- * 默认换算方向JPY↔CNY(服务的是中日两地记账场景)，但from/to都可以在CURRENCIES列表里
- * 自由切换，不再锁死只能JPY/CNY两个方向。
+const TIMEFRAMES = [
+  { key: '1D', days: 2 },
+  { key: '1W', days: 7 },
+  { key: '1M', days: 30 },
+  { key: '1Y', days: 365 },
+] as const
+type TimeframeKey = (typeof TIMEFRAMES)[number]['key']
+
+function monthDay(dateStr: string) {
+  const [, m, d] = dateStr.split('-')
+  return `${m}-${d}`
+}
+
+/** 汇率换算——照design-assets/prototypes/.../ad647758a5e5485e84e33107fb3fac3c
+ * ("汇率换算 全新重构版")这份最新Stitch设计稿重做：从"多货币搜索+热门汇率列表"换成
+ * "单一货币对换算卡片(和纸胶带装饰+图章式互换按钮+实时汇率胶囊) + 走势图"这个新布局，
+ * 旧的多货币列表/搜索框不再是这版设计的一部分，故未保留——如果以后还需要那个能力，
+ * 应该作为独立需求另外提。
  *
- * 数据源接frankfurter-cny同一个API(https://api.frankfurter.dev)，一次请求拿from货币
- * 兑其余所有常用货币的汇率，换算结果和下面的热门汇率列表共用这一份数据。旧App那套
- * 4源兜底取最新日期、近30天/12个月/8年走势图这次都还没做，跟v1版一样先只保证有汇率能用。
- *
- * 沙箱环境里api.frankfurter.dev不在代理白名单里，这次没能实际跑一遍联网验证——
- * 接口用法照官方文档写，出错时页面会显示具体错误文本，不是静默失败 */
+ * 走势图数据源用frankfurter.dev同一个API真实存在的时间序列接口(fetchRateHistory)，
+ * 不是编的假折线；这是按日更新的央行参考汇率，没有盘中粒度，周末/节假日也没有发布，
+ * 短窗口(1D)真实点可能很少甚至只有1个，如实显示，不插值凑数据。 */
 export function RatePage() {
   const { t } = useI18n()
   const [fromCode, setFromCode] = useState('JPY')
   const [toCode, setToCode] = useState('CNY')
-  const [amount, setAmount] = useState('1')
-  const [search, setSearch] = useState('')
+  const [amount, setAmount] = useState('100')
   const [snapshot, setSnapshot] = useState<RateSnapshot | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const [timeframe, setTimeframe] = useState<TimeframeKey>('1W')
+  const [history, setHistory] = useState<RateHistoryPoint[]>([])
+  const [historyLoading, setHistoryLoading] = useState(true)
+  const [historyError, setHistoryError] = useState('')
 
   async function refresh(base: string) {
     setLoading(true)
@@ -41,6 +57,16 @@ export function RatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromCode])
 
+  useEffect(() => {
+    const days = TIMEFRAMES.find((tf) => tf.key === timeframe)!.days
+    setHistoryLoading(true)
+    setHistoryError('')
+    fetchRateHistory(fromCode, toCode, days)
+      .then(setHistory)
+      .catch((e) => setHistoryError(e instanceof Error ? e.message : String(e)))
+      .finally(() => setHistoryLoading(false))
+  }, [fromCode, toCode, timeframe])
+
   function handleSwap() {
     setFromCode(toCode)
     setToCode(fromCode)
@@ -50,123 +76,160 @@ export function RatePage() {
   const amountNum = parseFloat(amount)
   const converted = unitRate != null && !isNaN(amountNum) ? amountNum * unitRate : null
 
-  const popularList = useMemo(() => {
-    const keyword = search.trim().toLowerCase()
-    return CURRENCIES.filter((c) => c.code !== fromCode).filter(
-      (c) => !keyword || c.code.toLowerCase().includes(keyword) || c.zh.includes(keyword)
-    )
-  }, [fromCode, search])
+  const chartPath = useMemo(() => {
+    if (history.length < 2) return null
+    const values = history.map((p) => p.rate)
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const range = max - min || 1
+    const points = history.map((p, i) => {
+      const x = (i / (history.length - 1)) * 100
+      const y = 38 - ((p.rate - min) / range) * 34
+      return { x, y }
+    })
+    const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
+    const area = `${line} L 100 40 L 0 40 Z`
+    return { line, area }
+  }, [history])
 
   return (
     <AppLayout title={t('rateNavLabel')}>
-      <div className="px-md pt-md flex flex-col gap-md">
-        <div className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md papercut-shadow relative">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <select
-                value={fromCode}
-                onChange={(e) => setFromCode(e.target.value)}
-                className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold"
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.code} · {c.zh}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full bg-transparent border-0 border-b-2 border-primary focus:outline-none focus:ring-0 px-0 py-1 font-serif text-[32px] font-semibold text-primary text-right"
-            />
-          </div>
+      <div className="px-md pt-lg pb-xl flex flex-col gap-lg">
+        {/* 换算卡片(The Ledger Card)——和纸胶带装饰角+虚线描边，照旧App结余卡片同一套材质语言 */}
+        <div className="relative bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">
+          <div
+            className="absolute -top-1.5 -right-2 w-10 h-3 rounded-sm opacity-70"
+            style={{ background: 'var(--color-tertiary-fixed-dim)', transform: 'rotate(4deg)' }}
+          />
 
-          <div className="flex justify-center my-2">
+          <div className="flex flex-col gap-md relative">
+            <div className="flex flex-col gap-1 pb-4 border-b border-dashed border-outline-variant/50">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container">
+                  <span className="material-symbols-outlined text-[18px]">payments</span>
+                </div>
+                <select
+                  value={fromCode}
+                  onChange={(e) => setFromCode(e.target.value)}
+                  className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold"
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.code} · {c.zh}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0.00"
+                className="w-full bg-transparent border-none outline-none px-0 py-1 font-serif text-[42px] leading-[48px] font-bold text-primary text-right focus:ring-0"
+              />
+            </div>
+
+            {/* 互换按钮(The Stamp)——照design稿绝对定位浮在两行中间，不占布局空间 */}
             <button
               type="button"
               onClick={handleSwap}
               aria-label={t('swapCurrencyAria')}
-              className="w-10 h-10 rounded-full bg-surface border-[1.5px] border-outline-variant flex items-center justify-center text-primary"
+              className="stamp-shadow absolute left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-surface-container-lowest border-[1.5px] border-outline-variant flex items-center justify-center text-primary"
+              style={{ boxShadow: '0 3px 0 var(--color-surface-variant)' }}
             >
-              <span className="material-symbols-outlined">swap_vert</span>
+              <span className="material-symbols-outlined text-[24px]">swap_vert</span>
             </button>
-          </div>
 
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-end gap-2">
-              <select
-                value={toCode}
-                onChange={(e) => setToCode(e.target.value)}
-                className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold text-right"
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.code} · {c.zh}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="w-full border-b-2 border-outline-variant py-1 font-serif text-[32px] font-semibold text-on-surface text-right opacity-80">
-              {converted != null ? converted.toFixed(2) : '--'}
-            </div>
-          </div>
-
-          <div className="mt-4 text-right text-label-caps font-sans text-outline">
-            {unitRate != null ? `1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}` : '--'}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between px-1">
-          <span className="text-body-md text-on-surface-variant">
-            {t('rateUpdatedLabel')}：{loading ? t('rateLoading') : snapshot ? snapshot.date : t('rateNeverFetched')}
-          </span>
-          <button
-            type="button"
-            onClick={() => refresh(fromCode)}
-            disabled={loading}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-primary text-primary text-body-md font-sans disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined text-[18px]">refresh</span>
-            {t('refreshRate')}
-          </button>
-        </div>
-
-        {error && <p className="text-body-md text-primary break-all">{error}</p>}
-
-        <div className="relative w-full">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('rateSearchPlaceholder')}
-            className="w-full bg-surface-container-highest border border-outline-variant rounded-full py-2.5 pl-10 pr-4 text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
-          />
-        </div>
-
-        <div>
-          <h3 className="text-label-caps font-sans text-on-surface-variant uppercase mb-xs">{t('ratePopularTitle')}</h3>
-          <div className="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
-            {popularList.map((c) => {
-              const rate = snapshot && snapshot.base === fromCode ? snapshot.rates[c.code] : null
-              return (
-                <div key={c.code} className="flex items-center justify-between p-sm border-b border-outline-variant/30 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center bg-surface-container text-on-surface font-serif">
-                      {c.code[0]}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-body-lg text-on-surface">{c.code}</span>
-                      <span className="text-label-caps font-sans text-outline">{c.zh}</span>
-                    </div>
-                  </div>
-                  <span className="font-serif text-entry-amount text-on-surface">{rate != null ? rate.toFixed(4) : '--'}</span>
+            <div className="flex flex-col gap-1 pt-2">
+              <div className="flex items-center justify-end gap-2">
+                <select
+                  value={toCode}
+                  onChange={(e) => setToCode(e.target.value)}
+                  className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold text-right"
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.code} · {c.zh}
+                    </option>
+                  ))}
+                </select>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-secondary-container text-on-secondary-container">
+                  <span className="material-symbols-outlined text-[18px]">account_balance</span>
                 </div>
-              )
-            })}
+              </div>
+              <div className="w-full px-0 py-1 font-serif text-[42px] leading-[48px] font-bold text-on-surface text-right opacity-80">
+                {converted != null ? converted.toFixed(2) : '--'}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center text-label-caps font-sans text-outline bg-surface-variant/30 py-2 rounded border border-dashed border-outline-variant/50">
+            {loading
+              ? t('rateLoading')
+              : unitRate != null
+                ? `1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
+                : t('rateNeverFetched')}
+          </div>
+          {error && <p className="mt-2 text-body-md text-primary break-all">{error}</p>}
+        </div>
+
+        {/* 走势图 */}
+        <div className="flex flex-col gap-md bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between">
+            <h3 className="text-label-caps font-sans text-on-surface-variant">
+              {fromCode}/{toCode} {t('rateTrendLabel')}
+            </h3>
+            <div className="flex gap-xs">
+              {TIMEFRAMES.map((tf) => (
+                <button
+                  key={tf.key}
+                  type="button"
+                  onClick={() => setTimeframe(tf.key)}
+                  className={`px-3 py-1.5 rounded text-label-caps transition-colors ${
+                    timeframe === tf.key
+                      ? 'bg-primary text-on-primary shadow-sm'
+                      : 'bg-surface-variant/50 text-on-surface-variant'
+                  }`}
+                >
+                  {tf.key}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative h-48 w-full flex items-end gap-1 px-1 mt-2">
+            {historyLoading ? (
+              <p className="w-full text-center text-body-md text-on-surface-variant self-center">{t('rateLoading')}</p>
+            ) : historyError ? (
+              <p className="w-full text-center text-body-md text-primary self-center break-all">{historyError}</p>
+            ) : !chartPath ? (
+              <p className="w-full text-center text-body-md text-on-surface-variant self-center">{t('rateNoHistory')}</p>
+            ) : (
+              <>
+                <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 40">
+                  <defs>
+                    <linearGradient id="rateChartGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-primary)" />
+                      <stop offset="100%" stopColor="transparent" />
+                    </linearGradient>
+                  </defs>
+                  <path d={chartPath.area} fill="url(#rateChartGradient)" opacity={0.15} />
+                  <path
+                    d={chartPath.line}
+                    fill="none"
+                    stroke="var(--color-primary)"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+                <div className="absolute bottom-0 left-0 w-full flex justify-between pt-2 border-t border-dashed border-outline-variant/50">
+                  <span className="text-[10px] text-outline font-sans">{monthDay(history[0].date)}</span>
+                  <span className="text-[10px] text-outline font-sans">{monthDay(history[history.length - 1].date)}</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
