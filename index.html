@@ -656,6 +656,37 @@
     padding:2px 8px;border-radius:999px;cursor:pointer;}
   .update-card button.update-refresh-btn:active{opacity:0.85;}
   .update-card .updating-row{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink);}
+  /* 云端登录掉线提示——完全照抄update-edge-tab那一套边缘小标签样式(同一个作者写的,
+     保持视觉语言一致)，只是top往下挪一档(104px+51px，41px标签高+10px间隙)，
+     避免跟"有新版本"那个提示同时出现时叠在一起 */
+  .cloud-edge-tab{position:fixed;top:calc(env(safe-area-inset-top) + 155px);right:0;width:26px;height:41px;
+    background:rgba(209,102,90,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.35);border-right:none;border-radius:12px 0 0 12px;z-index:60;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#fff;
+    box-shadow:-2px 2px 10px rgba(0,0,0,0.18);padding:0;cursor:pointer;transition:transform 0.15s ease;}
+  .cloud-edge-tab:active{transform:scale(0.94);}
+  .cloud-edge-tab .dot{width:6px;height:6px;border-radius:50%;background:#fff;position:relative;}
+  .cloud-edge-tab .dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid #fff;opacity:0.8;animation:updatePulse 1.8s ease-out infinite;}
+  .cloud-edge-tab .chevron{font-size:12px;line-height:1;}
+  .cloud-edge-tab.is-hidden{opacity:0;pointer-events:none;transform:translateX(6px);}
+  .cloud-expand-wrap{position:fixed;top:calc(env(safe-area-inset-top) + 155px);right:0;z-index:59;
+    display:flex;align-items:flex-start;gap:0;transform:translateX(16px);opacity:0;pointer-events:none;
+    transition:transform 0.22s cubic-bezier(.32,1.4,.5,1), opacity 0.18s ease;}
+  .cloud-expand-wrap.is-open{transform:translateX(0);opacity:1;pointer-events:auto;}
+  .cloud-collapse-handle{width:26px;height:40px;flex-shrink:0;border:none;padding:0;cursor:pointer;
+    background:rgba(209,102,90,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.35);border-right:none;color:#fff;border-radius:12px 0 0 12px;font-size:12px;
+    display:flex;align-items:center;justify-content:center;box-shadow:-2px 2px 10px rgba(0,0,0,0.18);}
+  .cloud-collapse-handle:active{transform:scale(0.94);}
+  .cloud-card{width:auto;max-width:175px;background:rgba(255,253,248,0.20);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.4);border-left:none;border-radius:0 12px 12px 0;padding:9px 11px;
+    box-shadow:0 10px 26px rgba(0,0,0,0.2);}
+  .cloud-card .title-row{display:flex;align-items:center;gap:20px;margin:0 0 3px;}
+  .cloud-card .title{font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;}
+  .cloud-card p{font-size:10.5px;color:var(--ink-soft);line-height:1.4;margin:0;}
+  .cloud-card button.cloud-reconnect-btn{flex-shrink:0;border:none;background:var(--seal);color:#fff;font-weight:600;font-size:10.5px;
+    padding:2px 8px;border-radius:999px;cursor:pointer;}
+  .cloud-card button.cloud-reconnect-btn:active{opacity:0.85;}
 </style>
 </head>
 <body>
@@ -2321,7 +2352,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.2';
   const IS_DEV_BUILD = true;
   const DEV_BUILD_DATE = '20260822';
-  const DEV_BUILD = 4;
+  const DEV_BUILD = 5;
   // 闹钟功能暂时封存:免费Apple ID侧载没有AlarmKit/Push/Critical Alert这些权限,
   // 后台音频保活+本地通知兜底这套方案模拟不出真正的持续响铃效果,先不让用户摸到——
   // 代码整体保留(入口按钮隐藏+原生调度整体不再触发),不是删掉,以后有别的方案再打开
@@ -2398,6 +2429,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cloudResendSuccess:'验证码已重新发送', cloudResendError:'发送失败：{msg}',
       cloudSyncError:'同步失败，请检查网络后重试',
       entriesSyncFailedError:'账目同步到云端失败：{msg}',
+      cloudDisconnectNoticeTitle:'登录已掉线',
+      cloudDisconnectNoticeDesc:'账目仍会正常保存，但暂时没有关联你的账户',
+      cloudReconnectBtn:'去登录',
       cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
       catalogEmptyHint:'分类数据加载中，请联网后重新打开App',
       cloudCodeSentToast:'验证码已发送至 {email}，请查收邮件',
@@ -2475,6 +2509,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cloudResendSuccess:'確認コードを再送しました', cloudResendError:'送信に失敗しました：{msg}',
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
       entriesSyncFailedError:'家計簿データのクラウド同期に失敗しました：{msg}',
+      cloudDisconnectNoticeTitle:'ログインが切断されました',
+      cloudDisconnectNoticeDesc:'家計簿は引き続き保存されますが、アカウントに紐付けられていません',
+      cloudReconnectBtn:'ログインへ',
       cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
       catalogEmptyHint:'カテゴリデータを読み込み中です。ネットワークに接続してからAppを開き直してください',
       cloudCodeSentToast:'確認コードを {email} に送信しました',
@@ -3846,6 +3883,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   }
   async function handleCloudSignedIn(user){
     cloudUser = user;
+    // 只在真实账户(非匿名)登录成功时打这个标记——匿名session兜底登录也会走这个函数,
+    // 不能把"匿名登录成功"误记成"真实登录过"
+    if(!user.is_anonymous){ try{ localStorage.setItem(EVER_SIGNED_IN_KEY, '1'); }catch(e){} }
     // 登录后这个人自己的自定义细分也能从数据库里读到了(RLS允许读自己的行),重新拉一次分类数据
     // 三个请求互不依赖,并行拉取而不是依次等待,减少总耗时
     const [, remoteEntries, remoteSettings, remoteAlarms] = await Promise.all([
@@ -3885,13 +3925,25 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     cacheMissingAlarmSounds();
     renderCloudSyncStatus();
   }
+  // 本机曾经真实登录过的标记——只有"曾经真实登录过、现在却变成未登录/匿名"才需要
+  // 弹掉线提示,第一次打开App从没登录过是正常的未登录状态,不该被当成"掉线"报警
+  const EVER_SIGNED_IN_KEY = 'ledger_ever_real_signed_in';
   function renderCloudSyncStatus(){
     // signedIn特意排除匿名session(cloudUser.is_anonymous)——匿名状态下这里要显示成
     // "未登录"引导去真实登录/注册,而不是显示一个没有email的"已登录"状态
     const signedIn = !!cloudUser && !cloudUser.is_anonymous;
     $('cloudSyncSignedOutBlock').style.display = signedIn ? 'none' : 'block';
     $('cloudSyncSignedInBlock').style.display = signedIn ? 'block' : 'none';
-    if(signedIn) $('cloudSyncStatusText').textContent = t('cloudSyncStatusSignedIn').replace('{email}', cloudUser.email||'');
+    if(signedIn){
+      $('cloudSyncStatusText').textContent = t('cloudSyncStatusSignedIn').replace('{email}', cloudUser.email||'');
+      hideCloudDisconnectTab();
+    }else if(localStorage.getItem(EVER_SIGNED_IN_KEY)==='1'){
+      // B-02同类事故的可见性兜底：真实账户曾经登录过、现在却掉线了(不管是主动
+      // 退出还是session静默失效)，在主要页面弹一个边缘小标签提醒——不能只在
+      // 设置页里悄悄切一下登录/未登录两个区块的显示，那样用户根本不会主动点进
+      // 设置页去发现，这正是B-02这次事故拖了好几天才被发现的根本原因
+      showCloudDisconnectTab();
+    }
   }
   // 保证cloudUser尽量存在：有真实session就用真实的，没有(含从没登录过、含真实账户
   // 主动退出登录之后)就匿名登录一个兜底，让账目/设置这些数据不用等真的登录才写数据库，
@@ -3958,9 +4010,22 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // 每次App重新可见时主动拉一次云端最新数据+重启订阅,而不是被动等它自己恢复
   let resumeSyncing = false;
   async function resyncCloudOnResume(){
-    if(!supabaseClient || !cloudUser || resumeSyncing) return;
+    if(!supabaseClient || resumeSyncing) return;
     resumeSyncing = true;
     try{
+      // 主动重新确认一次session,不被动等Supabase SDK自己后台的自动刷新定时器——
+      // iOS后台挂起太久,SDK内部基于setTimeout的刷新计时器可能被系统冻结、没能按时
+      // 触发,真正回到前台、JS又开始跑的这一刻才是最可靠的检查时机(这是真实事故
+      // B-02的根因之一：真实账户在后台静默掉线,回前台后完全没有任何提示)。
+      // ensureCloudSession()顺带兜底：真账户如果真的掉线了,也会立刻切回匿名session
+      // 继续记账,不用等下一次冷启动才发现；signedIn状态变化时更新一下UI(掉线提示/
+      // 恢复提示都在renderCloudSyncStatus里统一处理)
+      const sessionUser = await ensureCloudSession();
+      const wasSignedIn = cloudUser && !cloudUser.is_anonymous;
+      cloudUser = sessionUser;
+      const nowSignedIn = cloudUser && !cloudUser.is_anonymous;
+      if(wasSignedIn !== nowSignedIn) renderCloudSyncStatus();
+      if(!cloudUser) return;
       // 这里之前也是"entries = remoteEntries"直接整个覆盖——跟initCloudSync/
       // handleCloudSignedIn同一个坑，而且这一条触发频率最高(每次App从后台切回前台
       // 都会跑一次)，B-02修了另外两处、唯独漏了这里，导致用户前台切换一次就又把
@@ -4036,6 +4101,61 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(card) card.innerHTML = `<div class="updating-row"><span class="spin-icon">${iconSvg('refresh')}</span>${t('updating')}</div>`;
     try{ sessionStorage.setItem('pendingUpdateNotice', '1'); }catch(e){}
     setTimeout(()=> location.reload(), 400);
+  }
+  // 云端登录掉线提示——照抄上面update-edge-tab那一套边缘小标签交互(同一个作者写的,
+  // 保持视觉语言一致)，但这个不是"点了才刷新"的一次性动作，是持续反映当前登录状态的
+  // 提示：真账户掉线时出现，真正重新登录成功后要能消失（不像更新提示点了才会消失），
+  // 所以额外写了hideCloudDisconnectTab()，show/hide都由renderCloudSyncStatus()统一调度，
+  // 不需要在各个登录状态变化的地方分别调用
+  let cloudDisconnectTabShown = false;
+  function showCloudDisconnectTab(){
+    if(cloudDisconnectTabShown) return;
+    cloudDisconnectTabShown = true;
+
+    const edgeTab = document.createElement('button');
+    edgeTab.type = 'button';
+    edgeTab.id = 'cloudDisconnectEdgeTab';
+    edgeTab.className = 'cloud-edge-tab';
+    edgeTab.setAttribute('aria-label', t('cloudDisconnectNoticeTitle'));
+    edgeTab.innerHTML = `<span class="dot"></span><span class="chevron">‹</span>`;
+
+    const expandWrap = document.createElement('div');
+    expandWrap.id = 'cloudDisconnectExpandWrap';
+    expandWrap.className = 'cloud-expand-wrap';
+    expandWrap.innerHTML = `
+      <button type="button" class="cloud-collapse-handle" aria-label="收起">›</button>
+      <div class="cloud-card">
+        <div class="title-row">
+          <span class="title">${t('cloudDisconnectNoticeTitle')}</span>
+          <button type="button" class="cloud-reconnect-btn">${t('cloudReconnectBtn')}</button>
+        </div>
+        <p>${t('cloudDisconnectNoticeDesc')}</p>
+      </div>
+    `;
+
+    function expand(){ edgeTab.classList.add('is-hidden'); expandWrap.classList.add('is-open'); }
+    function collapse(){ expandWrap.classList.remove('is-open'); edgeTab.classList.remove('is-hidden'); }
+    edgeTab.addEventListener('click', expand);
+    expandWrap.querySelector('.cloud-collapse-handle').addEventListener('click', collapse);
+    expandWrap.querySelector('.cloud-reconnect-btn').addEventListener('click', ()=>{
+      collapse();
+      openSettingsSheet();
+      setTimeout(()=>{
+        const block = $('cloudSyncSignedOutBlock');
+        if(block) block.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 80);
+    });
+
+    document.body.appendChild(edgeTab);
+    document.body.appendChild(expandWrap);
+  }
+  function hideCloudDisconnectTab(){
+    if(!cloudDisconnectTabShown) return;
+    cloudDisconnectTabShown = false;
+    const edgeTab = $('cloudDisconnectEdgeTab');
+    const expandWrap = $('cloudDisconnectExpandWrap');
+    if(edgeTab) edgeTab.remove();
+    if(expandWrap) expandWrap.remove();
   }
   // 上次点了"更新"触发的刷新,这次重新加载完成后提示一下"更新完毕",3秒自动消失
   try{
