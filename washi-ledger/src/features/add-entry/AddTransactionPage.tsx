@@ -171,7 +171,7 @@ export function AddTransactionPage() {
         <button type="button" aria-label="返回" onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="font-serif text-headline-md text-on-surface tracking-tight [text-shadow:0_2px_4px_rgba(35,26,19,0.18)]">{pageTitle}</h1>
+        <h1 className="font-serif text-headline-md text-on-surface tracking-tight">{pageTitle}</h1>
         <div className="w-10" />
       </header>
 

@@ -24,7 +24,7 @@ export function ThemePage() {
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="flex-1 text-center font-serif text-headline-md text-on-surface tracking-tight -ml-10 [text-shadow:0_2px_4px_rgba(35,26,19,0.18)]">
+        <h1 className="flex-1 text-center font-serif text-headline-md text-on-surface tracking-tight -ml-10">
           {t('themeLabel')}
         </h1>
       </header>
