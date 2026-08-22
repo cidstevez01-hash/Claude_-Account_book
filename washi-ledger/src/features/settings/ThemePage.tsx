@@ -15,9 +15,7 @@ export function ThemePage() {
       className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      {/* top必须是env(safe-area-inset-top)而不是0——absolute定位会无视父级的padding-top，
-          写0会让header贴到刘海/状态栏底下被盖住点不到，见AppLayout.tsx同款header的注释 */}
-      <header className="app-header absolute top-[env(safe-area-inset-top)] inset-x-0 z-10 flex items-center px-md h-16 w-full">
+      <header className="flex items-center px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
         <button
           type="button"
           aria-label={t('backLabel')}
@@ -26,12 +24,12 @@ export function ThemePage() {
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="flex-1 text-center font-serif text-headline-md text-on-surface tracking-tight -ml-10">
+        <h1 className="flex-1 text-center font-serif text-headline-md text-on-surface tracking-tight -ml-10 [text-shadow:0_2px_4px_rgba(35,26,19,0.18)]">
           {t('themeLabel')}
         </h1>
       </header>
 
-      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain px-md pt-[88px]">
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain px-md pt-lg">
         <div className="w-32 mx-auto">
           <div className="w-full text-center rounded-xl border-[1.5px] border-dashed border-primary bg-surface-container-highest p-3 flex flex-col items-center gap-2 shadow-sm">
             <div className="w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1">

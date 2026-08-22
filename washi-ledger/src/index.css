@@ -179,17 +179,6 @@ body {
   box-shadow: 0 2px 0 rgba(58, 47, 40, 0.05);
 }
 
-/* 顶部大标题——照旧仓库index.html的.header真实效果复用：半透明纸色+毛玻璃模糊悬浮在
-   内容上方，配一层柔和投影，不是实色底+虚线分割线那种平贴的分隔方式。各页面共用这一个类，
-   position/z-index交给用到它的地方自己用Tailwind的absolute/z-10类写(不同页面header的
-   定位上下文不完全一样)，这里只管背景/模糊/阴影这几个视觉属性 */
-.app-header {
-  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
-  backdrop-filter: blur(8px) saturate(1.5);
-  -webkit-backdrop-filter: blur(8px) saturate(1.5);
-  box-shadow: 0 4px 16px rgba(35, 26, 19, 0.12);
-}
-
 /* 积分小胶囊——照旧仓库index.html的.points-chip真实样式复用，跟支出/收入用的
    text-primary/text-secondary纯色文字是两套东西，这个是带底色+描边的绿色胶囊 */
 .points-chip {
