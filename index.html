@@ -2321,7 +2321,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.2';
   const IS_DEV_BUILD = true;
   const DEV_BUILD_DATE = '20260822';
-  const DEV_BUILD = 2;
+  const DEV_BUILD = 3;
   // 闹钟功能暂时封存:免费Apple ID侧载没有AlarmKit/Push/Critical Alert这些权限,
   // 后台音频保活+本地通知兜底这套方案模拟不出真正的持续响铃效果,先不让用户摸到——
   // 代码整体保留(入口按钮隐藏+原生调度整体不再触发),不是删掉,以后有别的方案再打开
@@ -3935,11 +3935,15 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     if(!supabaseClient || !cloudUser || resumeSyncing) return;
     resumeSyncing = true;
     try{
+      // 这里之前也是"entries = remoteEntries"直接整个覆盖——跟initCloudSync/
+      // handleCloudSignedIn同一个坑，而且这一条触发频率最高(每次App从后台切回前台
+      // 都会跑一次)，B-02修了另外两处、唯独漏了这里，导致用户前台切换一次就又把
+      // 本机独有的未同步记录冲掉了一次。统一改成走mergeRemoteEntriesIntoLocal
       const remoteEntries = await pullAllEntriesFromCloud();
-      if(remoteEntries && JSON.stringify(remoteEntries) !== JSON.stringify(entries)){
-        entries = remoteEntries;
-        await saveEntriesLocalOnly();
-        renderAll();
+      if(remoteEntries){
+        const before = JSON.stringify(entries);
+        await mergeRemoteEntriesIntoLocal(remoteEntries);
+        if(JSON.stringify(entries) !== before) renderAll();
       }
       startCloudRealtime();
     }catch(e){ console.error('前台恢复时重新同步失败', e); }
