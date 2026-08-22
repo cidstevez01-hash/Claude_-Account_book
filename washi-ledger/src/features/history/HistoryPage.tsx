@@ -13,7 +13,7 @@ import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
-import { todayStr, firstOfMonthStr } from '../../lib/date'
+import { firstOfMonthStr, lastOfMonthStr } from '../../lib/date'
 import type { EntryType } from '../../types'
 
 type TypeFilter = 'all' | EntryType
@@ -40,9 +40,10 @@ export function HistoryPage() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   // 起止日期区间——跟仪表盘顶部(#8)同一个DateRangeBar组件、同一套校验逻辑(#9)，
-  // 默认值也保持一致(当月1日到今天)
+  // 默认值也保持一致：当月完整一个月(1日到月末)，不是"1日到今天"(那样月中打开时
+  // 后半个月的数据会被默认区间挡在外面，看起来像"缺失"/"搜不到")
   const [startDate, setStartDate] = useState(() => firstOfMonthStr())
-  const [endDate, setEndDate] = useState(() => todayStr())
+  const [endDate, setEndDate] = useState(() => lastOfMonthStr())
 
   const filtered = useMemo(() => {
     const keyword = search.trim().toLowerCase()

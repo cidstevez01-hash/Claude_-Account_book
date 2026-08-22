@@ -19,7 +19,7 @@ import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
-import { todayStr, firstOfMonthStr, formatDateRangeLabel } from '../../lib/date'
+import { firstOfMonthStr, lastOfMonthStr, formatDateRangeLabel } from '../../lib/date'
 import type { EntryType } from '../../types'
 
 /** 分类明细钻取(#7扩展)——照旧App openMonthDetail(filter, monthKey)真实逻辑，filter
@@ -38,10 +38,12 @@ export function DashboardPage() {
   const rates = useDisplayRates(settings.currency)
   const navigate = useNavigate()
 
-  // 起止日期区间——默认当月1日到今天(#8)，仪表盘结余/环状图/最近明细全部跟着这个区间走，
-  // 不再固定按"当前日历月"算
+  // 起止日期区间——默认当月完整一个月(1日到月末最后一天)，仪表盘结余/环状图/最近明细
+  // 全部跟着这个区间走；区间本身可以自由改成任意起止(#8)，只是初始值不能是"1日到今天"，
+  // 那样月中打开App时后半个月的数据(包括预先录入的未来日期记录)会被默认区间挡在外面，
+  // 看起来像"数据缺失"
   const [startDate, setStartDate] = useState(() => firstOfMonthStr())
-  const [endDate, setEndDate] = useState(() => todayStr())
+  const [endDate, setEndDate] = useState(() => lastOfMonthStr())
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail搬：
   // 记住点的是分类还是标签维度、具体是哪一个+当时环状图在看支出还是收入
@@ -142,6 +144,7 @@ export function DashboardPage() {
           <RecentEntriesList
             entries={recentEntries}
             categories={categories}
+            onViewAll={() => navigate('/history')}
             onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
             onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
             onDelete={(entry) => setPendingDeleteId(entry.id)}

@@ -12,6 +12,14 @@ const items = [
   { to: '/stats', icon: APP_ICONS.stats, labelKey: 'tabStats' as const },
 ]
 
+/** 记录"上一次停在哪个tab"——必须放在组件外面(模块级)，不能放进组件内部的useRef。
+ * React Router在tab之间切换时，是把DashboardPage/HistoryPage/StatsPage整个换掉，这三个
+ * 页面又都各自单独套了一层AppLayout(BottomNav就嵌在里面)，等于每切一次tab，BottomNav
+ * 这个组件本身就被销毁重建一次——不是同一个实例持续存在。如果"是不是第一次加载"这个
+ * 标记存在组件自己的useRef里，每次重建都会被重置，导致动画分支永远判断成"第一次加载"，
+ * 只会瞬间摆位、动画代码根本没机会跑。放到模块级变量就不会跟着组件销毁而丢失。 */
+let lastActiveTab: string | null = null
+
 /** 玻璃气泡指示器(#4)——照旧仓库index.html的tabBubble真实实现搬：选中态是一个绝对定位、
  * 跟随active tab左右滑动的毛玻璃色块(见index.css的.tab-bubble)，用Web Animations API
  * 手动摆位/动画，不是CSS transition——切换时先算出"起点∪终点"的并集区域，动画中途先
@@ -28,7 +36,6 @@ export function BottomNav() {
   const bubbleRef = useRef<HTMLDivElement>(null)
   const btnRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
   const currentAnimRef = useRef<Animation | null>(null)
-  const isFirstRender = useRef(true)
 
   const activeItem =
     items.find((item) => (item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to))) ??
@@ -96,12 +103,18 @@ export function BottomNav() {
 
   useLayoutEffect(() => {
     const btn = btnRefs.current[activeItem.to]
-    if (isFirstRender.current) {
-      place(btn)
-      isFirstRender.current = false
-    } else {
+    const fromTab = lastActiveTab
+    const fromBtn = fromTab ? btnRefs.current[fromTab] : null
+    if (fromTab && fromTab !== activeItem.to && fromBtn) {
+      // 这个组件实例是刚重建出来的(见上面lastActiveTab的说明)，气泡还没摆过位置；
+      // 先把它瞬间摆到"上一个tab"应该在的位置(这个新实例自己也渲染了那个按钮，
+      // 位置读得到)，再正常触发滑动动画到当前tab，做出"接着上次动画"的效果
+      place(fromBtn)
       slideTo(btn)
+    } else {
+      place(btn)
     }
+    lastActiveTab = activeItem.to
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeItem.to])
 

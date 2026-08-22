@@ -8,7 +8,7 @@ import type { Category, Entry } from '../../types'
 interface RecentEntriesListProps {
   entries: Entry[]
   categories: Category[]
-  limit?: number
+  onViewAll?: () => void
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
@@ -17,15 +17,18 @@ interface RecentEntriesListProps {
 export function RecentEntriesList({
   entries,
   categories,
-  limit = 6,
+  onViewAll,
   onEdit,
   onCopy,
   onDelete,
 }: RecentEntriesListProps) {
   const { t } = useI18n()
   // 传入的entries已经在DashboardPage按顶部时间范围筛选过了，这里只管排序(照旧App
-  // buildDayGroupedHtml的置顶逻辑，见groupByDayPinned的说明)+截取展示条数
-  const groups = groupByDayPinned(entries).slice(0, limit)
+  // buildDayGroupedHtml的置顶逻辑，见groupByDayPinned的说明)——之前这里还会再截取前
+  // limit(=6)条，那是"仪表盘固定显示最近几条"的旧设计；现在顶部有了真正可调的日期
+  // 范围，范围内该有多少条就得显示多少条，不然调节范围时列表看起来"没反应"(范围内
+  // 已经有6条以上时，不管怎么调都还是那6条)
+  const groups = groupByDayPinned(entries)
   // 点一条记录展开操作抽屉(编辑/复制/删除)，照design-assets-v2/_44的"Expanded Action Drawer"，
   // 同一时间只展开一条，不用给每条记录单独维护一个boolean状态
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -44,7 +47,11 @@ export function RecentEntriesList({
     <section className="px-md">
       <div className="flex justify-between items-end mb-2">
         <h3 className="font-serif text-headline-md text-on-surface">{t('recent')}</h3>
-        <button type="button" className="font-sans text-label-caps text-tertiary uppercase tracking-wider">
+        <button
+          type="button"
+          onClick={onViewAll}
+          className="font-sans text-label-caps text-tertiary uppercase tracking-wider"
+        >
           {t('viewAll')}
         </button>
       </div>
