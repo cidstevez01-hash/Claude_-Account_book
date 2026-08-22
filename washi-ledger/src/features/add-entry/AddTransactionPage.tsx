@@ -268,11 +268,16 @@ export function AddTransactionPage() {
           <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm mt-md tracking-widest uppercase">
             {t('dateLabel')}
           </h2>
+          {/* B-04：真机上日期框显示被截断——iOS Safari原生input[type=date]的日/月/年
+              字段+日历图标在窄容器里没有足够空间时会被WebKit自己的渲染直接裁掉，不是我们
+              这边的flex/grid挤压导致宽度不够(Chromium 375px下实测过w-full没有任何横向溢出，
+              问题出在WebKit控件内部渲染，不是CSS布局)。右侧padding和左侧留一样多，等于给
+              图标预留区域之外又额外挤了一次空间，缩小右侧padding把多出来的空间还给控件本身 */}
           <input
             type="date"
             value={date}
             onChange={(e) => touchDate(e.target.value)}
-            className="bg-surface-container border border-outline-variant rounded-xl py-3 px-3 text-body-md text-on-surface w-full focus:outline-none focus:border-primary"
+            className="bg-surface-container border border-outline-variant rounded-xl py-3 pl-3 pr-1.5 text-body-md text-on-surface w-full min-w-0 focus:outline-none focus:border-primary"
           />
         </div>
 
