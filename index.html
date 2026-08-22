@@ -2321,7 +2321,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   const APP_VERSION = '2.1.3';
   const IS_DEV_BUILD = false;
   const DEV_BUILD_DATE = '20260822';
-  const DEV_BUILD = 1;
+  const DEV_BUILD = 2;
   // 闹钟功能暂时封存:免费Apple ID侧载没有AlarmKit/Push/Critical Alert这些权限,
   // 后台音频保活+本地通知兜底这套方案模拟不出真正的持续响铃效果,先不让用户摸到——
   // 代码整体保留(入口按钮隐藏+原生调度整体不再触发),不是删掉,以后有别的方案再打开
@@ -2397,6 +2397,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cloudVerifyNeedCode:'请输入验证码', cloudVerifyError:'验证码不对或已过期，请重新获取',
       cloudResendSuccess:'验证码已重新发送', cloudResendError:'发送失败：{msg}',
       cloudSyncError:'同步失败，请检查网络后重试',
+      entriesSyncFailedError:'账目同步到云端失败：{msg}',
       cloudSyncNotReady:'云同步服务还没加载好，请检查网络后刷新页面重试',
       catalogEmptyHint:'分类数据加载中，请联网后重新打开App',
       cloudCodeSentToast:'验证码已发送至 {email}，请查收邮件',
@@ -2473,6 +2474,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       cloudVerifyNeedCode:'確認コードを入力してください', cloudVerifyError:'コードが正しくないか、期限切れです。再送してください',
       cloudResendSuccess:'確認コードを再送しました', cloudResendError:'送信に失敗しました：{msg}',
       cloudSyncError:'同期に失敗しました。ネットワークをご確認の上再試行してください',
+      entriesSyncFailedError:'家計簿データのクラウド同期に失敗しました：{msg}',
       cloudSyncNotReady:'同期サービスの読み込みがまだ完了していません。ネットワークをご確認の上、ページを再読み込みしてください',
       catalogEmptyHint:'カテゴリデータを読み込み中です。ネットワークに接続してからAppを開き直してください',
       cloudCodeSentToast:'確認コードを {email} に送信しました',
@@ -3652,7 +3654,15 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
           const row = entryToDbRow(entry); delete row.points; return row;
         }));
         if(error) throw error;
-      }catch(e2){ console.error('账目同步到数据库失败', e2); }
+      }catch(e2){
+        // 账目推送失败之前完全静默(只console.error,没有任何UI提示)——这正是B-02这次
+        // 事故被拖了好几天才发现的原因之一:哪怕后续版本修好了合并逻辑,如果推送本身
+        // 因为网络/RLS权限/表结构不匹配等原因失败,用户还是完全看不出来。改成跟铃声
+        // 上传失败(v2.0.3)同一套做法:把Supabase返回的原始报错文本直接展示出来,
+        // 不再是笼统的"同步失败"，方便定位真实原因
+        console.error('账目同步到数据库失败', e2);
+        showToast(t('entriesSyncFailedError').replace('{msg}', (e2&&e2.message)||''));
+      }
     }
   }
   function pushEntryUpsert(entry){ return pushEntriesBulkUpsert([entry]); }
