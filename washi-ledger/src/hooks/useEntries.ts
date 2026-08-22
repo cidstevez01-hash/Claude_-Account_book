@@ -12,7 +12,7 @@ import type { Entry } from '../types'
  * - 退出登录不清空当前数据(entries/缓存都保留原样，照旧App的cloudSignOutBtn真实
  *   处理——只清cloudUser、停实时订阅，从没碰过entries)，退出后应该还能正常看到之前的账目
  * - 只要挂载时有userId(含App冷启动时恢复已有会话、含单纯切页面重新mount这个hook)都
- *   做一次真实同步：云端已有数据就直接采用覆盖本地缓存(数据库是唯一权威源，不弹窗询问)；
+ *   做一次真实同步：远端拉到的数据按id跟本机合并(见mergeRemote)，不是直接整个覆盖；
  *   云端是空的就把本地现有缓存(可能是退出登录期间攒下的)推上去当种子数据
  * - App重新回到前台时补一次同步(照旧App resyncCloudOnResume)，不是定时轮询，只在
  *   真的可能有新数据的时机(回到前台)才请求，省流量也更及时
@@ -26,18 +26,41 @@ export function useEntries(userId: string | null) {
   const [entries, setEntries] = useState<Entry[]>(() => loadCachedEntries())
   const [loading, setLoading] = useState(false)
   const realtimeChannelRef = useRef<RealtimeChannel | null>(null)
+  // reload/挂载同步的effect依赖数组里都没有entries(避免每次entries变化就重新拉)，
+  // 所以不能直接闭包读entries——用ref拿实时值，规避拿到旧闭包快照
+  const entriesRef = useRef(entries)
+  useEffect(() => {
+    entriesRef.current = entries
+  }, [entries])
+
+  // 远端拉到账目后不能直接setEntries(remote)整个覆盖本机——本机在离线/登录失效期间
+  // 可能已经攒了远端还没有的新记录(真实事故：旧App index.html的B-02，一模一样的坑，
+  // 三处覆盖点漏改一处就会把本机独有记录连本机缓存一起冲掉)。改成按id合并：远端已有的
+  // id以远端为准(其它设备的修改要能生效)，远端没有的本机id(本机独有、还没同步过的
+  // 新记录)保留下来，并立刻回推到云端补齐——reload(含前台恢复)和挂载登录同步两处
+  // 都要走这一个函数，不能各写各的覆盖逻辑
+  const mergeRemote = useCallback(
+    (remote: Entry[]) => {
+      const remoteIds = new Set(remote.map((e) => e.id))
+      const localOnly = entriesRef.current.filter((e) => !remoteIds.has(e.id))
+      const merged = remote.concat(localOnly)
+      setEntries(merged)
+      saveCachedEntries(merged)
+      if (localOnly.length && userId) {
+        pushEntriesBulkUpsert(localOnly, userId).catch((e) => console.error('本机独有记录回推云端失败', e))
+      }
+    },
+    [userId]
+  )
 
   const reload = useCallback(() => {
     if (!userId) return
     setLoading(true)
     fetchEntries(userId)
-      .then((remote) => {
-        setEntries(remote)
-        saveCachedEntries(remote)
-      })
+      .then((remote) => mergeRemote(remote))
       .catch((e) => console.error('拉取记账记录失败', e))
       .finally(() => setLoading(false))
-  }, [userId])
+  }, [userId, mergeRemote])
 
   const stopRealtime = useCallback(() => {
     if (realtimeChannelRef.current) {
@@ -85,8 +108,7 @@ export function useEntries(userId: string | null) {
     fetchEntries(userId)
       .then(async (remote) => {
         if (remote.length > 0) {
-          setEntries(remote)
-          saveCachedEntries(remote)
+          mergeRemote(remote)
         } else {
           const local = loadCachedEntries()
           if (local.length > 0) {
@@ -98,7 +120,7 @@ export function useEntries(userId: string | null) {
       })
       .catch((e) => console.error('登录同步记账记录失败', e))
       .finally(() => setLoading(false))
-  }, [userId])
+  }, [userId, mergeRemote])
 
   useEffect(() => {
     if (!userId) return

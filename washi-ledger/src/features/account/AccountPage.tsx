@@ -18,7 +18,7 @@ import { useI18n } from '../../lib/i18n'
  * 里的真实缓存/同步逻辑，退出后账目照样能正常看) */
 export function AccountPage() {
   const navigate = useNavigate()
-  const { user, loading } = useAuth()
+  const { user, loading, signedIn } = useAuth()
   const { t } = useI18n()
   const [confirmSignOut, setConfirmSignOut] = useState(false)
 
@@ -30,7 +30,9 @@ export function AccountPage() {
 
   if (loading) return null
 
-  if (!user) {
+  // signedIn排除了匿名session(user.is_anonymous)——匿名状态下这个页面要显示成
+  // "未登录"(引导去登录/注册)，而不是显示一个没有email的"已登录"账户
+  if (!signedIn) {
     return (
       <AppLayout title={t('accountTitle')} leftButton="home">
         <div className="flex flex-col items-center gap-md px-md py-xl text-center">
@@ -61,7 +63,7 @@ export function AccountPage() {
         <div className="w-20 h-20 rounded-full border-2 border-primary flex items-center justify-center mb-3">
           <span className="material-symbols-outlined text-4xl text-primary">account_circle</span>
         </div>
-        <h2 className="text-body-md text-on-surface-variant">{user.email}</h2>
+        <h2 className="text-body-md text-on-surface-variant">{user!.email}</h2>
       </div>
 
       <div className="flex justify-center px-md">
