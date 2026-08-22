@@ -101,7 +101,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                   onClick={() => onSelectTag(active ? null : tag.code)}
                   className={`py-1.5 pl-2.5 pr-1 rounded-l-lg text-tab-label font-sans border ${
                     active
-                      ? 'bg-secondary-container text-on-secondary-container border-secondary/40'
+                      ? 'bg-primary-fixed text-primary border-primary'
                       : 'bg-surface-container text-on-surface-variant border-outline-variant'
                   }`}
                 >
@@ -112,7 +112,7 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                   onClick={() => setOpenMenuCode(menuOpen ? null : tag.code)}
                   className={`py-1.5 px-1 rounded-r-lg border border-l-0 ${
                     active
-                      ? 'bg-secondary-container text-on-secondary-container border-secondary/40'
+                      ? 'bg-primary-fixed text-primary border-primary'
                       : 'bg-surface-container text-on-surface-variant border-outline-variant'
                   }`}
                 >

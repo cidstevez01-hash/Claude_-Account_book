@@ -167,7 +167,7 @@ export function AddTransactionPage() {
       className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
+      <header className="app-header flex items-center justify-between px-md h-16 w-full shrink-0">
         <button type="button" aria-label="返回" onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
@@ -252,7 +252,7 @@ export function AddTransactionPage() {
                   onClick={() => touchPayCode(pm.code)}
                   className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl border text-body-md font-sans transition-colors ${
                     active
-                      ? 'border-primary bg-primary-container text-on-primary-container'
+                      ? 'border-primary bg-primary-fixed text-primary'
                       : 'border-outline-variant bg-surface-container text-on-surface-variant'
                   }`}
                 >

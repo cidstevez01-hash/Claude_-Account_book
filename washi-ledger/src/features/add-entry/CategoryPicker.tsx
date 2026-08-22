@@ -160,7 +160,7 @@ export function CategoryPicker({
                       onClick={() => onSelectSub(active ? null : sub.code)}
                       className={`py-2 pl-3 pr-1.5 rounded-l-xl text-body-md font-sans text-center transition-colors border ${
                         active
-                          ? 'border-primary bg-surface text-primary font-medium'
+                          ? 'border-primary bg-primary-fixed text-primary font-medium'
                           : 'border-outline-variant bg-surface-container text-on-surface-variant'
                       }`}
                     >
@@ -170,7 +170,7 @@ export function CategoryPicker({
                       type="button"
                       onClick={() => setOpenMenuCode(menuOpen ? null : sub.code)}
                       className={`py-2 px-1.5 rounded-r-xl border border-l-0 text-on-surface-variant ${
-                        active ? 'border-primary bg-surface' : 'border-outline-variant bg-surface-container'
+                        active ? 'border-primary bg-primary-fixed' : 'border-outline-variant bg-surface-container'
                       }`}
                     >
                       <span className="material-symbols-outlined text-[16px]">more_horiz</span>
@@ -206,7 +206,7 @@ export function CategoryPicker({
                 onClick={() => onSelectSub(active ? null : sub.code)}
                 className={`py-2 px-3 rounded-xl text-body-md font-sans text-center transition-colors border ${
                   active
-                    ? 'border-primary bg-surface text-primary font-medium'
+                    ? 'border-primary bg-primary-fixed text-primary font-medium'
                     : 'border-outline-variant bg-surface-container text-on-surface-variant'
                 }`}
               >

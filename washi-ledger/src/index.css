@@ -181,6 +181,17 @@ body {
 
 /* 积分小胶囊——照旧仓库index.html的.points-chip真实样式复用，跟支出/收入用的
    text-primary/text-secondary纯色文字是两套东西，这个是带底色+描边的绿色胶囊 */
+/* 顶部大标题——照旧仓库index.html的.header真实效果复用：半透明纸色+毛玻璃模糊悬浮在
+   内容上方，配一层柔和投影，不是实色底+虚线分割线那种平贴的分隔方式。各页面共用这一个类。 */
+.app-header {
+  position: relative;
+  z-index: 10;
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  backdrop-filter: blur(8px) saturate(1.5);
+  -webkit-backdrop-filter: blur(8px) saturate(1.5);
+  box-shadow: 0 2px 10px rgba(35, 26, 19, 0.08);
+}
+
 .points-chip {
   display: inline-flex;
   align-items: center;

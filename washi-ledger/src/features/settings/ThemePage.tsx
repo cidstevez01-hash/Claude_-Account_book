@@ -15,7 +15,7 @@ export function ThemePage() {
       className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <header className="flex items-center px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
+      <header className="app-header flex items-center px-md h-16 w-full shrink-0">
         <button
           type="button"
           aria-label={t('backLabel')}
