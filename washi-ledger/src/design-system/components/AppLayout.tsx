@@ -23,7 +23,11 @@ export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutPro
       className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <header className="app-header flex items-center justify-between px-md h-16 w-full shrink-0">
+      {/* header用absolute悬浮在main上方(不是shrink_0占自己的flex行高)，main底下垫同等高度的
+          padding-top——这样内容真正会从header底下滚动过去，透过app-header的backdrop-filter
+          若隐若现，才是"悬浮"这个效果本身；之前header跟main是各占一块flex行的普通兄弟节点，
+          压根没有重叠，玻璃模糊什么都照不到，等于加了css属性但视觉上跟没加一样 */}
+      <header className="app-header absolute top-0 inset-x-0 z-10 flex items-center justify-between px-md h-16 w-full">
         {leftButton === 'menu' ? (
           <button
             type="button"
@@ -55,7 +59,7 @@ export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutPro
         </Link>
       </header>
 
-      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32">{children}</main>
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pt-16 pb-32">{children}</main>
 
       <BottomNav />
       <NavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />

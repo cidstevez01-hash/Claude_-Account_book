@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { App } from '@capacitor/app'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { fetchEntries, pushEntriesBulkUpsert, subscribeEntriesRealtime } from '../data/catalog'
 import { supabase } from '../lib/supabase'
@@ -104,17 +105,25 @@ export function useEntries(userId: string | null) {
 
   useEffect(() => {
     if (!userId) return
-    function onResume() {
-      if (document.visibilityState === 'visible') {
+    // 用@capacitor/app的原生appStateChange事件，不是DOM的visibilitychange/pageshow——
+    // 这两个web标准事件在Capacitor的WKWebView原生壳里不保证按预期触发(不是PWA场景，
+    // 旧App那份注释是针对"添加到主屏幕"的PWA写的，跟这里的原生App壳是两种环境)，
+    // 装了真机实测过一次"确认没有变化"才发现这个环境差异。App插件在纯浏览器/开发预览
+    // 环境下也有内部的web兜底实现(同样基于visibilitychange)，两边行为一致，不用分别处理
+    let handle: { remove: () => void } | undefined
+    let cancelled = false
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
         reload()
         startRealtime()
       }
-    }
-    document.addEventListener('visibilitychange', onResume)
-    window.addEventListener('pageshow', onResume)
+    }).then((h) => {
+      if (cancelled) h.remove()
+      else handle = h
+    })
     return () => {
-      document.removeEventListener('visibilitychange', onResume)
-      window.removeEventListener('pageshow', onResume)
+      cancelled = true
+      handle?.remove()
     }
   }, [userId, reload, startRealtime])
 
