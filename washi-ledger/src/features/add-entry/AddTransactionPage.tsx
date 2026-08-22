@@ -167,7 +167,9 @@ export function AddTransactionPage() {
       className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <header className="app-header absolute top-0 inset-x-0 z-10 flex items-center justify-between px-md h-16 w-full">
+      {/* top必须是env(safe-area-inset-top)而不是0——absolute定位会无视父级的padding-top，
+          写0会让header贴到刘海/状态栏底下被盖住点不到，见AppLayout.tsx同款header的注释 */}
+      <header className="app-header absolute top-[env(safe-area-inset-top)] inset-x-0 z-10 flex items-center justify-between px-md h-16 w-full">
         <button type="button" aria-label="返回" onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>

@@ -11,12 +11,9 @@ import type { Entry } from '../types'
  * - 有本地缓存优先用缓存展示(初始state直接读缓存，不用等云端请求)，没缓存才是空列表
  * - 退出登录不清空当前数据(entries/缓存都保留原样，照旧App的cloudSignOutBtn真实
  *   处理——只清cloudUser、停实时订阅，从没碰过entries)，退出后应该还能正常看到之前的账目
- * - 每次"从未登录变成已登录"(含App冷启动时恢复已有会话)都做一次同步：云端已有数据就
- *   直接采用覆盖本地缓存(数据库是唯一权威源，不弹窗询问)；云端是空的就把本地现有缓存
- *   (可能是退出登录期间攒下的)推上去当种子数据。旧App里"冷启动静默恢复会话"
- *   (initCloudSync)和"交互式登录"(handleCloudSignedIn)是两条分开的代码路径，前者更
- *   简单粗暴(远端返回是空数组也会直接覆盖本地)；这里统一成后者这套更合理的逻辑，
- *   两种场景都不会把用户离线时的本地数据谁都不问就冲掉
+ * - 只要挂载时有userId(含App冷启动时恢复已有会话、含单纯切页面重新mount这个hook)都
+ *   做一次真实同步：云端已有数据就直接采用覆盖本地缓存(数据库是唯一权威源，不弹窗询问)；
+ *   云端是空的就把本地现有缓存(可能是退出登录期间攒下的)推上去当种子数据
  * - App重新回到前台时补一次同步(照旧App resyncCloudOnResume)，不是定时轮询，只在
  *   真的可能有新数据的时机(回到前台)才请求，省流量也更及时
  * - 常驻一条entries表的Realtime订阅(照旧App startCloudRealtime)：同一账号在别处(旧App/
@@ -28,7 +25,6 @@ import type { Entry } from '../types'
 export function useEntries(userId: string | null) {
   const [entries, setEntries] = useState<Entry[]>(() => loadCachedEntries())
   const [loading, setLoading] = useState(false)
-  const prevUserIdRef = useRef<string | null | undefined>(undefined)
   const realtimeChannelRef = useRef<RealtimeChannel | null>(null)
 
   const reload = useCallback(() => {
@@ -77,13 +73,14 @@ export function useEntries(userId: string | null) {
   }, [userId, startRealtime, stopRealtime])
 
   useEffect(() => {
-    const wasUserId = prevUserIdRef.current
-    prevUserIdRef.current = userId
-
     if (!userId) return // 退出登录：保留当前entries(内存+缓存)不变，不清空、不请求
-    if (wasUserId === userId) return // 同一账号的普通重渲染，交给reload()按需触发
 
-    // 刚从未登录/其他账号切到这个已登录账号——同步一次
+    // 每次挂载(含"从未登录切到已登录"、以及单纯换页面重新mount这个hook)都真实拉一次——
+    // 之前这里用一个ref记"上一次的userId"来只在"真的刚登录"时才拉，但DashboardPage/
+    // HistoryPage/StatsPage/AddTransactionPage各自独立调用这个hook、各自有自己的ref实例，
+    // 单纯切页面(userId没变，只是这个hook的新实例第一次挂载)也会被那个ref误判成"刚登录"，
+    // 逻辑本身没错但脆弱、容易在改动中被破坏；直接改成"只要挂载时有userId就真实拉一次"，
+    // 不依赖判断是不是真的登录事件，更简单也更不容易再出现"看起来该刷新却没刷新"的情况
     setLoading(true)
     fetchEntries(userId)
       .then(async (remote) => {
