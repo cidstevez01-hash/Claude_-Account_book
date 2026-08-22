@@ -10,7 +10,7 @@ interface BalanceCardProps {
 export function BalanceCard({ summary, currency }: BalanceCardProps) {
   const { t } = useI18n()
   return (
-    <section className="relative bg-surface-container-lowest rounded-xl p-md mx-md mt-sm mb-lg border-[1.5px] border-dashed border-outline-variant papercut-shadow">
+    <section className="ledger-card relative bg-surface-container-lowest rounded-xl p-md mx-md mt-sm mb-lg">
       {/* 和纸胶带装饰角 */}
       <div
         className="absolute -top-1.5 right-5 w-8 h-3.5 rounded-sm opacity-70"
@@ -20,12 +20,16 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
         <p className="font-sans text-label-caps text-on-surface-variant uppercase tracking-wider mb-1">
           {t('balanceLabel')}
         </p>
-        <h2 className="font-serif text-hero-balance font-bold text-on-surface flex items-baseline justify-center flex-wrap">
+        <h2 className="font-serif text-hero-balance font-bold text-on-surface flex items-baseline justify-center flex-wrap gap-2">
           <span className="text-2xl font-normal mr-1 text-on-surface-variant">{symbolFor(currency)}</span>
           {summary.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           {summary.points > 0 && (
-            <span className="ml-2 text-sm font-sans text-outline font-normal">
-              {summary.points.toLocaleString()} Points
+            <span className="points-chip font-sans">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-[11px] h-[11px] shrink-0">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+              +{summary.points.toLocaleString()}
             </span>
           )}
         </h2>

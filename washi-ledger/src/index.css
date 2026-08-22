@@ -160,6 +160,41 @@ body {
   box-shadow: 0 2px 0 var(--color-outline-variant);
 }
 
+/* 明细卡片外框——照旧仓库index.html的.entry真实样式复用：2px实线描边+不对称圆角
+   (奇数行18/8/18/8，偶数行镜像成8/18/8/18)，跟.papercut-shadow那种阴影卡片是两套
+   不同的视觉语言，明细列表用的是这一套 */
+.entry-card {
+  border: 2px solid var(--color-outline-variant);
+  border-radius: 18px 8px 18px 8px;
+}
+.entry-card:nth-child(even) {
+  border-radius: 8px 18px 8px 18px;
+}
+
+/* 结余卡片("今月の残高")外框——照旧仓库index.html的.ledger-card真实样式复用，
+   2px虚线朱红描边+不对称圆角，不是通用的虚线卡片(.papercut-shadow那套) */
+.ledger-card {
+  border: 2px dashed var(--color-primary);
+  border-radius: 26px 12px 24px 12px / 12px 24px 12px 26px;
+  box-shadow: 0 2px 0 rgba(58, 47, 40, 0.05);
+}
+
+/* 积分小胶囊——照旧仓库index.html的.points-chip真实样式复用，跟支出/收入用的
+   text-primary/text-secondary纯色文字是两套东西，这个是带底色+描边的绿色胶囊 */
+.points-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-secondary);
+  background: color-mix(in srgb, var(--color-secondary) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 40%, transparent);
+  border-radius: 20px;
+  padding: 3px 10px 3px 8px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* 底部导航选中气泡——照旧仓库index.html的.tab-bubble真实效果搬：毛玻璃背景+
    SVG位移滤镜(#glassLens，定义见index.html)透出背后图标的轻微折射变形，位置/
    宽度由BottomNav.tsx用Web Animations API驱动(见那边tabBubble的place/slideTo)，

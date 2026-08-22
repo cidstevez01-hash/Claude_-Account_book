@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { fetchEntries, pushEntriesBulkUpsert } from '../data/catalog'
+import type { RealtimeChannel } from '@supabase/supabase-js'
+import { fetchEntries, pushEntriesBulkUpsert, subscribeEntriesRealtime } from '../data/catalog'
+import { supabase } from '../lib/supabase'
 import { loadCachedEntries, saveCachedEntries } from '../lib/entriesCache'
 import type { Entry } from '../types'
 
@@ -15,11 +17,18 @@ import type { Entry } from '../types'
  *   简单粗暴(远端返回是空数组也会直接覆盖本地)；这里统一成后者这套更合理的逻辑，
  *   两种场景都不会把用户离线时的本地数据谁都不问就冲掉
  * - App重新回到前台时补一次同步(照旧App resyncCloudOnResume)，不是定时轮询，只在
- *   真的可能有新数据的时机(回到前台)才请求，省流量也更及时 */
+ *   真的可能有新数据的时机(回到前台)才请求，省流量也更及时
+ * - 常驻一条entries表的Realtime订阅(照旧App startCloudRealtime)：同一账号在别处(旧App/
+ *   另一台设备)写入的新记录靠这条连接实时推过来，不依赖"这一端自己被唤醒才去拉"——这一层
+ *   之前完全没做，只有上面那条"回前台补拉"，而visibilitychange/pageshow在iOS上不一定按预期
+ *   触发(旧App代码里也这么写过)，两条腿都得有才不会出现"旧App一直在加数据、这边好几天都不更新"
+ *   的情况。回前台时除了补拉一次，也重启一次这条订阅——iOS后台太久WebSocket可能被系统冻结，
+ *   不指望它自己重连。 */
 export function useEntries(userId: string | null) {
   const [entries, setEntries] = useState<Entry[]>(() => loadCachedEntries())
   const [loading, setLoading] = useState(false)
   const prevUserIdRef = useRef<string | null | undefined>(undefined)
+  const realtimeChannelRef = useRef<RealtimeChannel | null>(null)
 
   const reload = useCallback(() => {
     if (!userId) return
@@ -32,6 +41,39 @@ export function useEntries(userId: string | null) {
       .catch((e) => console.error('拉取记账记录失败', e))
       .finally(() => setLoading(false))
   }, [userId])
+
+  const stopRealtime = useCallback(() => {
+    if (realtimeChannelRef.current) {
+      supabase.removeChannel(realtimeChannelRef.current)
+      realtimeChannelRef.current = null
+    }
+  }, [])
+
+  const startRealtime = useCallback(() => {
+    if (!userId) return
+    stopRealtime()
+    realtimeChannelRef.current = subscribeEntriesRealtime(userId, (event) => {
+      setEntries((prev) => {
+        const next =
+          event.type === 'delete'
+            ? prev.filter((e) => e.id !== event.id)
+            : prev.some((e) => e.id === event.entry.id)
+              ? prev.map((e) => (e.id === event.entry.id ? event.entry : e))
+              : [...prev, event.entry]
+        saveCachedEntries(next)
+        return next
+      })
+    })
+  }, [userId, stopRealtime])
+
+  useEffect(() => {
+    if (!userId) {
+      stopRealtime()
+      return
+    }
+    startRealtime()
+    return stopRealtime
+  }, [userId, startRealtime, stopRealtime])
 
   useEffect(() => {
     const wasUserId = prevUserIdRef.current
@@ -63,7 +105,10 @@ export function useEntries(userId: string | null) {
   useEffect(() => {
     if (!userId) return
     function onResume() {
-      if (document.visibilityState === 'visible') reload()
+      if (document.visibilityState === 'visible') {
+        reload()
+        startRealtime()
+      }
     }
     document.addEventListener('visibilitychange', onResume)
     window.addEventListener('pageshow', onResume)
@@ -71,7 +116,7 @@ export function useEntries(userId: string | null) {
       document.removeEventListener('visibilitychange', onResume)
       window.removeEventListener('pageshow', onResume)
     }
-  }, [userId, reload])
+  }, [userId, reload, startRealtime])
 
   return { entries, loading, reload }
 }

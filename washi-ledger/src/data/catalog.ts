@@ -1,3 +1,4 @@
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { mapCategoryIcon } from '../lib/iconMap'
 import type {
@@ -243,6 +244,28 @@ export async function upsertEntry(entry: Entry, userId: string) {
 export async function deleteEntry(id: string, userId: string) {
   const { error } = await supabase.from('entries').delete().eq('id', id).eq('user_id', userId)
   if (error) throw error
+}
+
+export type EntryChangeEvent = { type: 'upsert'; entry: Entry } | { type: 'delete'; id: string }
+
+/** entries表的Realtime订阅——照抄旧仓库index.html的startCloudRealtime()。同一账号在别的
+ * 设备/旧App上写入的记录靠这条常驻WebSocket连接实时推过来，不依赖这一端自己被唤醒才去拉。 */
+export function subscribeEntriesRealtime(userId: string, onChange: (event: EntryChangeEvent) => void): RealtimeChannel {
+  return supabase
+    .channel('entries_changes_' + userId)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'entries', filter: 'user_id=eq.' + userId },
+      (payload) => {
+        if (payload.eventType === 'DELETE') {
+          const delId = (payload.old as { id?: string } | null)?.id
+          if (delId != null) onChange({ type: 'delete', id: delId })
+          return
+        }
+        if (payload.new) onChange({ type: 'upsert', entry: dbRowToEntry(payload.new as EntryRow) })
+      },
+    )
+    .subscribe()
 }
 
 /** 登录时如果云端还没有账目数据(全新账号/数据库还没数据)，把本地缓存现有的记录批量

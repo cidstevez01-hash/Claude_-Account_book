@@ -155,11 +155,18 @@ export function CategoryDonutCard({
                     className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30 text-left active:opacity-70"
                   >
                     <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
-                    <span className="text-body-md text-on-surface flex-1">{share.label}</span>
-                    <span className="text-stat-figure text-xs text-on-surface-variant mr-4">
+                    <span className="text-body-md text-on-surface flex-1 truncate">{share.label}</span>
+                    {/* 百分比/金额字号+对齐照旧App .legend-row .pct/.amt真实样式：固定宽度右对齐避免
+                        位数不同时错位，颜色按支出/收入(tab)着色而不是各分类自己的颜色 */}
+                    <span className="text-xs text-on-surface-variant w-[42px] text-right shrink-0">
                       {Math.round(share.ratio * 100)}%
                     </span>
-                    <span className="font-serif text-stat-figure text-on-surface">{formatCurrency(share.amount, currency)}</span>
+                    <span
+                      className="font-serif text-[13px] tabular-nums w-[82px] text-right shrink-0"
+                      style={{ color: tab === 'expense' ? 'var(--color-primary)' : 'var(--color-secondary)' }}
+                    >
+                      {formatCurrency(share.amount, currency)}
+                    </span>
                   </button>
                 ))}
               </div>

@@ -29,7 +29,7 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
       : catLabel(category, lang)
     : entry.note || '—'
   return (
-    <div className="flex flex-col bg-surface-container-lowest rounded-lg mb-2 border border-outline-variant papercut-shadow overflow-hidden">
+    <div className="entry-card flex flex-col bg-surface-container-lowest mb-2 overflow-hidden">
       <button type="button" className="flex items-center p-3 text-left" onClick={onToggle}>
         <div
           className="w-[38px] h-[38px] rounded-full flex items-center justify-center mr-3 shrink-0"
@@ -47,7 +47,7 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-sans text-body-lg font-medium text-on-surface truncate">{title}</p>
-          {entry.note && <p className="text-body-md text-on-surface-variant text-xs truncate">{entry.note}</p>}
+          {entry.note && <p className="text-xs text-on-surface-variant truncate">{entry.note}</p>}
         </div>
         <p
           className="font-serif text-entry-amount shrink-0 ml-2"

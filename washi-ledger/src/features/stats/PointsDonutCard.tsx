@@ -40,11 +40,13 @@ export function PointsDonutCard({ shares, resetKey }: PointsDonutCardProps) {
                   className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30"
                 >
                   <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
-                  <span className="text-body-md text-on-surface flex-1">{share.label}</span>
-                  <span className="text-stat-figure text-xs text-on-surface-variant mr-4">
+                  <span className="text-body-md text-on-surface flex-1 truncate">{share.label}</span>
+                  <span className="text-xs text-on-surface-variant w-[42px] text-right shrink-0">
                     {Math.round(share.ratio * 100)}%
                   </span>
-                  <span className="font-serif text-stat-figure text-on-surface">+{share.points.toLocaleString()}</span>
+                  <span className="font-serif text-[13px] tabular-nums text-on-surface w-[82px] text-right shrink-0">
+                    +{share.points.toLocaleString()}
+                  </span>
                 </div>
               ))}
             </div>
