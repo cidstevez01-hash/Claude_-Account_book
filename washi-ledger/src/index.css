@@ -68,8 +68,10 @@
   --color-on-primary-fixed: #410001;
   --color-on-primary-fixed-variant: #7f2921;
 
-  /* 橄榄绿——收入 */
-  --color-secondary: #4a6741;
+  /* 收入——B-03：这里之前用#4a6741(深橄榄绿)，跟旧仓库index.html实际用的--jade
+     (#7a9b6e，偏亮的青瓷绿)不是同一个值，导致仪表盘收入数字/point胶囊看起来太深。
+     改成跟旧App完全一致的#7a9b6e */
+  --color-secondary: #7a9b6e;
   --color-on-secondary: #ffffff;
   --color-secondary-container: #c9edba;
   --color-on-secondary-container: #4d6c44;
