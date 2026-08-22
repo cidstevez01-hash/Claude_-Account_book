@@ -71,6 +71,8 @@ export const dict = {
     signOutBtn: LEGACY_ZH.cloudSignOutBtn,
     confirmSignOutTitle: '确定要退出登录吗？', // 新App专属(旧App退出登录没有二次确认弹窗)
     confirmSignOutMessage: '退出登录后仍可以查看本机已缓存的账目，重新登录后会自动与云端同步。', // 新App专属
+    cloudDisconnectBannerText: '登录已掉线，账目仍会正常保存', // 新App专属(照抄旧App B-02修复引入的掉线提示文案)
+    cloudReconnectBtn: '去登录', // 新App专属
     cancelLabel: LEGACY_ZH.alarmTrimCancelBtn, // 通用"取消"，借用旧App裁剪铃声弹窗的取消按钮词条
     deleteLabel: LEGACY_ZH.delete,
     editLabel: LEGACY_ZH.edit,
@@ -185,6 +187,8 @@ export const dict = {
     signOutBtn: LEGACY_JA.cloudSignOutBtn,
     confirmSignOutTitle: 'ログアウトしますか？',
     confirmSignOutMessage: 'ログアウト後もこの端末にキャッシュされた記録は引き続き閲覧できます。再ログインすると自動的にクラウドと同期されます。',
+    cloudDisconnectBannerText: 'ログインが切断されました。家計簿は引き続き保存されます',
+    cloudReconnectBtn: 'ログインへ',
     cancelLabel: LEGACY_JA.alarmTrimCancelBtn,
     deleteLabel: LEGACY_JA.delete,
     editLabel: LEGACY_JA.edit,

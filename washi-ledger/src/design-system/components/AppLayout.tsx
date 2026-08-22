@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
+import { CloudDisconnectBanner } from './CloudDisconnectBanner'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
 
@@ -66,6 +67,7 @@ export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutPro
 
       <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pt-16 pb-32">{children}</main>
 
+      <CloudDisconnectBanner />
       <BottomNav />
       <NavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>

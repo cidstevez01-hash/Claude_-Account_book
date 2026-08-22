@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react'
+import { App } from '@capacitor/app'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
+
+const EVER_SIGNED_IN_KEY = 'washi_ledger_ever_real_signed_in'
+
+/** 本机是否曾经真实登录过(排除匿名session)——只有"曾经真实登录过、现在却变成
+ * 未登录/匿名"才该被当成"掉线"提醒，第一次打开App从没登录过是正常的未登录状态 */
+export function hasEverSignedIn(): boolean {
+  try {
+    return localStorage.getItem(EVER_SIGNED_IN_KEY) === '1'
+  } catch {
+    return false
+  }
+}
 
 /** 镜像旧仓库index.html里的cloudUser全局状态，但多了一层匿名兜底：完全没有session
  * (含从没登录过、含真实账户主动退出登录之后)时自动匿名登录(supabase.auth.signInAnonymously)，
@@ -53,12 +66,40 @@ export function useAuth() {
       }
       setUser(session?.user ?? null)
     })
+
+    // App从后台切回前台时主动重新确认一次session，不被动等Supabase SDK自己后台的
+    // 自动刷新定时器——iOS后台挂起太久这个定时器可能被系统冻结、没能按时触发，真正
+    // 回到前台、JS又开始跑的这一刻才是最可靠的检查时机(照抄旧App index.html的
+    // resyncCloudOnResume同一个思路，同一个真实事故B-02驱动的修复)
+    let appStateHandle: { remove: () => void } | undefined
+    let appStateCancelled = false
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) ensureSession()
+    }).then((h) => {
+      if (appStateCancelled) h.remove()
+      else appStateHandle = h
+    })
+
     return () => {
       cancelled = true
+      appStateCancelled = true
+      appStateHandle?.remove()
       sub.subscription.unsubscribe()
     }
   }, [])
 
   const isAnonymous = !!user?.is_anonymous
-  return { user, loading, signedIn: !!user && !isAnonymous, isAnonymous }
+  const signedIn = !!user && !isAnonymous
+  useEffect(() => {
+    // 只在真实账户(非匿名)登录成功时打这个标记——匿名session兜底登录不算
+    if (signedIn) {
+      try {
+        localStorage.setItem(EVER_SIGNED_IN_KEY, '1')
+      } catch {
+        // localStorage不可用时静默跳过，不影响登录状态本身
+      }
+    }
+  }, [signedIn])
+
+  return { user, loading, signedIn, isAnonymous }
 }
