@@ -131,6 +131,13 @@ export function CategoryPicker({
       </div>
 
       <div className="px-md">
+        {/* R-09：子分类区块之前没有标题，照旧App(.field-label#subFieldLabel"中項目")补上；
+            胶囊字号/内边距改成跟TagPicker一致(text-tab-label/py-1.5，之前用text-body-md/py-2
+            比分类文字还大，跟旧App"细分字号≈标签字号、明显小于分类"的比例不符，"⋯"菜单按钮
+            也顺带变得比例正常了——之前显得偏大就是因为外层胶囊本身偏大) */}
+        <h2 className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase mb-sm">
+          {t('subcategoryLabel')}
+        </h2>
         <div className="flex flex-wrap gap-xs">
           {subs.map((sub) => {
             if (editingCode === sub.id) {
@@ -141,10 +148,10 @@ export function CategoryPicker({
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
-                    className="py-2 px-3 rounded-xl border border-primary bg-surface text-body-md text-on-surface w-24 focus:outline-none"
+                    className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label text-on-surface w-20 focus:outline-none"
                   />
                   <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
-                    <span className="material-symbols-outlined text-[20px]">check</span>
+                    <span className="material-symbols-outlined text-[18px]">check</span>
                   </button>
                 </span>
               )
@@ -158,7 +165,7 @@ export function CategoryPicker({
                     <button
                       type="button"
                       onClick={() => onSelectSub(active ? null : sub.code)}
-                      className={`py-2 pl-3 pr-1.5 rounded-l-xl text-body-md font-sans text-center transition-colors border ${
+                      className={`py-1.5 pl-2.5 pr-1 rounded-l-lg text-tab-label font-sans text-center transition-colors border ${
                         active
                           ? 'border-primary bg-primary-fixed text-primary font-medium'
                           : 'border-outline-variant bg-surface-container text-on-surface-variant'
@@ -169,11 +176,11 @@ export function CategoryPicker({
                     <button
                       type="button"
                       onClick={() => setOpenMenuCode(menuOpen ? null : sub.code)}
-                      className={`py-2 px-1.5 rounded-r-xl border border-l-0 text-on-surface-variant ${
+                      className={`py-1.5 px-1 rounded-r-lg border border-l-0 text-on-surface-variant ${
                         active ? 'border-primary bg-primary-fixed' : 'border-outline-variant bg-surface-container'
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[16px]">more_horiz</span>
+                      <span className="material-symbols-outlined text-[14px]">more_horiz</span>
                     </button>
                   </span>
                   {menuOpen && (
@@ -204,7 +211,7 @@ export function CategoryPicker({
                 key={sub.id}
                 type="button"
                 onClick={() => onSelectSub(active ? null : sub.code)}
-                className={`py-2 px-3 rounded-xl text-body-md font-sans text-center transition-colors border ${
+                className={`py-1.5 px-2.5 rounded-lg text-tab-label font-sans text-center transition-colors border ${
                   active
                     ? 'border-primary bg-primary-fixed text-primary font-medium'
                     : 'border-outline-variant bg-surface-container text-on-surface-variant'
@@ -223,13 +230,13 @@ export function CategoryPicker({
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
                 placeholder={t('newSubPlaceholder')}
-                className="py-2 px-3 rounded-xl border border-primary bg-surface text-body-md text-on-surface w-24 focus:outline-none"
+                className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label text-on-surface w-20 focus:outline-none"
               />
               <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
-                <span className="material-symbols-outlined text-[20px]">check</span>
+                <span className="material-symbols-outlined text-[18px]">check</span>
               </button>
               <button type="button" onClick={cancelEdit} className="text-on-surface-variant">
-                <span className="material-symbols-outlined text-[20px]">close</span>
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </span>
           ) : (
@@ -238,9 +245,9 @@ export function CategoryPicker({
               <button
                 type="button"
                 onClick={startAdd}
-                className="py-2 px-3 rounded-xl border border-dashed border-primary text-primary text-body-md font-sans flex items-center gap-1"
+                className="py-1.5 px-2.5 rounded-lg border border-dashed border-primary text-primary text-tab-label font-sans flex items-center gap-1"
               >
-                <span className="material-symbols-outlined text-[16px]">add</span>
+                <span className="material-symbols-outlined text-[14px]">add</span>
                 {t('addLabel')}
               </button>
             )

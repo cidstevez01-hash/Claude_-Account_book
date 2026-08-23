@@ -40,6 +40,7 @@ export const dict = {
     typeIncome: LEGACY_ZH.segIncome,
     amountLabel: LEGACY_ZH.converterAmountFieldLabel,
     categoryLabel: LEGACY_ZH.catFieldLabel,
+    subcategoryLabel: LEGACY_ZH.subFieldLabel, // 新App专属(R-09：子分类区块之前没有标题，照旧App补上)
     methodLabel: LEGACY_ZH.payFieldLabel,
     dateLabel: '日期', // 新App专属(旧App记账表单的日期字段没有单独的文字标签)
     tagsLabel: LEGACY_ZH.tagFieldLabel,
@@ -156,6 +157,7 @@ export const dict = {
     typeIncome: LEGACY_JA.segIncome,
     amountLabel: LEGACY_JA.converterAmountFieldLabel,
     categoryLabel: LEGACY_JA.catFieldLabel,
+    subcategoryLabel: LEGACY_JA.subFieldLabel,
     methodLabel: LEGACY_JA.payFieldLabel,
     dateLabel: '日付',
     tagsLabel: LEGACY_JA.tagFieldLabel,

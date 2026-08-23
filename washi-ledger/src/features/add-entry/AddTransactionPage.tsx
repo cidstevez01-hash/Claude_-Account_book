@@ -9,6 +9,7 @@ import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { upsertEntry, resolvePointRate } from '../../data/catalog'
+import { symbolFor } from '../../data/currencyDisplay'
 import { useI18n } from '../../lib/i18n'
 import { payLabel } from '../../lib/catalogLabel'
 import type { Entry, EntryType } from '../../types'
@@ -193,8 +194,9 @@ export function AddTransactionPage() {
         <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
        ) : (
         <>
+        {/* R-10：收支页签栏改成虚线围绕，照旧App`.segment{border:2px dashed var(--grid)}`真实值 */}
         <div className="px-md pt-2 pb-6">
-          <div className="flex p-1 bg-surface-container-highest rounded-xl border border-outline-variant/30 relative">
+          <div className="flex p-1 bg-surface-container-highest rounded-xl border-2 border-dashed border-outline-variant relative">
             {(['expense', 'income'] as const).map((key) => (
               <button
                 key={key}
@@ -211,12 +213,12 @@ export function AddTransactionPage() {
           </div>
         </div>
 
+        {/* R-10："金额"字样去掉(照旧App没有单独的金额字段标题)；货币符号改成symbolFor()，
+            日元/人民币都显示"JP¥"/"CN¥"这种带国别前缀的完整写法，不能只显示裸的"¥"
+            (两种货币符号本来就长得一样，裸符号分不清是哪种货币) */}
         <div className="px-md pb-8 flex flex-col items-center">
-          <span className="text-on-surface-variant text-label-caps font-sans mb-4 tracking-widest uppercase">
-            {t('amountLabel')}
-          </span>
           <div className="flex items-baseline justify-center border-b-2 border-primary pb-2 w-3/4 max-w-[240px]">
-            <span className="font-serif text-hero-balance text-primary mr-2">¥</span>
+            <span className="font-serif text-hero-balance text-primary mr-2">{symbolFor(settings.currency)}</span>
             <input
               type="number"
               inputMode="decimal"
@@ -251,7 +253,10 @@ export function AddTransactionPage() {
           <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm tracking-widest uppercase">
             {t('methodLabel')}
           </h2>
-          <div className="flex overflow-x-auto gap-sm pb-1 -mx-1 px-1">
+          {/* R-11：支付方式每行3个(grid-cols-3)，之前是横向滚动的flex，一次只看得到2-3个
+              还得划才知道有别的选项；框的形状照旧App`.sub-pill`真实值改成接近全圆角的胶囊
+              (border-radius:20px≈rounded-full)，不是之前的rounded-xl方角矩形 */}
+          <div className="grid grid-cols-3 gap-sm">
             {paymentMethods.map((pm) => {
               const active = pm.code === payCode
               return (
@@ -259,14 +264,14 @@ export function AddTransactionPage() {
                   key={pm.code}
                   type="button"
                   onClick={() => touchPayCode(pm.code)}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl border text-body-md font-sans transition-colors ${
+                  className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-full border text-tab-label font-sans transition-colors ${
                     active
                       ? 'border-primary bg-primary-fixed text-primary'
                       : 'border-outline-variant bg-surface-container text-on-surface-variant'
                   }`}
                 >
-                  <PaymentMethodIcon method={pm} size={18} />
-                  {payLabel(pm, lang)}
+                  <PaymentMethodIcon method={pm} size={16} />
+                  <span className="truncate">{payLabel(pm, lang)}</span>
                 </button>
               )
             })}
@@ -275,16 +280,17 @@ export function AddTransactionPage() {
           <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm mt-md tracking-widest uppercase">
             {t('dateLabel')}
           </h2>
-          {/* B-04：真机上日期框显示被截断——iOS Safari原生input[type=date]的日/月/年
-              字段+日历图标在窄容器里没有足够空间时会被WebKit自己的渲染直接裁掉，不是我们
-              这边的flex/grid挤压导致宽度不够(Chromium 375px下实测过w-full没有任何横向溢出，
-              问题出在WebKit控件内部渲染，不是CSS布局)。右侧padding和左侧留一样多，等于给
-              图标预留区域之外又额外挤了一次空间，缩小右侧padding把多出来的空间还给控件本身 */}
+          {/* B-04：真机上日期框被截断的真正原因(照旧App index.html dateInput实测有效的
+              真实解法搬过来，不是猜的)——iOS Safari原生input[type=date]带自己的WebKit
+              控件外观(日/月/年分段+日历图标)，这套外观在被撑成整行宽度时会被自己内部的
+              渲染裁切。旧App的dateInput从来不是w-full，而是appearance:none去掉原生外观
+              渲染 + 限定一个较窄的固定宽度(max-width:150px)，把控件交给CSS完全接管尺寸，
+              不依赖WebKit自己去适配一个不确定的宽度 */}
           <input
             type="date"
             value={date}
             onChange={(e) => touchDate(e.target.value)}
-            className="bg-surface-container border border-outline-variant rounded-xl py-3 pl-3 pr-1.5 text-body-md text-on-surface w-full min-w-0 focus:outline-none focus:border-primary"
+            className="appearance-none bg-surface-container border border-outline-variant rounded-xl px-3.5 h-[46px] text-body-md text-on-surface max-w-[150px] focus:outline-none focus:border-primary"
           />
         </div>
 
