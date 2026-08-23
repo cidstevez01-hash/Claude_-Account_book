@@ -43,11 +43,22 @@ export function useEntries(userId: string | null) {
     (remote: Entry[]) => {
       const remoteIds = new Set(remote.map((e) => e.id))
       const localOnly = entriesRef.current.filter((e) => !remoteIds.has(e.id))
+      // eslint-disable-next-line no-console
+      console.log(
+        '[merge diag] entriesRef.current.length=',
+        entriesRef.current.length,
+        'remote.length=',
+        remote.length,
+        'localOnly ids=',
+        localOnly.map((e) => e.id)
+      )
       const merged = remote.concat(localOnly)
       setEntries(merged)
       saveCachedEntries(merged)
       if (localOnly.length && userId) {
-        pushEntriesBulkUpsert(localOnly, userId).catch((e) => console.error('本机独有记录回推云端失败', e))
+        pushEntriesBulkUpsert(localOnly, userId)
+          .then(() => console.log('[merge diag] pushEntriesBulkUpsert ok, ids=', localOnly.map((e) => e.id)))
+          .catch((e) => console.error('[merge diag] 本机独有记录回推云端失败', e))
       }
     },
     [userId]
@@ -117,8 +128,12 @@ export function useEntries(userId: string | null) {
     // 逻辑本身没错但脆弱、容易在改动中被破坏；直接改成"只要挂载时有userId就真实拉一次"，
     // 不依赖判断是不是真的登录事件，更简单也更不容易再出现"看起来该刷新却没刷新"的情况
     setLoading(true)
+    // eslint-disable-next-line no-console
+    console.log('[merge diag] mount effect start, cache at mount=', loadCachedEntries().map((e) => e.id))
     fetchEntries(userId)
       .then(async (remote) => {
+        // eslint-disable-next-line no-console
+        console.log('[merge diag] mount effect fetchEntries resolved, remote.length=', remote.length)
         if (remote.length > 0) {
           mergeRemote(remote)
         } else {
