@@ -253,10 +253,11 @@ export function AddTransactionPage() {
           <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm tracking-widest uppercase">
             {t('methodLabel')}
           </h2>
-          {/* R-11：支付方式每行3个(grid-cols-3)，之前是横向滚动的flex，一次只看得到2-3个
-              还得划才知道有别的选项；框的形状照旧App`.sub-pill`真实值改成接近全圆角的胶囊
-              (border-radius:20px≈rounded-full)，不是之前的rounded-xl方角矩形 */}
-          <div className="grid grid-cols-3 gap-sm">
+          {/* R-11修正：grid-cols-3强制等分三列会把长一点的支付方式名字(比如"クレジットカード")
+              截断——改回照旧App`.sub-wrap`(flex flex-wrap)+`.sub-pill`真实值，每个胶囊按
+              文字内容自身宽度撑开、自动换行，短的名字自然一行能排下3个左右，长的也能完整
+              显示，不强制等宽三列 */}
+          <div className="flex flex-wrap gap-2">
             {paymentMethods.map((pm) => {
               const active = pm.code === payCode
               return (
@@ -264,14 +265,14 @@ export function AddTransactionPage() {
                   key={pm.code}
                   type="button"
                   onClick={() => touchPayCode(pm.code)}
-                  className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-full border text-tab-label font-sans transition-colors ${
+                  className={`flex items-center gap-1.5 py-2 px-3.5 rounded-full border text-[13px] font-sans transition-colors ${
                     active
-                      ? 'border-primary bg-primary-fixed text-primary'
+                      ? 'border-primary bg-primary-fixed text-primary font-semibold'
                       : 'border-outline-variant bg-surface-container text-on-surface-variant'
                   }`}
                 >
-                  <PaymentMethodIcon method={pm} size={16} />
-                  <span className="truncate">{payLabel(pm, lang)}</span>
+                  <PaymentMethodIcon method={pm} size={18} />
+                  {payLabel(pm, lang)}
                 </button>
               )
             })}
