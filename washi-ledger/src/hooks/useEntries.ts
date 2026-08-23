@@ -62,6 +62,18 @@ export function useEntries(userId: string | null) {
       .finally(() => setLoading(false))
   }, [userId, mergeRemote])
 
+  // 删除成功后调用方要先调这个把本地状态里的这条记录摘掉，再reload()——不然
+  // mergeRemote会把"删除后就不在最新远端列表里"误判成"本机独有、还没同步的新记录"，
+  // 反手又把刚删掉的记录推回云端，等于删除白做了(2026-08-23 delete回归测试时
+  // 发现的真实bug，不是猜的)
+  const removeLocal = useCallback((id: string) => {
+    setEntries((prev) => {
+      const next = prev.filter((e) => e.id !== id)
+      saveCachedEntries(next)
+      return next
+    })
+  }, [])
+
   const stopRealtime = useCallback(() => {
     if (realtimeChannelRef.current) {
       supabase.removeChannel(realtimeChannelRef.current)
@@ -146,5 +158,5 @@ export function useEntries(userId: string | null) {
     }
   }, [userId, reload, startRealtime])
 
-  return { entries, loading, reload }
+  return { entries, loading, reload, removeLocal }
 }

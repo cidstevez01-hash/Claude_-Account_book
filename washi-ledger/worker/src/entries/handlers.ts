@@ -36,24 +36,14 @@ export async function upsertEntries(c: Context<{ Bindings: Bindings }>) {
   return c.json({ ok: true })
 }
 
-/** DELETE /entries/:id——对应前端deleteEntry(id, userId)。
- * 临时诊断：加.select()让PostgREST把实际被删掉的行返回回来，这样能从
- * deletedCount区分"删除语句执行成功但RLS/条件没匹配到任何行"(deletedCount:0，
- * 数据库那边悄悄过滤掉了，不会报错)和"真的删掉了"(deletedCount:1)——
- * 2026-08-23排查真机/本地测试"删除显示成功但刷新后数据还在"时加的，
- * 排查完确认原因后可以去掉 */
+/** DELETE /entries/:id——对应前端deleteEntry(id, userId) */
 export async function deleteEntry(c: Context<{ Bindings: Bindings }>) {
   const client = getUserScopedClient(c.env, c.req.raw)
   const userId = await getVerifiedUserId(client)
   const id = c.req.param('id')
 
-  const { data, error } = await client
-    .from('entries')
-    .delete()
-    .eq('id', id)
-    .eq('user_id', userId)
-    .select()
+  const { error } = await client.from('entries').delete().eq('id', id).eq('user_id', userId)
   if (error) throw new HttpError(500, error.message)
 
-  return c.json({ ok: true, deletedCount: (data ?? []).length, matchedUserId: userId, matchedId: id })
+  return c.json({ ok: true })
 }

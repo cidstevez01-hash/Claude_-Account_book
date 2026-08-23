@@ -22,7 +22,7 @@ export function HistoryPage() {
   const { t } = useI18n()
   const { user } = useAuth()
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
-  const { entries, reload } = useEntries(user?.id ?? null)
+  const { entries, reload, removeLocal } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
   const navigate = useNavigate()
@@ -64,6 +64,7 @@ export function HistoryPage() {
   async function confirmDelete() {
     if (!user || !pendingDeleteId) return
     await deleteEntry(pendingDeleteId, user.id)
+    removeLocal(pendingDeleteId)
     setPendingDeleteId(null)
     reload()
   }
