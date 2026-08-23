@@ -1,0 +1,17 @@
+# Cloudflare Worker配置——washi-ledger的自建后端(phase 1: entries资源)。
+# 前后端分家的技术选型见 /root/.claude/plans/purring-wibbling-clarke.md：
+# 选Cloudflare Workers而不是Supabase Edge Functions，是因为要真正独立于Supabase
+# 平台本身；选Workers而不是免费档Node/Express(Railway/Render)，是因为那类免费档
+# 常驻服务闲置会休眠、下次请求冷启动能到30-60秒，跟"偶尔打开记一笔"这种间歇使用
+# 场景相性很差，也跟当天(2026-08-22)刚修完的同步及时性问题(B-02)是同一类风险。
+name = "washi-ledger-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# SUPABASE_URL/SUPABASE_ANON_KEY两个值本来就是要打包进前端App里的公开值(anon key
+# 的安全边界是RLS策略，不是"保密")，不需要当作wrangler secret处理，直接写在vars里
+# 即可——跟washi-ledger/.env.example里的VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY
+# 是同一个值、同一个Supabase项目，那份文件同样把这两个值原样提交进仓库过，这里保持一致。
+[vars]
+SUPABASE_URL = "https://echqjmtouxvwybxdfcqk.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjaHFqbXRvdXh2d3lieGRmY3FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0OTE0MzYsImV4cCI6MjEwMTA2NzQzNn0.WQcSC7WcA0yNp43l8EQLYr7-NmxEyuDjvwoUtDYPPTI"

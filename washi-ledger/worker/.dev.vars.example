@@ -1,0 +1,6 @@
+# 本地 `wrangler dev` 用的环境变量样例。复制成 .dev.vars（已加入.gitignore，不进仓库）
+# 一般情况下直接照抄wrangler.toml里[vars]的两个值就够用——SUPABASE_URL/SUPABASE_ANON_KEY
+# 本来就是公开值，wrangler.toml里的[vars]本身在本地dev时就会生效，这份.dev.vars.example
+# 只是给"想覆盖成别的Supabase项目做隔离测试"这种场景留的口子，日常开发不需要单独建.dev.vars。
+SUPABASE_URL=https://echqjmtouxvwybxdfcqk.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjaHFqbXRvdXh2d3lieGRmY3FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0OTE0MzYsImV4cCI6MjEwMTA2NzQzNn0.WQcSC7WcA0yNp43l8EQLYr7-NmxEyuDjvwoUtDYPPTI

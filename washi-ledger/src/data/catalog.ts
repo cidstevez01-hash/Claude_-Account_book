@@ -1,5 +1,6 @@
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { apiClient } from '../lib/apiClient'
 import { mapCategoryIcon } from '../lib/iconMap'
 import type {
   Category,
@@ -212,10 +213,15 @@ function dbRowToEntry(row: EntryRow): Entry {
   }
 }
 
+// 前后端分家(phase 1)——entries的读写全部改成经过自建的Cloudflare Worker后端
+// (washi-ledger/worker/)，不再直接supabase.from('entries')查表；userId参数
+// 保留只是为了不用改这几个函数在DashboardPage/HistoryPage/StatsPage/
+// AddTransactionPage/useEntries.ts里的调用签名，真正的身份校验现在由Worker
+// 从access_token里反推，不是从这个参数来
 export async function fetchEntries(userId: string): Promise<Entry[]> {
-  const { data, error } = await supabase.from('entries').select('*').eq('user_id', userId)
-  if (error) throw error
-  return ((data ?? []) as EntryRow[]).map(dbRowToEntry)
+  void userId
+  const { entries } = await apiClient.get<{ entries: EntryRow[] }>('/entries')
+  return entries.map(dbRowToEntry)
 }
 
 export function entryToDbRow(entry: Entry, userId: string): Omit<EntryRow, 'created_at'> {
@@ -237,13 +243,12 @@ export function entryToDbRow(entry: Entry, userId: string): Omit<EntryRow, 'crea
 }
 
 export async function upsertEntry(entry: Entry, userId: string) {
-  const { error } = await supabase.from('entries').upsert(entryToDbRow(entry, userId))
-  if (error) throw error
+  await apiClient.post('/entries/upsert-bulk', { entries: [entryToDbRow(entry, userId)] })
 }
 
 export async function deleteEntry(id: string, userId: string) {
-  const { error } = await supabase.from('entries').delete().eq('id', id).eq('user_id', userId)
-  if (error) throw error
+  void userId
+  await apiClient.del(`/entries/${id}`)
 }
 
 export type EntryChangeEvent = { type: 'upsert'; entry: Entry } | { type: 'delete'; id: string }
@@ -273,8 +278,7 @@ export function subscribeEntriesRealtime(userId: string, onChange: (event: Entry
  * (pushEntriesBulkUpsert)，不是简单互相覆盖 */
 export async function pushEntriesBulkUpsert(entries: Entry[], userId: string) {
   if (entries.length === 0) return
-  const { error } = await supabase.from('entries').upsert(entries.map((e) => entryToDbRow(e, userId)))
-  if (error) throw error
+  await apiClient.post('/entries/upsert-bulk', { entries: entries.map((e) => entryToDbRow(e, userId)) })
 }
 
 /** 自定义细分/标签的新增/改名/删除——逻辑照抄旧仓库index.html的addCustomSub/
