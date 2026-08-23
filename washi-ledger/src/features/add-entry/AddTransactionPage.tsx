@@ -39,23 +39,36 @@ export function AddTransactionPage() {
   const { entries } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
 
-  const [type, setType] = useState<EntryType>('expense')
-  const [amount, setAmount] = useState('')
-  const [catCode, setCatCode] = useState<string | null>(null)
-  const [subCode, setSubCode] = useState<string | null>(null)
-  const [payCode, setPayCode] = useState<string | null>(null)
-  const [date, setDate] = useState(todayStr)
-  const [tagCode, setTagCode] = useState<string | null>(null)
-  const [points, setPoints] = useState('')
-  const [note, setNote] = useState('')
-  const [sourceEntry, setSourceEntry] = useState<Entry | null>(null)
-  const [prefilled, setPrefilled] = useState(mode === 'add')
+  // entries的初始值来自useEntries里loadCachedEntries()的同步本地缓存读取，不是异步
+  // 请求——从列表页点编辑/复制进来时，这条记录早就在缓存里了，能在首次渲染就同步
+  // 找到，直接拿去给下面每个useState做初始值。不再是"先渲染一遍空表单，effect里
+  // 再补填"，避免用户看到表单先闪一下空白/默认值、再"跳"到真实内容这个可见跳变
+  // (2026-08-23真机反馈发现的——B-06那次只修了"填进去又被覆盖"，没解决"填之前
+  // 会先闪一下"这个更早的问题)
+  const initialSourceEntry = sourceId ? (entries.find((e) => e.id === sourceId) ?? null) : null
+
+  const [type, setType] = useState<EntryType>(() => initialSourceEntry?.type ?? 'expense')
+  const [amount, setAmount] = useState(() => (initialSourceEntry ? String(initialSourceEntry.amount) : ''))
+  const [catCode, setCatCode] = useState<string | null>(() => initialSourceEntry?.catCode ?? null)
+  const [subCode, setSubCode] = useState<string | null>(() => initialSourceEntry?.subCode ?? null)
+  const [payCode, setPayCode] = useState<string | null>(() => initialSourceEntry?.paymentMethod ?? null)
+  const [date, setDate] = useState(() =>
+    initialSourceEntry ? (mode === 'copy' ? todayStr() : initialSourceEntry.date) : todayStr()
+  )
+  const [tagCode, setTagCode] = useState<string | null>(() => initialSourceEntry?.tagCode ?? null)
+  const [points, setPoints] = useState(() => (initialSourceEntry?.points != null ? String(initialSourceEntry.points) : ''))
+  const [note, setNote] = useState(() => initialSourceEntry?.note ?? '')
+  const [sourceEntry, setSourceEntry] = useState<Entry | null>(() => initialSourceEntry)
+  const [prefilled, setPrefilled] = useState(() => mode === 'add' || initialSourceEntry != null)
 
   // 积分自动计算只在用户真正改过金额/支付方式/日期之后才触发，预填表单(编辑/复制)时
   // 不能被这个effect覆盖掉原本保存的积分值——照旧App"程序赋值不触发input/change事件、
   // 只有真实用户操作才会重算"的行为
   const pointsArmed = useRef(mode === 'add')
 
+  // 兜底：极少数情况下(比如直接深链接打开编辑页，entries本地缓存还没来得及有这条数据)
+  // 首次渲染时在entries里找不到，等entries真正拉到之后再补填一次——正常"从列表页点
+  // 编辑/复制进来"这条最常见路径走的是上面的同步初始值，不会经过这个effect
   useEffect(() => {
     if (prefilled || !sourceId) return
     const src = entries.find((e) => e.id === sourceId)
