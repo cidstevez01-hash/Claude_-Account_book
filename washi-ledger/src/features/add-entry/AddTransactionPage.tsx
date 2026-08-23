@@ -82,24 +82,33 @@ export function AddTransactionPage() {
   )
   const paymentMethods = catalog?.paymentMethods ?? []
 
-  // 分类默认值——新记录/切换收支类型后，若当前catCode不在新的分类列表里，兜底选第一个
+  // 分类默认值——新记录/切换收支类型后，若当前catCode不在新的分类列表里，兜底选第一个。
+  // !prefilled时直接跳过：编辑/复制模式下，这个effect和上面的预填effect在同一次
+  // commit里都会跑，但各自读到的还是没更新前的旧闭包值(setState要等下一轮渲染才生效)，
+  // 如果不加这个判断，这里会用"还没被预填更新"的catCode(还是初始的null)误判成
+  // "没选分类"，把预填的src.catCode又覆盖回categories[0]——这正是B-06的真实原因，
+  // 分类/子分类/支付方式编辑时都记不住就是被这几个"默认值兜底"effect覆盖掉的
   useEffect(() => {
+    if (!prefilled) return
     if (categories.length === 0) return
     if (!catCode || !categories.find((c) => c.code === catCode)) {
       setCatCode(categories[0].code)
       setSubCode(null)
     }
-  }, [categories, catCode])
+  }, [categories, catCode, prefilled])
 
   // 标签不属于当前收支类型时清空(比如编辑数据切了类型这种边界情况)
   useEffect(() => {
     if (tagCode && !tags.find((tg) => tg.code === tagCode)) setTagCode(null)
   }, [tags, tagCode])
 
+  // 同上一个分类兜底effect的道理——!prefilled时跳过，避免编辑/复制模式下用没更新前的
+  // 旧payCode(初始值null)误判成"没选支付方式"，把预填的src.paymentMethod覆盖掉
   useEffect(() => {
+    if (!prefilled) return
     if (payCode || paymentMethods.length === 0) return
     setPayCode(paymentMethods[0].code)
-  }, [paymentMethods, payCode])
+  }, [paymentMethods, payCode, prefilled])
 
   // 收入没有积分这个概念，切收入时清空——照旧App updatePointsFieldVisibility()
   useEffect(() => {
