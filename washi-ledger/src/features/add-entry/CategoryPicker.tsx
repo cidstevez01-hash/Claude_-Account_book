@@ -131,24 +131,25 @@ export function CategoryPicker({
       </div>
 
       <div className="px-md">
-        {/* R-09：子分类区块之前没有标题，照旧App(.field-label#subFieldLabel"中項目")补上；
-            胶囊字号/内边距改成跟TagPicker一致(text-tab-label/py-1.5，之前用text-body-md/py-2
-            比分类文字还大，跟旧App"细分字号≈标签字号、明显小于分类"的比例不符，"⋯"菜单按钮
-            也顺带变得比例正常了——之前显得偏大就是因为外层胶囊本身偏大) */}
+        {/* R-09重新设计：完全照旧App index.html的.sub-pill/.sub-menu-btn真实结构搬，不是
+            照TagPicker风格猜的split-button。旧App真实做法——"⋯"不是跟胶囊拼接的分体按钮，
+            是绝对定位、悬浮压在胶囊右上角的一个18px小圆点(sub-menu-btn: position:absolute;
+            top:-7px;right:-7px)，点开的编辑/删除菜单也是绝对定位悬浮在胶囊下方，不占布局
+            空间；胶囊本身border-radius:20px(≈rounded-full)+13px字号，不是rounded-xl方角 */}
         <h2 className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase mb-sm">
           {t('subcategoryLabel')}
         </h2>
-        <div className="flex flex-wrap gap-xs">
+        <div className="flex flex-wrap gap-2">
           {subs.map((sub) => {
             if (editingCode === sub.id) {
               return (
-                <span key={sub.id} className="flex items-center gap-1">
+                <span key={sub.id} className="inline-flex items-center gap-1">
                   <input
                     autoFocus
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
-                    className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label text-on-surface w-20 focus:outline-none"
+                    className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
                   />
                   <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
                     <span className="material-symbols-outlined text-[18px]">check</span>
@@ -157,80 +158,65 @@ export function CategoryPicker({
               )
             }
             const active = sub.code === selectedSubCode
-            if (sub.custom) {
-              const menuOpen = openMenuCode === sub.code
-              return (
-                <span key={sub.id} className="relative">
-                  <span className="inline-flex items-center">
-                    <button
-                      type="button"
-                      onClick={() => onSelectSub(active ? null : sub.code)}
-                      className={`py-1.5 pl-2.5 pr-1 rounded-l-lg text-tab-label font-sans text-center transition-colors border ${
-                        active
-                          ? 'border-primary bg-primary-fixed text-primary font-medium'
-                          : 'border-outline-variant bg-surface-container text-on-surface-variant'
-                      }`}
-                    >
-                      {subLabel(sub, lang)}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOpenMenuCode(menuOpen ? null : sub.code)}
-                      className={`py-1.5 px-1 rounded-r-lg border border-l-0 text-on-surface-variant ${
-                        active ? 'border-primary bg-primary-fixed' : 'border-outline-variant bg-surface-container'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[14px]">more_horiz</span>
-                    </button>
-                  </span>
-                  {menuOpen && (
-                    <div className="absolute z-20 top-full left-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(sub.id, subLabel(sub, lang))}
-                        className="flex items-center gap-2 px-3 py-2 text-body-md text-on-surface whitespace-nowrap w-full"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">edit</span>
-                        {t('editLabel')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(sub.id, sub.code)}
-                        className="flex items-center gap-2 px-3 py-2 text-body-md text-primary whitespace-nowrap w-full"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">delete</span>
-                        {t('deleteLabel')}
-                      </button>
-                    </div>
-                  )}
-                </span>
-              )
-            }
-            return (
+            const pill = (
               <button
-                key={sub.id}
                 type="button"
                 onClick={() => onSelectSub(active ? null : sub.code)}
-                className={`py-1.5 px-2.5 rounded-lg text-tab-label font-sans text-center transition-colors border ${
+                className={`py-2 px-3.5 rounded-full text-[13px] font-sans text-center transition-colors border ${
                   active
-                    ? 'border-primary bg-primary-fixed text-primary font-medium'
+                    ? 'border-primary bg-primary-fixed text-primary font-semibold'
                     : 'border-outline-variant bg-surface-container text-on-surface-variant'
                 }`}
               >
                 {subLabel(sub, lang)}
               </button>
             )
+            if (!sub.custom) return <span key={sub.id}>{pill}</span>
+
+            const menuOpen = openMenuCode === sub.code
+            return (
+              <span key={sub.id} className="relative inline-flex">
+                {pill}
+                <button
+                  type="button"
+                  onClick={() => setOpenMenuCode(menuOpen ? null : sub.code)}
+                  className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] rounded-full bg-on-surface-variant text-surface text-[11px] font-bold border-2 border-surface flex items-center justify-center leading-none"
+                >
+                  ⋯
+                </button>
+                {menuOpen && (
+                  <div className="absolute z-20 top-[22px] -right-1.5 bg-surface-container border border-outline-variant rounded-[10px] shadow-lg overflow-hidden min-w-[92px]">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(sub.id, subLabel(sub, lang))}
+                      className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-on-surface whitespace-nowrap w-full"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">edit</span>
+                      {t('editLabel')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(sub.id, sub.code)}
+                      className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-primary whitespace-nowrap w-full"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">delete</span>
+                      {t('deleteLabel')}
+                    </button>
+                  </div>
+                )}
+              </span>
+            )
           })}
 
           {editingCode === '__new__' ? (
-            <span className="flex items-center gap-1">
+            <span className="inline-flex items-center gap-1">
               <input
                 autoFocus
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
                 placeholder={t('newSubPlaceholder')}
-                className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label text-on-surface w-20 focus:outline-none"
+                className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
               />
               <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
                 <span className="material-symbols-outlined text-[18px]">check</span>
@@ -245,10 +231,9 @@ export function CategoryPicker({
               <button
                 type="button"
                 onClick={startAdd}
-                className="py-1.5 px-2.5 rounded-lg border border-dashed border-primary text-primary text-tab-label font-sans flex items-center gap-1"
+                className="py-2 px-3.5 rounded-full border border-dashed border-outline-variant text-on-surface-variant text-[13px] font-sans"
               >
-                <span className="material-symbols-outlined text-[14px]">add</span>
-                {t('addLabel')}
+                ＋
               </button>
             )
           )}
