@@ -2351,7 +2351,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   // #nativeAppVersionRow,那个是CI打包ipa时写进去的真实ipa版本号,两码事)
   const APP_VERSION = '2.1.2';
   const IS_DEV_BUILD = true;
-  const DEV_BUILD_DATE = '20260823';
+  const DEV_BUILD_DATE = '20260824';
   const DEV_BUILD = 1;
   // 闹钟功能暂时封存:免费Apple ID侧载没有AlarmKit/Push/Critical Alert这些权限,
   // 后台音频保活+本地通知兜底这套方案模拟不出真正的持续响铃效果,先不让用户摸到——
@@ -2583,9 +2583,11 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   async function fetchCatalogFromCloud(){
     if(!supabaseClient) return false;
     try{
+      // R-16：subcategories/tags也改成软删除了(deleted_at)，这里跟entries一样要过滤掉
+      // 已软删除的行，不然自定义细分/标签删掉之后还会在列表里"复活"显示
       const [catRes, subRes, payRes] = await Promise.all([
         supabaseClient.from('categories').select('*'),
-        supabaseClient.from('subcategories').select('*'),
+        supabaseClient.from('subcategories').select('*').is('deleted_at', null),
         supabaseClient.from('payment_methods').select('*'),
       ]);
       if(catRes.error) throw catRes.error;
@@ -2602,7 +2604,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
       }));
       // tags表是后加的,万一还没跑迁移SQL/建表,不能让它拖累分类/支付方式一起加载失败——单独try,失败就标签列表留空
       try{
-        const tagRes = await supabaseClient.from('tags').select('*');
+        const tagRes = await supabaseClient.from('tags').select('*').is('deleted_at', null);
         if(tagRes.error) throw tagRes.error;
         const tagRows = tagRes.data||[];
         expenseTags = rowsToTagArray(tagRows, 'expense');
@@ -3719,7 +3721,12 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   async function pushEntryDelete(id){
     if(!supabaseClient || !cloudUser) return;
     try{
-      const { error } = await supabaseClient.from('entries').delete().eq('id', String(id)).eq('user_id', cloudUser.id);
+      // R-16：跟entries表2026-08-23那次改成软删除的策略保持一致——这个删除按钮之前
+      // 一直是真删(.delete())，跟pullAllEntriesFromCloud()那边已经在过滤deleted_at
+      // 不一致：如果这条记录还留在某台设备的本机过期缓存里，下次那台设备用
+      // pushEntriesBulkUpsert()整表重推时，真删掉的行会被当成"本机独有的新记录"
+      // 重新插回去，复活。改成UPDATE deleted_at就没有这个风险了
+      const { error } = await supabaseClient.from('entries').update({ deleted_at: new Date().toISOString() }).eq('id', String(id)).eq('user_id', cloudUser.id);
       if(error) throw error;
     }catch(e){ console.error('账目删除同步失败', e); }
   }
@@ -3814,14 +3821,17 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   async function pushAlarmDelete(id){
     if(!supabaseClient || !cloudUser) return;
     try{
-      const { error } = await supabaseClient.from('alarms').delete().eq('id', String(id)).eq('user_id', cloudUser.id);
+      // R-16：alarms表和entries表是同一种"本地缓存整表bulk upsert重推"同步模式，
+      // 真删(.delete())会被下次pushAlarmsBulkUpsert()整表重推时当成"本机独有的新
+      // 记录"重新插回去，复活——改成跟entries一致的软删除策略
+      const { error } = await supabaseClient.from('alarms').update({ deleted_at: new Date().toISOString() }).eq('id', String(id)).eq('user_id', cloudUser.id);
       if(error) throw error;
     }catch(e){ console.error('闹钟删除同步失败', e); }
   }
   async function pullAllAlarmsFromCloud(){
     if(!supabaseClient || !cloudUser) return null;
     try{
-      const { data, error } = await supabaseClient.from('alarms').select('*').eq('user_id', cloudUser.id);
+      const { data, error } = await supabaseClient.from('alarms').select('*').eq('user_id', cloudUser.id).is('deleted_at', null);
       if(error) throw error;
       return (data||[]).map(dbRowToAlarm);
     }catch(e){ console.error('拉取闹钟失败', e); return null; }
@@ -3880,6 +3890,16 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
           return;
         }
         if(!payload.new) return;
+        // R-16：alarms表删除操作改成软删除(UPDATE标记deleted_at)之后，这条实时事件会以
+        // UPDATE的形式推过来，不是DELETE，这里要按"删掉"处理，逻辑跟entries那边一致
+        if(payload.new.deleted_at){
+          const delId = payload.new.id;
+          if(delId == null) return;
+          const before = alarms.length;
+          alarms = alarms.filter(a=> String(a.id) !== String(delId));
+          if(alarms.length !== before){ await saveAlarmsLocalOnly(); renderAlarmList(); rearmNativeAlarms(); }
+          return;
+        }
         const alarm = dbRowToAlarm(payload.new);
         const idx = alarms.findIndex(a=> String(a.id) === String(alarm.id));
         if(idx >= 0 && JSON.stringify(alarms[idx]) === JSON.stringify(alarm)) return;
@@ -5027,7 +5047,9 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     saveCatalogCache();
     if(cloudUser && supabaseClient && sub){
       try{
-        const { error } = await supabaseClient.from('subcategories').delete().eq('id', sub.id);
+        // R-16：改成软删除(标记deleted_at，不再物理删除行)，跟entries/alarms那套
+        // 同步模式保持一致的删除策略
+        const { error } = await supabaseClient.from('subcategories').update({ deleted_at: new Date().toISOString() }).eq('id', sub.id);
         if(error) throw error;
       }catch(e){ console.error('自定义细分删除失败', e); showToast(t('cloudSyncError')); }
     }
@@ -5071,7 +5093,8 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
     saveCatalogCache();
     if(cloudUser && supabaseClient && tag){
       try{
-        const { error } = await supabaseClient.from('tags').delete().eq('id', tag.id);
+        // R-16：改成软删除，跟自定义细分/entries/alarms保持一致的删除策略
+        const { error } = await supabaseClient.from('tags').update({ deleted_at: new Date().toISOString() }).eq('id', tag.id);
         if(error) throw error;
       }catch(e){ console.error('自定义标签删除失败', e); showToast(t('cloudSyncError')); }
     }
@@ -5833,7 +5856,7 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   async function fetchAlarmSoundRecords(){
     if(!supabaseClient || !cloudUser) return alarmSoundRecords;
     try{
-      const { data, error } = await supabaseClient.from('alarm_sounds').select('*').eq('user_id', cloudUser.id).order('created_at', { ascending:false });
+      const { data, error } = await supabaseClient.from('alarm_sounds').select('*').eq('user_id', cloudUser.id).is('deleted_at', null).order('created_at', { ascending:false });
       if(error) throw error;
       alarmSoundRecords = data || [];
     }catch(e){ console.error('拉取我的铃声列表失败', e); }
@@ -5861,8 +5884,11 @@ c-20 5 -30 16 -36 37 -4 16 -11 26 -15 22z"/>
   async function deleteAlarmSoundRecord(record){
     if(!confirm(t('alarmSoundDeleteConfirm'))) return false;
     try{
+      // R-16：数据库行改成软删除，但Storage里的音频文件本身仍然物理删除——铃声文件
+      // 不是"整表bulk upsert重推"这种同步模式，留着软删除的行只为了跟其它几张表统一
+      // 删除策略，没必要为了软删除让文件继续占用户的Storage空间
       await supabaseClient.storage.from('alarm-sounds').remove([record.storage_path]);
-      const { error } = await supabaseClient.from('alarm_sounds').delete().eq('id', record.id);
+      const { error } = await supabaseClient.from('alarm_sounds').update({ deleted_at: new Date().toISOString() }).eq('id', record.id);
       if(error) throw error;
       alarmSoundRecords = alarmSoundRecords.filter(r=>r.id!==record.id);
       if(alarmFormSoundFile === record.storage_path){ alarmFormSoundFile = null; updateAlarmSoundDisplay(); }
