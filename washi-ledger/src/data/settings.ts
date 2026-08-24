@@ -17,7 +17,7 @@ export async function fetchUserSettings(userId: string): Promise<UserSettings | 
   return {
     lang: row.lang === 'zh' ? 'zh' : row.lang === 'ja' ? 'ja' : DEFAULT_SETTINGS.lang,
     currency: row.currency ?? DEFAULT_SETTINGS.currency,
-    themeSkin: 'default',
+    themeSkin: row.theme_skin === 'nostalgia' ? 'nostalgia' : 'default',
   }
 }
 

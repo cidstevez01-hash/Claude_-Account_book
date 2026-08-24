@@ -105,7 +105,8 @@ export const dict = {
     pointsDimMonth: LEGACY_ZH.pointsDimMonth,
     newSubPlaceholder: LEGACY_ZH.newSubPlaceholder, // 概念对应(新增细分输入框占位文字)，措辞跟旧App"新中项目名称"沿用
     newTagPlaceholder: LEGACY_ZH.newTagPlaceholder,
-    themeOnlyOneHint: '目前只有这一套视觉主题，更多主题以后再加', // 新App专属
+    themeDefaultName: 'Washi Ledger', // 新App专属(默认主题卡片名字)
+    themeNostalgiaName: '怀旧', // 新App专属(R-14新增主题，颜色/背景改回旧App基本主题色调)
     emailLabel: LEGACY_ZH.cloudEmailPlaceholder,
     passwordLabel: LEGACY_ZH.cloudPasswordPlaceholder,
     confirmPasswordLabel: '确认密码', // 新App专属(旧App注册没有"确认密码"这一栏，只有设置新密码一栏)
@@ -225,7 +226,8 @@ export const dict = {
     pointsDimMonth: LEGACY_JA.pointsDimMonth,
     newSubPlaceholder: LEGACY_JA.newSubPlaceholder,
     newTagPlaceholder: LEGACY_JA.newTagPlaceholder,
-    themeOnlyOneHint: '現在このビジュアルテーマのみ利用可能です。今後追加予定です',
+    themeDefaultName: 'Washi Ledger',
+    themeNostalgiaName: 'ノスタルジー',
     emailLabel: LEGACY_JA.cloudEmailPlaceholder,
     passwordLabel: LEGACY_JA.cloudPasswordPlaceholder,
     confirmPasswordLabel: 'パスワード（確認）',
