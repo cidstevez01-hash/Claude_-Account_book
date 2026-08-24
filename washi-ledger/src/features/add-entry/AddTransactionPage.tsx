@@ -180,7 +180,11 @@ export function AddTransactionPage() {
       createdAt: base?.createdAt ?? Date.now(),
     }
     await upsertEntry(entry, user.id)
-    navigate(-1)
+    // B-12：保存后之前是navigate(-1)(回上一页)，新建场景大多是从仪表盘FAB进来的，
+    // 回去之后新记录可能不在当前显示的日期区间/滚动位置里，等于白跳。改成统一跳到
+    // 明细页并把日期区间调整到覆盖这条记录所在的月份、滚动定位+高亮这一条，编辑/
+    // 复制也走同一个逻辑，不用区分"从哪来的"
+    navigate('/history', { state: { focusEntryId: entry.id, focusDate: entry.date } })
   }
 
   const pageTitle = mode === 'edit' ? t('editTitle') : mode === 'copy' ? t('copyTitle') : t('addTitle')

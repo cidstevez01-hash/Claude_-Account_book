@@ -93,8 +93,13 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
             style={{ height: pullDistance }}
           >
             {refreshing ? (
+              // B-07：转圈圈样式——参考视频里全程只看到一个小箭头图标，没有拍到明显的
+              // 加载态(网络太快一晃而过)，找不到确切参考帧；不用Material的progress_activity
+              // (虚线分段的圆环，视觉上跟下拉时的箭头是两个不同图标，会跳一下)，改成同一个
+              // "refresh"图标持续旋转，保持下拉→加载两个阶段视觉上是同一个图标在动，不是
+              // 切换成完全不同的符号
               <span className="material-symbols-outlined animate-spin text-primary" style={{ fontSize: 16 }}>
-                progress_activity
+                refresh
               </span>
             ) : (
               <span

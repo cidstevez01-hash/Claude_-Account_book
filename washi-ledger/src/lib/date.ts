@@ -16,6 +16,20 @@ export function lastOfMonthStr(ref: Date = new Date()): string {
   return formatDateYMD(new Date(ref.getFullYear(), ref.getMonth() + 1, 0))
 }
 
+/** B-12：给定"YYYY-MM-DD"字符串(比如某条记账记录的date字段)求它所在月份的起止日期——
+ * 直接从字符串拆年月，不经过new Date(dateStr)这条路：那样解析出来是UTC零点，负时区
+ * (比如美洲)下会被折算成本地时间的前一天，月末最后一天/月初第一天这种边界日期会错算成
+ * 上/下个月，这里手写拆解避免这个坑，跟同文件formatDateFull()的做法一致 */
+export function firstOfMonthStrFor(dateStr: string): string {
+  const [y, m] = dateStr.split('-').map(Number)
+  return firstOfMonthStr(new Date(y, m - 1, 1))
+}
+
+export function lastOfMonthStrFor(dateStr: string): string {
+  const [y, m] = dateStr.split('-').map(Number)
+  return lastOfMonthStr(new Date(y, m - 1, 1))
+}
+
 /** 完整日期的展示文案——固定用"Y年M月D日"，中日文共用汉字，不依赖设备系统语言/浏览器
  * locale(原生<input type="date">收起状态的文字是被动跟随设备系统语言的，跟App内切换的
  * 语言设置是两回事，会出现"App设置中文但选择器显示英文"的错位，所以起止日期选择器的

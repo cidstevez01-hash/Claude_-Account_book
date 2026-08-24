@@ -17,11 +17,23 @@ interface HistoryEntryListProps {
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
+  /** B-12：新建/编辑/复制保存后跳到明细页要定位到这条记录，传进来给对应的
+   * EntryCard加DOM id(供HistoryPage.tsx做scrollIntoView)+高亮态 */
+  focusEntryId?: string | null
 }
 
 /** 明细页的按日分组列表——跟仪表盘的RecentEntriesList不同点：不限条数、每日标题
  * 旁边带当日净额(照design-assets-v2/_13)，没有"最近记录/查看全部"标题 */
-export function HistoryEntryList({ entries, categories, paymentMethods, currency, onEdit, onCopy, onDelete }: HistoryEntryListProps) {
+export function HistoryEntryList({
+  entries,
+  categories,
+  paymentMethods,
+  currency,
+  onEdit,
+  onCopy,
+  onDelete,
+  focusEntryId,
+}: HistoryEntryListProps) {
   const { t } = useI18n()
   const groups = groupByDay(entries)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -59,6 +71,8 @@ export function HistoryEntryList({ entries, categories, paymentMethods, currency
               return (
                 <EntryCard
                   key={entry.id}
+                  id={`entry-${entry.id}`}
+                  highlighted={focusEntryId === entry.id}
                   entry={entry}
                   category={cat}
                   paymentMethod={pm}

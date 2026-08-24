@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 
-// 幅度参照用户给的X App下拉刷新真机录屏调的——那边的指示器很克制，只在标题栏和
-// tab栏之间窄窄探出一个小箭头，页面几乎不怎么被推下去，不是Material Design那种
-// 大缺口+大转圈圈的做法；第一版照通用Material模式做的64/88偏大，改小一圈
-const PULL_THRESHOLD = 40 // 松手触发刷新的临界距离(px)
-const MAX_PULL = 52 // 视觉上允许拉出的最大距离，超过后阻尼拉满不再继续跟手
-const RESISTANCE = 0.45 // 手指划动距离按这个系数打折换算成实际下拉距离，制造"拉纸有阻力"的手感
+// 幅度参照用户给的X App下拉刷新真机录屏调的——第一版照Material Design常见惯例做的
+// 64/88偏大，改小成40/52；真机实测后反馈"再大一点"，这版在两者之间再调高一档
+const PULL_THRESHOLD = 56 // 松手触发刷新的临界距离(px)
+const MAX_PULL = 72 // 视觉上允许拉出的最大距离，超过后阻尼拉满不再继续跟手
+const RESISTANCE = 0.5 // 手指划动距离按这个系数打折换算成实际下拉距离，制造"拉纸有阻力"的手感
 
 /** 下拉刷新(R-17)——挂在AppLayout的<main>滚动容器上，只在scrollTop===0时才开始追踪
  * 手指下滑距离，避免跟正常向下滚动内容冲突。原生addEventListener而不是React的
@@ -18,9 +17,24 @@ export function usePullToRefresh<T extends HTMLElement>(onRefresh: (() => Promis
   const [refreshing, setRefreshing] = useState(false)
   const [dragging, setDragging] = useState(false)
 
+  // B-09："下拉有时候会卡死"的真实根因：调用方(Dashboard/History/Stats/Rate)传的
+  // onRefresh是页面渲染函数里直接定义的普通函数，不是useCallback包过的稳定引用，
+  // 每次页面重渲染(比如后台账目同步/Realtime推送到新数据，或者随便什么状态变化)
+  // 都是全新的函数对象。下面这个useEffect原来依赖[onRefresh]，只要正在下拉的过程中
+  // (已经touchstart但还没touchend)撞上一次这样的重渲染，effect就会卸载重挂载——新装
+  // 上的监听器闭包里startY是null，紧接着来的touchmove/touchend会被当成"没在追踪"直接
+  // 提前返回，没人再把pullDistance归零，指示器就那样卡在半空。改成用ref存最新的
+  // onRefresh，effect只在"有没有onRefresh"这个稳定布尔值变化时才重新挂载监听器，
+  // 手势进行中不管页面重渲染多少次，监听器都不会被换掉
+  const onRefreshRef = useRef(onRefresh)
+  useEffect(() => {
+    onRefreshRef.current = onRefresh
+  })
+  const hasRefresh = onRefresh != null
+
   useEffect(() => {
     const el = containerRef.current
-    if (!el || !onRefresh) return
+    if (!el || !hasRefresh) return
 
     let startY: number | null = null
     let isRefreshing = false
@@ -59,7 +73,7 @@ export function usePullToRefresh<T extends HTMLElement>(onRefresh: (() => Promis
         if (current >= PULL_THRESHOLD) {
           isRefreshing = true
           setRefreshing(true)
-          onRefresh!().finally(() => {
+          onRefreshRef.current!().finally(() => {
             isRefreshing = false
             setRefreshing(false)
             setPullDistance(0)
@@ -80,7 +94,7 @@ export function usePullToRefresh<T extends HTMLElement>(onRefresh: (() => Promis
       el.removeEventListener('touchend', onTouchEnd)
       el.removeEventListener('touchcancel', onTouchEnd)
     }
-  }, [onRefresh])
+  }, [hasRefresh])
 
   return { containerRef, pullDistance, refreshing, dragging, threshold: PULL_THRESHOLD }
 }
