@@ -185,8 +185,13 @@ export function StatsPage() {
     reload()
   }
 
+  // R-17：下拉刷新——重新拉一次账目记录+分类/支付方式目录，两个互不依赖并行拉
+  async function handleRefresh() {
+    await Promise.all([reload(), reloadCatalog()])
+  }
+
   return (
-    <AppLayout title={t('tabStats')}>
+    <AppLayout title={t('tabStats')} onRefresh={handleRefresh}>
       <div className="px-md pt-md mb-md">
         <div className="w-full bg-surface-container rounded-full p-1 flex relative border-[1.5px] border-dashed border-outline-variant/50">
           <div

@@ -5,6 +5,7 @@ import { NavDrawer } from './NavDrawer'
 import { CloudDisconnectBanner } from './CloudDisconnectBanner'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
+import { usePullToRefresh } from '../../hooks/usePullToRefresh'
 
 interface AppLayoutProps {
   title: string
@@ -12,12 +13,18 @@ interface AppLayoutProps {
   /** 左上角按钮：'menu'(默认，点开抽屉导航)/'home'(小房子，直接跳回仪表盘，不带
    * 抽屉——我的账户页用这个，不需要再从这里进抽屉) */
   leftButton?: 'menu' | 'home'
+  /** 下拉刷新(R-17)——只有传了这个才会启用手势监听/显示指示器，不传就是原来的普通
+   * 页面(比如"我的账户"/"设置"这类没有"重新拉取数据"这个概念的页面)。四个大页面
+   * (仪表盘/明细/统计/汇率换算)各自传自己的数据刷新函数，必须返回Promise——指示器
+   * 转圈圈状态靠这个Promise什么时候resolve来收起，不是定时器估算 */
+  onRefresh?: () => Promise<void>
 }
 
-export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutProps) {
+export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: AppLayoutProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const navigate = useNavigate()
   const { t } = useI18n()
+  const { containerRef, pullDistance, refreshing, dragging, threshold } = usePullToRefresh<HTMLElement>(onRefresh)
 
   return (
     <div
@@ -60,7 +67,43 @@ export function AppLayout({ title, children, leftButton = 'menu' }: AppLayoutPro
         </Link>
       </header>
 
-      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32">{children}</main>
+      <main
+        ref={containerRef}
+        className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32"
+        style={
+          onRefresh
+            ? { paddingTop: pullDistance, transition: dragging ? 'none' : 'padding-top 0.2s ease' }
+            : undefined
+        }
+      >
+        {/* 下拉刷新指示器(R-17)——absolute定位不影响main的position:relative给其它
+            fixed后代(比如仪表盘的记一笔悬浮按钮)当containing block；如果这里改用
+            transform把children整体往下推，会连带把后代的fixed定位也变成"相对这个
+            被transform的祖先"而不是相对视口，悬浮按钮会跟着被拉走位置——这个坑踩过，
+            所以改用paddingTop推移content，指示器本身用absolute贴在main顶部的空隙里，
+            两者都不会创建fixed的containing block */}
+        {onRefresh && (
+          <div
+            className="absolute top-0 left-0 w-full flex items-center justify-center pointer-events-none overflow-hidden"
+            style={{ height: pullDistance }}
+          >
+            {refreshing ? (
+              <span className="material-symbols-outlined animate-spin text-2xl text-primary">progress_activity</span>
+            ) : (
+              <span
+                className="material-symbols-outlined text-2xl text-primary"
+                style={{
+                  opacity: Math.min(1, pullDistance / threshold),
+                  transform: `rotate(${Math.min(1, pullDistance / threshold) * 180}deg)`,
+                }}
+              >
+                arrow_downward
+              </span>
+            )}
+          </div>
+        )}
+        {children}
+      </main>
 
       <CloudDisconnectBanner />
       <BottomNav />

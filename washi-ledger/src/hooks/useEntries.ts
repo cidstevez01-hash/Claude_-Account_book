@@ -53,10 +53,11 @@ export function useEntries(userId: string | null) {
     [userId]
   )
 
+  // 返回Promise——R-17下拉刷新指示器要等这个真正拉完才收起转圈圈，不是估个时间
   const reload = useCallback(() => {
-    if (!userId) return
+    if (!userId) return Promise.resolve()
     setLoading(true)
-    fetchEntries(userId)
+    return fetchEntries(userId)
       .then((remote) => mergeRemote(remote))
       .catch((e) => console.error('拉取记账记录失败', e))
       .finally(() => setLoading(false))

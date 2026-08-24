@@ -84,16 +84,32 @@ export function RatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromCode])
 
-  useEffect(() => {
-    const days = TIMEFRAMES.find((tf) => tf.key === timeframe)!.days
+  async function loadHistory(base: string, target: string, tf: TimeframeKey) {
+    const days = TIMEFRAMES.find((t) => t.key === tf)!.days
     setHistoryLoading(true)
     setHistoryError('')
+    try {
+      const points = await fetchRateHistory(base, target, days)
+      setHistory(points)
+    } catch (e) {
+      setHistoryError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
+
+  useEffect(() => {
     setSelectedIdx(null)
-    fetchRateHistory(fromCode, toCode, days)
-      .then(setHistory)
-      .catch((e) => setHistoryError(e instanceof Error ? e.message : String(e)))
-      .finally(() => setHistoryLoading(false))
+    loadHistory(fromCode, toCode, timeframe)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromCode, toCode, timeframe])
+
+  // R-17：下拉刷新——当前货币对的实时汇率快照+走势图历史数据都重新拉一次，两者
+  // 互不依赖并行拉；不重置selectedIdx/timeframe/货币对，用户已经选的东西不因为
+  // 刷新一下就被打乱
+  async function handleRefresh() {
+    await Promise.all([refresh(fromCode), loadHistory(fromCode, toCode, timeframe)])
+  }
 
   function handleSwap() {
     setFromCode(toCode)
@@ -151,7 +167,7 @@ export function RatePage() {
   const activePoint = chartGeometry && activeIdx != null ? chartGeometry.points[activeIdx] : null
 
   return (
-    <AppLayout title={t('rateNavLabel')}>
+    <AppLayout title={t('rateNavLabel')} onRefresh={handleRefresh}>
       <div className="px-md pt-lg pb-xl flex flex-col gap-lg">
         {/* 换算卡片(The Ledger Card)——和纸胶带装饰角+虚线描边，照旧App结余卡片同一套材质语言 */}
         <div className="relative bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">

@@ -103,8 +103,13 @@ export function DashboardPage() {
     }
   }, [detailSelection, categories, lang])
 
+  // R-17：下拉刷新——重新拉一次账目记录+分类/支付方式目录，两个互不依赖并行拉
+  async function handleRefresh() {
+    await Promise.all([reload(), reloadCatalog()])
+  }
+
   return (
-    <AppLayout title={t('appTitle')}>
+    <AppLayout title={t('appTitle')} onRefresh={handleRefresh}>
       {/* entries缓存优先(见useEntries.ts)，比只走网络请求的catalog先就绪很多；catalog没
           就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会闪一下"英文图标名
           +统一灰色"的半成品画面——之前用if(!catalog)return null整页提前返回，连header/
