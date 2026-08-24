@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
-const PULL_THRESHOLD = 64 // 松手触发刷新的临界距离(px)
-const MAX_PULL = 88 // 视觉上允许拉出的最大距离，超过后阻尼拉满不再继续跟手
-const RESISTANCE = 0.55 // 手指划动距离按这个系数打折换算成实际下拉距离，制造"拉纸有阻力"的手感
+// 幅度参照用户给的X App下拉刷新真机录屏调的——那边的指示器很克制，只在标题栏和
+// tab栏之间窄窄探出一个小箭头，页面几乎不怎么被推下去，不是Material Design那种
+// 大缺口+大转圈圈的做法；第一版照通用Material模式做的64/88偏大，改小一圈
+const PULL_THRESHOLD = 40 // 松手触发刷新的临界距离(px)
+const MAX_PULL = 52 // 视觉上允许拉出的最大距离，超过后阻尼拉满不再继续跟手
+const RESISTANCE = 0.45 // 手指划动距离按这个系数打折换算成实际下拉距离，制造"拉纸有阻力"的手感
 
 /** 下拉刷新(R-17)——挂在AppLayout的<main>滚动容器上，只在scrollTop===0时才开始追踪
  * 手指下滑距离，避免跟正常向下滚动内容冲突。原生addEventListener而不是React的

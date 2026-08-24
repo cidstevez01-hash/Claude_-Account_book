@@ -81,18 +81,22 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
             transform把children整体往下推，会连带把后代的fixed定位也变成"相对这个
             被transform的祖先"而不是相对视口，悬浮按钮会跟着被拉走位置——这个坑踩过，
             所以改用paddingTop推移content，指示器本身用absolute贴在main顶部的空隙里，
-            两者都不会创建fixed的containing block */}
+            两者都不会创建fixed的containing block。图标尺寸/克制程度照用户给的X App
+            真机录屏调过——就是窄窄探出一个小箭头，不是大号Material圆环占一大块地方 */}
         {onRefresh && (
           <div
             className="absolute top-0 left-0 w-full flex items-center justify-center pointer-events-none overflow-hidden"
             style={{ height: pullDistance }}
           >
             {refreshing ? (
-              <span className="material-symbols-outlined animate-spin text-2xl text-primary">progress_activity</span>
+              <span className="material-symbols-outlined animate-spin text-primary" style={{ fontSize: 16 }}>
+                progress_activity
+              </span>
             ) : (
               <span
-                className="material-symbols-outlined text-2xl text-primary"
+                className="material-symbols-outlined text-primary"
                 style={{
+                  fontSize: 16,
                   opacity: Math.min(1, pullDistance / threshold),
                   transform: `rotate(${Math.min(1, pullDistance / threshold) * 180}deg)`,
                 }}
