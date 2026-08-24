@@ -187,7 +187,7 @@ export function AddTransactionPage() {
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
+      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface paper-grid-bg overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">

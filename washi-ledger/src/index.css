@@ -148,6 +148,19 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* 旧App方格信笺纸背景(R-12)——照旧仓库index.html的body网格线公式原样搬：横竖两条
+   1px线的linear-gradient叠加成24x24格子。新App各页面根容器是不透明的position:fixed
+   满屏div(bg-surface)，不像旧App的.app/.page是透明的能透出body背景，所以不能只改
+   body，要单独做一个class配合bg-surface一起贴到每个根容器上。线条颜色用现成的
+   --color-surface-container-highest token，不新造token，色调比--color-surface深一档，
+   跟旧App--paper/--grid-bg的关系一致 */
+.paper-grid-bg {
+  background-image:
+    linear-gradient(var(--color-surface-container-highest) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-surface-container-highest) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 /* 印章/压印按压反馈——FAB、主要CTA按钮共用 */
 .stamp-shadow {
   transition: transform 0.12s ease, box-shadow 0.12s ease;
