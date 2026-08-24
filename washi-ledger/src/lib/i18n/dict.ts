@@ -92,6 +92,7 @@ export const dict = {
     currencyRowLabel: '货币', // 新App专属，设置页这一行只放短标签(旧App对应的currencyFieldLabel是"本位货币（用于统计汇总）"这种带说明的长版本，跟这里单行列表的短标签风格不一致，没有直接复用)
     themeLabel: LEGACY_ZH.themeSheetTitle,
     aboutTagline: '有纸感的极简记账本，希望能让记账这件事多一点从容与清晰。', // 新App专属，关于页的App介绍文案
+    aboutCopyright: '© 2026 PigBang', // 新App专属，关于页落款
     confirmDeleteTitle: '确定要删除这条记录吗？', // 新App专属(旧App的deleteConfirm文案里带{info}记录摘要，这里是不带摘要的通用版)
     confirmDeleteMessage: '删除后将无法恢复此条账单数据，您的账户余额将自动重新计算。', // 新App专属，比旧App的deleteConfirm多了"余额自动重新计算"这句提示
     noRecordsThisMonth: '这个月还没有记录', // 新App专属(旧App对应的emptyChart文案是"这段时间还没有相关记录"，这里是仪表盘/统计页donut卡片用的月份限定版)
@@ -111,7 +112,7 @@ export const dict = {
     pointsDimMonth: LEGACY_ZH.pointsDimMonth,
     newSubPlaceholder: LEGACY_ZH.newSubPlaceholder, // 概念对应(新增细分输入框占位文字)，措辞跟旧App"新中项目名称"沿用
     newTagPlaceholder: LEGACY_ZH.newTagPlaceholder,
-    themeDefaultName: 'Washi Ledger', // 新App专属(默认主题卡片名字)
+    themeDefaultName: 'PigBang', // 新App专属(默认主题卡片名字，R-19：App名称确定沿用PigBang)
     themeNostalgiaName: '怀旧', // 新App专属(R-14新增主题，颜色/背景改回旧App基本主题色调)
     emailLabel: LEGACY_ZH.cloudEmailPlaceholder,
     passwordLabel: LEGACY_ZH.cloudPasswordPlaceholder,
@@ -215,6 +216,7 @@ export const dict = {
     currencyRowLabel: '通貨',
     themeLabel: LEGACY_JA.themeSheetTitle,
     aboutTagline: '和紙のような温もりを感じるミニマルな家計簿。記録することに、もう少し余裕と落ち着きを。',
+    aboutCopyright: '© 2026 PigBang',
     confirmDeleteTitle: 'この記録を削除しますか？',
     confirmDeleteMessage: '削除すると元に戻せません。アカウントの残高は自動的に再計算されます。',
     noRecordsThisMonth: '今月はまだ記録がありません',
@@ -234,7 +236,7 @@ export const dict = {
     pointsDimMonth: LEGACY_JA.pointsDimMonth,
     newSubPlaceholder: LEGACY_JA.newSubPlaceholder,
     newTagPlaceholder: LEGACY_JA.newTagPlaceholder,
-    themeDefaultName: 'Washi Ledger',
+    themeDefaultName: 'PigBang',
     themeNostalgiaName: 'ノスタルジー',
     emailLabel: LEGACY_JA.cloudEmailPlaceholder,
     passwordLabel: LEGACY_JA.cloudPasswordPlaceholder,

@@ -50,7 +50,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
             </span>
           </div>
           <div className="min-w-0">
-            <p className="font-serif text-headline-md text-primary leading-tight">Washi Ledger</p>
+            <p className="font-serif text-headline-md text-primary leading-tight">PigBang</p>
             <p className="text-body-md text-on-surface-variant truncate">{signedIn ? user!.email : t('notSignedIn')}</p>
           </div>
         </div>

@@ -43,7 +43,7 @@ export function SignInPage() {
         <div className="w-16 h-16 rounded-full border-2 border-primary flex items-center justify-center mb-3">
           <span className="material-symbols-outlined text-3xl text-primary">menu_book</span>
         </div>
-        <h1 className="font-serif text-headline-lg text-primary">Washi Ledger</h1>
+        <h1 className="font-serif text-headline-lg text-primary">PigBang</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md flex flex-col gap-md">

@@ -1,6 +1,6 @@
 {
   "appId": "com.cidstevez01.washiledger",
-  "appName": "Washi Ledger",
+  "appName": "PigBang",
   "webDir": "dist",
   "ios": {
     "contentInset": "never",

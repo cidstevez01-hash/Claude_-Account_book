@@ -105,7 +105,7 @@ export function SettingsPage() {
 
         <SettingsRow icon="palette" label={t('themeLabel')} onClick={() => navigate('/theme')}>
           <div className="flex items-center gap-1">
-            <span>Washi Ledger</span>
+            <span>PigBang</span>
             <span className="material-symbols-outlined text-[18px]">chevron_right</span>
           </div>
         </SettingsRow>
