@@ -59,6 +59,12 @@ export const dict = {
     rateTimeframe1W: '近1周', // 新App专属(R-13：时间范围按钮去掉1D后，剩下三档改用翻译文案，不再直接显示英文缩写)
     rateTimeframe1M: '近1个月',
     rateTimeframe1Y: '近1年',
+    // B-10：仪表盘/统计页环状图中间的小字之前写死英文"Total Expenses"/"Total Income"，
+    // 不跟着语言切换。旧App对应的是typeExpense/typeIncome("支出构成"/"收入构成")这两个
+    // 词条——但新App自己的typeExpense/typeIncome已经被"记一笔"页面的收支切换按钮占用了
+    // (对应旧App的segExpense/segIncome，见文件顶部说明)，不能重名，这里另起donut专用的key
+    donutExpenseTitle: LEGACY_ZH.typeExpense,
+    donutIncomeTitle: LEGACY_ZH.typeIncome,
 
     // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
     menuAria: '菜单', // 新App专属(左上角抽屉导航按钮，旧App没有这个汉堡菜单)
@@ -180,6 +186,8 @@ export const dict = {
     rateTimeframe1W: '過去1週間',
     rateTimeframe1M: '過去1か月',
     rateTimeframe1Y: '過去1年',
+    donutExpenseTitle: LEGACY_JA.typeExpense,
+    donutIncomeTitle: LEGACY_JA.typeIncome,
 
     // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
     menuAria: 'メニュー',

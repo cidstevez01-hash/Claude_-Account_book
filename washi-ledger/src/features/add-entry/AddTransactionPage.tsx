@@ -187,9 +187,11 @@ export function AddTransactionPage() {
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface paper-grid-bg overflow-hidden"
+      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
+      {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
+          上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致 */}
       <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
         <button type="button" aria-label="返回" onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface">
           <span className="material-symbols-outlined">arrow_back</span>
@@ -198,7 +200,7 @@ export function AddTransactionPage() {
         <div className="w-10" />
       </header>
 
-      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-40">
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-40 paper-grid-bg">
        {/* entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染分类/支付方式
            选择器会闪一下"英文图标名+统一灰色"的半成品画面——之前用if(!catalog)return null
            整页提前返回，连header/返回按钮都出不来，真机上就是"进App白屏一段时间"；改成

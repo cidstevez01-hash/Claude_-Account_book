@@ -43,7 +43,7 @@ export function TrendLegend({
         {selectedBucket.detailSegments.length === 0 ? (
           <p className="text-body-md text-on-surface-variant text-center py-2">{t('noRecordsThisDay')}</p>
         ) : (
-          <ScrollLegendList key={selectedBucket.label} rowHeight={30}>
+          <ScrollLegendList key={selectedBucket.label}>
             <div className="flex flex-col gap-1">
               {selectedBucket.detailSegments.map((seg) => (
                 <div key={seg.key} className="flex items-center gap-2 py-1">
@@ -65,7 +65,7 @@ export function TrendLegend({
   if (aggregate.length === 0) return null
 
   return (
-    <ScrollLegendList key={resetKey} rowHeight={30}>
+    <ScrollLegendList key={resetKey}>
       <div className="flex flex-col gap-1 mt-sm">
         {aggregate.map((item) => (
           <div
