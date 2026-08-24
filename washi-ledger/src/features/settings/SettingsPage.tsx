@@ -82,7 +82,7 @@ export function SettingsPage() {
   const { settings, update } = useSettings()
 
   return (
-    <AppLayout title={t('settingsTitle')}>
+    <AppLayout title={t('settingsTitle')} leftButton="back">
       <div className="px-md pt-md flex flex-col gap-2">
         <SelectRow
           icon="language"
