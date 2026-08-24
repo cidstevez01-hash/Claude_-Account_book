@@ -180,11 +180,29 @@ export function AddTransactionPage() {
       createdAt: base?.createdAt ?? Date.now(),
     }
     await upsertEntry(entry, user.id)
-    // B-12：保存后之前是navigate(-1)(回上一页)，新建场景大多是从仪表盘FAB进来的，
-    // 回去之后新记录可能不在当前显示的日期区间/滚动位置里，等于白跳。改成统一跳到
-    // 明细页并把日期区间调整到覆盖这条记录所在的月份、滚动定位+高亮这一条，编辑/
-    // 复制也走同一个逻辑，不用区分"从哪来的"
-    navigate('/history', { state: { focusEntryId: entry.id, focusDate: entry.date } })
+    // B-12：新建/复制会产生一条"新位置"的记录(日期/所在月份可能跟进来之前完全不同)，
+    // 原来统一navigate(-1)会回到进来之前那页，但那页不一定能看到这条新记录，等于白跳。
+    // 这两种场景改跳明细页，日期区间调整到覆盖这条记录所在的月份、滚动定位+高亮。
+    // 编辑不一样：改的还是同一条、位置没变，用户是从哪条记录点进来编辑的，保存完应该
+    // 还回到那个位置(不管是仪表盘还是明细页)，不需要专门跳明细页去"找"它，改成跟"取消"
+    // 一样单纯navigate(-1)记住原位置，不重新跳转
+    if (mode === 'edit') {
+      navigate(-1)
+    } else {
+      navigate('/history', { state: { focusEntryId: entry.id, focusDate: entry.date } })
+    }
+  }
+
+  // 点"返回"(不保存，放弃改动)——编辑本来就不产生新位置，跟保存一样单纯navigate(-1)
+  // 记住原位置。复制取消了虽然没真的创建新记录，但用户是从"要复制的那条"点进来的，
+  // 跳明细页定位回那条原始记录，体验跟保存一致。纯新建没有"来源记录"可定位，也是
+  // navigate(-1)
+  function handleBack() {
+    if (mode !== 'edit' && sourceEntry) {
+      navigate('/history', { state: { focusEntryId: sourceEntry.id, focusDate: sourceEntry.date } })
+    } else {
+      navigate(-1)
+    }
   }
 
   const pageTitle = mode === 'edit' ? t('editTitle') : mode === 'copy' ? t('copyTitle') : t('addTitle')
@@ -197,7 +215,7 @@ export function AddTransactionPage() {
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
           上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致 */}
       <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
-        <button type="button" aria-label="返回" onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface">
+        <button type="button" aria-label="返回" onClick={handleBack} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <h1 className="font-serif text-headline-md text-on-surface tracking-tight">{pageTitle}</h1>

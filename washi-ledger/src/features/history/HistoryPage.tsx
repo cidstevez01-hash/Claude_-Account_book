@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
@@ -14,6 +14,7 @@ import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { firstOfMonthStr, lastOfMonthStr, firstOfMonthStrFor, lastOfMonthStrFor } from '../../lib/date'
+import { loadHistoryViewMemory, saveHistoryViewMemory } from '../../lib/historyViewMemory'
 import type { EntryType } from '../../types'
 
 /** B-12：新建/编辑/复制保存后从AddTransactionPage带过来的导航state——要定位到
@@ -37,6 +38,7 @@ export function HistoryPage() {
   const location = useLocation()
   const navState = location.state as HistoryLocationState | null
   const [focusEntryId, setFocusEntryId] = useState<string | null>(navState?.focusEntryId ?? null)
+  const mainRef = useRef<HTMLElement>(null)
 
   const categories = useMemo(
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
@@ -48,19 +50,16 @@ export function HistoryPage() {
     [entries, settings.currency, rates]
   )
 
-  const [search, setSearch] = useState('')
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
-  // 起止日期区间——跟仪表盘顶部(#8)同一个DateRangeBar组件、同一套校验逻辑(#9)，
-  // 默认值也保持一致：当月完整一个月(1日到月末)，不是"1日到今天"(那样月中打开时
-  // 后半个月的数据会被默认区间挡在外面，看起来像"缺失"/"搜不到")。B-12：如果是
-  // 从保存记账跳转过来定位某条记录，区间改成覆盖那条记录所在的月份，不然默认
-  // 当月区间可能根本不包含它(比如补记了一笔上个月的账)，定位无从谈起
-  const [startDate, setStartDate] = useState(() =>
-    navState?.focusDate ? firstOfMonthStrFor(navState.focusDate) : firstOfMonthStr()
-  )
-  const [endDate, setEndDate] = useState(() =>
-    navState?.focusDate ? lastOfMonthStrFor(navState.focusDate) : lastOfMonthStr()
-  )
+  // 明细页每次从别的页面导航回来都是全新挂载的组件实例(这个App的路由结构没有共享
+  // Outlet布局)，筛选条件/滚动位置本来会全部重置。改成挂载时优先读上次离开前记住
+  // 的状态(见lib/historyViewMemory.ts)，只有从没来过(memory是null)才用"当月"这个
+  // 出厂默认值。B-12的focusDate只在"记住的区间本来就盖不住这条记录"时才用来临时
+  // 顶替区间(下面的定位effect里做，不在这里)，不再无条件用focusDate覆盖记住的筛选
+  const remembered = loadHistoryViewMemory()
+  const [search, setSearch] = useState(() => remembered?.search ?? '')
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>(() => remembered?.typeFilter ?? 'all')
+  const [startDate, setStartDate] = useState(() => remembered?.startDate ?? firstOfMonthStr())
+  const [endDate, setEndDate] = useState(() => remembered?.endDate ?? lastOfMonthStr())
 
   const filtered = useMemo(() => {
     const keyword = search.trim().toLowerCase()
@@ -76,17 +75,79 @@ export function HistoryPage() {
     })
   }, [displayEntries, typeFilter, startDate, endDate, search, categories])
 
-  // B-12：等目标记录真的出现在DOM里(EntryCard带id="entry-<id>")才滚过去，catalog/
-  // 列表数据到位的时机不确定，所以依赖这几个可能让目标行渲染出来的值，滚到之后
-  // 停留几秒(给用户看清是哪一条)再把focusEntryId清空，高亮态跟着一起自动退场
+  // 挂载时先把滚动位置瞬间还原到记住的值(useLayoutEffect在浏览器画第一帧之前跑，
+  // 不会先闪一下顶部再跳)，不管这次是不是带着focusEntryId进来的——用户体感是"回到
+  // 我刚才在的地方"，新建/复制场景下面那个effect会接着从这个位置平滑滚到新记录，
+  // 而不是固定从最顶上开始滚
+  const scrollRestoredRef = useRef(false)
+  useLayoutEffect(() => {
+    if (scrollRestoredRef.current || !catalog) return
+    if (remembered && mainRef.current) {
+      mainRef.current.scrollTop = remembered.scrollTop
+    }
+    scrollRestoredRef.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalog])
+
+  // B-12：定位到新建/编辑/复制的那条记录。如果这条记录被当前(记住的)筛选条件挡住了
+  // (不在日期区间/类型不符/搜索关键字过滤掉)，依次放宽挡住它的那一个维度，而不是
+  // 整个重置成"当月"——放宽后触发重渲染，effect会再跑一次接着检查下一个维度，直到
+  // 记录真的能出现在filtered里为止，再真正滚过去+高亮。放宽后的筛选会被下面的
+  // "离开时存记忆"逻辑记住，下次回来就是放宽后的状态，不是又变回原来那个
   useEffect(() => {
     if (!focusEntryId || !catalog) return
+    const target = entries.find((e) => e.id === focusEntryId)
+    if (!target) return // 新记录还没同步进本地entries(等mergeRemote拉回来)，等下一轮
+    if (target.date < startDate || target.date > endDate) {
+      setStartDate(firstOfMonthStrFor(target.date))
+      setEndDate(lastOfMonthStrFor(target.date))
+      return
+    }
+    if (typeFilter !== 'all' && target.type !== typeFilter) {
+      setTypeFilter('all')
+      return
+    }
+    const keyword = search.trim().toLowerCase()
+    if (keyword) {
+      const cat = categories.find((c) => c.code === target.catCode)
+      const haystack = `${cat?.zh ?? ''}${cat?.ja ?? ''}${target.note ?? ''}`.toLowerCase()
+      if (!haystack.includes(keyword)) {
+        setSearch('')
+        return
+      }
+    }
     const el = document.getElementById(`entry-${focusEntryId}`)
     if (!el) return
     el.scrollIntoView({ behavior: 'smooth', block: 'center' })
     const timer = setTimeout(() => setFocusEntryId(null), 2500)
     return () => clearTimeout(timer)
-  }, [focusEntryId, catalog, filtered])
+  }, [focusEntryId, catalog, entries, startDate, endDate, typeFilter, search, categories])
+
+  // 离开明细页(路由切走/组件卸载)前把当前筛选+滚动位置存起来，供下次挂载还原。用ref
+  // 存"最新值"而不是直接把state放进这个effect的依赖数组——不然筛选/滚动每变一次就要
+  // 重新挂一次scroll监听器，这里只需要真正卸载的那一刻才落盘一次
+  const latestViewRef = useRef({ startDate, endDate, typeFilter, search, scrollTop: 0 })
+  useEffect(() => {
+    latestViewRef.current.startDate = startDate
+    latestViewRef.current.endDate = endDate
+    latestViewRef.current.typeFilter = typeFilter
+    latestViewRef.current.search = search
+  })
+  useEffect(() => {
+    const el = mainRef.current
+    function onScroll() {
+      if (el) latestViewRef.current.scrollTop = el.scrollTop
+    }
+    el?.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      el?.removeEventListener('scroll', onScroll)
+      // latestViewRef不是指向React渲染的DOM节点，是纯数据存放用的ref，上面那个
+      // 无依赖数组的effect每次渲染后都会把它同步成最新值，卸载时读到的就是最新的，
+      // 不存在"读到过期DOM引用"这个lint规则本来想防的问题
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      saveHistoryViewMemory({ ...latestViewRef.current })
+    }
+  }, [])
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
@@ -110,7 +171,7 @@ export function HistoryPage() {
   }
 
   return (
-    <AppLayout title={t('tabHistory')} onRefresh={handleRefresh}>
+    <AppLayout title={t('tabHistory')} onRefresh={handleRefresh} mainRef={mainRef}>
       <section className="flex flex-col gap-sm px-md pt-md">
         <div className="relative w-full">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">
