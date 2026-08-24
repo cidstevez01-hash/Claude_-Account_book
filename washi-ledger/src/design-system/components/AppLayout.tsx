@@ -48,7 +48,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
           <button
             type="button"
             aria-label={t('menuAria')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors"
             onClick={() => setDrawerOpen(true)}
           >
             <span className="material-symbols-outlined">{APP_ICONS.menu}</span>
@@ -57,7 +57,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
           <button
             type="button"
             aria-label={t('backToDashboardAria')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors"
             onClick={() => navigate('/')}
           >
             <span className="material-symbols-outlined">home</span>
@@ -69,7 +69,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
           <button
             type="button"
             aria-label={t('backLabel')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors"
             onClick={() => navigate(-1)}
           >
             <span className="material-symbols-outlined">arrow_back</span>
@@ -90,7 +90,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
           <Link
             to="/account"
             aria-label={t('accountTitle')}
-            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
+            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors"
           >
             <span className="material-symbols-outlined">{APP_ICONS.account}</span>
           </Link>

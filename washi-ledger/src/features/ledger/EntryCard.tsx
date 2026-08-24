@@ -97,7 +97,7 @@ export function EntryCard({
         <div className="flex items-center justify-around py-2 px-md bg-surface-container-low border-t border-dashed border-outline-variant/30">
           <button
             type="button"
-            className="flex flex-col items-center gap-1 text-on-surface-variant"
+            className="flex flex-col items-center gap-1 text-on-surface-variant active:opacity-60 transition-opacity"
             onClick={() => onEdit?.(entry)}
           >
             <span className="material-symbols-outlined text-[20px]">edit</span>
@@ -105,7 +105,7 @@ export function EntryCard({
           </button>
           <button
             type="button"
-            className="flex flex-col items-center gap-1 text-on-surface-variant"
+            className="flex flex-col items-center gap-1 text-on-surface-variant active:opacity-60 transition-opacity"
             onClick={() => onCopy?.(entry)}
           >
             <span className="material-symbols-outlined text-[20px]">content_copy</span>
@@ -113,7 +113,7 @@ export function EntryCard({
           </button>
           <button
             type="button"
-            className="flex flex-col items-center gap-1 text-primary"
+            className="flex flex-col items-center gap-1 text-primary active:opacity-60 transition-opacity"
             onClick={() => onDelete?.(entry)}
           >
             <span className="material-symbols-outlined text-[20px]">delete</span>
