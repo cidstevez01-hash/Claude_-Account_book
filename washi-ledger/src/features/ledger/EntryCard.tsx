@@ -14,12 +14,28 @@ interface EntryCardProps {
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
+  /** DOM id，配合B-12"保存后跳转定位到这条记录"用scrollIntoView找它 */
+  id?: string
+  /** B-12：新建/编辑/复制保存后跳到明细页，需要有个视觉提示告诉用户"就是这条"，
+   * 不是只把它滚到可视范围就完事——短暂高亮几秒后自动退场 */
+  highlighted?: boolean
 }
 
 /** 单条记账记录的可展开卡片(点击展开编辑/复制/删除操作抽屉)，照design-assets-v2/_44的
  * "Expanded Action Drawer"实现。仪表盘的最近记录列表和明细页的完整列表共用这个组件，
  * 避免同一段UI在两个页面各写一遍。 */
-export function EntryCard({ entry, category, paymentMethod, expanded, onToggle, onEdit, onCopy, onDelete }: EntryCardProps) {
+export function EntryCard({
+  entry,
+  category,
+  paymentMethod,
+  expanded,
+  onToggle,
+  onEdit,
+  onCopy,
+  onDelete,
+  id,
+  highlighted,
+}: EntryCardProps) {
   const { t, lang } = useI18n()
   const isIncome = entry.type === 'income'
   // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)；
@@ -31,7 +47,12 @@ export function EntryCard({ entry, category, paymentMethod, expanded, onToggle, 
       : catLabel(category, lang)
     : entry.note || '—'
   return (
-    <div className="entry-card flex flex-col bg-surface-container-lowest mb-2 overflow-hidden">
+    <div
+      id={id}
+      className={`entry-card flex flex-col bg-surface-container-lowest mb-2 overflow-hidden transition-shadow duration-500 ${
+        highlighted ? 'ring-2 ring-primary' : ''
+      }`}
+    >
       <button type="button" className="flex items-center p-3 text-left" onClick={onToggle}>
         <div
           className="w-[38px] h-[38px] rounded-full flex items-center justify-center mr-3 shrink-0"

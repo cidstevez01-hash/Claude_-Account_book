@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
@@ -13,8 +13,16 @@ import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
-import { firstOfMonthStr, lastOfMonthStr } from '../../lib/date'
+import { firstOfMonthStr, lastOfMonthStr, firstOfMonthStrFor, lastOfMonthStrFor } from '../../lib/date'
 import type { EntryType } from '../../types'
+
+/** B-12：新建/编辑/复制保存后从AddTransactionPage带过来的导航state——要定位到
+ * 哪条记录、那条记录是哪天的(用来把日期区间调整成能覆盖到它所在的月份，不然
+ * 默认当月区间可能根本不包含这条记录，定位无从谈起) */
+interface HistoryLocationState {
+  focusEntryId?: string
+  focusDate?: string
+}
 
 type TypeFilter = 'all' | EntryType
 
@@ -26,6 +34,9 @@ export function HistoryPage() {
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
   const navigate = useNavigate()
+  const location = useLocation()
+  const navState = location.state as HistoryLocationState | null
+  const [focusEntryId, setFocusEntryId] = useState<string | null>(navState?.focusEntryId ?? null)
 
   const categories = useMemo(
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
@@ -41,9 +52,15 @@ export function HistoryPage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   // 起止日期区间——跟仪表盘顶部(#8)同一个DateRangeBar组件、同一套校验逻辑(#9)，
   // 默认值也保持一致：当月完整一个月(1日到月末)，不是"1日到今天"(那样月中打开时
-  // 后半个月的数据会被默认区间挡在外面，看起来像"缺失"/"搜不到")
-  const [startDate, setStartDate] = useState(() => firstOfMonthStr())
-  const [endDate, setEndDate] = useState(() => lastOfMonthStr())
+  // 后半个月的数据会被默认区间挡在外面，看起来像"缺失"/"搜不到")。B-12：如果是
+  // 从保存记账跳转过来定位某条记录，区间改成覆盖那条记录所在的月份，不然默认
+  // 当月区间可能根本不包含它(比如补记了一笔上个月的账)，定位无从谈起
+  const [startDate, setStartDate] = useState(() =>
+    navState?.focusDate ? firstOfMonthStrFor(navState.focusDate) : firstOfMonthStr()
+  )
+  const [endDate, setEndDate] = useState(() =>
+    navState?.focusDate ? lastOfMonthStrFor(navState.focusDate) : lastOfMonthStr()
+  )
 
   const filtered = useMemo(() => {
     const keyword = search.trim().toLowerCase()
@@ -58,6 +75,18 @@ export function HistoryPage() {
       return true
     })
   }, [displayEntries, typeFilter, startDate, endDate, search, categories])
+
+  // B-12：等目标记录真的出现在DOM里(EntryCard带id="entry-<id>")才滚过去，catalog/
+  // 列表数据到位的时机不确定，所以依赖这几个可能让目标行渲染出来的值，滚到之后
+  // 停留几秒(给用户看清是哪一条)再把focusEntryId清空，高亮态跟着一起自动退场
+  useEffect(() => {
+    if (!focusEntryId || !catalog) return
+    const el = document.getElementById(`entry-${focusEntryId}`)
+    if (!el) return
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const timer = setTimeout(() => setFocusEntryId(null), 2500)
+    return () => clearTimeout(timer)
+  }, [focusEntryId, catalog, filtered])
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
@@ -139,6 +168,7 @@ export function HistoryPage() {
             categories={categories}
             paymentMethods={catalog.paymentMethods}
             currency={settings.currency}
+            focusEntryId={focusEntryId}
             onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
             onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
             onDelete={(entry) => setPendingDeleteId(entry.id)}
