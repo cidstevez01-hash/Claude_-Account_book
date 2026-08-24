@@ -28,9 +28,13 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface paper-grid-bg overflow-hidden"
+      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
+      {/* B-08：paper-grid-bg之前贴在这个根容器上，顶部安全区(header上方那一小条，
+          没有header遮住)会透出方格纹理，跟正下方header的纯色bg-surface不一致，看起来
+          像缺了一块。改成只贴在真正的内容滚动区(main)上，根容器/header都保持纯色，
+          这样安全区跟header视觉一致 */}
       <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
         {leftButton === 'menu' ? (
           <button
@@ -69,7 +73,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
 
       <main
         ref={containerRef}
-        className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32"
+        className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32 paper-grid-bg"
         style={
           onRefresh
             ? { paddingTop: pullDistance, transition: dragging ? 'none' : 'padding-top 0.2s ease' }

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { DonutRing } from '../../design-system/components/DonutRing'
 import { ScrollLegendList } from '../../design-system/components/ScrollLegendList'
 import { useI18n } from '../../lib/i18n'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { tagBreakdownRange, type CategoryShare } from '../../data/summary'
 import { tagLabel } from '../../lib/catalogLabel'
+import { activeTintColor } from '../../lib/color'
 import type { Entry, EntryType, Tag } from '../../types'
 
 interface TagDimensionProps {
@@ -126,7 +127,7 @@ export function CategoryDonutCard({
               <DonutRing shares={shares.map((s) => ({ key: s.catCode, color: s.color, ratio: s.ratio }))} />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-sans text-on-surface-variant uppercase">
-                  {tab === 'expense' ? 'Total Expenses' : 'Total Income'}
+                  {tab === 'expense' ? t('donutExpenseTitle') : t('donutIncomeTitle')}
                 </span>
                 <span className="font-serif text-stat-figure text-primary">
                   {formatCurrency(total, currency)}
@@ -152,7 +153,11 @@ export function CategoryDonutCard({
                         onSelectCategory?.(share.catCode, tab)
                       }
                     }}
-                    className="flex items-center gap-3 py-1 border-b border-dashed border-outline-variant/30 text-left active:opacity-70"
+                    // B-13：点击图例的选中/按压反馈——照旧App.legend-row.clickable-legend
+                    // 真实样式搬：按下时用这一行分类自己的颜色轻轻染一下背景(不是通用的
+                    // opacity变暗)，圆角+左右负margin把按压区域撑得比内容宽一点
+                    style={{ '--legend-bg': activeTintColor(share.color, 0.22) } as CSSProperties}
+                    className="flex items-center gap-3 py-1 px-1.5 -mx-1.5 rounded-[10px] border-b border-dashed border-outline-variant/30 text-left transition-colors active:bg-[var(--legend-bg)]"
                   >
                     <div className="w-3 h-3 rounded-full shrink-0" style={{ background: share.color }} />
                     <span className="text-body-md text-on-surface flex-1 truncate">{share.label}</span>
