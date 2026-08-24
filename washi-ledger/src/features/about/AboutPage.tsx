@@ -8,7 +8,7 @@ import { useI18n } from '../../lib/i18n'
 export function AboutPage() {
   const { t } = useI18n()
   return (
-    <AppLayout title={t('aboutTitle')}>
+    <AppLayout title={t('aboutTitle')} leftButton="back">
       <div className="flex flex-col items-center px-md pt-xl pb-lg text-center">
         <div className="w-20 h-20 rounded-2xl bg-primary-fixed flex items-center justify-center mb-md">
           <span className="material-symbols-outlined text-4xl text-primary">menu_book</span>

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { I18nProvider } from './lib/i18n'
 import { SettingsProvider } from './hooks/useSettings'
 import { CatalogProvider } from './hooks/useCatalog'
+import { DrawerProvider } from './hooks/useDrawer'
 import { DashboardPage } from './features/ledger/DashboardPage'
 import { HistoryPage } from './features/history/HistoryPage'
 import { StatsPage } from './features/stats/StatsPage'
@@ -20,19 +21,21 @@ export default function App() {
       <I18nProvider>
         <CatalogProvider>
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/history" element={<HistoryPage />} />
-              <Route path="/stats" element={<StatsPage />} />
-              <Route path="/add" element={<AddTransactionPage />} />
-              <Route path="/rate" element={<RatePage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/theme" element={<ThemePage />} />
-              <Route path="/account" element={<AccountPage />} />
-              <Route path="/signin" element={<SignInPage />} />
-              <Route path="/register" element={<SignUpPage />} />
-              <Route path="/about" element={<AboutPage />} />
-            </Routes>
+            <DrawerProvider>
+              <Routes>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/history" element={<HistoryPage />} />
+                <Route path="/stats" element={<StatsPage />} />
+                <Route path="/add" element={<AddTransactionPage />} />
+                <Route path="/rate" element={<RatePage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/theme" element={<ThemePage />} />
+                <Route path="/account" element={<AccountPage />} />
+                <Route path="/signin" element={<SignInPage />} />
+                <Route path="/register" element={<SignUpPage />} />
+                <Route path="/about" element={<AboutPage />} />
+              </Routes>
+            </DrawerProvider>
           </BrowserRouter>
         </CatalogProvider>
       </I18nProvider>

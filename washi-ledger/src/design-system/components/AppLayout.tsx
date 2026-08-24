@@ -1,18 +1,21 @@
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
 import { CloudDisconnectBanner } from './CloudDisconnectBanner'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
+import { useDrawer } from '../../hooks/useDrawer'
 import { usePullToRefresh } from '../../hooks/usePullToRefresh'
 
 interface AppLayoutProps {
   title: string
   children: ReactNode
   /** 左上角按钮：'menu'(默认，点开抽屉导航)/'home'(小房子，直接跳回仪表盘，不带
-   * 抽屉——我的账户页用这个，不需要再从这里进抽屉) */
-  leftButton?: 'menu' | 'home'
+   * 抽屉——我的账户页用这个，不需要再从这里进抽屉)/'back'(返回箭头，R-18：汇率换算/
+   * 设置/about这三个从抽屉进来的子页面用这个——同时隐藏底部导航栏、右上角账户按钮、
+   * 不渲染抽屉本身，跟"主页面"(仪表盘/明细/统计/我的账户)视觉上区分成两层) */
+  leftButton?: 'menu' | 'home' | 'back'
   /** 下拉刷新(R-17)——只有传了这个才会启用手势监听/显示指示器，不传就是原来的普通
    * 页面(比如"我的账户"/"设置"这类没有"重新拉取数据"这个概念的页面)。四个大页面
    * (仪表盘/明细/统计/汇率换算)各自传自己的数据刷新函数，必须返回Promise——指示器
@@ -21,10 +24,15 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: AppLayoutProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  // R-18：抽屉展开状态改用跨路由共享的Context(见useDrawer.tsx)，不再是这个组件的
+  // 本地state——汇率换算/设置/about这几个"从抽屉进来的子页面"各自有自己独立的
+  // AppLayout实例(不同路由页面，不是同一个组件实例)，返回上一页时要"记得"抽屉当时
+  // 是展开的，本地state做不到这一点(实例卸载就清空了)
+  const { open: drawerOpen, setOpen: setDrawerOpen } = useDrawer()
   const navigate = useNavigate()
   const { t } = useI18n()
   const { containerRef, pullDistance, refreshing, dragging, threshold } = usePullToRefresh<HTMLElement>(onRefresh)
+  const isSubpage = leftButton === 'back'
 
   return (
     <div
@@ -45,7 +53,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
           >
             <span className="material-symbols-outlined">{APP_ICONS.menu}</span>
           </button>
-        ) : (
+        ) : leftButton === 'home' ? (
           <button
             type="button"
             aria-label={t('backToDashboardAria')}
@@ -53,6 +61,18 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
             onClick={() => navigate('/')}
           >
             <span className="material-symbols-outlined">home</span>
+          </button>
+        ) : (
+          // R-18：返回上一页(不是固定跳仪表盘)——这几个子页面是从抽屉哪个主页面点进来的
+          // 不一定，navigate(-1)回到真正来源的那一页，抽屉展开状态本身靠上面的共享
+          // Context自然"记得"，这里不用额外传状态
+          <button
+            type="button"
+            aria-label={t('backLabel')}
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
+            onClick={() => navigate(-1)}
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
           </button>
         )}
         {/* 照旧仓库index.html的.papercut真实效果复用(不是随手写的模糊阴影)：8层描边阴影
@@ -62,13 +82,19 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
         <h1 className="font-serif text-headline-lg font-extrabold text-primary tracking-tight [text-shadow:1.5px_0_0_var(--color-surface),-1.5px_0_0_var(--color-surface),0_1.5px_0_var(--color-surface),0_-1.5px_0_var(--color-surface),1px_1px_0_var(--color-surface),-1px_-1px_0_var(--color-surface),1px_-1px_0_var(--color-surface),-1px_1px_0_var(--color-surface),3px_4px_0_rgba(35,26,19,0.16)]">
           {title}
         </h1>
-        <Link
-          to="/account"
-          aria-label={t('accountTitle')}
-          className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
-        >
-          <span className="material-symbols-outlined">{APP_ICONS.account}</span>
-        </Link>
+        {/* R-18：右上角在子页面不显示任何东西——用一个等宽的空div占位，让标题(左右各
+            靠一个w-10按钮/占位)还能居中，不是直接不渲染导致标题偏向左边 */}
+        {isSubpage ? (
+          <div className="w-10 h-10 -mr-2" />
+        ) : (
+          <Link
+            to="/account"
+            aria-label={t('accountTitle')}
+            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 transition-colors"
+          >
+            <span className="material-symbols-outlined">{APP_ICONS.account}</span>
+          </Link>
+        )}
       </header>
 
       <main
@@ -119,8 +145,16 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
       </main>
 
       <CloudDisconnectBanner />
-      <BottomNav />
-      <NavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      {/* R-18：子页面(汇率换算/设置/about)隐藏底部导航栏；抽屉本身也不渲染——这几个
+          页面左上角是返回箭头，没有汉堡按钮能重新打开它，渲染了也永远打不开、纯粹
+          多余的DOM，而且drawerOpen这个共享状态如果恰好是true(从主页面点进来时抽屉
+          正展开着)，渲染出来反而会在子页面上叠一层不该出现的抽屉遮罩 */}
+      {!isSubpage && (
+        <>
+          <BottomNav />
+          <NavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+        </>
+      )}
     </div>
   )
 }
