@@ -104,9 +104,11 @@ function rowsToTags(tagRows: TagRow[], type: 'expense' | 'income'): Tag[] {
 /** 分类/支付方式是核心数据，拉取失败要整体报错；tags和point_rules是后加的表，
  * 单独try/catch，没跑迁移SQL也不该拖累前面两个的加载(照抄旧仓库index.html的容错逻辑) */
 export async function fetchCatalog(): Promise<Catalog> {
+  // R-16：subcategories/tags也改成软删除了(deleted_at)，这里跟entries一样要过滤掉
+  // 已软删除的行，不然自定义细分/标签删掉之后还会在列表里显示
   const [catRes, subRes, payRes] = await Promise.all([
     supabase.from('categories').select('*'),
-    supabase.from('subcategories').select('*'),
+    supabase.from('subcategories').select('*').is('deleted_at', null),
     supabase.from('payment_methods').select('*'),
   ])
   if (catRes.error) throw catRes.error
@@ -134,7 +136,7 @@ export async function fetchCatalog(): Promise<Catalog> {
   let expenseTags: Tag[] = []
   let incomeTags: Tag[] = []
   try {
-    const tagRes = await supabase.from('tags').select('*')
+    const tagRes = await supabase.from('tags').select('*').is('deleted_at', null)
     if (tagRes.error) throw tagRes.error
     const tagRows = (tagRes.data ?? []) as TagRow[]
     expenseTags = rowsToTags(tagRows, 'expense')
@@ -300,8 +302,10 @@ export async function updateCustomSubcategory(id: string, label: string): Promis
   if (error) throw error
 }
 
+// R-16：改成软删除(标记deleted_at，不再物理删除行)，跟entries/alarms那套同步模式
+// 保持一致的删除策略
 export async function deleteCustomSubcategory(id: string): Promise<void> {
-  const { error } = await supabase.from('subcategories').delete().eq('id', id)
+  const { error } = await supabase.from('subcategories').update({ deleted_at: new Date().toISOString() }).eq('id', id)
   if (error) throw error
 }
 
@@ -321,6 +325,6 @@ export async function updateCustomTag(id: string, label: string): Promise<void> 
 }
 
 export async function deleteCustomTag(id: string): Promise<void> {
-  const { error } = await supabase.from('tags').delete().eq('id', id)
+  const { error } = await supabase.from('tags').update({ deleted_at: new Date().toISOString() }).eq('id', id)
   if (error) throw error
 }

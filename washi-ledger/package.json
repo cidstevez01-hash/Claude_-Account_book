@@ -1,7 +1,7 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260823-dev.12",
+  "version": "0.0.0-20260823-dev.13",
   "type": "module",
   "scripts": {
     "dev": "vite",
