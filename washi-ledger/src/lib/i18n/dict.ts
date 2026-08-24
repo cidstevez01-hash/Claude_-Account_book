@@ -56,6 +56,9 @@ export const dict = {
     ratePopularTitle: '热门汇率', // 新App专属
     rateTrendLabel: '走势', // 新App专属(R-04汇率页重设计新增的趋势图标题，旧App没有这个走势图功能)
     rateNoHistory: '这段时间没有汇率数据', // 新App专属(周末/节假日frankfurter.dev没有发布数据时的真实提示，不补假数据)
+    rateTimeframe1W: '近1周', // 新App专属(R-13：时间范围按钮去掉1D后，剩下三档改用翻译文案，不再直接显示英文缩写)
+    rateTimeframe1M: '近1个月',
+    rateTimeframe1Y: '近1年',
 
     // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
     menuAria: '菜单', // 新App专属(左上角抽屉导航按钮，旧App没有这个汉堡菜单)
@@ -173,6 +176,9 @@ export const dict = {
     ratePopularTitle: '人気の為替レート',
     rateTrendLabel: '推移',
     rateNoHistory: 'この期間のデータはありません',
+    rateTimeframe1W: '過去1週間',
+    rateTimeframe1M: '過去1か月',
+    rateTimeframe1Y: '過去1年',
 
     // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
     menuAria: 'メニュー',
