@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
@@ -21,9 +21,13 @@ interface AppLayoutProps {
    * (仪表盘/明细/统计/汇率换算)各自传自己的数据刷新函数，必须返回Promise——指示器
    * 转圈圈状态靠这个Promise什么时候resolve来收起，不是定时器估算 */
   onRefresh?: () => Promise<void>
+  /** 明细页记忆筛选/滚动位置(B-12后续需求)要拿到真正在滚动的<main>节点自己读写
+   * scrollTop——这个节点是AppLayout内部usePullToRefresh的containerRef，页面组件
+   * 本来碰不到，通过这个可选prop把同一个DOM节点也同步给调用方 */
+  mainRef?: RefObject<HTMLElement | null>
 }
 
-export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: AppLayoutProps) {
+export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mainRef }: AppLayoutProps) {
   // R-18：抽屉展开状态改用跨路由共享的Context(见useDrawer.tsx)，不再是这个组件的
   // 本地state——汇率换算/设置/about这几个"从抽屉进来的子页面"各自有自己独立的
   // AppLayout实例(不同路由页面，不是同一个组件实例)，返回上一页时要"记得"抽屉当时
@@ -98,7 +102,10 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh }: A
       </header>
 
       <main
-        ref={containerRef}
+        ref={(el) => {
+          containerRef.current = el
+          if (mainRef) mainRef.current = el
+        }}
         className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32 paper-grid-bg"
         style={
           onRefresh
