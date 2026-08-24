@@ -3,11 +3,12 @@ import { useI18n } from '../../lib/i18n'
 import { groupByDayPinned } from '../../data/summary'
 import { EntryCard } from './EntryCard'
 import { dayLabel } from './dayLabel'
-import type { Category, Entry } from '../../types'
+import type { Category, Entry, PaymentMethod } from '../../types'
 
 interface RecentEntriesListProps {
   entries: Entry[]
   categories: Category[]
+  paymentMethods: PaymentMethod[]
   onViewAll?: () => void
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
@@ -17,6 +18,7 @@ interface RecentEntriesListProps {
 export function RecentEntriesList({
   entries,
   categories,
+  paymentMethods,
   onViewAll,
   onEdit,
   onCopy,
@@ -65,11 +67,13 @@ export function RecentEntriesList({
             </div>
             {group.entries.map((entry) => {
               const cat = categories.find((c) => c.code === entry.catCode)
+              const pm = paymentMethods.find((p) => p.code === entry.paymentMethod)
               return (
                 <EntryCard
                   key={entry.id}
                   entry={entry}
                   category={cat}
+                  paymentMethod={pm}
                   expanded={expandedId === entry.id}
                   onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
                   onEdit={onEdit}

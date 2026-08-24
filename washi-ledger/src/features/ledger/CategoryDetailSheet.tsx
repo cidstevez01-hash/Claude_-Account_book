@@ -4,7 +4,7 @@ import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from './EntryCard'
 import { dayLabel } from './dayLabel'
 import { useI18n } from '../../lib/i18n'
-import type { Category, Entry } from '../../types'
+import type { Category, Entry, PaymentMethod } from '../../types'
 
 export interface CategoryDetailHeader {
   icon: string
@@ -21,6 +21,7 @@ interface CategoryDetailSheetProps {
    * 一次钻取出来的记录可能横跨好几个不同分类(比如"外食"标签下有餐饮也有交通打车的
    * 记录)，不能像分类维度那样直接假设"列表里所有记录都是header这一个分类" */
   categories: Category[]
+  paymentMethods: PaymentMethod[]
   monthLabel: string
   entries: Entry[]
   /** 顶部总额的显示币种——调用方应该已经用toDisplayEntries()把entries统一换算成
@@ -41,6 +42,7 @@ export function CategoryDetailSheet({
   open,
   header,
   categories,
+  paymentMethods,
   monthLabel,
   entries,
   currency = 'CNY',
@@ -95,6 +97,7 @@ export function CategoryDetailSheet({
                     key={entry.id}
                     entry={entry}
                     category={categories.find((c) => c.code === entry.catCode)}
+                    paymentMethod={paymentMethods.find((p) => p.code === entry.paymentMethod)}
                     expanded={expandedId === entry.id}
                     onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
                     onEdit={onEdit}

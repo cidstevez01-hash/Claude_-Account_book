@@ -132,6 +132,7 @@ export function HistoryPage() {
           <HistoryEntryList
             entries={filtered}
             categories={categories}
+            paymentMethods={catalog.paymentMethods}
             currency={settings.currency}
             onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
             onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
