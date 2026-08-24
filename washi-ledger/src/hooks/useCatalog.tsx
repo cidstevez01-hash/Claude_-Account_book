@@ -6,7 +6,8 @@ interface CatalogContextValue {
   catalog: Catalog | null
   loading: boolean
   error: unknown
-  reload: () => void
+  /** 返回Promise——R-17下拉刷新指示器要等这个真正拉完才收起转圈圈，不是估个时间 */
+  reload: () => Promise<void>
 }
 
 const CatalogContext = createContext<CatalogContextValue | null>(null)
@@ -28,7 +29,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
 
   const reload = useCallback(() => {
     setLoading((prev) => prev || !loadCachedCatalog())
-    fetchCatalog()
+    return fetchCatalog()
       .then((data) => {
         setCatalog(data)
         saveCachedCatalog(data)

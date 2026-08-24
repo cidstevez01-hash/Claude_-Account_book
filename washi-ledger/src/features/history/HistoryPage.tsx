@@ -75,8 +75,13 @@ export function HistoryPage() {
     { key: 'income', label: t('filterIncome') },
   ]
 
+  // R-17：下拉刷新——重新拉一次账目记录+分类/支付方式目录，两个互不依赖并行拉
+  async function handleRefresh() {
+    await Promise.all([reload(), reloadCatalog()])
+  }
+
   return (
-    <AppLayout title={t('tabHistory')}>
+    <AppLayout title={t('tabHistory')} onRefresh={handleRefresh}>
       <section className="flex flex-col gap-sm px-md pt-md">
         <div className="relative w-full">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">
