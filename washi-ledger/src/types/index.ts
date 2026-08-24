@@ -71,8 +71,10 @@ export interface Entry {
 }
 
 export type Lang = 'zh' | 'ja'
-export type ThemeSkin = 'default' // 现有App只有默认+summerB(花火)两套皮肤，新设计只有一套Washi Ledger视觉，
-// 主题选择页(_25)先只做"当前唯一主题"的占位，等以后真的要做多主题再扩展这个union type
+// R-14：新增'nostalgia'("怀旧")主题——颜色/背景改回旧仓库index.html基本主题(--paper/
+// --ink/--grid等)那套暖色调，布局/组件结构完全不变，只切CSS变量(见index.css
+// :root[data-theme="nostalgia"]覆盖块)
+export type ThemeSkin = 'default' | 'nostalgia'
 
 export interface UserSettings {
   lang: Lang

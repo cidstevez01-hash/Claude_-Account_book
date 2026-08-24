@@ -21,6 +21,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(() => loadCachedSettings())
   const prevUserIdRef = useRef<string | null | undefined>(undefined)
 
+  // R-14："怀旧"主题——切换的是根元素上的data-theme属性，index.css里
+  // :root[data-theme="nostalgia"]那块覆盖token靠这个属性生效；写在Provider里而不是
+  // 某个具体页面组件，这样切换主题设置后全局(包括不会重新挂载的AppLayout以外页面，
+  // 比如登录页)立刻跟着变，不用等用户导航到某个特定页面才触发
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', settings.themeSkin)
+  }, [settings.themeSkin])
+
   useEffect(() => {
     const userId = user?.id ?? null
     const wasUserId = prevUserIdRef.current

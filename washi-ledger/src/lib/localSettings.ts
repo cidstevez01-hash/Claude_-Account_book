@@ -16,7 +16,7 @@ export function loadCachedSettings(): UserSettings {
     return {
       lang: parsed.lang === 'zh' ? 'zh' : parsed.lang === 'ja' ? 'ja' : DEFAULT_SETTINGS.lang,
       currency: parsed.currency ?? DEFAULT_SETTINGS.currency,
-      themeSkin: 'default',
+      themeSkin: parsed.themeSkin === 'nostalgia' ? 'nostalgia' : 'default',
     }
   } catch (e) {
     console.error('读取本地设置缓存失败', e)

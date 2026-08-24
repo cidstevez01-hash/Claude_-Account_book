@@ -126,6 +126,44 @@
   --spacing-safe-bottom: 90px;
 }
 
+/* "怀旧"主题(R-14)——保持布局/组件结构完全不变，只覆盖设计token本身，让颜色/背景
+   回到旧仓库index.html"基本"主题(:root那份，不是summerB花火皮肤)的真实取值：
+   --paper#F7F1E7/--card#FFFDF8/--ink#3a2f28/--ink-soft#a99c86/--grid#e7dcc4/
+   --grid-bg#e3e7dd。primary(#d1665a=--seal)/secondary(#7a9b6e=--jade)默认主题本来就
+   已经跟旧App对齐(见上面@theme块B-03那条注释)，这里不用重复覆盖；只需要重新覆盖
+   surface/文字/描边/背景这几组——default主题这几组是偏冷调的浅粉白(#fff8f5)配深棕黑
+   (#231a13)，跟旧App暖调米黄纸(#F7F1E7)配浅棕墨(#3a2f28)是完全不同的两套基调，
+   这正是这次要改的地方。用[data-theme="nostalgia"]属性选择器(比默认:root的
+   :root{@theme块}特异性更高)覆盖，由useSettings.tsx里的effect根据
+   settings.themeSkin写到<html>根元素上。 */
+:root[data-theme="nostalgia"] {
+  --color-surface: #f7f1e7;
+  --color-surface-dim: #ecdfc7;
+  --color-surface-bright: #f7f1e7;
+  --color-surface-container-lowest: #fffdf8;
+  --color-surface-container-low: #fbf6ea;
+  --color-surface-container: #f5eedf;
+  --color-surface-container-high: #f0e7d3;
+  --color-surface-container-highest: #e3e7dd;
+  --color-surface-variant: #e7dcc4;
+  --color-on-surface: #3a2f28;
+  --color-on-surface-variant: #a99c86;
+  --color-inverse-surface: #3a2f28;
+  --color-inverse-on-surface: #f7f1e7;
+  --color-outline: #a99c86;
+  --color-outline-variant: #e7dcc4;
+
+  --color-background: #f7f1e7;
+  --color-on-background: #3a2f28;
+
+  --color-primary-container: #e2897d;
+  --color-on-primary-container: #fffdf8;
+  --color-inverse-primary: #e2897d;
+  --color-primary-fixed-dim: #e2897d;
+  --color-on-primary-fixed: #3a2f28;
+  --color-on-primary-fixed-variant: #a84a3f;
+}
+
 /* html/body/#root钉死height:100%+overflow:hidden——外壳整个固定，不滚动。每个页面
    自己的根容器是position:fixed;inset:0(见AppLayout.tsx等)，真正会滚动的只有页面
    内部的<main>(overflow-y:auto)，body/html本身不再承担滚动职责。这样处理是因为
