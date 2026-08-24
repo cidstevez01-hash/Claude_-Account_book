@@ -90,7 +90,7 @@ export function SignUpPage() {
       )}
 
       <div className="flex flex-col items-center mb-lg">
-        <h1 className="font-serif text-headline-lg text-primary">Washi Ledger</h1>
+        <h1 className="font-serif text-headline-lg text-primary">PigBang</h1>
         <p className="text-label-caps font-sans text-on-surface-variant mt-1">
           {mode === 'signup' ? t('signUpTagline') : t('verifyTagline')}
         </p>
