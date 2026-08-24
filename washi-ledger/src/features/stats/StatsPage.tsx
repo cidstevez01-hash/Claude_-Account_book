@@ -304,6 +304,7 @@ export function StatsPage() {
         open={detailCatCode != null}
         header={detailHeader}
         categories={categories}
+        paymentMethods={paymentMethods}
         monthLabel={trendPeriodLabel}
         entries={detailEntries}
         currency={settings.currency}

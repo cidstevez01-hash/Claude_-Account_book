@@ -1,12 +1,14 @@
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { formatCurrency } from '../../data/currencyDisplay'
-import { catLabel, subLabel } from '../../lib/catalogLabel'
-import type { Category, Entry } from '../../types'
+import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
+import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
+import type { Category, Entry, PaymentMethod } from '../../types'
 
 interface EntryCardProps {
   entry: Entry
   category?: Category
+  paymentMethod?: PaymentMethod
   expanded: boolean
   onToggle: () => void
   onEdit?: (entry: Entry) => void
@@ -17,7 +19,7 @@ interface EntryCardProps {
 /** 单条记账记录的可展开卡片(点击展开编辑/复制/删除操作抽屉)，照design-assets-v2/_44的
  * "Expanded Action Drawer"实现。仪表盘的最近记录列表和明细页的完整列表共用这个组件，
  * 避免同一段UI在两个页面各写一遍。 */
-export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy, onDelete }: EntryCardProps) {
+export function EntryCard({ entry, category, paymentMethod, expanded, onToggle, onEdit, onCopy, onDelete }: EntryCardProps) {
   const { t, lang } = useI18n()
   const isIncome = entry.type === 'income'
   // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)；
@@ -47,7 +49,19 @@ export function EntryCard({ entry, category, expanded, onToggle, onEdit, onCopy,
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-sans text-body-lg font-medium text-on-surface truncate">{title}</p>
-          {entry.note && <p className="text-xs text-on-surface-variant truncate">{entry.note}</p>}
+          {/* R-15：账目明细补上支付方式(图标+文字)，照旧App.entry-meta/.pay-badge真实结构——
+              支付方式徽标和备注同一行并排展示，不是备注单独占一行 */}
+          {(paymentMethod || entry.note) && (
+            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              {paymentMethod && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-on-surface-variant bg-surface-container rounded-md px-1.5 py-px shrink-0">
+                  <PaymentMethodIcon method={paymentMethod} size={12} />
+                  {payLabel(paymentMethod, lang)}
+                </span>
+              )}
+              {entry.note && <span className="text-xs text-on-surface-variant truncate">{entry.note}</span>}
+            </div>
+          )}
         </div>
         <p
           className="font-serif text-entry-amount shrink-0 ml-2"

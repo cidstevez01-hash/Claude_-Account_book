@@ -145,6 +145,7 @@ export function DashboardPage() {
           <RecentEntriesList
             entries={recentEntries}
             categories={categories}
+            paymentMethods={catalog.paymentMethods}
             onViewAll={() => navigate('/history')}
             onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
             onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
@@ -163,6 +164,7 @@ export function DashboardPage() {
             open={detailSelection != null}
             header={detailHeader}
             categories={categories}
+            paymentMethods={catalog.paymentMethods}
             monthLabel={rangeLabel}
             entries={detailEntries}
             currency={settings.currency}
