@@ -35,18 +35,20 @@ export function ThemePage() {
     >
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
           上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致 */}
-      <header className="flex items-center px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
+      <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
         <button
           type="button"
           aria-label={t('backLabel')}
           onClick={() => navigate(-1)}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface"
+          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors"
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="flex-1 text-center font-serif text-headline-md text-on-surface tracking-tight -ml-10">
-          {t('themeLabel')}
-        </h1>
+        <h1 className="font-serif text-headline-md text-on-surface tracking-tight">{t('themeLabel')}</h1>
+        {/* B-14根因：原来h1是flex-1+text-center+-ml-10模拟居中，负margin让h1的不可见
+            边界盖住了左边返回按钮的可点击区域，按钮"看得到点不动"。改成跟AppLayout.tsx
+            同款的"两侧等宽占位+justify-between"布局，不用负margin就不会有点击区域重叠 */}
+        <div className="w-10 h-10 -mr-2" />
       </header>
 
       <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain px-md pt-lg paper-grid-bg">
