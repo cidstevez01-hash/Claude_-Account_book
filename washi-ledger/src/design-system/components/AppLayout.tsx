@@ -126,19 +126,18 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
             style={{ height: pullDistance }}
           >
             {refreshing ? (
-              // B-07：转圈圈样式——参考视频里全程只看到一个小箭头图标，没有拍到明显的
-              // 加载态(网络太快一晃而过)，找不到确切参考帧；不用Material的progress_activity
-              // (虚线分段的圆环，视觉上跟下拉时的箭头是两个不同图标，会跳一下)，改成同一个
-              // "refresh"图标持续旋转，保持下拉→加载两个阶段视觉上是同一个图标在动，不是
-              // 切换成完全不同的符号
-              <span className="material-symbols-outlined animate-spin text-primary" style={{ fontSize: 16 }}>
-                refresh
+              // B-07：加载中改成iOS原生菊花转圈(.ios-spinner，真实实现见index.css)，
+              // 不再用Material的refresh图标transform旋转那套
+              <span className="ios-spinner text-primary">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
+                ))}
               </span>
             ) : (
               <span
                 className="material-symbols-outlined text-primary"
                 style={{
-                  fontSize: 16,
+                  fontSize: 24,
                   opacity: Math.min(1, pullDistance / threshold),
                   transform: `rotate(${Math.min(1, pullDistance / threshold) * 180}deg)`,
                 }}

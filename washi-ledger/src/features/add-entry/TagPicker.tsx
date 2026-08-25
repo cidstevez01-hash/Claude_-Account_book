@@ -10,7 +10,7 @@ interface TagPickerProps {
   selectedTagCode: string | null
   onSelectTag: (code: string | null) => void
   userId: string | null
-  onCatalogChanged: () => void
+  onCatalogChanged: () => Promise<void>
 }
 
 /** 标签选择——单选，再点一下已选中的会取消选中(照旧App"标签允许不选"的逻辑)。
@@ -56,11 +56,13 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
     try {
       if (editingCode === '__new__') {
         const tag = await addCustomTag(type, label, userId)
-        onCatalogChanged()
+        // 同CategoryPicker.tsx确认按钮那处修复：必须等catalog真刷新完再切回展示态，
+        // 不然会先用刷新前的旧tags props闪一下错误内容，等网络请求落地才变成正确名字
+        await onCatalogChanged()
         onSelectTag(tag.code)
       } else if (editingCode) {
         await updateCustomTag(editingCode, label)
-        onCatalogChanged()
+        await onCatalogChanged()
       }
       setEditingCode(null)
       setInputValue('')
@@ -114,49 +116,47 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
         }
         const active = tag.code === selectedTagCode
         if (tag.custom) {
+          // R-XX：跟CategoryPicker.tsx的子分类"⋯"菜单改成同一套结构/样式(照旧App
+          // .sub-menu-btn/.sub-menu-popover真实值)——之前这里是"胶囊+分体more_horiz
+          // 按钮"拼接样式，跟子分类那套18px浮动圆形"⋯"徽标完全是两套不同设计，用户
+          // 反馈两处不搭调，统一成子分类那套(以旧App为准，两处本来就是同一个组件)
           const menuOpen = openMenuCode === tag.code
           return (
-            <span key={tag.id} className="relative">
-              <span className="inline-flex items-center">
-                <button
-                  type="button"
-                  onClick={() => onSelectTag(active ? null : tag.code)}
-                  className={`py-1.5 pl-2.5 pr-1 rounded-l-lg text-tab-label font-sans border ${
-                    active
-                      ? 'bg-primary-fixed text-primary border-primary'
-                      : 'bg-surface-container text-on-surface-variant border-outline-variant'
-                  }`}
-                >
-                  #{tagLabel(tag, lang)}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOpenMenuCode(menuOpen ? null : tag.code)}
-                  className={`py-1.5 px-1 rounded-r-lg border border-l-0 ${
-                    active
-                      ? 'bg-primary-fixed text-primary border-primary'
-                      : 'bg-surface-container text-on-surface-variant border-outline-variant'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[14px]">more_horiz</span>
-                </button>
-              </span>
+            <span key={tag.id} className="relative inline-flex">
+              <button
+                type="button"
+                onClick={() => onSelectTag(active ? null : tag.code)}
+                className={`py-1.5 px-2.5 rounded-lg text-tab-label font-sans border transition-colors ${
+                  active
+                    ? 'bg-secondary-container text-on-secondary-container border-secondary/40'
+                    : 'bg-surface-container text-on-surface-variant border-outline-variant'
+                }`}
+              >
+                #{tagLabel(tag, lang)}
+              </button>
+              <button
+                type="button"
+                onClick={() => setOpenMenuCode(menuOpen ? null : tag.code)}
+                className="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] rounded-full bg-on-surface-variant text-surface text-[11px] font-bold border-2 border-surface flex items-center justify-center leading-none"
+              >
+                ⋯
+              </button>
               {menuOpen && (
-                <div className="absolute z-20 top-full left-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden">
+                <div className="absolute z-20 top-[22px] -right-1.5 bg-surface-container border border-outline-variant rounded-[10px] shadow-lg overflow-hidden min-w-[92px]">
                   <button
                     type="button"
                     onClick={() => startEdit(tag.id, tagLabel(tag, lang))}
-                    className="flex items-center gap-2 px-3 py-2 text-body-md text-on-surface whitespace-nowrap w-full"
+                    className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-on-surface whitespace-nowrap w-full"
                   >
-                    <span className="material-symbols-outlined text-[16px]">edit</span>
+                    <span className="material-symbols-outlined text-[14px]">edit</span>
                     {t('editLabel')}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(tag.id, tag.code)}
-                    className="flex items-center gap-2 px-3 py-2 text-body-md text-primary whitespace-nowrap w-full"
+                    className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-primary whitespace-nowrap w-full"
                   >
-                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                    <span className="material-symbols-outlined text-[14px]">delete</span>
                     {t('deleteLabel')}
                   </button>
                 </div>
