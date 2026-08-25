@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { addCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
@@ -39,25 +39,42 @@ export function CategoryPicker({
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [saving, setSaving] = useState(false)
+  // 照旧仓库index.html的bindInlineSubInput()真实逻辑搬：确认按钮(mousedown阶段
+  // preventDefault，不然点它第一下先让input失焦触发blur)、回车、点别处失焦(blur)
+  // 三条路都能提交，但同一次编辑只能真正提交一次——用settledRef挡住"先blur commit
+  // 一次、按钮的click紧接着又commit一次"这种重复请求。旧App注释里明确写过"不再只靠
+  // 点别处自动保存"是因为用户反馈过找不到保存在哪，所以按钮必须留着，不是可以去掉的
+  // 摆设——blur只是给按钮之外多一条顺手的路，不是替代按钮
+  const settledRef = useRef(true)
 
   function startAdd() {
+    settledRef.current = false
     setEditingCode('__new__')
     setInputValue('')
     setOpenMenuCode(null)
   }
   function startEdit(subId: string, currentLabel: string) {
+    settledRef.current = false
     setEditingCode(subId)
     setInputValue(currentLabel)
     setOpenMenuCode(null)
   }
   function cancelEdit() {
+    settledRef.current = true
     setEditingCode(null)
     setInputValue('')
   }
 
   async function confirmEdit() {
+    if (settledRef.current) return
+    settledRef.current = true
     const label = inputValue.trim()
-    if (!label || !userId || !selectedCat || saving) return
+    // 没输入内容/没登录/没选中分类——等同于取消，直接退出编辑态，不发请求存空值
+    if (!label || !userId || !selectedCat) {
+      setEditingCode(null)
+      setInputValue('')
+      return
+    }
     setSaving(true)
     try {
       if (editingCode === '__new__') {
@@ -68,7 +85,8 @@ export function CategoryPicker({
         await updateCustomSubcategory(editingCode, label)
         onCatalogChanged()
       }
-      cancelEdit()
+      setEditingCode(null)
+      setInputValue('')
     } catch (e) {
       console.error('自定义细分保存失败', e)
     } finally {
@@ -148,10 +166,20 @@ export function CategoryPicker({
                     autoFocus
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') confirmEdit()
+                      if (e.key === 'Escape') cancelEdit()
+                    }}
+                    onBlur={confirmEdit}
                     className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
                   />
-                  <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={confirmEdit}
+                    disabled={saving}
+                    className="text-primary"
+                  >
                     <span className="material-symbols-outlined text-[18px]">check</span>
                   </button>
                 </span>
@@ -214,14 +242,32 @@ export function CategoryPicker({
                 autoFocus
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') confirmEdit()
+                  if (e.key === 'Escape') cancelEdit()
+                }}
+                onBlur={confirmEdit}
                 placeholder={t('newSubPlaceholder')}
                 className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
               />
-              <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
+              {/* 确认/取消按钮都要在mousedown阶段就preventDefault，不然点它们的第一下先让
+                  input失焦触发上面的onBlur=confirmEdit，取消按钮会被抢先当成"确认"存下去
+                  (confirmEdit内部靠settledRef挡了重复提交，但取消这个意图本身就没法达成了) */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={confirmEdit}
+                disabled={saving}
+                className="text-primary"
+              >
                 <span className="material-symbols-outlined text-[18px]">check</span>
               </button>
-              <button type="button" onClick={cancelEdit} className="text-on-surface-variant">
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={cancelEdit}
+                className="text-on-surface-variant"
+              >
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </span>
