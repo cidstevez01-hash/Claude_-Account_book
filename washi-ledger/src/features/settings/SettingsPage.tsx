@@ -105,7 +105,11 @@ export function SettingsPage() {
 
         <SettingsRow icon="palette" label={t('themeLabel')} onClick={() => navigate('/theme')}>
           <div className="flex items-center gap-1">
-            <span>PigBang</span>
+            {/* 之前这里写死显示"PigBang"，跟ThemePage.tsx选卡片切主题完全没接上——
+                切完主题回设置页这一行还是那个死字符串，看起来像"没生效"。改成
+                跟ThemePage.tsx同一套themeDefaultName/themeNostalgiaName翻译键，
+                真实反映settings.themeSkin当前值 */}
+            <span>{settings.themeSkin === 'nostalgia' ? t('themeNostalgiaName') : t('themeDefaultName')}</span>
             <span className="material-symbols-outlined text-[18px]">chevron_right</span>
           </div>
         </SettingsRow>
