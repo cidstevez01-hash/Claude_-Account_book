@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { fetchUserSettings, upsertUserSettings } from '../data/settings'
-import { loadCachedSettings, saveCachedSettings } from '../lib/localSettings'
+import { loadCachedSettings, saveCachedSettings, loadLastSyncedUserId, saveLastSyncedUserId } from '../lib/localSettings'
 import { useAuth } from '../features/auth/useAuth'
 import type { UserSettings } from '../types'
 
@@ -19,7 +19,9 @@ const SettingsContext = createContext<SettingsContextValue | null>(null)
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const [settings, setSettings] = useState<UserSettings>(() => loadCachedSettings())
-  const prevUserIdRef = useRef<string | null | undefined>(undefined)
+  // B-17根因修复：初始值不能是undefined——那样每次App冷启动都会被误判成"刚登录"，
+  // 见localSettings.ts里loadLastSyncedUserId的详细说明
+  const prevUserIdRef = useRef<string | null | undefined>(loadLastSyncedUserId())
 
   // R-14："怀旧"主题——切换的是根元素上的data-theme属性，index.css里
   // :root[data-theme="nostalgia"]那块覆盖token靠这个属性生效；写在Provider里而不是
@@ -35,9 +37,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     prevUserIdRef.current = userId
 
     if (!userId) return // 退出登录：保留当前设置(内存+缓存)不变
-    if (wasUserId === userId) return // 同一账号的普通重渲染
+    saveLastSyncedUserId(userId)
+    // 同一账号的普通重渲染，或者App冷启动后session被supabase-js自动恢复回同一个
+    // 账号——本地缓存已经是这个账号最新的真实设置(含刚切换、还没来得及推上云端的
+    // 主题)，不用去同步，更不能被云端可能还没来得及更新的旧值覆盖
+    if (wasUserId === userId) return
 
-    // 刚从未登录/其他账号切到这个已登录账号——同步一次
+    // 真的换了个账号(不是同一个账号重启恢复)——同步一次
     fetchUserSettings(userId)
       .then(async (remote) => {
         if (remote) {
