@@ -21,10 +21,9 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
   const [editingCode, setEditingCode] = useState<string | null>(null) // tag.id 或 '__new__'
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
-  const [saving, setSaving] = useState(false)
   // 照旧仓库index.html的bindInlineTagInput()真实逻辑搬(跟CategoryPicker的子分类
-  // 输入框是同一套写法)：确认按钮/回车/点别处失焦(blur)三条路都能提交，用settledRef
-  // 挡住"blur先commit一次、按钮的click紧接着又commit一次"这种重复请求
+  // 输入框是同一套写法)：回车、点别处失焦(blur)都能提交，这版去掉了显式确认按钮
+  // (用户明确反馈不需要)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
   const settledRef = useRef(true)
 
   function startAdd() {
@@ -54,7 +53,6 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
       setInputValue('')
       return
     }
-    setSaving(true)
     try {
       if (editingCode === '__new__') {
         const tag = await addCustomTag(type, label, userId)
@@ -68,8 +66,6 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
       setInputValue('')
     } catch (e) {
       console.error('自定义标签保存失败', e)
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -102,15 +98,6 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                 onBlur={confirmEdit}
                 className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label font-sans w-20 focus:outline-none"
               />
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={confirmEdit}
-                disabled={saving}
-                className="text-primary"
-              >
-                <span className="material-symbols-outlined text-[18px]">check</span>
-              </button>
             </span>
           )
         }
@@ -196,17 +183,8 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
             placeholder={t('newTagPlaceholder')}
             className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label font-sans w-20 focus:outline-none"
           />
-          {/* 确认/取消按钮都要在mousedown阶段就preventDefault，不然点它们的第一下先让
-              input失焦触发上面的onBlur=confirmEdit，取消按钮会被抢先当成"确认"存下去 */}
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={confirmEdit}
-            disabled={saving}
-            className="text-primary"
-          >
-            <span className="material-symbols-outlined text-[18px]">check</span>
-          </button>
+          {/* 取消按钮要在mousedown阶段就preventDefault，不然点它的第一下先让input失焦
+              触发上面的onBlur=confirmEdit，把还没删干净的文字当成"确认"存下去 */}
           <button
             type="button"
             onMouseDown={(e) => e.preventDefault()}
