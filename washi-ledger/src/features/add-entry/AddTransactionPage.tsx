@@ -180,29 +180,16 @@ export function AddTransactionPage() {
       createdAt: base?.createdAt ?? Date.now(),
     }
     await upsertEntry(entry, user.id)
-    // B-12：新建/复制会产生一条"新位置"的记录(日期/所在月份可能跟进来之前完全不同)，
-    // 原来统一navigate(-1)会回到进来之前那页，但那页不一定能看到这条新记录，等于白跳。
-    // 这两种场景改跳明细页，日期区间调整到覆盖这条记录所在的月份、滚动定位+高亮。
-    // 编辑不一样：改的还是同一条、位置没变，用户是从哪条记录点进来编辑的，保存完应该
-    // 还回到那个位置(不管是仪表盘还是明细页)，不需要专门跳明细页去"找"它，改成跟"取消"
-    // 一样单纯navigate(-1)记住原位置，不重新跳转
-    if (mode === 'edit') {
-      navigate(-1)
-    } else {
-      navigate('/history', { state: { focusEntryId: entry.id, focusDate: entry.date } })
-    }
+    // 新建/编辑/复制保存后统一navigate(-1)，回到进来之前那个底部大导航页签(仪表盘/
+    // 明细都可能是来源)，不强制跳明细页——"新建"入口目前只在仪表盘的悬浮按钮上，
+    // 保存完跳去明细页反而是跑题了。回到原页面后该页自己的数据请求会重新拉一次，
+    // 列表/统计数字自然刷新，不需要额外传定位状态去手动滚动高亮
+    navigate(-1)
   }
 
-  // 点"返回"(不保存，放弃改动)——编辑本来就不产生新位置，跟保存一样单纯navigate(-1)
-  // 记住原位置。复制取消了虽然没真的创建新记录，但用户是从"要复制的那条"点进来的，
-  // 跳明细页定位回那条原始记录，体验跟保存一致。纯新建没有"来源记录"可定位，也是
-  // navigate(-1)
+  // 点"返回"(不保存，放弃改动)，回到进来之前那个页面，跟保存后的行为一致
   function handleBack() {
-    if (mode !== 'edit' && sourceEntry) {
-      navigate('/history', { state: { focusEntryId: sourceEntry.id, focusDate: sourceEntry.date } })
-    } else {
-      navigate(-1)
-    }
+    navigate(-1)
   }
 
   const pageTitle = mode === 'edit' ? t('editTitle') : mode === 'copy' ? t('copyTitle') : t('addTitle')

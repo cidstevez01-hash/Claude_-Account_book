@@ -17,9 +17,6 @@ interface HistoryEntryListProps {
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
-  /** B-12：新建/编辑/复制保存后跳到明细页要定位到这条记录，传进来给对应的
-   * EntryCard加DOM id(供HistoryPage.tsx做scrollIntoView)+高亮态 */
-  focusEntryId?: string | null
 }
 
 /** 明细页的按日分组列表——跟仪表盘的RecentEntriesList不同点：不限条数、每日标题
@@ -32,7 +29,6 @@ export function HistoryEntryList({
   onEdit,
   onCopy,
   onDelete,
-  focusEntryId,
 }: HistoryEntryListProps) {
   const { t } = useI18n()
   const groups = groupByDay(entries)
@@ -71,8 +67,6 @@ export function HistoryEntryList({
               return (
                 <EntryCard
                   key={entry.id}
-                  id={`entry-${entry.id}`}
-                  highlighted={focusEntryId === entry.id}
                   entry={entry}
                   category={cat}
                   paymentMethod={pm}
