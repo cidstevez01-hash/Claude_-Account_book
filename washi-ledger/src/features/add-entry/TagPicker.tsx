@@ -22,8 +22,8 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
   // 照旧仓库index.html的bindInlineTagInput()真实逻辑搬(跟CategoryPicker的子分类
-  // 输入框是同一套写法)：回车、点别处失焦(blur)都能提交，这版去掉了显式确认按钮
-  // (用户明确反馈不需要)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
+  // 输入框是同一套写法)：确认按钮/回车/点别处失焦(blur)三条路都能提交，没有单独
+  // 的取消按钮(旧App也没有)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
   const settledRef = useRef(true)
 
   function startAdd() {
@@ -98,6 +98,17 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                 onBlur={confirmEdit}
                 className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label font-sans w-20 focus:outline-none"
               />
+              {/* 照旧App.sub-mini-btn.sub-confirm真实样式：22px圆形实心jade底(跟这套
+                  主题token里的--color-secondary正好是同一个色值)+白色对勾；:active
+                  scale(0.88)+opacity(0.7)也是旧App原有的按压反馈 */}
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={confirmEdit}
+                className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
+              >
+                <span className="material-symbols-outlined text-[13px]">check</span>
+              </button>
             </span>
           )
         }
@@ -183,15 +194,13 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
             placeholder={t('newTagPlaceholder')}
             className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label font-sans w-20 focus:outline-none"
           />
-          {/* 取消按钮要在mousedown阶段就preventDefault，不然点它的第一下先让input失焦
-              触发上面的onBlur=confirmEdit，把还没删干净的文字当成"确认"存下去 */}
           <button
             type="button"
             onMouseDown={(e) => e.preventDefault()}
-            onClick={cancelEdit}
-            className="text-on-surface-variant"
+            onClick={confirmEdit}
+            className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <span className="material-symbols-outlined text-[13px]">check</span>
           </button>
         </span>
       ) : (

@@ -38,9 +38,10 @@ export function CategoryPicker({
   const [editingCode, setEditingCode] = useState<string | null>(null) // 具体sub的id=改名，'__new__'=新增，null=都没有
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
-  // 照旧仓库index.html的bindInlineSubInput()真实逻辑搬：回车、点别处失焦(blur)都能
-  // 提交，只是这版去掉了显式确认按钮(用户明确反馈不需要)。同一次编辑只能真正提交
-  // 一次——用settledRef挡住重复触发(比如失焦事件在某些场景下被连续派发两次)
+  // 照旧仓库index.html的bindInlineSubInput()真实逻辑搬：确认按钮(mousedown阶段
+  // preventDefault，不然点它第一下先让input失焦触发blur)、回车、点别处失焦(blur)
+  // 三条路都能提交，没有单独的取消按钮(旧App也没有，只能清空文字再失焦，或者按
+  // Escape)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
   const settledRef = useRef(true)
 
   function startAdd() {
@@ -166,6 +167,17 @@ export function CategoryPicker({
                     onBlur={confirmEdit}
                     className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
                   />
+                  {/* 照旧App.sub-mini-btn.sub-confirm真实样式：22px圆形实心jade底(跟这套
+                      主题token里的--color-secondary正好是同一个色值)+白色对勾，不是纯文字
+                      色图标；:active scale(0.88)+opacity(0.7)也是旧App原有的按压反馈 */}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={confirmEdit}
+                    className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">check</span>
+                  </button>
                 </span>
               )
             }
@@ -234,16 +246,13 @@ export function CategoryPicker({
                 placeholder={t('newSubPlaceholder')}
                 className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
               />
-              {/* 取消按钮要在mousedown阶段就preventDefault，不然点它的第一下先让input失焦
-                  触发上面的onBlur=confirmEdit，把还没删干净的文字当成"确认"存下去，取消
-                  就形同虚设了 */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={cancelEdit}
-                className="text-on-surface-variant"
+                onClick={confirmEdit}
+                className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <span className="material-symbols-outlined text-[13px]">check</span>
               </button>
             </span>
           ) : (
