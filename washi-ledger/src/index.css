@@ -275,3 +275,33 @@ body {
 .tab-bubble.show {
   opacity: 1;
 }
+
+/* B-07：下拉刷新"正在加载"状态改成iOS原生菊花转圈(UIActivityIndicatorView真实
+   效果)，不是Material风格"整个图标本身transform:rotate"——8根辐射短线固定不转，
+   靠animation-delay错开各自的淡出/淡入节奏，制造"转动"的视觉错觉，这才是iOS原生
+   菊花转圈实际的实现原理，跟下拉未达阈值那阶段箭头本身旋转是完全不同的两套动画 */
+.ios-spinner {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.ios-spinner i {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 6px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: 1px 11px;
+  animation: ios-spinner-fade 1s linear infinite;
+}
+@keyframes ios-spinner-fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}

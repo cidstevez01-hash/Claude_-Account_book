@@ -12,7 +12,7 @@ interface CategoryPickerProps {
   onSelectCat: (code: string) => void
   onSelectSub: (code: string | null) => void
   userId: string | null
-  onCatalogChanged: () => void
+  onCatalogChanged: () => Promise<void>
 }
 
 /** 两级分类选择器——一级4列网格(照旧App`.cat-grid`的真实布局，不是Stitch稿的横向
@@ -75,11 +75,16 @@ export function CategoryPicker({
     try {
       if (editingCode === '__new__') {
         const sub = await addCustomSubcategory(selectedCat.code, label, userId)
-        onCatalogChanged()
+        // 必须等catalog真的刷新完再切回展示态——onCatalogChanged是reloadCatalog，
+        // 内部要打一次网络请求拉最新目录。之前没await它就立刻setEditingCode(null)，
+        // input消失、展示态用的还是刷新前那份旧categories/tags props渲染，会先闪一下
+        // 错误/缺失的内容，等这个请求真正落地(有明显网络延迟时能到一两秒)才变成正确
+        // 的新名字——这才是"点确认后要等一阵子才显示正确内容"的真实原因
+        await onCatalogChanged()
         onSelectSub(sub.code)
       } else if (editingCode) {
         await updateCustomSubcategory(editingCode, label)
-        onCatalogChanged()
+        await onCatalogChanged()
       }
       setEditingCode(null)
       setInputValue('')
