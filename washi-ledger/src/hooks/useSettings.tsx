@@ -17,7 +17,7 @@ const SettingsContext = createContext<SettingsContextValue | null>(null)
  * 否则把本地设置推上去当种子数据(跟useEntries.ts同一套"从未登录变成已登录"同步模式)。
  * I18nProvider内部消费这个Context的settings.lang，不再自己单独维护一份language状态。 */
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [settings, setSettings] = useState<UserSettings>(() => loadCachedSettings())
   // B-17根因修复：初始值不能是undefined——那样每次App冷启动都会被误判成"刚登录"，
   // 见localSettings.ts里loadLastSyncedUserId的详细说明
@@ -32,6 +32,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, [settings.themeSkin])
 
   useEffect(() => {
+    // B-17根因(第二层)：useAuth()的user在session真正恢复完成前，每次冷启动都会先
+    // 以null跑一轮(异步ensureSession()还没resolve)，这个effect本来会在那一轮就把
+    // prevUserIdRef.current覆盖成null(在下面的!userId return之前)，等真实session
+    // 恢复、user变成实际账号时，wasUserId读到的是这个被污染的null而不是localStorage
+    // 里存的值，导致"冷启动恢复同一账号"又被误判成"刚登录了一个新账号"，重新触发一次
+    // 用远端覆盖本地的同步——跟B-17原本要修的问题是同一个模式，只是从ref初始值的
+    // undefined换成了运行期间被踩了一脚的null，绕开了第一轮加的localStorage兜底。
+    // 加上loading判断：认证状态还没真正解析出来之前，这个effect完全不跑，等
+    // useAuth()给出一个真正稳定的结果(真实账号/匿名账号/彻底失败后的null)才比较
+    if (authLoading) return
     const userId = user?.id ?? null
     const wasUserId = prevUserIdRef.current
     prevUserIdRef.current = userId
@@ -55,7 +65,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch((e) => console.error('登录同步设置失败', e))
-  }, [user])
+  }, [user, authLoading])
 
   const update = useCallback(
     (patch: Partial<UserSettings>) => {
