@@ -38,13 +38,9 @@ export function CategoryPicker({
   const [editingCode, setEditingCode] = useState<string | null>(null) // 具体sub的id=改名，'__new__'=新增，null=都没有
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
-  const [saving, setSaving] = useState(false)
-  // 照旧仓库index.html的bindInlineSubInput()真实逻辑搬：确认按钮(mousedown阶段
-  // preventDefault，不然点它第一下先让input失焦触发blur)、回车、点别处失焦(blur)
-  // 三条路都能提交，但同一次编辑只能真正提交一次——用settledRef挡住"先blur commit
-  // 一次、按钮的click紧接着又commit一次"这种重复请求。旧App注释里明确写过"不再只靠
-  // 点别处自动保存"是因为用户反馈过找不到保存在哪，所以按钮必须留着，不是可以去掉的
-  // 摆设——blur只是给按钮之外多一条顺手的路，不是替代按钮
+  // 照旧仓库index.html的bindInlineSubInput()真实逻辑搬：回车、点别处失焦(blur)都能
+  // 提交，只是这版去掉了显式确认按钮(用户明确反馈不需要)。同一次编辑只能真正提交
+  // 一次——用settledRef挡住重复触发(比如失焦事件在某些场景下被连续派发两次)
   const settledRef = useRef(true)
 
   function startAdd() {
@@ -75,7 +71,6 @@ export function CategoryPicker({
       setInputValue('')
       return
     }
-    setSaving(true)
     try {
       if (editingCode === '__new__') {
         const sub = await addCustomSubcategory(selectedCat.code, label, userId)
@@ -89,8 +84,6 @@ export function CategoryPicker({
       setInputValue('')
     } catch (e) {
       console.error('自定义细分保存失败', e)
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -173,15 +166,6 @@ export function CategoryPicker({
                     onBlur={confirmEdit}
                     className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
                   />
-                  <button
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={confirmEdit}
-                    disabled={saving}
-                    className="text-primary"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">check</span>
-                  </button>
                 </span>
               )
             }
@@ -250,18 +234,9 @@ export function CategoryPicker({
                 placeholder={t('newSubPlaceholder')}
                 className="py-2 px-3 rounded-full border border-primary bg-surface text-[13px] text-on-surface w-[118px] box-border focus:outline-none"
               />
-              {/* 确认/取消按钮都要在mousedown阶段就preventDefault，不然点它们的第一下先让
-                  input失焦触发上面的onBlur=confirmEdit，取消按钮会被抢先当成"确认"存下去
-                  (confirmEdit内部靠settledRef挡了重复提交，但取消这个意图本身就没法达成了) */}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={confirmEdit}
-                disabled={saving}
-                className="text-primary"
-              >
-                <span className="material-symbols-outlined text-[18px]">check</span>
-              </button>
+              {/* 取消按钮要在mousedown阶段就preventDefault，不然点它的第一下先让input失焦
+                  触发上面的onBlur=confirmEdit，把还没删干净的文字当成"确认"存下去，取消
+                  就形同虚设了 */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
