@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { addCustomTag, updateCustomTag, deleteCustomTag } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { tagLabel } from '../../lib/catalogLabel'
@@ -22,25 +22,38 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [saving, setSaving] = useState(false)
+  // 照旧仓库index.html的bindInlineTagInput()真实逻辑搬(跟CategoryPicker的子分类
+  // 输入框是同一套写法)：确认按钮/回车/点别处失焦(blur)三条路都能提交，用settledRef
+  // 挡住"blur先commit一次、按钮的click紧接着又commit一次"这种重复请求
+  const settledRef = useRef(true)
 
   function startAdd() {
+    settledRef.current = false
     setEditingCode('__new__')
     setInputValue('')
     setOpenMenuCode(null)
   }
   function startEdit(tagId: string, currentLabel: string) {
+    settledRef.current = false
     setEditingCode(tagId)
     setInputValue(currentLabel)
     setOpenMenuCode(null)
   }
   function cancelEdit() {
+    settledRef.current = true
     setEditingCode(null)
     setInputValue('')
   }
 
   async function confirmEdit() {
+    if (settledRef.current) return
+    settledRef.current = true
     const label = inputValue.trim()
-    if (!label || !userId || saving) return
+    if (!label || !userId) {
+      setEditingCode(null)
+      setInputValue('')
+      return
+    }
     setSaving(true)
     try {
       if (editingCode === '__new__') {
@@ -51,7 +64,8 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
         await updateCustomTag(editingCode, label)
         onCatalogChanged()
       }
-      cancelEdit()
+      setEditingCode(null)
+      setInputValue('')
     } catch (e) {
       console.error('自定义标签保存失败', e)
     } finally {
@@ -81,10 +95,20 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
                 autoFocus
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') confirmEdit()
+                  if (e.key === 'Escape') cancelEdit()
+                }}
+                onBlur={confirmEdit}
                 className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label font-sans w-20 focus:outline-none"
               />
-              <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={confirmEdit}
+                disabled={saving}
+                className="text-primary"
+              >
                 <span className="material-symbols-outlined text-[18px]">check</span>
               </button>
             </span>
@@ -164,14 +188,31 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
             autoFocus
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') confirmEdit()
+              if (e.key === 'Escape') cancelEdit()
+            }}
+            onBlur={confirmEdit}
             placeholder={t('newTagPlaceholder')}
             className="py-1.5 px-2.5 rounded-lg border border-primary bg-surface text-tab-label font-sans w-20 focus:outline-none"
           />
-          <button type="button" onClick={confirmEdit} disabled={saving} className="text-primary">
+          {/* 确认/取消按钮都要在mousedown阶段就preventDefault，不然点它们的第一下先让
+              input失焦触发上面的onBlur=confirmEdit，取消按钮会被抢先当成"确认"存下去 */}
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={confirmEdit}
+            disabled={saving}
+            className="text-primary"
+          >
             <span className="material-symbols-outlined text-[18px]">check</span>
           </button>
-          <button type="button" onClick={cancelEdit} className="text-on-surface-variant">
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={cancelEdit}
+            className="text-on-surface-variant"
+          >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </span>
