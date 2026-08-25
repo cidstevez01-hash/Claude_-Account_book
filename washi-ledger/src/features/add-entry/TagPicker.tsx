@@ -16,7 +16,7 @@ interface TagPickerProps {
 /** 标签选择——单选，再点一下已选中的会取消选中(照旧App"标签允许不选"的逻辑)。
  * 自定义标签支持内联新增/改名/删除，逻辑照旧仓库index.html的renderTagGrid()搬；
  * 预设标签(is_preset=true)显示锁形小图标，不给编辑/删除入口 */
-export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, onCatalogChanged }: TagPickerProps) {
+export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, userId, onCatalogChanged }: TagPickerProps) {
   const { t, lang } = useI18n()
   const [editingCode, setEditingCode] = useState<string | null>(null) // tag.id 或 '__new__'
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
@@ -25,6 +25,15 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
   // 输入框是同一套写法)：确认按钮/回车/点别处失焦(blur)三条路都能提交，没有单独
   // 的取消按钮(旧App也没有)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
   const settledRef = useRef(true)
+
+  // 乐观本地补丁——同CategoryPicker.tsx：改名/新增只await单条写入本身，不等一次
+  // 完整目录重新拉取就切回展示态，本地直接摆上改好的名字/新建的项，onCatalogChanged()
+  // 放到后台不阻塞UI地跑
+  const [renameOverrides, setRenameOverrides] = useState<Record<string, string>>({})
+  const [pendingTags, setPendingTags] = useState<Tag[]>([])
+  const tags = rawTags
+    .map((tg) => (renameOverrides[tg.id] ? { ...tg, zh: renameOverrides[tg.id], ja: renameOverrides[tg.id] } : tg))
+    .concat(pendingTags.filter((p) => !rawTags.some((tg) => tg.code === p.code)))
 
   function startAdd() {
     settledRef.current = false
@@ -56,16 +65,15 @@ export function TagPicker({ tags, type, selectedTagCode, onSelectTag, userId, on
     try {
       if (editingCode === '__new__') {
         const tag = await addCustomTag(type, label, userId)
-        // 同CategoryPicker.tsx确认按钮那处修复：必须等catalog真刷新完再切回展示态，
-        // 不然会先用刷新前的旧tags props闪一下错误内容，等网络请求落地才变成正确名字
-        await onCatalogChanged()
+        setPendingTags((arr) => [...arr, tag])
         onSelectTag(tag.code)
       } else if (editingCode) {
         await updateCustomTag(editingCode, label)
-        await onCatalogChanged()
+        setRenameOverrides((o) => ({ ...o, [editingCode]: label }))
       }
       setEditingCode(null)
       setInputValue('')
+      onCatalogChanged().catch((e) => console.error('目录后台刷新失败', e))
     } catch (e) {
       console.error('自定义标签保存失败', e)
     }
