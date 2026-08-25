@@ -68,10 +68,30 @@ export function HistoryPage() {
   const scrollRestoredRef = useRef(false)
   useLayoutEffect(() => {
     if (scrollRestoredRef.current || !catalog) return
-    if (remembered && mainRef.current) {
-      mainRef.current.scrollTop = remembered.scrollTop
+    if (!remembered) {
+      scrollRestoredRef.current = true
+      return
     }
-    scrollRestoredRef.current = true
+    const el = mainRef.current
+    if (!el) return
+    // catalog和entries是两个独立的hook，各自异步就绪，这个effect只依赖catalog——
+    // entries(尤其是从编辑页navigate(-1)回来这种场景，entries hook全新挂载要重新
+    // 走一遍"读缓存→可能还有一次网络合并"的流程)如果比catalog晚到位，这一刻列表
+    // 内容还没撑起来，直接赋值scrollTop会被浏览器夹回0(容器还没那么高，滚不过去)，
+    // 且这个effect只跑一次、不会再重试，"记住的位置"就白记了。改成用rAF反复重试
+    // 几帧，只要内容还没长到能到达目标位置就继续试，真的到了(或者试够10帧还是
+    // 到不了，比如筛选条件让内容本来就比之前矮)才停手
+    let attempts = 0
+    function tryRestore() {
+      el!.scrollTop = remembered!.scrollTop
+      attempts++
+      if (el!.scrollTop < remembered!.scrollTop && attempts < 10) {
+        requestAnimationFrame(tryRestore)
+      } else {
+        scrollRestoredRef.current = true
+      }
+    }
+    tryRestore()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog])
 
