@@ -107,7 +107,8 @@ export function AddTransactionPage() {
     if (categories.length === 0) return
     if (!catCode || !categories.find((c) => c.code === catCode)) {
       setCatCode(categories[0].code)
-      setSubCode(null)
+      // 同上面onSelectCat：默认落到第一个分类时也要默认选中它的第一个子分类
+      setSubCode(categories[0].subs[0]?.code ?? null)
     }
   }, [categories, catCode, prefilled])
 
@@ -263,7 +264,10 @@ export function AddTransactionPage() {
           onSelectCat={(code) => {
             if (code !== catCode) {
               setCatCode(code)
-              setSubCode(null)
+              // 切换分类后默认选中新分类下的第一个子分类，不是清空成"不选"——
+              // 没有子分类的分类(subs为空数组)才落回null
+              const newCat = categories.find((c) => c.code === code)
+              setSubCode(newCat?.subs[0]?.code ?? null)
             }
           }}
           onSelectSub={setSubCode}

@@ -3,7 +3,7 @@ import { addCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory 
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { catLabel, subLabel } from '../../lib/catalogLabel'
-import type { Category } from '../../types'
+import type { Category, Subcategory } from '../../types'
 
 interface CategoryPickerProps {
   categories: Category[]
@@ -33,7 +33,7 @@ export function CategoryPicker({
 }: CategoryPickerProps) {
   const { t, lang } = useI18n()
   const selectedCat = categories.find((c) => c.code === selectedCatCode) ?? categories[0] ?? null
-  const subs = selectedCat?.subs ?? []
+  const rawSubs = selectedCat?.subs ?? []
 
   const [editingCode, setEditingCode] = useState<string | null>(null) // 具体sub的id=改名，'__new__'=新增，null=都没有
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null)
@@ -43,6 +43,18 @@ export function CategoryPicker({
   // 三条路都能提交，没有单独的取消按钮(旧App也没有，只能清空文字再失焦，或者按
   // Escape)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
   const settledRef = useRef(true)
+
+  // 乐观本地补丁——照旧App bindInlineSubInput()的commit()真实逻辑：改名/新增只
+  // await单条写入本身(updateCustomSub/addCustomSub)，不等一次完整的目录重新拉取
+  // 就切回展示态；本地直接把改好的名字/新建的项摆进去显示，onCatalogChanged()
+  // (重新拉整个目录，比单条写入慢得多)放到后台不阻塞UI地跑，等它真的拉回来后
+  // categories/tags这份props自然会带上正确数据，届时下面的合并逻辑用真实数据
+  // 覆盖过去，这份本地补丁不需要手动清空
+  const [renameOverrides, setRenameOverrides] = useState<Record<string, string>>({})
+  const [pendingSubs, setPendingSubs] = useState<Subcategory[]>([])
+  const subs = rawSubs
+    .map((s) => (renameOverrides[s.id] ? { ...s, zh: renameOverrides[s.id], ja: renameOverrides[s.id] } : s))
+    .concat(pendingSubs.filter((p) => !rawSubs.some((s) => s.code === p.code)))
 
   function startAdd() {
     settledRef.current = false
@@ -75,19 +87,15 @@ export function CategoryPicker({
     try {
       if (editingCode === '__new__') {
         const sub = await addCustomSubcategory(selectedCat.code, label, userId)
-        // 必须等catalog真的刷新完再切回展示态——onCatalogChanged是reloadCatalog，
-        // 内部要打一次网络请求拉最新目录。之前没await它就立刻setEditingCode(null)，
-        // input消失、展示态用的还是刷新前那份旧categories/tags props渲染，会先闪一下
-        // 错误/缺失的内容，等这个请求真正落地(有明显网络延迟时能到一两秒)才变成正确
-        // 的新名字——这才是"点确认后要等一阵子才显示正确内容"的真实原因
-        await onCatalogChanged()
+        setPendingSubs((arr) => [...arr, sub])
         onSelectSub(sub.code)
       } else if (editingCode) {
         await updateCustomSubcategory(editingCode, label)
-        await onCatalogChanged()
+        setRenameOverrides((o) => ({ ...o, [editingCode]: label }))
       }
       setEditingCode(null)
       setInputValue('')
+      onCatalogChanged().catch((e) => console.error('目录后台刷新失败', e))
     } catch (e) {
       console.error('自定义细分保存失败', e)
     }
