@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { addCustomTag, updateCustomTag, deleteCustomTag } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { tagLabel } from '../../lib/catalogLabel'
@@ -25,6 +25,24 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
   // 输入框是同一套写法)：确认按钮/回车/点别处失焦(blur)三条路都能提交，没有单独
   // 的取消按钮(旧App也没有)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
   const settledRef = useRef(true)
+  const tagListRef = useRef<HTMLDivElement>(null)
+
+  // 同CategoryPicker.tsx：菜单默认贴右边缘展开，第一个/靠左的标签会让菜单越过
+  // 左边界，被外层overflow-x-hidden裁掉、点不到——量一次真实位置，超出就贴左展开
+  useLayoutEffect(() => {
+    if (!openMenuCode) return
+    const container = tagListRef.current
+    const popover = container?.querySelector<HTMLElement>('[data-sub-menu-popover]')
+    if (!container || !popover) return
+    popover.style.right = ''
+    popover.style.left = ''
+    const containerRect = container.getBoundingClientRect()
+    const popRect = popover.getBoundingClientRect()
+    if (popRect.left < containerRect.left) {
+      popover.style.right = 'auto'
+      popover.style.left = '-6px'
+    }
+  }, [openMenuCode])
 
   // 乐观本地补丁——同CategoryPicker.tsx：改名/新增只await单条写入本身，不等一次
   // 完整目录重新拉取就切回展示态，本地直接摆上改好的名字/新建的项，onCatalogChanged()
@@ -92,7 +110,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2" ref={tagListRef}>
       {tags.map((tag) => {
         if (editingCode === tag.id) {
           return (
@@ -150,7 +168,10 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
                 ⋯
               </button>
               {menuOpen && (
-                <div className="absolute z-20 top-[22px] -right-1.5 bg-surface-container border border-outline-variant rounded-[10px] shadow-lg overflow-hidden min-w-[92px]">
+                <div
+                  data-sub-menu-popover
+                  className="absolute z-20 top-[22px] -right-1.5 bg-surface-container border border-outline-variant rounded-[10px] shadow-lg overflow-hidden min-w-[92px]"
+                >
                   <button
                     type="button"
                     onClick={() => startEdit(tag.id, tagLabel(tag, lang))}

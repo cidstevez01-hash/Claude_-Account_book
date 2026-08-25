@@ -12,11 +12,19 @@ export async function listEntries(c: Context<{ Bindings: Bindings }>) {
   const client = getUserScopedClient(c.env, c.req.raw)
   const userId = await getVerifiedUserId(client)
 
+  // .order('created_at')：真实bug(用户反馈"编辑一条记录后明细顺序会变")——这里
+  // 之前没有ORDER BY，PostgREST/Postgres在没有显式排序时不保证返回顺序稳定，
+  // UPDATE(编辑走的是upsert)在MVCC下会产生新的物理行版本，足以改变顺序扫描时
+  // 这一行出现的位置。前端groupByDay()按天分组时不会再对组内顺序做二次排序，
+  // 直接用这里返回的数组顺序展示，顺序一变列表看起来就"跳动"了。created_at是
+  // 插入时间，编辑(UPDATE)不会改这一列，按它排序能保证同一条记录不管编辑多少次
+  // 在列表里的相对位置都不变
   const { data, error } = await client
     .from('entries')
     .select('*')
     .eq('user_id', userId)
     .is('deleted_at', null)
+    .order('created_at', { ascending: false })
   if (error) throw new HttpError(500, error.message)
 
   return c.json({ entries: (data ?? []) as EntryRow[] })

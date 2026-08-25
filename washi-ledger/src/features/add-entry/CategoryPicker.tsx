@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { addCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
@@ -43,6 +43,28 @@ export function CategoryPicker({
   // 三条路都能提交，没有单独的取消按钮(旧App也没有，只能清空文字再失焦，或者按
   // Escape)。同一次编辑只能真正提交一次——用settledRef挡住重复触发
   const settledRef = useRef(true)
+  const subListRef = useRef<HTMLDivElement>(null)
+
+  // "⋯"弹出菜单默认贴着胶囊右边缘往左展开(-right-1.5)，如果这个胶囊正好是当前
+  // 这一行第一个/靠左的item，菜单(min-w-92px)会整个越过左边界——真机上被外层
+  // <main overflow-x-hidden>裁掉看不见也点不到，这正是"点删除没反应"的真实原因。
+  // 照旧App`.sub-menu-popover.flip-up`(超出底部翻上去)同一个思路，但这里要处理
+  // 的是左边界：菜单渲染后量一次真实位置，超出所在容器左边界就贴左对齐展开，
+  // 不再贴右
+  useLayoutEffect(() => {
+    if (!openMenuCode) return
+    const container = subListRef.current
+    const popover = container?.querySelector<HTMLElement>('[data-sub-menu-popover]')
+    if (!container || !popover) return
+    popover.style.right = ''
+    popover.style.left = ''
+    const containerRect = container.getBoundingClientRect()
+    const popRect = popover.getBoundingClientRect()
+    if (popRect.left < containerRect.left) {
+      popover.style.right = 'auto'
+      popover.style.left = '-6px'
+    }
+  }, [openMenuCode])
 
   // 乐观本地补丁——照旧App bindInlineSubInput()的commit()真实逻辑：改名/新增只
   // await单条写入本身(updateCustomSub/addCustomSub)，不等一次完整的目录重新拉取
@@ -51,7 +73,12 @@ export function CategoryPicker({
   // categories/tags这份props自然会带上正确数据，届时下面的合并逻辑用真实数据
   // 覆盖过去，这份本地补丁不需要手动清空
   const [renameOverrides, setRenameOverrides] = useState<Record<string, string>>({})
-  const [pendingSubs, setPendingSubs] = useState<Subcategory[]>([])
+  // 按分类code分开存——CategoryPicker是切换分类tab时复用同一个组件实例(不重新
+  // 挂载)，之前直接用一个不分类的Subcategory[]数组存待补丁项，导致刚在A分类新建
+  // 的子分类切到B分类也会显示出来(合并逻辑不看这个新建项到底属于哪个分类)。按
+  // 分类code分桶后，渲染时只取当前选中分类那一桶
+  const [pendingSubsByCat, setPendingSubsByCat] = useState<Record<string, Subcategory[]>>({})
+  const pendingSubs = (selectedCat && pendingSubsByCat[selectedCat.code]) || []
   const subs = rawSubs
     .map((s) => (renameOverrides[s.id] ? { ...s, zh: renameOverrides[s.id], ja: renameOverrides[s.id] } : s))
     .concat(pendingSubs.filter((p) => !rawSubs.some((s) => s.code === p.code)))
@@ -87,7 +114,8 @@ export function CategoryPicker({
     try {
       if (editingCode === '__new__') {
         const sub = await addCustomSubcategory(selectedCat.code, label, userId)
-        setPendingSubs((arr) => [...arr, sub])
+        const catCode = selectedCat.code
+        setPendingSubsByCat((o) => ({ ...o, [catCode]: [...(o[catCode] ?? []), sub] }))
         onSelectSub(sub.code)
       } else if (editingCode) {
         await updateCustomSubcategory(editingCode, label)
@@ -164,7 +192,7 @@ export function CategoryPicker({
         <h2 className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase mb-sm">
           {t('subcategoryLabel')}
         </h2>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" ref={subListRef}>
           {subs.map((sub) => {
             if (editingCode === sub.id) {
               return (
@@ -222,7 +250,10 @@ export function CategoryPicker({
                   ⋯
                 </button>
                 {menuOpen && (
-                  <div className="absolute z-20 top-[22px] -right-1.5 bg-surface-container border border-outline-variant rounded-[10px] shadow-lg overflow-hidden min-w-[92px]">
+                  <div
+                    data-sub-menu-popover
+                    className="absolute z-20 top-[22px] -right-1.5 bg-surface-container border border-outline-variant rounded-[10px] shadow-lg overflow-hidden min-w-[92px]"
+                  >
                     <button
                       type="button"
                       onClick={() => startEdit(sub.id, subLabel(sub, lang))}
