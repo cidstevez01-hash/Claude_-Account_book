@@ -29,6 +29,7 @@ export function HistoryPage() {
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
     [catalog]
   )
+  const tags = useMemo(() => [...(catalog?.expenseTags ?? []), ...(catalog?.incomeTags ?? [])], [catalog])
   // 每条记录按settings.currency统一换算后再筛选/分组显示(见data/currencyDisplay.ts)
   const displayEntries = useMemo(
     () => toDisplayEntries(entries, settings.currency, rates),
@@ -51,13 +52,21 @@ export function HistoryPage() {
       if (typeFilter !== 'all' && e.type !== typeFilter) return false
       if (e.date < startDate || e.date > endDate) return false
       if (keyword) {
+        // 搜索范围之前只覆盖分类名+备注，用户实测拿支付方式名字(比如"ペイディ")搜
+        // 完全搜不到——这个字段确实没进过haystack，不是模糊匹配算法的问题。补上
+        // 子分类/支付方式/标签这几个真实会在卡片上显示、用户会拿来搜的字段，
+        // includes()这个子串匹配本身已经是"模糊搜索"(不要求分词/精确对齐)，不用换
+        // 更复杂的算法
         const cat = categories.find((c) => c.code === e.catCode)
-        const haystack = `${cat?.zh ?? ''}${cat?.ja ?? ''}${e.note ?? ''}`.toLowerCase()
+        const sub = cat?.subs.find((s) => s.code === e.subCode)
+        const pm = catalog?.paymentMethods.find((p) => p.code === e.paymentMethod)
+        const tag = tags.find((tg) => tg.code === e.tagCode)
+        const haystack = `${cat?.zh ?? ''}${cat?.ja ?? ''}${sub?.zh ?? ''}${sub?.ja ?? ''}${pm?.zh ?? ''}${pm?.ja ?? ''}${tag?.zh ?? ''}${tag?.ja ?? ''}${e.note ?? ''}`.toLowerCase()
         if (!haystack.includes(keyword)) return false
       }
       return true
     })
-  }, [displayEntries, typeFilter, startDate, endDate, search, categories])
+  }, [displayEntries, typeFilter, startDate, endDate, search, categories, tags, catalog])
 
   // 挂载时先把滚动位置瞬间还原到记住的值(useLayoutEffect在浏览器画第一帧之前跑，
   // 不会先闪一下顶部再跳)，用户体感是"回到我刚才在的地方"
