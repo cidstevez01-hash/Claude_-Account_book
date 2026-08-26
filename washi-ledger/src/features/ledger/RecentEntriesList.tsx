@@ -13,6 +13,9 @@ interface RecentEntriesListProps {
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
+  /** 新建/编辑/复制保存后跳回仪表盘，要定位/高亮到这条记录——见
+   * lib/dashboardFocusMemory.ts，DashboardPage挂载后consume一次传下来 */
+  focusEntryId?: string | null
 }
 
 export function RecentEntriesList({
@@ -23,6 +26,7 @@ export function RecentEntriesList({
   onEdit,
   onCopy,
   onDelete,
+  focusEntryId,
 }: RecentEntriesListProps) {
   const { t } = useI18n()
   // 传入的entries已经在DashboardPage按顶部时间范围筛选过了，这里只管排序(照旧App
@@ -71,6 +75,8 @@ export function RecentEntriesList({
               return (
                 <EntryCard
                   key={entry.id}
+                  id={`entry-${entry.id}`}
+                  highlighted={focusEntryId === entry.id}
                   entry={entry}
                   category={cat}
                   paymentMethod={pm}
