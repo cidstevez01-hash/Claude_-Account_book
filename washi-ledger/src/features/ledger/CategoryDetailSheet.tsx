@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from './EntryCard'
@@ -54,21 +54,62 @@ export function CategoryDetailSheet({
   const { t } = useI18n()
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  if (!open || !header) return null
+  // 弹出/收起做平缓过渡——照旧仓库index.html真实的.sheet/.sheet.show搬：初始
+  // transform:translateY(105%)，show时translateY(0)，0.3s cubic-bezier(.32,.72,0,1)。
+  // 之前open变false就直接return null，没有退场动画，弹窗是"啪"一下消失/出现，
+  // 这里改成open=false后还多停留300ms(退场动画时长)才真正卸载；header/entries
+  // 这些内容父组件在关闭的同一刻就清空了，退场这300ms期间用一份快照兜底，不然
+  // 动画播到一半内容突然变白屏
+  const [mounted, setMounted] = useState(open)
+  const [visible, setVisible] = useState(false)
+  const snapshotRef = useRef<{
+    header: CategoryDetailHeader
+    categories: Category[]
+    paymentMethods: PaymentMethod[]
+    monthLabel: string
+    entries: Entry[]
+    currency: string
+  } | null>(null)
+  if (open && header) {
+    snapshotRef.current = { header, categories, paymentMethods, monthLabel, entries, currency }
+  }
 
-  const total = entries.reduce((sum, e) => sum + e.amount, 0)
-  const groups = groupByDay(entries)
+  useEffect(() => {
+    if (open) {
+      setMounted(true)
+      // 挂载的第一帧还是初始态(translateY(105%))，下一帧再切到show，这样浏览器
+      // 才有"起点"可以过渡，不会直接跳到终态
+      const raf = requestAnimationFrame(() => setVisible(true))
+      return () => cancelAnimationFrame(raf)
+    }
+    setVisible(false)
+    const timer = window.setTimeout(() => setMounted(false), 300)
+    return () => window.clearTimeout(timer)
+  }, [open])
+
+  if (!mounted || !snapshotRef.current) return null
+  const snap = snapshotRef.current
+
+  const total = snap.entries.reduce((sum, e) => sum + e.amount, 0)
+  const groups = groupByDay(snap.entries)
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
-      <div className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px]" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-[480px] max-h-[85vh] bg-surface rounded-t-[24px] shadow-xl flex flex-col overflow-hidden">
+      <div
+        className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px] transition-opacity duration-300"
+        style={{ opacity: visible ? 1 : 0 }}
+        onClick={onClose}
+      />
+      <div
+        className="relative z-10 w-full max-w-[480px] max-h-[85vh] bg-surface rounded-t-[24px] shadow-xl flex flex-col overflow-hidden transition-transform duration-300"
+        style={{ transform: visible ? 'translateY(0)' : 'translateY(105%)', transitionTimingFunction: 'cubic-bezier(.32,.72,0,1)' }}
+      >
         <header className="flex items-center justify-between px-md h-16 border-b-[1.5px] border-dashed border-outline-variant shrink-0">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined" style={{ color: header.color }}>
-              {header.icon}
+            <span className="material-symbols-outlined" style={{ color: snap.header.color }}>
+              {snap.header.icon}
             </span>
-            <h2 className="font-serif text-headline-md text-on-surface">{header.label}</h2>
+            <h2 className="font-serif text-headline-md text-on-surface">{snap.header.label}</h2>
           </div>
           <button type="button" aria-label={t('closeAria')} onClick={onClose} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
             <span className="material-symbols-outlined">close</span>
@@ -78,9 +119,9 @@ export function CategoryDetailSheet({
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-md py-md">
           <div className="flex flex-col items-center mb-md">
             <span className="text-label-caps font-sans text-on-surface-variant uppercase">
-              {monthLabel} · TOTAL
+              {snap.monthLabel} · TOTAL
             </span>
-            <span className="font-serif text-headline-lg text-on-surface">{formatCurrency(total, currency)}</span>
+            <span className="font-serif text-headline-lg text-on-surface">{formatCurrency(total, snap.currency)}</span>
           </div>
           <div className="w-full border-t border-outline-variant mb-md" />
 
@@ -96,8 +137,8 @@ export function CategoryDetailSheet({
                   <EntryCard
                     key={entry.id}
                     entry={entry}
-                    category={categories.find((c) => c.code === entry.catCode)}
-                    paymentMethod={paymentMethods.find((p) => p.code === entry.paymentMethod)}
+                    category={snap.categories.find((c) => c.code === entry.catCode)}
+                    paymentMethod={snap.paymentMethods.find((p) => p.code === entry.paymentMethod)}
                     expanded={expandedId === entry.id}
                     onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
                     onEdit={onEdit}
