@@ -7,7 +7,6 @@ import { MonthNavBar } from './MonthNavBar'
 import { TrendControls } from './TrendControls'
 import { TrendLegend } from './TrendLegend'
 import { PointsDonutCard } from './PointsDonutCard'
-import { CategoryDonutCard } from '../ledger/CategoryDonutCard'
 import { CategoryDetailSheet, type CategoryDetailHeader } from '../ledger/CategoryDetailSheet'
 import { TrendBarChart } from '../../design-system/components/TrendBarChart'
 import { useAuth } from '../auth/useAuth'
@@ -17,7 +16,6 @@ import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import {
   summarizeMonth,
-  categoryBreakdown,
   pointsBreakdownByPaymentMethod,
   dailyTrendBuckets,
   monthlyTrendBuckets,
@@ -99,8 +97,6 @@ export function StatsPage() {
   )
 
   const summary = summarizeMonth(displayEntries, monthAnchor)
-  const expenseShares = categoryBreakdown(displayEntries, categories, 'expense', monthAnchor, lang)
-  const incomeShares = categoryBreakdown(displayEntries, categories, 'income', monthAnchor, lang)
   const pointsShares = pointsBreakdownByPaymentMethod(entries, paymentMethods, monthAnchor, lang)
 
   const now = new Date()
@@ -292,8 +288,6 @@ export function StatsPage() {
               <p className="font-serif text-stat-figure text-primary">{formatCurrency(summary.expense, settings.currency)}</p>
             </div>
           </div>
-          <CategoryDonutCard expenseShares={expenseShares} incomeShares={incomeShares} resetKey={monthLabel} currency={settings.currency} />
-
           <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
             <div className="flex items-center justify-between mb-sm">
               <h3 className="font-serif text-headline-md text-on-surface">{t('statsTrendTitle')}</h3>
