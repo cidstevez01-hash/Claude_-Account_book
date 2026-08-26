@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
@@ -20,6 +20,7 @@ import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
 import { firstOfMonthStr, lastOfMonthStr, formatDateRangeLabel } from '../../lib/date'
+import { consumeDashboardFocusEntryId } from '../../lib/dashboardFocusMemory'
 import type { EntryType } from '../../types'
 
 /** 分类明细钻取(#7扩展)——照旧App openMonthDetail(filter, monthKey)真实逻辑，filter
@@ -45,6 +46,34 @@ export function DashboardPage() {
   const [startDate, setStartDate] = useState(() => firstOfMonthStr())
   const [endDate, setEndDate] = useState(() => lastOfMonthStr())
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const mainRef = useRef<HTMLElement>(null)
+  // 新建/编辑/复制保存后navigate(-1)跳回仪表盘，要定位/高亮到那条记录——
+  // AddTransactionPage.tsx保存成功后把entry.id写进这个一次性信号(见
+  // lib/dashboardFocusMemory.ts)，这里挂载时读一次。同HistoryPage.tsx那个
+  // scrollTop还原的坑：entries是独立于catalog的另一个hook，异步就绪时机可能
+  // 更晚，这一刻列表内容(含目标那张卡片的DOM)可能还没渲染出来，用
+  // requestAnimationFrame反复重试几帧，直到真的找到那张卡片或者放弃
+  const [focusEntryId, setFocusEntryId] = useState<string | null>(null)
+  const focusConsumedRef = useRef(false)
+  useLayoutEffect(() => {
+    if (focusConsumedRef.current || !catalog) return
+    focusConsumedRef.current = true
+    const id = consumeDashboardFocusEntryId()
+    if (!id) return
+    let attempts = 0
+    function tryFocus() {
+      const el = document.getElementById(`entry-${id}`)
+      if (el) {
+        el.scrollIntoView({ block: 'center' })
+        setFocusEntryId(id)
+        window.setTimeout(() => setFocusEntryId(null), 2000)
+        return
+      }
+      attempts++
+      if (attempts < 20) requestAnimationFrame(tryFocus)
+    }
+    tryFocus()
+  }, [catalog])
   // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail搬：
   // 记住点的是分类还是标签维度、具体是哪一个+当时环状图在看支出还是收入
   const [detailSelection, setDetailSelection] = useState<DetailSelection | null>(null)
@@ -109,7 +138,7 @@ export function DashboardPage() {
   }
 
   return (
-    <AppLayout title={t('appTitle')} onRefresh={handleRefresh}>
+    <AppLayout title={t('appTitle')} onRefresh={handleRefresh} mainRef={mainRef}>
       {/* entries缓存优先(见useEntries.ts)，比只走网络请求的catalog先就绪很多；catalog没
           就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会闪一下"英文图标名
           +统一灰色"的半成品画面——之前用if(!catalog)return null整页提前返回，连header/
@@ -155,6 +184,7 @@ export function DashboardPage() {
             onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
             onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
             onDelete={(entry) => setPendingDeleteId(entry.id)}
+            focusEntryId={focusEntryId}
           />
 
           <ConfirmDialog

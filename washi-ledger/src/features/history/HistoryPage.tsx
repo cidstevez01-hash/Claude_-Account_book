@@ -1,7 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
-import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { DateRangeBar } from '../../design-system/components/DateRangeBar'
 import { HistoryEntryList } from './HistoryEntryList'
@@ -11,7 +9,6 @@ import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
-import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { firstOfMonthStr, lastOfMonthStr } from '../../lib/date'
 import { loadHistoryViewMemory, saveHistoryViewMemory } from '../../lib/historyViewMemory'
@@ -23,10 +20,9 @@ export function HistoryPage() {
   const { t } = useI18n()
   const { user } = useAuth()
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
-  const { entries, reload, removeLocal } = useEntries(user?.id ?? null)
+  const { entries, reload } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
-  const navigate = useNavigate()
   const mainRef = useRef<HTMLElement>(null)
 
   const categories = useMemo(
@@ -121,16 +117,6 @@ export function HistoryPage() {
     }
   }, [])
 
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-
-  async function confirmDelete() {
-    if (!user || !pendingDeleteId) return
-    await deleteEntry(pendingDeleteId, user.id)
-    removeLocal(pendingDeleteId)
-    setPendingDeleteId(null)
-    reload()
-  }
-
   const typeChips: { key: TypeFilter; label: string }[] = [
     { key: 'all', label: t('filterAll') },
     { key: 'expense', label: t('filterExpense') },
@@ -201,20 +187,9 @@ export function HistoryPage() {
             categories={categories}
             paymentMethods={catalog.paymentMethods}
             currency={settings.currency}
-            onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-            onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
-            onDelete={(entry) => setPendingDeleteId(entry.id)}
           />
         )}
       </div>
-
-      <ConfirmDialog
-        open={pendingDeleteId != null}
-        title={t('confirmDeleteTitle')}
-        message={t('confirmDeleteMessage')}
-        onConfirm={confirmDelete}
-        onCancel={() => setPendingDeleteId(null)}
-      />
     </AppLayout>
   )
 }

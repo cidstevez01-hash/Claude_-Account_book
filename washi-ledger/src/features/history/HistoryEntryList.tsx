@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
@@ -14,25 +13,16 @@ interface HistoryEntryListProps {
    * data/currencyDisplay.ts的toDisplayEntries()把entries统一换算成这个币种了，
    * 这里只管格式化显示，不做换算 */
   currency: string
-  onEdit?: (entry: Entry) => void
-  onCopy?: (entry: Entry) => void
-  onDelete?: (entry: Entry) => void
 }
 
 /** 明细页的按日分组列表——跟仪表盘的RecentEntriesList不同点：不限条数、每日标题
- * 旁边带当日净额(照design-assets-v2/_13)，没有"最近记录/查看全部"标题 */
-export function HistoryEntryList({
-  entries,
-  categories,
-  paymentMethods,
-  currency,
-  onEdit,
-  onCopy,
-  onDelete,
-}: HistoryEntryListProps) {
+ * 旁边带当日净额(照design-assets-v2/_13)，没有"最近记录/查看全部"标题。编辑/复制/
+ * 删除操作按用户要求收拢到仪表盘("全放在首页操作")，这里不传onEdit/onCopy/
+ * onDelete这三个handler给EntryCard——EntryCard自己会按有没有传来决定要不要显示
+ * 对应的操作抽屉，明细页这边只负责浏览 */
+export function HistoryEntryList({ entries, categories, paymentMethods, currency }: HistoryEntryListProps) {
   const { t } = useI18n()
   const groups = groupByDay(entries)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   if (entries.length === 0) {
     return (
@@ -65,17 +55,7 @@ export function HistoryEntryList({
               const cat = categories.find((c) => c.code === entry.catCode)
               const pm = paymentMethods.find((p) => p.code === entry.paymentMethod)
               return (
-                <EntryCard
-                  key={entry.id}
-                  entry={entry}
-                  category={cat}
-                  paymentMethod={pm}
-                  expanded={expandedId === entry.id}
-                  onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
-                  onEdit={onEdit}
-                  onCopy={onCopy}
-                  onDelete={onDelete}
-                />
+                <EntryCard key={entry.id} entry={entry} category={cat} paymentMethod={pm} expanded={false} onToggle={() => {}} />
               )
             })}
           </section>
