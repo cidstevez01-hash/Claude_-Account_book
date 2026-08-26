@@ -59,6 +59,27 @@ export function DashboardPage() {
     memoryConsumedRef.current = true
     const mem = consumeDashboardReturnMemory()
     if (!mem) return
+    // 进新建/复制/编辑页面前，goToAdd()本来就无条件先记了一次scrollTop(不管
+    // 最后是保存还是取消)；focusEntryId是保存成功后才额外补记的，两者会一起
+    // 出现在同一份mem里。之前focusEntryId分支直接return，页面在等新记录从
+    // 网络同步回来的这段时间里滚动位置停在初始值(=顶部)，看起来像"先跳到
+    // 顶部再跳到定位位置"；这里先用scrollTop把页面立刻摆回大致原位，
+    // 不留可见的顶部空档，下面依赖entries的effect再去精确定位/高亮
+    if (mem.scrollTop != null) {
+      const el = mainRef.current
+      if (el) {
+        const targetTop = mem.scrollTop
+        // 同HistoryPage.tsx那个坑：entries比catalog晚就绪时内容还没撑起来，
+        // scrollTop会被浏览器夹回0，用rAF重试几帧
+        let attempts = 0
+        const tryRestore = () => {
+          el.scrollTop = targetTop
+          attempts++
+          if (el.scrollTop < targetTop && attempts < 10) requestAnimationFrame(tryRestore)
+        }
+        tryRestore()
+      }
+    }
     if (mem.focusEntryId) {
       // 交给下面那个依赖entries的effect去等——新建/复制出来的是一条全新id，
       // 要等它真的从服务端同步回本地entries数组才可能出现在DOM里，不能只靠
@@ -66,20 +87,7 @@ export function DashboardPage() {
       // 不生效、只有编辑能生效的真实原因——编辑的id本来就在缓存里，新建/复制
       // 的id要等一轮真实网络往返)
       pendingFocusIdRef.current = mem.focusEntryId
-      return
     }
-    if (mem.scrollTop == null) return
-    const el = mainRef.current
-    if (!el) return
-    // 同HistoryPage.tsx那个坑：entries比catalog晚就绪时内容还没撑起来，
-    // scrollTop会被浏览器夹回0，用rAF重试几帧
-    let attempts = 0
-    function tryRestore() {
-      el!.scrollTop = mem!.scrollTop!
-      attempts++
-      if (el!.scrollTop < mem!.scrollTop! && attempts < 10) requestAnimationFrame(tryRestore)
-    }
-    tryRestore()
   }, [catalog])
   // entries真的包含目标记录后才去找DOM并高亮——不用固定帧数硬等，等多久取决于
   // 这条记录真正同步回来要多久

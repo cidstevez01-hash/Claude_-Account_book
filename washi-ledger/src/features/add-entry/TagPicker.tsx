@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { addCustomTag, updateCustomTag, deleteCustomTag } from '../../data/catalog'
+import { buildNewTag, insertCustomTag, updateCustomTag, deleteCustomTag } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { tagLabel } from '../../lib/catalogLabel'
 import type { EntryType, Tag } from '../../types'
@@ -49,9 +49,14 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
   // 放到后台不阻塞UI地跑
   const [renameOverrides, setRenameOverrides] = useState<Record<string, string>>({})
   const [pendingTags, setPendingTags] = useState<Tag[]>([])
+  // 删除也是乐观本地补丁——同CategoryPicker.tsx：点删除立刻把id记进这个集合、
+  // 从列表里过滤掉，不用等deleteCustomTag()真正写库+onCatalogChanged()整个
+  // 目录重新拉回来才消失
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
   const tags = rawTags
+    .filter((tg) => !deletedIds.has(tg.id))
     .map((tg) => (renameOverrides[tg.id] ? { ...tg, zh: renameOverrides[tg.id], ja: renameOverrides[tg.id] } : tg))
-    .concat(pendingTags.filter((p) => !rawTags.some((tg) => tg.code === p.code)))
+    .concat(pendingTags.filter((p) => !rawTags.some((tg) => tg.code === p.code) && !deletedIds.has(p.id)))
 
   function startAdd() {
     settledRef.current = false
@@ -80,15 +85,26 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
       setInputValue('')
       return
     }
+    if (editingCode === '__new__') {
+      // id/code本来就是纯本地生成，不用等insert请求真的落库就能先切回展示态、
+      // 本地摆上新标签——insert在后台跑，失败再把这个乐观项撤回来
+      const tag = buildNewTag(type, label)
+      setPendingTags((arr) => [...arr, tag])
+      onSelectTag(tag.code)
+      setEditingCode(null)
+      setInputValue('')
+      insertCustomTag(tag, userId)
+        .then(() => onCatalogChanged().catch((e) => console.error('目录后台刷新失败', e)))
+        .catch((e) => {
+          console.error('自定义标签新增失败', e)
+          setPendingTags((arr) => arr.filter((tg) => tg.id !== tag.id))
+        })
+      return
+    }
+    if (!editingCode) return
     try {
-      if (editingCode === '__new__') {
-        const tag = await addCustomTag(type, label, userId)
-        setPendingTags((arr) => [...arr, tag])
-        onSelectTag(tag.code)
-      } else if (editingCode) {
-        await updateCustomTag(editingCode, label)
-        setRenameOverrides((o) => ({ ...o, [editingCode]: label }))
-      }
+      await updateCustomTag(editingCode, label)
+      setRenameOverrides((o) => ({ ...o, [editingCode]: label }))
       setEditingCode(null)
       setInputValue('')
       onCatalogChanged().catch((e) => console.error('目录后台刷新失败', e))
@@ -97,16 +113,21 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
     }
   }
 
-  async function handleDelete(tagId: string, tagCode: string) {
+  function handleDelete(tagId: string, tagCode: string) {
     if (!userId) return
-    try {
-      await deleteCustomTag(tagId)
-      if (selectedTagCode === tagCode) onSelectTag(null)
-      onCatalogChanged()
-    } catch (e) {
-      console.error('自定义标签删除失败', e)
-    }
+    setDeletedIds((s) => new Set(s).add(tagId))
+    if (selectedTagCode === tagCode) onSelectTag(null)
     setOpenMenuCode(null)
+    deleteCustomTag(tagId)
+      .then(() => onCatalogChanged())
+      .catch((e) => {
+        console.error('自定义标签删除失败', e)
+        setDeletedIds((s) => {
+          const next = new Set(s)
+          next.delete(tagId)
+          return next
+        })
+      })
   }
 
   return (

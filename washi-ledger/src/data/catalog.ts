@@ -287,14 +287,18 @@ export async function pushEntriesBulkUpsert(entries: Entry[], userId: string) {
  * updateCustomSub/deleteCustomSub(细分)和addCustomTag/updateCustomTag/deleteCustomTag
  * (标签)。预设的(is_preset=true)不允许改/删，这几个函数只处理is_preset=false的自定义项，
  * 调用方(UI)要保证只对custom===true的项调用这几个函数 */
-export async function addCustomSubcategory(catCode: string, label: string, userId: string): Promise<Subcategory> {
-  const id = crypto.randomUUID()
-  const code = genCustomKey()
+// id/code是纯本地生成(crypto.randomUUID()+genCustomKey())，不依赖服务端返回——
+// 拆成"先建对象"+"再写库"两步，UI侧(CategoryPicker.tsx)可以先用建好的对象乐观
+// 更新界面，插入请求放到后台，不用等一次真实网络往返才能把输入框切回展示态
+export function buildNewSubcategory(label: string): Subcategory {
+  return { id: crypto.randomUUID(), code: genCustomKey(), zh: label, ja: label, custom: true }
+}
+
+export async function insertCustomSubcategory(catCode: string, sub: Subcategory, userId: string): Promise<void> {
   const { error } = await supabase
     .from('subcategories')
-    .insert({ id, code, cat_code: catCode, zh: label, ja: label, is_preset: false, user_id: userId })
+    .insert({ id: sub.id, code: sub.code, cat_code: catCode, zh: sub.zh, ja: sub.ja, is_preset: false, user_id: userId })
   if (error) throw error
-  return { id, code, zh: label, ja: label, custom: true }
 }
 
 export async function updateCustomSubcategory(id: string, label: string): Promise<void> {
@@ -309,14 +313,16 @@ export async function deleteCustomSubcategory(id: string): Promise<void> {
   if (error) throw error
 }
 
-export async function addCustomTag(type: EntryType, label: string, userId: string): Promise<Tag> {
-  const id = crypto.randomUUID()
-  const code = genCustomKey()
+// 同buildNewSubcategory/insertCustomSubcategory的拆分理由
+export function buildNewTag(type: EntryType, label: string): Tag {
+  return { id: crypto.randomUUID(), code: genCustomKey(), type, zh: label, ja: label, custom: true }
+}
+
+export async function insertCustomTag(tag: Tag, userId: string): Promise<void> {
   const { error } = await supabase
     .from('tags')
-    .insert({ id, code, type, zh: label, ja: label, is_preset: false, user_id: userId })
+    .insert({ id: tag.id, code: tag.code, type: tag.type, zh: tag.zh, ja: tag.ja, is_preset: false, user_id: userId })
   if (error) throw error
-  return { id, code, type, zh: label, ja: label, custom: true }
 }
 
 export async function updateCustomTag(id: string, label: string): Promise<void> {
