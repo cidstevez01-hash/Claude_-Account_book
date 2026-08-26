@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
@@ -20,7 +20,7 @@ import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
 import { firstOfMonthStr, lastOfMonthStr, formatDateRangeLabel } from '../../lib/date'
-import { consumeDashboardFocusEntryId } from '../../lib/dashboardFocusMemory'
+import { consumeDashboardReturnMemory, saveDashboardScrollTop } from '../../lib/dashboardFocusMemory'
 import type { EntryType } from '../../types'
 
 /** 分类明细钻取(#7扩展)——照旧App openMonthDetail(filter, monthKey)真实逻辑，filter
@@ -47,33 +47,61 @@ export function DashboardPage() {
   const [endDate, setEndDate] = useState(() => lastOfMonthStr())
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const mainRef = useRef<HTMLElement>(null)
-  // 新建/编辑/复制保存后navigate(-1)跳回仪表盘，要定位/高亮到那条记录——
-  // AddTransactionPage.tsx保存成功后把entry.id写进这个一次性信号(见
-  // lib/dashboardFocusMemory.ts)，这里挂载时读一次。同HistoryPage.tsx那个
-  // scrollTop还原的坑：entries是独立于catalog的另一个hook，异步就绪时机可能
-  // 更晚，这一刻列表内容(含目标那张卡片的DOM)可能还没渲染出来，用
-  // requestAnimationFrame反复重试几帧，直到真的找到那张卡片或者放弃
+  // 进新建/编辑/复制页面前先记一下仪表盘当时的滚动位置+要不要定位到具体某条
+  // 记录，见lib/dashboardFocusMemory.ts的说明。点"返回"(取消，没保存)回来时没有
+  // 具体记录可定位，就退回到进入前的滚动位置；真的保存了才用更精确的"定位/
+  // 高亮那条记录"
   const [focusEntryId, setFocusEntryId] = useState<string | null>(null)
-  const focusConsumedRef = useRef(false)
+  const pendingFocusIdRef = useRef<string | null>(null)
+  const memoryConsumedRef = useRef(false)
   useLayoutEffect(() => {
-    if (focusConsumedRef.current || !catalog) return
-    focusConsumedRef.current = true
-    const id = consumeDashboardFocusEntryId()
-    if (!id) return
-    let attempts = 0
-    function tryFocus() {
-      const el = document.getElementById(`entry-${id}`)
-      if (el) {
-        el.scrollIntoView({ block: 'center' })
-        setFocusEntryId(id)
-        window.setTimeout(() => setFocusEntryId(null), 2000)
-        return
-      }
-      attempts++
-      if (attempts < 20) requestAnimationFrame(tryFocus)
+    if (memoryConsumedRef.current || !catalog) return
+    memoryConsumedRef.current = true
+    const mem = consumeDashboardReturnMemory()
+    if (!mem) return
+    if (mem.focusEntryId) {
+      // 交给下面那个依赖entries的effect去等——新建/复制出来的是一条全新id，
+      // 要等它真的从服务端同步回本地entries数组才可能出现在DOM里，不能只靠
+      // 几帧rAF硬等(网络请求通常比几帧的时间长得多，这正是新建/复制定位一直
+      // 不生效、只有编辑能生效的真实原因——编辑的id本来就在缓存里，新建/复制
+      // 的id要等一轮真实网络往返)
+      pendingFocusIdRef.current = mem.focusEntryId
+      return
     }
-    tryFocus()
+    if (mem.scrollTop == null) return
+    const el = mainRef.current
+    if (!el) return
+    // 同HistoryPage.tsx那个坑：entries比catalog晚就绪时内容还没撑起来，
+    // scrollTop会被浏览器夹回0，用rAF重试几帧
+    let attempts = 0
+    function tryRestore() {
+      el!.scrollTop = mem!.scrollTop!
+      attempts++
+      if (el!.scrollTop < mem!.scrollTop! && attempts < 10) requestAnimationFrame(tryRestore)
+    }
+    tryRestore()
   }, [catalog])
+  // entries真的包含目标记录后才去找DOM并高亮——不用固定帧数硬等，等多久取决于
+  // 这条记录真正同步回来要多久
+  useEffect(() => {
+    const pendingId = pendingFocusIdRef.current
+    if (!pendingId || !entries.some((e) => e.id === pendingId)) return
+    pendingFocusIdRef.current = null
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`entry-${pendingId}`)
+      if (!el) return
+      el.scrollIntoView({ block: 'center' })
+      setFocusEntryId(pendingId)
+      window.setTimeout(() => setFocusEntryId(null), 2000)
+    })
+  }, [entries])
+  // 跳去新建/编辑/复制页面之前先记住当时的滚动位置——不管最后是保存还是取消
+  // 返回，都可能用得到(取消返回直接退到这个位置；保存的话上面那个consume逻辑
+  // 会优先用更精确的focusEntryId，这份scrollTop当个兜底不会互相打架)
+  function goToAdd(path: string) {
+    if (mainRef.current) saveDashboardScrollTop(mainRef.current.scrollTop)
+    navigate(path)
+  }
   // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail搬：
   // 记住点的是分类还是标签维度、具体是哪一个+当时环状图在看支出还是收入
   const [detailSelection, setDetailSelection] = useState<DetailSelection | null>(null)
@@ -181,8 +209,8 @@ export function DashboardPage() {
             categories={categories}
             paymentMethods={catalog.paymentMethods}
             onViewAll={() => navigate('/history')}
-            onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-            onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+            onEdit={(entry) => goToAdd(`/add?editId=${entry.id}`)}
+            onCopy={(entry) => goToAdd(`/add?copyId=${entry.id}`)}
             onDelete={(entry) => setPendingDeleteId(entry.id)}
             focusEntryId={focusEntryId}
           />
@@ -204,8 +232,8 @@ export function DashboardPage() {
             entries={detailEntries}
             currency={settings.currency}
             onClose={() => setDetailSelection(null)}
-            onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-            onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+            onEdit={(entry) => goToAdd(`/add?editId=${entry.id}`)}
+            onCopy={(entry) => goToAdd(`/add?copyId=${entry.id}`)}
             onDelete={(entry) => setPendingDeleteId(entry.id)}
           />
         </>
@@ -214,7 +242,7 @@ export function DashboardPage() {
       <button
         type="button"
         aria-label={t('addTitle')}
-        onClick={() => navigate('/add')}
+        onClick={() => goToAdd('/add')}
         className="stamp-shadow fixed z-40 flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-on-primary"
         style={{
           right: 'max(20px, calc(50% - 240px + 20px))',
