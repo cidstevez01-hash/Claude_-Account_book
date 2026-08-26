@@ -77,10 +77,21 @@ export function CategoryDetailSheet({
   useEffect(() => {
     if (open) {
       setMounted(true)
-      // 挂载的第一帧还是初始态(translateY(105%))，下一帧再切到show，这样浏览器
-      // 才有"起点"可以过渡，不会直接跳到终态
-      const raf = requestAnimationFrame(() => setVisible(true))
-      return () => cancelAnimationFrame(raf)
+      // 只用一层rAF不够可靠——"挂载成初始态"和"下一帧切到show"这两次状态更新
+      // 可能被浏览器合并进同一次绘制(尤其是React 18+自动批处理下，第二次open
+      // 之后基本每次都会撞上这个合并，只有第一次因为刚好隔了别的耗时操作才侥幸
+      // 躲开)，一旦合并成同一帧，浏览器直接看到的是"两个状态里的后一个"，等于
+      // 没有起点可过渡，弹窗变成瞬间跳出来，这正是"只有第一个图例平缓、其余都是
+      // 一闪跳出"的真实原因。嵌套两层rAF，保证初始态(translateY(105%))先真的画
+      // 到屏幕上一次，再翻到show，每次都稳定触发过渡
+      let raf2 = 0
+      const raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => setVisible(true))
+      })
+      return () => {
+        cancelAnimationFrame(raf1)
+        cancelAnimationFrame(raf2)
+      }
     }
     setVisible(false)
     const timer = window.setTimeout(() => setMounted(false), 300)
