@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { addCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
+import { buildNewSubcategory, insertCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { catLabel, subLabel } from '../../lib/catalogLabel'
@@ -79,9 +79,13 @@ export function CategoryPicker({
   // 分类code分桶后，渲染时只取当前选中分类那一桶
   const [pendingSubsByCat, setPendingSubsByCat] = useState<Record<string, Subcategory[]>>({})
   const pendingSubs = (selectedCat && pendingSubsByCat[selectedCat.code]) || []
+  // 删除也是乐观本地补丁——点删除立刻把id记进这个集合、从列表里过滤掉，不用等
+  // deleteCustomSubcategory()真正写库+onCatalogChanged()整个目录重新拉回来才消失
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
   const subs = rawSubs
+    .filter((s) => !deletedIds.has(s.id))
     .map((s) => (renameOverrides[s.id] ? { ...s, zh: renameOverrides[s.id], ja: renameOverrides[s.id] } : s))
-    .concat(pendingSubs.filter((p) => !rawSubs.some((s) => s.code === p.code)))
+    .concat(pendingSubs.filter((p) => !rawSubs.some((s) => s.code === p.code) && !deletedIds.has(p.id)))
 
   function startAdd() {
     settledRef.current = false
@@ -111,16 +115,27 @@ export function CategoryPicker({
       setInputValue('')
       return
     }
+    if (editingCode === '__new__') {
+      // id/code本来就是纯本地生成，不用等insert请求真的落库就能先切回展示态、
+      // 本地摆上新胶囊——insert在后台跑，失败再把这个乐观项撤回来
+      const sub = buildNewSubcategory(label)
+      const catCode = selectedCat.code
+      setPendingSubsByCat((o) => ({ ...o, [catCode]: [...(o[catCode] ?? []), sub] }))
+      onSelectSub(sub.code)
+      setEditingCode(null)
+      setInputValue('')
+      insertCustomSubcategory(catCode, sub, userId)
+        .then(() => onCatalogChanged().catch((e) => console.error('目录后台刷新失败', e)))
+        .catch((e) => {
+          console.error('自定义细分新增失败', e)
+          setPendingSubsByCat((o) => ({ ...o, [catCode]: (o[catCode] ?? []).filter((s) => s.id !== sub.id) }))
+        })
+      return
+    }
+    if (!editingCode) return
     try {
-      if (editingCode === '__new__') {
-        const sub = await addCustomSubcategory(selectedCat.code, label, userId)
-        const catCode = selectedCat.code
-        setPendingSubsByCat((o) => ({ ...o, [catCode]: [...(o[catCode] ?? []), sub] }))
-        onSelectSub(sub.code)
-      } else if (editingCode) {
-        await updateCustomSubcategory(editingCode, label)
-        setRenameOverrides((o) => ({ ...o, [editingCode]: label }))
-      }
+      await updateCustomSubcategory(editingCode, label)
+      setRenameOverrides((o) => ({ ...o, [editingCode]: label }))
       setEditingCode(null)
       setInputValue('')
       onCatalogChanged().catch((e) => console.error('目录后台刷新失败', e))
@@ -129,16 +144,21 @@ export function CategoryPicker({
     }
   }
 
-  async function handleDelete(subId: string, subCode: string) {
+  function handleDelete(subId: string, subCode: string) {
     if (!userId) return
-    try {
-      await deleteCustomSubcategory(subId)
-      if (selectedSubCode === subCode) onSelectSub(null)
-      onCatalogChanged()
-    } catch (e) {
-      console.error('自定义细分删除失败', e)
-    }
+    setDeletedIds((s) => new Set(s).add(subId))
+    if (selectedSubCode === subCode) onSelectSub(null)
     setOpenMenuCode(null)
+    deleteCustomSubcategory(subId)
+      .then(() => onCatalogChanged())
+      .catch((e) => {
+        console.error('自定义细分删除失败', e)
+        setDeletedIds((s) => {
+          const next = new Set(s)
+          next.delete(subId)
+          return next
+        })
+      })
   }
 
   return (
