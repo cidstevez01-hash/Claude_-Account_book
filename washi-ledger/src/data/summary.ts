@@ -12,6 +12,20 @@ export function isSameMonth(dateStr: string, ref: Date): boolean {
   return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth()
 }
 
+/** 照旧App monthHasAnyEntries()的真实逻辑搬：某个年月/年份内有没有任何一条记录，不区分
+ * 收支类型——用来在月份导航条上禁用"切到一个完全没有数据的月份/年份"，避免切过去看到
+ * 一张空图。旧App只在仪表盘的环状图月份导航用了这个模式，这次统计页的顶部月份导航条/
+ * 两张趋势图各自的按日按月导航都是同样"切到没数据的地方毫无意义"的场景，一并套用 */
+export function hasEntriesInMonth(entries: Entry[], year: number, month: number): boolean {
+  const key = `${year}-${String(month).padStart(2, '0')}`
+  return entries.some((e) => e.date.startsWith(key))
+}
+
+export function hasEntriesInYear(entries: Entry[], year: number): boolean {
+  const key = String(year)
+  return entries.some((e) => e.date.startsWith(key))
+}
+
 export interface MonthSummary {
   balance: number
   income: number

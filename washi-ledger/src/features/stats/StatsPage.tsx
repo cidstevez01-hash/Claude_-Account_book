@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
@@ -24,6 +24,8 @@ import {
   dailyPointsTrendBuckets,
   monthlyPointsTrendBuckets,
   aggregateTrendSegments,
+  hasEntriesInMonth,
+  hasEntriesInYear,
 } from '../../data/summary'
 import { toDisplayEntries, formatCurrency, symbolFor } from '../../data/currencyDisplay'
 import { deleteEntry } from '../../data/catalog'
@@ -164,6 +166,49 @@ export function StatsPage() {
     }
   }
 
+  // 用户反馈：顶部月份导航条切换年月后，下面两张趋势图完全没跟着变，感知上像坏了——
+  // 两张趋势图各自维护独立年月状态这个设计本身没问题(点开趋势图之后还能各自继续往前
+  // 后翻看)，但至少切顶部月份的这一刻应该把两张图都重新定位到那个月/那一年，不能让
+  // 它们停在"App刚打开时的当前月"纹丝不动
+  useEffect(() => {
+    const y = monthAnchor.getFullYear()
+    const m = monthAnchor.getMonth() + 1
+    setTrendDayYear(y)
+    setTrendDayMonth(m)
+    setTrendMonthYear(y)
+    setSelectedTrendIdx(null)
+    setPointsDayYear(y)
+    setPointsDayMonth(m)
+    setPointsMonthYear(y)
+    setSelectedPointsTrendIdx(null)
+  }, [monthAnchor])
+
+  // 照旧App monthHasAnyEntries()的真实逻辑：切到完全没有记录的月份/年份没有意义，禁用
+  // 对应方向的箭头。这几个月份导航条(顶部+两张趋势图各自的)都是同一类"切过去看到一张
+  // 空图"的场景，一并套用
+  const [monthAnchorPrevY, monthAnchorPrevM] = stepMonth(monthAnchor.getFullYear(), monthAnchor.getMonth() + 1, -1)
+  const [monthAnchorNextY, monthAnchorNextM] = stepMonth(monthAnchor.getFullYear(), monthAnchor.getMonth() + 1, 1)
+  const monthAnchorDisablePrev = !hasEntriesInMonth(entries, monthAnchorPrevY, monthAnchorPrevM)
+  const monthAnchorDisableNext = !hasEntriesInMonth(entries, monthAnchorNextY, monthAnchorNextM)
+
+  const trendDisablePrev =
+    trendDim === 'day'
+      ? !hasEntriesInMonth(entries, ...stepMonth(trendDayYear, trendDayMonth, -1))
+      : !hasEntriesInYear(entries, trendMonthYear - 1)
+  const trendDisableNext =
+    trendDim === 'day'
+      ? !hasEntriesInMonth(entries, ...stepMonth(trendDayYear, trendDayMonth, 1))
+      : !hasEntriesInYear(entries, trendMonthYear + 1)
+
+  const pointsTrendDisablePrev =
+    pointsTrendDim === 'day'
+      ? !hasEntriesInMonth(entries, ...stepMonth(pointsDayYear, pointsDayMonth, -1))
+      : !hasEntriesInYear(entries, pointsMonthYear - 1)
+  const pointsTrendDisableNext =
+    pointsTrendDim === 'day'
+      ? !hasEntriesInMonth(entries, ...stepMonth(pointsDayYear, pointsDayMonth, 1))
+      : !hasEntriesInYear(entries, pointsMonthYear + 1)
+
   // 点收支趋势图的聚合图例一行——钻取那个分类在当前趋势图可见范围(按日=当月，按月=当年)内的明细
   const [detailCatCode, setDetailCatCode] = useState<string | null>(null)
   const detailCategory = categories.find((c) => c.code === detailCatCode) ?? null
@@ -226,7 +271,13 @@ export function StatsPage() {
       ) : (
       <>
       <div className="mb-md">
-        <MonthNavBar monthLabel={monthLabel} onPrevMonth={() => shiftMonth(-1)} onNextMonth={() => shiftMonth(1)} />
+        <MonthNavBar
+          monthLabel={monthLabel}
+          onPrevMonth={() => shiftMonth(-1)}
+          onNextMonth={() => shiftMonth(1)}
+          disablePrev={monthAnchorDisablePrev}
+          disableNext={monthAnchorDisableNext}
+        />
       </div>
 
       {tab === 'cashflow' ? (
@@ -261,6 +312,8 @@ export function StatsPage() {
               periodLabel={trendPeriodLabel}
               onPrev={() => shiftTrend(-1)}
               onNext={() => shiftTrend(1)}
+              disablePrev={trendDisablePrev}
+              disableNext={trendDisableNext}
             />
             <TrendBarChart
               buckets={trendBuckets}
@@ -289,6 +342,8 @@ export function StatsPage() {
               periodLabel={pointsTrendPeriodLabel}
               onPrev={() => shiftPointsTrend(-1)}
               onNext={() => shiftPointsTrend(1)}
+              disablePrev={pointsTrendDisablePrev}
+              disableNext={pointsTrendDisableNext}
             />
             <TrendBarChart
               buckets={pointsTrendBuckets}
