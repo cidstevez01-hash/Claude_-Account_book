@@ -9,6 +9,7 @@ import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
+import { matchesEntrySearch, fullDataRange } from '../../data/summary'
 import { useI18n } from '../../lib/i18n'
 import { firstOfMonthStr, lastOfMonthStr } from '../../lib/date'
 import { loadHistoryViewMemory, saveHistoryViewMemory } from '../../lib/historyViewMemory'
@@ -38,32 +39,24 @@ export function HistoryPage() {
 
   // 明细页每次从别的页面导航回来都是全新挂载的组件实例(这个App的路由结构没有共享
   // Outlet布局)，筛选条件/滚动位置本来会全部重置。改成挂载时优先读上次离开前记住
-  // 的状态(见lib/historyViewMemory.ts)，只有从没来过(memory是null)才用"当月"这个
-  // 出厂默认值
+  // 的状态(见lib/historyViewMemory.ts)，只有从没来过(memory是null)才用出厂默认值——
+  // R-26：出厂默认值改成"第一条数据到最新一条数据"(全量，可跨月跨年)，不再是"当月"。
+  // entries的初始state本来就直接读本地缓存(见useEntries.ts)，挂载这一刻就有数据，
+  // 不用等网络请求。真的一条记录都没有(全新用户)才退回"当月"这个还算合理的默认区间
   const remembered = loadHistoryViewMemory()
+  const defaultRange = fullDataRange(entries)
   const [search, setSearch] = useState(() => remembered?.search ?? '')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>(() => remembered?.typeFilter ?? 'all')
-  const [startDate, setStartDate] = useState(() => remembered?.startDate ?? firstOfMonthStr())
-  const [endDate, setEndDate] = useState(() => remembered?.endDate ?? lastOfMonthStr())
+  const [startDate, setStartDate] = useState(() => remembered?.startDate ?? defaultRange?.start ?? firstOfMonthStr())
+  const [endDate, setEndDate] = useState(() => remembered?.endDate ?? defaultRange?.end ?? lastOfMonthStr())
 
   const filtered = useMemo(() => {
-    const keyword = search.trim().toLowerCase()
     return displayEntries.filter((e) => {
       if (typeFilter !== 'all' && e.type !== typeFilter) return false
       if (e.date < startDate || e.date > endDate) return false
-      if (keyword) {
-        // 搜索范围之前只覆盖分类名+备注，用户实测拿支付方式名字(比如"ペイディ")搜
-        // 完全搜不到——这个字段确实没进过haystack，不是模糊匹配算法的问题。补上
-        // 子分类/支付方式/标签这几个真实会在卡片上显示、用户会拿来搜的字段，
-        // includes()这个子串匹配本身已经是"模糊搜索"(不要求分词/精确对齐)，不用换
-        // 更复杂的算法
-        const cat = categories.find((c) => c.code === e.catCode)
-        const sub = cat?.subs.find((s) => s.code === e.subCode)
-        const pm = catalog?.paymentMethods.find((p) => p.code === e.paymentMethod)
-        const tag = tags.find((tg) => tg.code === e.tagCode)
-        const haystack = `${cat?.zh ?? ''}${cat?.ja ?? ''}${sub?.zh ?? ''}${sub?.ja ?? ''}${pm?.zh ?? ''}${pm?.ja ?? ''}${tag?.zh ?? ''}${tag?.ja ?? ''}${e.note ?? ''}`.toLowerCase()
-        if (!haystack.includes(keyword)) return false
-      }
+      // 搜索匹配逻辑抽到data/summary.ts的matchesEntrySearch，R-22仪表盘"最近记录"
+      // 也复用同一份，不是两边各写一套容易走样
+      if (!matchesEntrySearch(e, search, categories, tags, catalog?.paymentMethods ?? [])) return false
       return true
     })
   }, [displayEntries, typeFilter, startDate, endDate, search, categories, tags, catalog])
@@ -149,7 +142,7 @@ export function HistoryPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('historySearchPlaceholder')}
-            className="w-full bg-surface-container-highest border border-outline-variant rounded-xl py-3 pl-10 pr-4 text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+            className="w-full bg-surface-container-highest border-[1.5px] border-dashed border-outline-variant rounded-full py-2 pl-10 pr-4 text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1">

@@ -52,19 +52,19 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           <button
             type="button"
             aria-label={t('menuAria')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-primary/25 active:scale-90 transition-[background-color,transform]"
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             onClick={() => setDrawerOpen(true)}
           >
-            <span className="material-symbols-outlined">{APP_ICONS.menu}</span>
+            <span className="material-symbols-outlined papercut-text-shadow">{APP_ICONS.menu}</span>
           </button>
         ) : leftButton === 'home' ? (
           <button
             type="button"
             aria-label={t('backToDashboardAria')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-primary/25 active:scale-90 transition-[background-color,transform]"
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             onClick={() => navigate('/')}
           >
-            <span className="material-symbols-outlined">home</span>
+            <span className="material-symbols-outlined papercut-text-shadow">home</span>
           </button>
         ) : (
           // R-18：返回上一页(不是固定跳仪表盘)——这几个子页面是从抽屉哪个主页面点进来的
@@ -73,17 +73,17 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           <button
             type="button"
             aria-label={t('backLabel')}
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-primary/25 active:scale-90 transition-[background-color,transform]"
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             onClick={() => navigate(-1)}
           >
-            <span className="material-symbols-outlined">arrow_back</span>
+            <span className="material-symbols-outlined papercut-text-shadow">arrow_back</span>
           </button>
         )}
         {/* 照旧仓库index.html的.papercut真实效果复用(不是随手写的模糊阴影)：8层描边阴影
             用--color-surface(跟旧App--card同色调)在字形周围勾出一圈纸色轮廓，制造"从纸上
             剪下来贴上去"的贴纸感，再叠一层3px 4px偏移、不带模糊的深色阴影(旧App用--ink
             15%左右透明度)做投影厚度——纯高斯模糊text-shadow做不出这种硬边剪纸质感 */}
-        <h1 className="font-serif text-headline-lg font-extrabold text-primary tracking-tight [text-shadow:1.5px_0_0_var(--color-surface),-1.5px_0_0_var(--color-surface),0_1.5px_0_var(--color-surface),0_-1.5px_0_var(--color-surface),1px_1px_0_var(--color-surface),-1px_-1px_0_var(--color-surface),1px_-1px_0_var(--color-surface),-1px_1px_0_var(--color-surface),3px_4px_0_rgba(35,26,19,0.16)]">
+        <h1 className="font-serif text-headline-lg font-extrabold text-app-title tracking-tight papercut-text-shadow">
           {title}
         </h1>
         {/* R-18：右上角在子页面不显示任何东西——用一个等宽的空div占位，让标题(左右各
@@ -94,9 +94,9 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           <Link
             to="/account"
             aria-label={t('accountTitle')}
-            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-primary hover:bg-surface-variant/50 active:bg-primary/25 active:scale-90 transition-[background-color,transform]"
+            className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
           >
-            <span className="material-symbols-outlined">{APP_ICONS.account}</span>
+            <span className="material-symbols-outlined papercut-text-shadow">{APP_ICONS.account}</span>
           </Link>
         )}
       </header>

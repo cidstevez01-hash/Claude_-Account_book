@@ -10,17 +10,16 @@ interface NavDrawerProps {
 }
 
 // 左侧抽屉导航——照design-assets第二版_33做，放"低频/全局入口"：设置、汇率换算、关于。
-// 主要3个页面(仪表盘/明细/统计)在底部悬浮胶囊导航，这里不重复放。
+// 主要3个页面(仪表盘/明细/统计)在底部悬浮胶囊导航，这里不重复放。"我的账户"这里
+// 不再重复放一个入口(R-24)——头部右上角账户图标已经是独立入口，两处都能进同一个
+// 页面没必要，去掉这里这个
 // R-18：汇率换算/设置/about这三个是"子页面"(AppLayout leftButton="back"，隐藏底部
 // 导航栏+抽屉本身)，点进去时不关闭抽屉——共享的drawerOpen状态(见useDrawer.tsx)保持
-// true，等用户从子页面点返回箭头回到这里时，抽屉自然还是展开的样子。/account不在
-// 这三个之列(它是leftButton="home"，还是有底部导航栏的"主页面")，维持原来点了就关闭
-// 抽屉的行为
+// true，等用户从子页面点返回箭头回到这里时，抽屉自然还是展开的样子
 const SUBPAGE_PATHS = new Set(['/rate', '/settings', '/about'])
 const links: { to: string; icon: string; labelKey: TranslationKey }[] = [
   { to: '/rate', icon: APP_ICONS.rate, labelKey: 'rateNavLabel' },
   { to: '/settings', icon: APP_ICONS.settings, labelKey: 'settingsTitle' },
-  { to: '/account', icon: APP_ICONS.account, labelKey: 'accountTitle' },
   { to: '/about', icon: APP_ICONS.about, labelKey: 'aboutTitle' },
 ]
 

@@ -103,6 +103,13 @@ export const dict = {
     prevPeriodAria: '上一段', // 新App专属(趋势图的上一段导航，"段"根据当前是按日/按月对应"上月/上年")
     nextPeriodAria: '下一段', // 新App专属
     closeAria: '关闭', // 新App专属(分类明细钻取sheet/趋势图明细面板的关闭按钮)
+    rangePickerTitle: '选择时间范围', // 新App专属(R-27自绘日历弹层标题)
+    rangePickerYearTitle: '选择年份', // 新App专属(R-27年份快速跳转页标题)
+    rangePickerMonthTitle: '选择年月', // 新App专属(R-27月份快速跳转页标题)
+    presetThisMonth: '本月', // 新App专属(R-27日历预设选项)
+    presetPastMonth: '过去一个月', // 新App专属(R-25要求的是"过去一个月"这种滚动30天区间，不是"上个月"整月)
+    presetPastYear: '过去一年', // 新App专属
+    confirmLabel: '确定', // 新App专属，通用"确定"按钮
     statsTrendTitle: '收支趋势', // 新App专属(统计页收支栏趋势图标题，旧App没有单独抽出这个小标题)
     statsTabMoney: LEGACY_ZH.statsTabMoney,
     statsTabPoints: LEGACY_ZH.statsTabPoints,
@@ -227,6 +234,13 @@ export const dict = {
     prevPeriodAria: '前の期間',
     nextPeriodAria: '次の期間',
     closeAria: '閉じる',
+    rangePickerTitle: '期間を選択',
+    rangePickerYearTitle: '年を選択',
+    rangePickerMonthTitle: '年月を選択',
+    presetThisMonth: '今月',
+    presetPastMonth: '過去1か月',
+    presetPastYear: '過去1年',
+    confirmLabel: '確定',
     statsTrendTitle: '収支の推移',
     statsTabMoney: LEGACY_JA.statsTabMoney,
     statsTabPoints: LEGACY_JA.statsTabPoints,

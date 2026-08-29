@@ -68,6 +68,28 @@
   --color-on-primary-fixed: #410001;
   --color-on-primary-fixed-variant: #7f2921;
 
+  /* App顶部大标题("记账本")专用色——默认主题直接沿用--color-primary，不单独指定
+     颜色也没差别；单独拆出这个token是给"怀旧"主题用的，那边标题需要比--color-primary
+     更深一档、但--color-primary这个变量本身(按钮/Tab下划线/次要文字等一大堆地方在用)
+     不能跟着一起变深，两者用途不一样，不能共用同一个变量 */
+  --color-app-title: var(--color-primary);
+
+  /* 记一笔悬浮按钮("+")图标专用色——默认主题直接沿用--color-on-primary，不单独指定
+     颜色也没差别；单独拆出给"怀旧"主题用，那边--color-on-primary本身(登录/提交等
+     一大堆按钮的文字颜色，需要在浅绿底色上保证可读对比度，不能是白色)保持深绿，
+     只有这个"+"图标单独要求改白色，两者用途不一样，不能共用同一个变量 */
+  --color-fab-icon: var(--color-on-primary);
+
+  /* 支出/收入专用固定色系——用户明确要求：不管主题怎么换，支出永远是红色系、收入
+     永远是绿色系，主题最多只能调深浅，不能整个换色相。之前BalanceCard/
+     CategoryDonutCard这些地方直接复用--color-primary/--color-secondary显示支出/收入
+     金额，默认主题凑巧primary本来就是红、secondary本来就是绿，所以看不出问题；一旦
+     "怀旧"主题把--color-primary换成别的色相(浅绿/珊瑚橙这些实验)，支出数字会跟着
+     被带偏。拆成独立token，默认主题原样沿用现有红/绿，"怀旧"主题这两个token不跟随
+     --color-primary/--color-secondary的实验，单独固定住 */
+  --color-expense: var(--color-primary);
+  --color-income: var(--color-secondary);
+
   /* 收入——B-03：这里之前用#4a6741(深橄榄绿)，跟旧仓库index.html实际用的--jade
      (#7a9b6e，偏亮的青瓷绿)不是同一个值，导致仪表盘收入数字/point胶囊看起来太深。
      改成跟旧App完全一致的#7a9b6e */
@@ -156,12 +178,39 @@
   --color-background: #f7f1e7;
   --color-on-background: #3a2f28;
 
-  --color-primary-container: #e2897d;
-  --color-on-primary-container: #fffdf8;
-  --color-inverse-primary: #e2897d;
-  --color-primary-fixed-dim: #e2897d;
-  --color-on-primary-fixed: #3a2f28;
-  --color-on-primary-fixed-variant: #a84a3f;
+  /* 怀旧主题的主色——改成用户指定的#FF9459(浅橙)。container/fixed/app-title这几个
+     "深浅"衍生值走color-mix()公式，只跟着--color-primary这一个值走，这次只手动改了
+     primary这一行 + on-primary系列这几个"对比色"(算过对比度，白字在#FF9459上只有
+     ~2.2:1不够，还是要深色，具体深浅跟着新橙色重新调了一版，不是公式自动出的) */
+  --color-primary: #ff9459;
+  --color-primary-container: color-mix(in srgb, var(--color-primary) 82%, black 18%);
+  --color-inverse-primary: color-mix(in srgb, var(--color-primary) 55%, white 45%);
+  --color-primary-fixed: color-mix(in srgb, var(--color-primary) 25%, white 75%);
+  --color-primary-fixed-dim: color-mix(in srgb, var(--color-primary) 60%, white 40%);
+
+  /* on-primary系列不能用同样的"混黑/混白固定比例"公式——这几个是"对比色"，不是
+     "深浅"：不同色相本身明暗不同，浅色主色要配深色对比色、深色主色要配浅色对比色，
+     选深还是选浅是个独立判断(算过对比度，见下方说明)，跟"深多少/浅多少"这种线性
+     深浅关系是两件事，所以保留手动指定，不能公式化 */
+  --color-on-primary: #6a2f14;
+  --color-on-primary-container: #431a04;
+  --color-on-primary-fixed: #431400;
+  --color-on-primary-fixed-variant: #8a4420;
+
+  /* 大标题("记账本")+头部两个图标——"深浅配方"的一种，同样公式化：主色混黑25%
+     (原来45%太高，橙色被压得发浑发褐，看起来像换了个不相关的棕色，不像"同一个
+     橙色的深色版"，降到25%保留更多原色相)。换色相后这里自动跟着变深，不用再
+     单独手调 */
+  --color-app-title: color-mix(in srgb, var(--color-primary) 75%, black 25%);
+
+  /* 记一笔悬浮按钮"+"图标——跟on-primary同类，是"对比色"选择(这次要求白色)，不是
+     深浅公式，换色相后如果对比度不够需要单独重新判断，不会跟着--color-primary公式走 */
+  --color-fab-icon: #ffffff;
+
+  /* 支出固定用默认主题原本的复古红，不跟着上面--color-primary这次的珊瑚橙实验走——
+     用户明确要求支出/收入的色相固定，主题只能调深浅。收入本来就没改过
+     --color-secondary，不用单独覆盖--color-income */
+  --color-expense: #d1665a;
 }
 
 /* html/body/#root钉死height:100%+overflow:hidden——外壳整个固定，不滚动。每个页面
@@ -184,6 +233,57 @@ body {
   color: var(--color-on-background);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+}
+
+/* R-27自绘日历——年/月快速跳转两个独立页面跟日历页之间来回切换是弹出页面覆盖(不是
+   同一个DOM原地变化)，直接切换会显得生硬。照Windows日历控件"钻取"的缩放效果：往下
+   钻(年→月、月→日)从略小+半透明放大到位，往上跳(点标题回全局视图)反过来从略大+
+   半透明缩小到位，用方向区分"聚焦"和"回看"这两种不同操作意图。纯CSS一次性入场动画，
+   不用额外动画库——每次page切换，对应分支的div都是全新mount(不是复用同一个节点)，
+   animation天然会重新播放，不需要手动重置 */
+@keyframes picker-zoom-in {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes picker-zoom-out {
+  from {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.picker-zoom-in {
+  animation: picker-zoom-in 0.18s ease-out;
+}
+.picker-zoom-out {
+  animation: picker-zoom-out 0.18s ease-out;
+}
+
+/* R-27自绘日历面板毛玻璃——研究过其他方案，最后还是用backdrop-filter：
+   1) SVG位移滤镜(仓库里.tab-bubble那种#glassLens折射效果)是做"透过玻璃看到背后
+      图标轻微变形"这种精致小面积效果的，日历这种大面积、内容本身还要保持清晰
+      可读(数字/网格)的面板用这个反而会让文字变形，不合适；
+   2) 截图后离屏模糊(canvas截取背景再模糊贴上去)在纯前端React里成本高、还要
+      跟着弹层位置/背景滚动同步刷新，杀鸡用牛刀；
+   3) 纯降低不透明度、不加blur——测试过之前(theme-compare.mjs真机截图验证)不够，
+      背后仪表盘的文字/色块透过来会跟前景数字混在一起，可读性不够。
+   结论：backdrop-filter是唯一现成、性能可控、且已经在本仓库headers/.tab-bubble
+   用过的方案，只是这次面板更大、内容更需要清晰，blur/饱和度参数比header那种
+   薄薄一条(blur(1px))强得多——沿用之前给"贴底面板"实测校准过的blur(18px)
+   saturate(150%)+80%纸色，不透明度更高一点(85%)因为要兼顾数字可读性 */
+.picker-panel-glass {
+  background: color-mix(in srgb, var(--color-surface-container-lowest) 85%, transparent);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
 }
 
 /* 旧App方格信笺纸背景(R-12)——照旧仓库index.html的body网格线公式原样搬：横竖两条
@@ -211,6 +311,23 @@ body {
 /* 卡片底边"纸张厚度"阴影 */
 .papercut-shadow {
   box-shadow: 0 2px 0 var(--color-outline-variant);
+}
+
+/* "从纸上剪下来贴上去"的剪纸描边+投影效果——App顶部大标题("记账本")原创，
+   现在header左右两个图标(汉堡菜单/账户)复用同一套，深浅统一：8层描边阴影用
+   --color-surface在字形/图标周围勾出一圈纸色轮廓，再叠一层3px 4px偏移、不带
+   模糊的深色阴影做投影厚度，纯高斯模糊text-shadow做不出这种硬边剪纸质感 */
+.papercut-text-shadow {
+  text-shadow:
+    1.5px 0 0 var(--color-surface),
+    -1.5px 0 0 var(--color-surface),
+    0 1.5px 0 var(--color-surface),
+    0 -1.5px 0 var(--color-surface),
+    1px 1px 0 var(--color-surface),
+    -1px -1px 0 var(--color-surface),
+    1px -1px 0 var(--color-surface),
+    -1px 1px 0 var(--color-surface),
+    3px 4px 0 rgba(35, 26, 19, 0.16);
 }
 
 /* 明细卡片外框——照旧仓库index.html的.entry真实样式复用：2px实线描边+不对称圆角

@@ -34,7 +34,7 @@ export function AccountPage() {
   // "未登录"(引导去登录/注册)，而不是显示一个没有email的"已登录"账户
   if (!signedIn) {
     return (
-      <AppLayout title={t('accountTitle')} leftButton="home">
+      <AppLayout title={t('accountTitle')} leftButton="back">
         <div className="flex flex-col items-center gap-md px-md py-xl text-center">
           <span className="material-symbols-outlined text-5xl text-outline">account_circle</span>
           <p className="text-body-lg text-on-surface-variant">{t('accountSignInHint')}</p>
@@ -58,7 +58,7 @@ export function AccountPage() {
   }
 
   return (
-    <AppLayout title={t('accountTitle')} leftButton="home">
+    <AppLayout title={t('accountTitle')} leftButton="back">
       <div className="flex flex-col items-center px-md pt-lg pb-lg">
         <div className="w-20 h-20 rounded-full border-2 border-primary flex items-center justify-center mb-3">
           <span className="material-symbols-outlined text-4xl text-primary">account_circle</span>
