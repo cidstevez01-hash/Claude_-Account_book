@@ -40,11 +40,11 @@ export function ThemePage() {
           type="button"
           aria-label={t('backLabel')}
           onClick={() => navigate(-1)}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors"
+          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
         >
-          <span className="material-symbols-outlined">arrow_back</span>
+          <span className="material-symbols-outlined papercut-text-shadow">arrow_back</span>
         </button>
-        <h1 className="font-serif text-headline-md text-on-surface tracking-tight">{t('themeLabel')}</h1>
+        <h1 className="font-serif text-headline-md text-app-title tracking-tight papercut-text-shadow">{t('themeLabel')}</h1>
         {/* B-14根因：原来h1是flex-1+text-center+-ml-10模拟居中，负margin让h1的不可见
             边界盖住了左边返回按钮的可点击区域，按钮"看得到点不动"。改成跟AppLayout.tsx
             同款的"两侧等宽占位+justify-between"布局，不用负margin就不会有点击区域重叠 */}

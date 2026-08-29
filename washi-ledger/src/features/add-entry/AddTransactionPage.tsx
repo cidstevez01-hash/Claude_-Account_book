@@ -206,10 +206,10 @@ export function AddTransactionPage() {
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
           上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致 */}
       <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
-        <button type="button" aria-label="返回" onClick={handleBack} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-variant/50 active:bg-surface-variant/50 transition-colors">
-          <span className="material-symbols-outlined">arrow_back</span>
+        <button type="button" aria-label="返回" onClick={handleBack} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]">
+          <span className="material-symbols-outlined papercut-text-shadow">arrow_back</span>
         </button>
-        <h1 className="font-serif text-headline-md text-on-surface tracking-tight">{pageTitle}</h1>
+        <h1 className="font-serif text-headline-md text-app-title tracking-tight papercut-text-shadow">{pageTitle}</h1>
         <div className="w-10" />
       </header>
 

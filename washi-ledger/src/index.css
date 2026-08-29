@@ -193,7 +193,7 @@
      选深还是选浅是个独立判断(算过对比度，见下方说明)，跟"深多少/浅多少"这种线性
      深浅关系是两件事，所以保留手动指定，不能公式化 */
   --color-on-primary: #6a2f14;
-  --color-on-primary-container: #431a04;
+  --color-on-primary-container: #fffbff;
   --color-on-primary-fixed: #431400;
   --color-on-primary-fixed-variant: #8a4420;
 
