@@ -11,10 +11,12 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
   const { t } = useI18n()
   return (
     <section className="ledger-card relative bg-surface-container-lowest rounded-xl p-md mx-md mt-sm mb-lg">
-      {/* 和纸胶带装饰角 */}
+      {/* B-33：和纸胶带装饰角——换成真实斜纹纹理(.washi-tape-texture，见index.css)，
+          不再是纯色块；尺寸放大到w-11 h-5更接近旧App56x20的观感比例，位置(-top-1.5
+          right-5)/旋转角度(4deg)保持不动 */}
       <div
-        className="absolute -top-1.5 right-5 w-8 h-3.5 rounded-sm opacity-70"
-        style={{ background: 'var(--color-tertiary-fixed-dim)', transform: 'rotate(4deg)' }}
+        className="absolute -top-1.5 right-5 w-11 h-5 rounded-sm washi-tape-texture"
+        style={{ transform: 'rotate(4deg)' }}
       />
       <div className="text-center mb-lg">
         <p className="font-sans text-label-caps text-on-surface-variant uppercase tracking-wider mb-1">
@@ -38,7 +40,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
         <div className="flex-1 text-center">
           <p className="font-sans text-label-caps text-secondary mb-1 flex items-center justify-center gap-1">
             <span className="material-symbols-outlined text-sm">arrow_downward</span>
-            {t('monthIncome')}
+            {t('rangeIncome')}
           </p>
           <p className="font-serif text-stat-figure text-income">{formatCurrency(summary.income, currency)}</p>
         </div>
@@ -46,7 +48,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
         <div className="flex-1 text-center">
           <p className="font-sans text-label-caps text-primary mb-1 flex items-center justify-center gap-1">
             <span className="material-symbols-outlined text-sm">arrow_upward</span>
-            {t('monthExpense')}
+            {t('rangeExpense')}
           </p>
           <p className="font-serif text-stat-figure text-expense">{formatCurrency(summary.expense, currency)}</p>
         </div>

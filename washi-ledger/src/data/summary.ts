@@ -272,9 +272,16 @@ function buildTrendBuckets(
 ): TrendBucket[] {
   const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], detailSegments: [], total: 0 }))
   const byKey = new Map(buckets.map((b) => [b.key, b]))
+  // B-32根因：之前写的是`e.date.length === 7 ? e.date.slice(0,7) : e.date`——但
+  // entry.date永远是完整的"YYYY-MM-DD"(10字符)，这个判断永远走else分支、永远拿
+  // 完整日期去查表。日别桶(dailyTrendBuckets)的key本来就是完整日期，凑巧能查到；
+  // 月别桶(monthlyTrendBuckets)的key是"YYYY-MM"(7字符)，完整日期永远查不到这个
+  // key，月别柱状图因此永远是空的。改成按skeleton自己key的长度决定要不要截断
+  // entry.date，不是判断entry.date自身的长度(那个值不会变，判断了也没意义)
+  const bucketKeyLen = skeleton[0]?.key.length ?? 10
   for (const e of entries) {
     if (e.type !== type) continue
-    const b = byKey.get(e.date.length === 7 ? e.date.slice(0, 7) : e.date)
+    const b = byKey.get(e.date.slice(0, bucketKeyLen))
     if (!b) continue
     let seg = b.segments.find((s) => s.key === e.catCode)
     if (!seg) {
@@ -338,9 +345,12 @@ function buildPointsTrendBuckets(
 ): TrendBucket[] {
   const buckets: TrendBucket[] = skeleton.map((s) => ({ ...s, segments: [], detailSegments: [], total: 0 }))
   const byKey = new Map(buckets.map((b) => [b.key, b]))
+  // B-32同款bug——见上面buildTrendBuckets的说明，这里是积分推移图那份独立实现，
+  // 同样的查表逻辑要同样修
+  const bucketKeyLen = skeleton[0]?.key.length ?? 10
   for (const e of entries) {
     if (e.type !== 'expense' || !e.points) continue
-    const b = byKey.get(e.date.length === 7 ? e.date.slice(0, 7) : e.date)
+    const b = byKey.get(e.date.slice(0, bucketKeyLen))
     if (!b) continue
     b.total += e.points
     let seg = b.detailSegments.find((s) => s.key === e.catCode)

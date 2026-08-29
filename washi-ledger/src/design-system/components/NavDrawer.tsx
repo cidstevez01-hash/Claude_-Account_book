@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useAuth } from '../../features/auth/useAuth'
 import { useI18n } from '../../lib/i18n'
@@ -26,6 +27,24 @@ const links: { to: string; icon: string; labelKey: TranslationKey }[] = [
 export function NavDrawer({ open, onClose }: NavDrawerProps) {
   const { user, signedIn } = useAuth()
   const { t } = useI18n()
+  const location = useLocation()
+  const navigate = useNavigate()
+  // B-34：点这三行(汇率换算/设置/关于)本来指望能看到"点中的这行变绿高亮"这个点击
+  // 反馈，但这三个都是SUBPAGE_PATHS——AppLayout.tsx对子页面完全不渲染NavDrawer
+  // (isSubpage分支)，之前用NavLink直接同步跳转，路由一变、这个组件立刻从DOM里
+  // 消失，浏览器根本没机会把"isActive=true"这一帧真的画出来，用户看到的就是"点了
+  // 没反应"。改成点击先用pendingTo这个本地state让对应行立刻显示高亮态(这一帧稳定
+  // 画出来)，停顿一小段时间再真正调用navigate()跳转，让绿色反馈有时间被看到 */
+  const [pendingTo, setPendingTo] = useState<string | null>(null)
+
+  function handleClick(to: string) {
+    setPendingTo(to)
+    window.setTimeout(() => {
+      navigate(to)
+      if (!SUBPAGE_PATHS.has(to)) onClose()
+      setPendingTo(null)
+    }, 150)
+  }
 
   return (
     <>
@@ -54,25 +73,27 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
           </div>
         </div>
         <nav className="flex-1 py-sm flex flex-col font-body-lg text-body-lg text-on-surface">
-          {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              onClick={() => {
-                if (!SUBPAGE_PATHS.has(link.to)) onClose()
-              }}
-              className={({ isActive }) =>
-                `flex items-center gap-md mx-2 my-1 px-4 py-3 rounded-lg transition-colors active:opacity-70 ${
+          {links.map((link) => {
+            // 有pendingTo(刚点过某一行、还没真正跳转)时，只有被点中的那行算active，
+            // 不看真实路由——避免停顿这150ms内因为路由还没变、显示成上一个页面对应
+            // 的行还亮着，跟"我刚点的是哪行"对不上
+            const isActive = pendingTo != null ? pendingTo === link.to : location.pathname === link.to
+            return (
+              <button
+                key={link.to}
+                type="button"
+                onClick={() => handleClick(link.to)}
+                className={`flex items-center gap-md mx-2 my-1 px-4 py-3 rounded-lg transition-colors active:opacity-70 text-left ${
                   isActive
                     ? 'bg-secondary-container text-on-secondary-container font-bold'
                     : 'text-on-surface-variant hover:bg-surface-variant/30'
-                }`
-              }
-            >
-              <span className="material-symbols-outlined">{link.icon}</span>
-              {t(link.labelKey)}
-            </NavLink>
-          ))}
+                }`}
+              >
+                <span className="material-symbols-outlined">{link.icon}</span>
+                {t(link.labelKey)}
+              </button>
+            )
+          })}
         </nav>
       </aside>
     </>

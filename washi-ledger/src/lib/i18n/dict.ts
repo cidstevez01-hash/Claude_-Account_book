@@ -17,7 +17,14 @@ export const dict = {
     tabDashboard: '概览', // 用户明确要求，旧App没有完全对应的词(旧App叫"记账")
     tabHistory: LEGACY_ZH.ledgerSectionTitle, // 用户要求改成"出入金"，旧App正好有这个词
     tabStats: LEGACY_ZH.tabStats,
-    balanceLabel: LEGACY_ZH.balanceLabel,
+    // B-31：仪表盘顶部卡片这三个词条不能再叫"本月"——R-27放开自定义日期区间后，
+    // 卡片统计的是当前选中的任意区间(不一定是当月)，继续用旧App"本月"系列翻译会
+    // 跟实际区间对不上，改成"累计"措辞；旧App没有这个概念，不从legacy.ts取值。
+    // monthIncome/monthExpense这两个key本身仍保留旧App"本月"语义，是统计页
+    // (StatsPage.tsx，真正按月导航，不是自定义区间)在用，不能跟着改
+    balanceLabel: '累计结余',
+    rangeIncome: '累计收入',
+    rangeExpense: '累计支出',
     monthIncome: LEGACY_ZH.monthIncome,
     monthExpense: LEGACY_ZH.monthExpense,
     recent: '最近记录', // 新App专属(旧App首页没有"最近记录"这个独立区块)
@@ -152,7 +159,11 @@ export const dict = {
     tabDashboard: LEGACY_JA.tabLedger, // 用户明确要求用"家計簿"，正好是旧App记账tab的日文
     tabHistory: LEGACY_JA.ledgerSectionTitle, // 旧App zh/ja都是"出入金"(中日通用汉字词，不是detailWord的"明細")
     tabStats: LEGACY_JA.tabStats,
-    balanceLabel: LEGACY_JA.balanceLabel,
+    // B-31：同上zh块的说明——仪表盘卡片改用"累計"措辞，monthIncome/monthExpense
+    // 保留给统计页用，不能跟着改
+    balanceLabel: '累計残高',
+    rangeIncome: '累計収入',
+    rangeExpense: '累計支出',
     monthIncome: LEGACY_JA.monthIncome,
     monthExpense: LEGACY_JA.monthExpense,
     recent: '最近の記録',

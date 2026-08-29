@@ -105,7 +105,7 @@ export function RecentEntriesList({
             onClick={() => setSearchExpanded(true)}
             className="w-[30px] h-[30px] shrink-0 flex items-center justify-center text-outline"
           >
-            <span className="material-symbols-outlined text-[16px]">search</span>
+            <span className="material-symbols-outlined text-[14px]">search</span>
           </button>
           <input
             type="text"

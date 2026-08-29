@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
-import { EntryCard } from './EntryCard'
-import { dayLabel } from './dayLabel'
+import { EntryCard } from '../ledger/EntryCard'
+import { dayLabel } from '../ledger/dayLabel'
 import { useI18n } from '../../lib/i18n'
 import type { Category, Entry, PaymentMethod } from '../../types'
 
@@ -22,12 +22,11 @@ interface CategoryDetailSheetProps {
    * 记录)，不能像分类维度那样直接假设"列表里所有记录都是header这一个分类" */
   categories: Category[]
   paymentMethods: PaymentMethod[]
-  /** 仪表盘顶部有真实的自定义日期区间输入框(DateRangeBar)，这里传的是当前选中的
-   * 任意区间文案(formatDateRangeLabel的结果，不一定是整月)——跟统计页那份独立的
-   * features/stats/CategoryDetailSheet.tsx语义不同(那边是真正的当月/趋势周期，
-   * 没有区间输入框)，B-31之前误共用同一个组件、只传不同字符串糊弄过去，两边概念
-   * 本来就不一样，拆成两个独立文件，不再共用 */
-  rangeLabel: string
+  /** 统计页真正按月/按日/按趋势周期导航(MonthNavBar/TrendControls)，没有像仪表盘
+   * 那样的自定义日期区间输入框——这里的月份/周期文案是货真价实的"当前统计周期"，
+   * 跟仪表盘那份区间弹层(features/ledger/CategoryDetailSheet.tsx)语义完全不同，
+   * B-31之前误共用同一个组件，两边概念混在一起，改成统计页专属的独立组件 */
+  monthLabel: string
   entries: Entry[]
   /** 顶部总额的显示币种——调用方应该已经用toDisplayEntries()把entries统一换算成
    * 这个币种了，这里只管格式化，不做换算 */
@@ -38,17 +37,17 @@ interface CategoryDetailSheetProps {
   onDelete?: (entry: Entry) => void
 }
 
-/** 分类/标签明细钻取——点仪表盘分类环状图的图例行，弹出该分类(或该标签，见#7)当月的
- * 明细列表，照design-assets-v2/_40(Category Detail)做，逻辑照旧仓库index.html的
+/** 分类/标签明细钻取——统计页专属版本，点收支趋势图例或分类环状图的图例行，弹出
+ * 该分类(或该标签)当前统计周期内的明细列表。逻辑照旧仓库index.html的
  * openMonthDetail/renderMonthDetailList搬(该函数本来就同时支持catCode/tagCode两种
- * 筛选维度，不是只有分类)：标题+当月总额+按日分组的记录列表，从底部滑入的sheet而不是
- * 新开一个路由页面 */
+ * 筛选维度，不是只有分类)：标题+当前周期总额+按日分组的记录列表，从底部滑入的
+ * sheet而不是新开一个路由页面 */
 export function CategoryDetailSheet({
   open,
   header,
   categories,
   paymentMethods,
-  rangeLabel,
+  monthLabel,
   entries,
   currency = 'CNY',
   onClose,
@@ -71,12 +70,12 @@ export function CategoryDetailSheet({
     header: CategoryDetailHeader
     categories: Category[]
     paymentMethods: PaymentMethod[]
-    rangeLabel: string
+    monthLabel: string
     entries: Entry[]
     currency: string
   } | null>(null)
   if (open && header) {
-    snapshotRef.current = { header, categories, paymentMethods, rangeLabel, entries, currency }
+    snapshotRef.current = { header, categories, paymentMethods, monthLabel, entries, currency }
   }
 
   useEffect(() => {
@@ -135,7 +134,7 @@ export function CategoryDetailSheet({
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-md py-md">
           <div className="flex flex-col items-center mb-md">
             <span className="text-label-caps font-sans text-on-surface-variant uppercase">
-              {snap.rangeLabel}
+              {snap.monthLabel}
             </span>
             <span className="font-serif text-headline-lg text-on-surface">{formatCurrency(total, snap.currency)}</span>
           </div>

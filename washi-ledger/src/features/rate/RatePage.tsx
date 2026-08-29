@@ -171,9 +171,10 @@ export function RatePage() {
       <div className="px-md pt-lg pb-xl flex flex-col gap-lg">
         {/* 换算卡片(The Ledger Card)——和纸胶带装饰角+虚线描边，照旧App结余卡片同一套材质语言 */}
         <div className="relative bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">
+          {/* B-33：同BalanceCard.tsx——换成真实斜纹纹理，尺寸放大，位置/角度不动 */}
           <div
-            className="absolute -top-1.5 -right-2 w-10 h-3 rounded-sm opacity-70"
-            style={{ background: 'var(--color-tertiary-fixed-dim)', transform: 'rotate(4deg)' }}
+            className="absolute -top-1.5 -right-2 w-14 h-4 rounded-sm washi-tape-texture"
+            style={{ transform: 'rotate(4deg)' }}
           />
 
           <div className="flex flex-col gap-md relative">

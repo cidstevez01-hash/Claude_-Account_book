@@ -252,7 +252,7 @@ export function DashboardPage() {
             header={detailHeader}
             categories={categories}
             paymentMethods={catalog.paymentMethods}
-            monthLabel={rangeLabel}
+            rangeLabel={rangeLabel}
             entries={detailEntries}
             currency={settings.currency}
             onClose={() => setDetailSelection(null)}

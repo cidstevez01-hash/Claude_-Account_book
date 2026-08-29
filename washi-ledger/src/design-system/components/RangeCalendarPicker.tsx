@@ -87,6 +87,20 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
   const complete = pendingStart != null && pendingEnd != null
   const grid = buildMonthGrid(viewYear, viewMonth)
 
+  // 预设选项要能显示"当前生效的区间正好是哪个预设"——不然点了预设只是那一瞬间关闭
+  // 弹层，下次重新打开完全看不出选的是哪个预设，跟没选一样。用户明确要求过这个
+  // 高亮态，且要能"切自定义区间后自动取消预设高亮"：不额外维护一个"选中了哪个预设"
+  // 的state，直接每次渲染都用当前草稿(pendingStart/pendingEnd，弹层一打开就用真实
+  // startDate/endDate初始化)去反推匹配哪个预设——自定义点选一改草稿，天然就不再匹配
+  // 任何预设，高亮自动消失，不用额外写"清除预设选中"这一步
+  const now = new Date()
+  const thisMonthRange: [string, string] = [ymd(new Date(now.getFullYear(), now.getMonth(), 1)), ymd(new Date(now.getFullYear(), now.getMonth() + 1, 0))]
+  const pastMonthRange: [string, string] = [ymd(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate() + 1)), ymd(now)]
+  const pastYearRange: [string, string] = [ymd(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() + 1)), ymd(now)]
+  function matchesPreset([s, e]: [string, string]): boolean {
+    return pendingStart === s && pendingEnd === e
+  }
+
   function applyPreset(start: string, end: string) {
     onConfirm(start, end)
     onClose()
@@ -116,14 +130,22 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
     else if (deltaX >= 40) handlePrevMonth()
   }
 
-  // 点标题"2026年8月"打开年份快速跳转页——decadeStart定位到viewYear所在的十年段。
-  // 这是往上跳回全局视图，过渡方向是'out'(缩小到位)
+  // 日历页点标题"2026年8月"打开月份快速跳转页——完全仿照Windows日历的层级顺序：
+  // 日→月→年，逐级放大到更粗粒度的视图，不是日→年→月。这是往上跳一级，过渡方向
+  // 是'out'(缩小到位)
+  function openMonthPage() {
+    setTransitionDir('out')
+    setPage('month')
+  }
+  // 月份页点标题再往上跳一级到年份页(十年网格)——decadeStart定位到viewYear所在的
+  // 十年段，同样是'out'(缩小到位)
   function openYearPage() {
     setDecadeStart(Math.floor(viewYear / 10) * 10)
     setTransitionDir('out')
     setPage('year')
   }
-  // 选年份/选月份都是往下钻取更具体的视图，过渡方向是'in'(放大到位)
+  // 选年份/选月份都是往下钻回更具体的视图，过渡方向是'in'(放大到位)：年份页选完
+  // 年份退回月份页(停在选好的年份，继续选月)，月份页选完月份退回日历页
   function pickYear(y: number) {
     setViewYear(y)
     setTransitionDir('in')
@@ -217,26 +239,18 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
         <div className="flex gap-1.5 flex-wrap mb-3">
           <PresetChip
             label={t('presetThisMonth')}
-            onClick={() => {
-              const now = new Date()
-              applyPreset(ymd(new Date(now.getFullYear(), now.getMonth(), 1)), ymd(new Date(now.getFullYear(), now.getMonth() + 1, 0)))
-            }}
+            active={matchesPreset(thisMonthRange)}
+            onClick={() => applyPreset(...thisMonthRange)}
           />
           <PresetChip
             label={t('presetPastMonth')}
-            onClick={() => {
-              // R-25明确要的是"过去一个月"(滚动区间：从一个月前的次日到今天)，不是
-              // "上个月"那种整个自然月——跟下面"过去一年"用同一个计算思路
-              const now = new Date()
-              applyPreset(ymd(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate() + 1)), ymd(now))
-            }}
+            active={matchesPreset(pastMonthRange)}
+            onClick={() => applyPreset(...pastMonthRange)}
           />
           <PresetChip
             label={t('presetPastYear')}
-            onClick={() => {
-              const now = new Date()
-              applyPreset(ymd(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() + 1)), ymd(now))
-            }}
+            active={matchesPreset(pastYearRange)}
+            onClick={() => applyPreset(...pastYearRange)}
           />
         </div>
 
@@ -244,12 +258,13 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
             结束日期"这句要么被截断要么挤占太多空间，用户明确要求"显示不全索性不要"——
             拿掉了，靠日历本身的状态(只有一个实心圆点/确定按钮禁用)传达"还没选完" */}
         {/* 左右‹›翻月按钮拿掉了——用户明确要求让位给日历本身，改成日历格子区域直接
-            左右滑动切月(见下面handleGridTouchStart/End)。标题保留，点它还是打开年份
-            快速跳转页(两个独立页面，不是跟月份混一起滚动)，这个跟滑动翻月是两回事 */}
+            左右滑动切月(见下面handleGridTouchStart/End)。标题保留，点它打开月份快速
+            跳转页(日→月→年逐级上跳，仿照Windows日历，不是日→年→月)，这个跟滑动
+            翻月是两回事 */}
         <div className="flex items-center justify-center mb-2">
           <button
             type="button"
-            onClick={openYearPage}
+            onClick={openMonthPage}
             className="px-2.5 py-1 rounded-lg bg-primary-fixed font-serif text-body-lg text-primary"
           >
             {viewYear}年{viewMonth + 1}月
@@ -320,12 +335,16 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
   )
 }
 
-function PresetChip({ label, onClick }: { label: string; onClick: () => void }) {
+function PresetChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="px-2.5 py-1 rounded-full border-[1.5px] border-outline-variant font-sans text-[11.5px] text-on-surface active:bg-surface-variant/50 transition-colors"
+      className={`px-2.5 py-1 rounded-full border-[1.5px] font-sans text-[11.5px] transition-colors ${
+        active
+          ? 'border-primary bg-primary-container text-on-primary-container'
+          : 'border-outline-variant text-on-surface active:bg-surface-variant/50'
+      }`}
     >
       {label}
     </button>

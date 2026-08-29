@@ -118,6 +118,26 @@ export function BottomNav() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeItem.to])
 
+  // B-35：冷启动(关闭App重开)时气泡摆位错位——useLayoutEffect里的place()是浏览器
+  // 画面绘制前的同步测量，如果这一刻网页字体(日文衬线字体/Material Symbols图标
+  // 字体)还没加载完成，量出来的按钮宽度是字体换上之前的临时尺寸，摆位摆的是这个
+  // 临时尺寸对应的位置；字体后续异步加载完成后会重新排版变宽，但气泡是写死的
+  // 内联left/width，不会跟着自动重新摆位。只会在真冷启动(字体还没被浏览器缓存过)
+  // 出现，跟"App内切tab不会错位"这个现象吻合——切tab时字体早就加载完了。
+  // document.fonts.ready在字体已经就绪时会立刻resolve，对热切换场景是无害的多摆
+  // 一次；activeToRef用来在字体加载这段异步等待期间读到"当时真正生效的tab"，
+  // 不是effect创建那一刻闭包住的旧值
+  const activeToRef = useRef(activeItem.to)
+  useEffect(() => {
+    activeToRef.current = activeItem.to
+  })
+  useEffect(() => {
+    document.fonts?.ready?.then(() => {
+      place(btnRefs.current[activeToRef.current])
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     function onResize() {
       place(btnRefs.current[activeItem.to])

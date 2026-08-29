@@ -313,6 +313,15 @@ body {
   box-shadow: 0 2px 0 var(--color-outline-variant);
 }
 
+/* B-33：和纸胶带装饰角——照旧仓库index.html真实的.washi-tape搬(rgba(227,178,60,...)
+   斜纹条纹，不是纯色块)。旧App原始尺寸是56x20px(它自己贴在页头顶边探出去的场景)，
+   新App贴的是卡片右上角，尺寸/位置由各自调用处的className单独控制，这里只提供
+   纹理本身；不再叠加外层opacity——条纹本身已经用两级rgba做了透明度层次，外面再套
+   一层opacity会让纹理糊成一片看不出条纹感，跟旧App视觉对不上 */
+.washi-tape-texture {
+  background: repeating-linear-gradient(-45deg, rgba(227, 178, 60, 0.55) 0 6px, rgba(227, 178, 60, 0.32) 6px 12px);
+}
+
 /* "从纸上剪下来贴上去"的剪纸描边+投影效果——App顶部大标题("记账本")原创，
    现在header左右两个图标(汉堡菜单/账户)复用同一套，深浅统一：8层描边阴影用
    --color-surface在字形/图标周围勾出一圈纸色轮廓，再叠一层3px 4px偏移、不带
