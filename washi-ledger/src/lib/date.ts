@@ -40,12 +40,15 @@ export function formatDateFull(dateStr: string): string {
 }
 
 /** 起止日期区间的展示文案——区间正好是"当月1日到当月某天"这种最常见的默认情况时，
- * 显示成"Y年M月"(照旧App月份标题的习惯)；其余任意自定义起止才显示完整的"起 ~ 止" */
+ * 显示成"Y年M月"(照旧App月份标题的习惯)；其余任意自定义起止(R-27自绘日历放开了
+ * 任意起止选择后，这种情况不再是边缘case，"过去一年"这类预设算出来的起止日基本
+ * 都落在这个分支)显示完整的"起 ~ 止"，两边都走formatDateFull()同一套"Y年M月D日"
+ * 格式，不能是原始的YYYY-MM-DD——那样跟App里其它地方的日期展示风格不一致 */
 export function formatDateRangeLabel(startDate: string, endDate: string): string {
   const [sy, sm, sd] = startDate.split('-').map(Number)
   const [ey, em] = endDate.split('-').map(Number)
   if (sy === ey && sm === em && sd === 1) {
     return `${sy}年${sm}月`
   }
-  return `${startDate} ~ ${endDate}`
+  return `${formatDateFull(startDate)} ~ ${formatDateFull(endDate)}`
 }

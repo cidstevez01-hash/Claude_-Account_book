@@ -129,7 +129,7 @@ export function CategoryDonutCard({
                 <span className="text-[10px] font-sans text-on-surface-variant uppercase">
                   {tab === 'expense' ? t('donutExpenseTitle') : t('donutIncomeTitle')}
                 </span>
-                <span className="font-serif text-stat-figure text-primary">
+                <span className={`font-serif text-stat-figure ${tab === 'expense' ? 'text-expense' : 'text-income'}`}>
                   {formatCurrency(total, currency)}
                 </span>
               </div>

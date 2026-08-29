@@ -20,7 +20,7 @@ import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
 import { firstOfMonthStr, lastOfMonthStr, formatDateRangeLabel } from '../../lib/date'
-import { consumeDashboardReturnMemory, saveDashboardScrollTop } from '../../lib/dashboardFocusMemory'
+import { consumeDashboardReturnMemory, saveDashboardScrollTop, saveDashboardSearch } from '../../lib/dashboardFocusMemory'
 import type { EntryType } from '../../types'
 
 /** 分类明细钻取(#7扩展)——照旧App openMonthDetail(filter, monthKey)真实逻辑，filter
@@ -47,10 +47,15 @@ export function DashboardPage() {
   const [endDate, setEndDate] = useState(() => lastOfMonthStr())
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const mainRef = useRef<HTMLElement>(null)
-  // 进新建/编辑/复制页面前先记一下仪表盘当时的滚动位置+要不要定位到具体某条
-  // 记录，见lib/dashboardFocusMemory.ts的说明。点"返回"(取消，没保存)回来时没有
-  // 具体记录可定位，就退回到进入前的滚动位置；真的保存了才用更精确的"定位/
-  // 高亮那条记录"
+  // R-22：最近记录搜索框——状态放在这里(不是RecentEntriesList自己的useState)，
+  // 原因见dashboardFocusMemory.ts顶部注释：goToAdd()跳转前要能读到当前搜索词
+  // 存进memory，返回时才能复原，不然每次去/add再回来这个状态就丢了
+  const [search, setSearch] = useState('')
+  // 进新建/编辑/复制页面前先记一下仪表盘当时的滚动位置+搜索词+要不要定位到具体
+  // 某条记录，见lib/dashboardFocusMemory.ts的说明。点"返回"(取消，没保存)回来时
+  // 没有具体记录可定位，就退回到进入前的滚动位置+搜索词；真的保存了才用更精确的
+  // "定位/高亮那条记录"(用户确认过：搜索词始终保留，哪怕保存出来的记录被搜索词
+  // 过滤掉、定位不到，也不自动清空搜索——方案B)
   const [focusEntryId, setFocusEntryId] = useState<string | null>(null)
   const pendingFocusIdRef = useRef<string | null>(null)
   const memoryConsumedRef = useRef(false)
@@ -65,6 +70,7 @@ export function DashboardPage() {
     // 网络同步回来的这段时间里滚动位置停在初始值(=顶部)，看起来像"先跳到
     // 顶部再跳到定位位置"；这里先用scrollTop把页面立刻摆回大致原位，
     // 不留可见的顶部空档，下面依赖entries的effect再去精确定位/高亮
+    if (mem.search != null) setSearch(mem.search)
     if (mem.scrollTop != null) {
       const el = mainRef.current
       if (el) {
@@ -108,6 +114,7 @@ export function DashboardPage() {
   // 会优先用更精确的focusEntryId，这份scrollTop当个兜底不会互相打架)
   function goToAdd(path: string) {
     if (mainRef.current) saveDashboardScrollTop(mainRef.current.scrollTop)
+    saveDashboardSearch(search)
     navigate(path)
   }
   // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail搬：
@@ -117,6 +124,7 @@ export function DashboardPage() {
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
     [catalog]
   )
+  const tags = useMemo(() => [...(catalog?.expenseTags ?? []), ...(catalog?.incomeTags ?? [])], [catalog])
   // 每条记录按settings.currency统一换算后再参与后面的求和/占比计算(照旧App
   // dayTotal用reduce(...+toBase(...))的真实模式，见data/currencyDisplay.ts的说明)
   const displayEntries = useMemo(
@@ -129,7 +137,11 @@ export function DashboardPage() {
   const summary = summarizeRange(displayEntries, startDate, endDate)
   const expenseShares = categoryBreakdownRange(displayEntries, categories, 'expense', startDate, endDate, lang)
   const incomeShares = categoryBreakdownRange(displayEntries, categories, 'income', startDate, endDate, lang)
-  // 最近明细(#6)——只显示当前选中区间内的记录，排序用groupByDayPinned(见RecentEntriesList.tsx)
+  // 最近明细(#6)——只显示当前选中区间内的记录，排序用groupByDayPinned(见RecentEntriesList.tsx)。
+  // R-22搜索框放在RecentEntriesList组件内部(标题下方、列表上方)，这里只按时间范围筛，
+  // 不在这一层过滤搜索关键词——不然搜索结果是空的时候，RecentEntriesList拿到的entries
+  // 也会是空数组，没法区分"这段时间本来就没数据"和"搜索没搜到"，标题+搜索框整个都会
+  // 被组件自己的空状态判断隐藏掉
   const recentEntries = useMemo(
     () => displayEntries.filter((e) => e.date >= startDate && e.date <= endDate),
     [displayEntries, startDate, endDate]
@@ -212,10 +224,14 @@ export function DashboardPage() {
               endDate,
             }}
           />
+          {/* R-22搜索框(标题下方、列表上方)在组件内部自己渲染，见RecentEntriesList.tsx */}
           <RecentEntriesList
             entries={recentEntries}
             categories={categories}
+            tags={tags}
             paymentMethods={catalog.paymentMethods}
+            search={search}
+            onSearchChange={setSearch}
             onViewAll={() => navigate('/history')}
             onEdit={(entry) => goToAdd(`/add?editId=${entry.id}`)}
             onCopy={(entry) => goToAdd(`/add?copyId=${entry.id}`)}
@@ -251,7 +267,7 @@ export function DashboardPage() {
         type="button"
         aria-label={t('addTitle')}
         onClick={() => goToAdd('/add')}
-        className="stamp-shadow fixed z-40 flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-on-primary"
+        className="stamp-shadow fixed z-40 flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-fab-icon"
         style={{
           right: 'max(20px, calc(50% - 240px + 20px))',
           bottom: 'calc(6rem + 24px)',

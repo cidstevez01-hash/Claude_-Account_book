@@ -26,6 +26,41 @@ export function hasEntriesInYear(entries: Entry[], year: number): boolean {
   return entries.some((e) => e.date.startsWith(key))
 }
 
+/** R-26：明细页默认时间范围——第一条数据到最新一条数据(全量，可跨月跨年)，不再是
+ * "当月"。日期是YYYY-MM-DD字符串，字典序比较本身就等价于按日期比较，不用转Date */
+export function fullDataRange(entries: Entry[]): { start: string; end: string } | null {
+  if (entries.length === 0) return null
+  let start = entries[0].date
+  let end = entries[0].date
+  for (const e of entries) {
+    if (e.date < start) start = e.date
+    if (e.date > end) end = e.date
+  }
+  return { start, end }
+}
+
+/** 明细页搜索(B-25)的haystack匹配逻辑——原来只写在HistoryPage.tsx里，R-22要求仪表盘
+ * 的"最近记录"也要能搜、且"复用明细页面的搜索框逻辑"，抽成共享函数两边调同一份，
+ * 不是各写一份容易走样(比如再漏掉某个字段)。覆盖分类/子分类/支付方式/标签/备注这几个
+ * 真实会显示在卡片上、用户会拿来搜的字段，子串匹配(includes)已经是"模糊搜索" */
+export function matchesEntrySearch(
+  entry: Entry,
+  keyword: string,
+  categories: Category[],
+  tags: Tag[],
+  paymentMethods: PaymentMethod[]
+): boolean {
+  const trimmed = keyword.trim().toLowerCase()
+  if (!trimmed) return true
+  const cat = categories.find((c) => c.code === entry.catCode)
+  const sub = cat?.subs.find((s) => s.code === entry.subCode)
+  const pm = paymentMethods.find((p) => p.code === entry.paymentMethod)
+  const tag = tags.find((tg) => tg.code === entry.tagCode)
+  const haystack =
+    `${cat?.zh ?? ''}${cat?.ja ?? ''}${sub?.zh ?? ''}${sub?.ja ?? ''}${pm?.zh ?? ''}${pm?.ja ?? ''}${tag?.zh ?? ''}${tag?.ja ?? ''}${entry.note ?? ''}`.toLowerCase()
+  return haystack.includes(trimmed)
+}
+
 export interface MonthSummary {
   balance: number
   income: number
