@@ -20,6 +20,15 @@ const items = [
  * 只会瞬间摆位、动画代码根本没机会跑。放到模块级变量就不会跟着组件销毁而丢失。 */
 let lastActiveTab: string | null = null
 
+/** B-33修的字体加载纠偏只该在整个App会话里生效一次(真冷启动那一次)，不能每次
+ * BottomNav重建(=每次切tab)都重跑——document.fonts.ready这个Promise只resolve一次，
+ * 第一次切tab之后的每次重建，这个effect(空依赖数组，但组件是全新实例)都会重新
+ * 订阅，而这时Promise早就resolve过了，.then()几乎立刻触发，place()又会把正在跑的
+ * slideTo()动画cancel掉、瞬间摆位——这正是"切tab从滑动变成瞬移"这个回归的根因。
+ * 用同样的模块级变量模式挡住，保证只在这个变量还是false的那一次(=lastActiveTab
+ * 还是null、真正的冷启动)才生效，此后切tab不会再被这个effect打断 */
+let coldStartFontFixApplied = false
+
 /** 玻璃气泡指示器(#4)——照旧仓库index.html的tabBubble真实实现搬：选中态是一个绝对定位、
  * 跟随active tab左右滑动的毛玻璃色块(见index.css的.tab-bubble)，用Web Animations API
  * 手动摆位/动画，不是CSS transition——切换时先算出"起点∪终点"的并集区域，动画中途先
@@ -124,14 +133,22 @@ export function BottomNav() {
   // 临时尺寸对应的位置；字体后续异步加载完成后会重新排版变宽，但气泡是写死的
   // 内联left/width，不会跟着自动重新摆位。只会在真冷启动(字体还没被浏览器缓存过)
   // 出现，跟"App内切tab不会错位"这个现象吻合——切tab时字体早就加载完了。
-  // document.fonts.ready在字体已经就绪时会立刻resolve，对热切换场景是无害的多摆
-  // 一次；activeToRef用来在字体加载这段异步等待期间读到"当时真正生效的tab"，
-  // 不是effect创建那一刻闭包住的旧值
+  // 回归修复：document.fonts.ready在字体已经就绪时会立刻resolve——一开始以为这对
+  // 热切换场景"无害"，但实际上每次切tab、这个effect(空依赖数组，但组件是全新实例)
+  // 都会重新订阅，Promise早就resolve过了，.then()几乎立刻触发，place()会把正在跑
+  // 的slideTo()动画cancel掉、瞬间摆位到位——切tab从"滑过去"变成"跳过去"就是这么
+  // 回归的。用coldStartFontFixApplied挡住，只在这个effect第一次真正跑起来时生效
+  // 一次(对应App这次会话的冷启动)，之后每次切tab重建都会看到这个标记已经是true、
+  // 直接跳过，不会再打断正常的滑动动画。
+  // activeToRef用来在字体加载这段异步等待期间读到"当时真正生效的tab"，不是effect
+  // 创建那一刻闭包住的旧值
   const activeToRef = useRef(activeItem.to)
   useEffect(() => {
     activeToRef.current = activeItem.to
   })
   useEffect(() => {
+    if (coldStartFontFixApplied) return
+    coldStartFontFixApplied = true
     document.fonts?.ready?.then(() => {
       place(btnRefs.current[activeToRef.current])
     })
