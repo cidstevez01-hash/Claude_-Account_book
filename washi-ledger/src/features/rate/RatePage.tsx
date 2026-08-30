@@ -24,9 +24,17 @@ const CHART_H = 160
 const CHART_TOP = 12
 const CHART_BASE = 118
 const CHART_LEFT = 40
-const CHART_RIGHT = 8
+// 原来是8——横坐标日期文字是text-anchor="middle"，最后一个点紧贴右边缘时文字有一半会
+// 超出viewBox被裁掉(这才是"08-28被截断"的真正成因，不只是之前非均匀拉伸的问题)，留够
+// 边距让最后一个日期标签完整显示
+const CHART_RIGHT = 20
 const GRID_STEPS = 3
 const MIN_LABEL_GAP_PX = 40
+// B-38：横坐标点数多(比如1Y档365个点)时按点数撑宽图表本身的像素宽度，而不是把固定
+// 320的viewBox用preserveAspectRatio="none"强行拉伸/压扁去塞进容器——那样宽高比不一致
+// 会导致横坐标日期文字被非均匀缩放挤压、看起来截断。改成图表按真实需要的宽度渲染，
+// 外层套滚动容器，点少时Math.max兜底到原来的320不至于比容器还窄显得空荡
+const POINT_GAP = 24
 
 /** 纵坐标数值精度——汇率数值量级差异很大(比如JPY→CNY在0.05附近，CNY→JPY在19附近)，
  * 固定小数位要么小汇率全显示0.0，要么大汇率一堆无意义的尾数，按量级动态选精度 */
@@ -126,7 +134,8 @@ export function RatePage() {
     const min = Math.min(...values)
     const max = Math.max(...values)
     const range = max - min || max * 0.02 || 1
-    const stepX = (CHART_W - CHART_LEFT - CHART_RIGHT) / (history.length - 1)
+    const chartWidth = Math.max(CHART_W, CHART_LEFT + CHART_RIGHT + (history.length - 1) * POINT_GAP)
+    const stepX = (chartWidth - CHART_LEFT - CHART_RIGHT) / (history.length - 1)
     const points = history.map((p, i) => {
       const x = CHART_LEFT + i * stepX
       const y = CHART_BASE - ((p.rate - min) / range) * (CHART_BASE - CHART_TOP)
@@ -154,7 +163,7 @@ export function RatePage() {
       return nextIdx === undefined || points[nextIdx].x - points[idx].x >= MIN_LABEL_GAP_PX
     })
 
-    return { points, line, area, gridLines, labelIdxs }
+    return { points, line, area, gridLines, labelIdxs, chartWidth }
   }, [history])
 
   // 选中点(R-13)——没手动点过时默认最后一个点(最新数据)，跟旧App一致
@@ -291,7 +300,8 @@ export function RatePage() {
             ) : !chartGeometry ? (
               <p className="w-full h-full flex items-center justify-center text-body-md text-on-surface-variant">{t('rateNoHistory')}</p>
             ) : (
-              <svg className="w-full h-full" preserveAspectRatio="none" viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
+              <div className="w-full h-full overflow-x-auto overflow-y-hidden">
+              <svg width={chartGeometry.chartWidth} height={CHART_H} viewBox={`0 0 ${chartGeometry.chartWidth} ${CHART_H}`} style={{ display: 'block' }}>
                 <defs>
                   <linearGradient id="rateChartGradient" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stopColor="var(--color-primary)" />
@@ -305,7 +315,7 @@ export function RatePage() {
                     <line
                       x1={CHART_LEFT}
                       y1={g.y}
-                      x2={CHART_W - CHART_RIGHT}
+                      x2={chartGeometry.chartWidth - CHART_RIGHT}
                       y2={g.y}
                       stroke="var(--color-outline-variant)"
                       strokeWidth={1}
@@ -362,6 +372,7 @@ export function RatePage() {
                   </>
                 )}
               </svg>
+              </div>
             )}
           </div>
         </div>

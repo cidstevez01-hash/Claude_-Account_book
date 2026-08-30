@@ -88,6 +88,12 @@ export const dict = {
     signOutBtn: LEGACY_ZH.cloudSignOutBtn,
     confirmSignOutTitle: '确定要退出登录吗？', // 新App专属(旧App退出登录没有二次确认弹窗)
     confirmSignOutMessage: '退出登录后仍可以查看本机已缓存的账目，重新登录后会自动与云端同步。', // 新App专属
+    changeAvatarAria: '更换头像', // 新App专属(我的账户页头像右下角的编辑徽标)
+    changeAvatarTitle: '更换头像', // 新App专属，更换头像子页面标题
+    currentAvatarLabel: '当前使用', // 新App专属
+    choosePresetAvatarLabel: '选择一个预设头像', // 新App专属
+    chooseFromAlbumBtn: '从相册选择', // 新App专属(自定义头像上传，这一版先禁用占位)
+    chooseFromAlbumComingSoon: '即将推出', // 新App专属
     cloudDisconnectBannerText: '登录已掉线，账目仍会正常保存', // 新App专属(照抄旧App B-02修复引入的掉线提示文案)
     cloudReconnectBtn: '去登录', // 新App专属
     cancelLabel: LEGACY_ZH.alarmTrimCancelBtn, // 通用"取消"，借用旧App裁剪铃声弹窗的取消按钮词条
@@ -98,7 +104,6 @@ export const dict = {
     langLabel: LEGACY_ZH.langFieldLabel,
     currencyRowLabel: '货币', // 新App专属，设置页这一行只放短标签(旧App对应的currencyFieldLabel是"本位货币（用于统计汇总）"这种带说明的长版本，跟这里单行列表的短标签风格不一致，没有直接复用)
     themeLabel: LEGACY_ZH.themeSheetTitle,
-    aboutTagline: '有纸感的极简记账本，希望能让记账这件事多一点从容与清晰。', // 新App专属，关于页的App介绍文案
     aboutCopyright: '© 2026 PigBang', // 新App专属，关于页落款
     confirmDeleteTitle: '确定要删除这条记录吗？', // 新App专属(旧App的deleteConfirm文案里带{info}记录摘要，这里是不带摘要的通用版)
     confirmDeleteMessage: '删除后将无法恢复此条账单数据，您的账户余额将自动重新计算。', // 新App专属，比旧App的deleteConfirm多了"余额自动重新计算"这句提示
@@ -223,6 +228,12 @@ export const dict = {
     signOutBtn: LEGACY_JA.cloudSignOutBtn,
     confirmSignOutTitle: 'ログアウトしますか？',
     confirmSignOutMessage: 'ログアウト後もこの端末にキャッシュされた記録は引き続き閲覧できます。再ログインすると自動的にクラウドと同期されます。',
+    changeAvatarAria: 'アバターを変更',
+    changeAvatarTitle: 'アバターを変更',
+    currentAvatarLabel: '現在使用中',
+    choosePresetAvatarLabel: 'プリセットアバターを選択',
+    chooseFromAlbumBtn: 'アルバムから選択',
+    chooseFromAlbumComingSoon: '近日公開',
     cloudDisconnectBannerText: 'ログインが切断されました。家計簿は引き続き保存されます',
     cloudReconnectBtn: 'ログインへ',
     cancelLabel: LEGACY_JA.alarmTrimCancelBtn,
@@ -233,7 +244,6 @@ export const dict = {
     langLabel: LEGACY_JA.langFieldLabel,
     currencyRowLabel: '通貨',
     themeLabel: LEGACY_JA.themeSheetTitle,
-    aboutTagline: '和紙のような温もりを感じるミニマルな家計簿。記録することに、もう少し余裕と落ち着きを。',
     aboutCopyright: '© 2026 PigBang',
     confirmDeleteTitle: 'この記録を削除しますか？',
     confirmDeleteMessage: '削除すると元に戻せません。アカウントの残高は自動的に再計算されます。',

@@ -5,6 +5,8 @@ import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { useAuth } from '../auth/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
+import { getAvatarPreset } from '../../lib/avatarPresets'
+import { loadAvatarId } from '../../lib/avatarStorage'
 
 /** 我的账户——照design-assets-v2/_30/_31/_32的头像+列表布局做，但去掉了"Pro"徽章、
  * "Premium Subscription"、"Data Backup & Sync"这些设计稿里虚构的功能(我们的数据模型
@@ -19,8 +21,10 @@ import { useI18n } from '../../lib/i18n'
 export function AccountPage() {
   const navigate = useNavigate()
   const { user, loading, signedIn } = useAuth()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [confirmSignOut, setConfirmSignOut] = useState(false)
+  const [avatarId] = useState(() => loadAvatarId())
+  const avatar = getAvatarPreset(avatarId)
 
   async function handleSignOut() {
     setConfirmSignOut(false)
@@ -60,8 +64,15 @@ export function AccountPage() {
   return (
     <AppLayout title={t('accountTitle')} leftButton="back">
       <div className="flex flex-col items-center px-md pt-lg pb-lg">
-        <div className="w-20 h-20 rounded-full border-2 border-primary flex items-center justify-center mb-3">
-          <span className="material-symbols-outlined text-4xl text-primary">account_circle</span>
+        <div className="relative w-20 h-20 rounded-full border-2 border-primary overflow-hidden mb-3">
+          <img src={avatar.src} alt={lang === 'ja' ? avatar.labelJa : avatar.labelZh} className="w-full h-full object-cover" />
+          <Link
+            to="/account/avatar"
+            aria-label={t('changeAvatarAria')}
+            className="absolute -right-0.5 bottom-0 w-[26px] h-[26px] rounded-full bg-primary border-2 border-surface flex items-center justify-center active:scale-90 transition-transform"
+          >
+            <span className="material-symbols-outlined text-[13px] text-on-primary">edit</span>
+          </Link>
         </div>
         <h2 className="text-body-md text-on-surface-variant">{user!.email}</h2>
       </div>

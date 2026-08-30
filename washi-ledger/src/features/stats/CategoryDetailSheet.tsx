@@ -143,11 +143,26 @@ export function CategoryDetailSheet({
           {groups.length === 0 ? (
             <p className="text-center text-body-md text-on-surface-variant py-8">{t('historyNoResults')}</p>
           ) : (
-            groups.map((group) => (
+            groups.map((group) => {
+              // 每日净额——用户明确要求过：这里的金额不是"当天全部记录"的总额，是
+              // "已经按图例点的这个分类/标签筛选过"的明细里，按天再算一次净额，
+              // 算法照HistoryEntryList.tsx同款(group.entries本来就是筛选后的结果，
+              // 不用额外再筛一次)：收入加、支出减，正数绿色带+、负数红色带-
+              const dayNet = group.entries.reduce((acc, e) => acc + (e.type === 'income' ? e.amount : -e.amount), 0)
+              return (
               <div key={group.date} className="mb-3">
-                <span className="inline-block bg-surface-variant text-on-surface-variant text-[10px] font-sans px-2 py-1 rounded-md mb-1">
-                  {dayLabel(group.date, t)}
-                </span>
+                <div className="flex justify-between items-end border-b-[1.5px] border-dashed border-outline-variant mb-1 pb-1">
+                  <span className="inline-block bg-surface-variant text-on-surface-variant text-[10px] font-sans px-2 py-1 rounded-md">
+                    {dayLabel(group.date, t)}
+                  </span>
+                  <span
+                    className="font-serif text-stat-figure"
+                    style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
+                  >
+                    {dayNet >= 0 ? '+' : '-'}
+                    {formatCurrency(Math.abs(dayNet), snap.currency)}
+                  </span>
+                </div>
                 {group.entries.map((entry) => (
                   <EntryCard
                     key={entry.id}
@@ -162,7 +177,8 @@ export function CategoryDetailSheet({
                   />
                 ))}
               </div>
-            ))
+              )
+            })
           )}
         </div>
       </div>

@@ -23,16 +23,9 @@ export function AboutPage() {
         <div className="inline-flex items-center px-3 py-1 bg-surface-container-high rounded-full border border-dashed border-outline-variant mb-lg">
           <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">v{__APP_VERSION__}</span>
         </div>
-
-        <div className="relative w-full bg-surface-container/50 rounded-2xl p-lg border border-dashed border-outline-variant shadow-sm">
-          <div className="absolute -top-3 -left-3 w-8 h-4 bg-tertiary rotate-[-15deg] opacity-80 rounded-sm" />
-          <p className="text-body-lg text-on-surface-variant italic leading-relaxed text-center">
-            {t('aboutTagline')}
-          </p>
-        </div>
       </div>
 
-      <div className="text-center text-body-md text-outline mt-lg pb-lg">{t('aboutCopyright')}</div>
+      <div className="text-center text-body-md text-outline pb-lg">{t('aboutCopyright')}</div>
     </AppLayout>
   )
 }
