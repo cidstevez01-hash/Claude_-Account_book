@@ -101,9 +101,16 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
     return pendingStart === s && pendingEnd === e
   }
 
+  // 用户明确要求过：预设选项不能绕过"確定"这一步直接生效——那样"確定"按钮/草稿态
+  // 这整套流程就没有意义了。改成预设只是把草稿(pendingStart/pendingEnd)填成对应
+  // 区间、日历view跳到区间末尾月份(方便用户看到高亮的选中范围)，真正提交还是要走
+  // 跟手动点日期一样的确定按钮(handleConfirm)
   function applyPreset(start: string, end: string) {
-    onConfirm(start, end)
-    onClose()
+    setPendingStart(start)
+    setPendingEnd(end)
+    const [endY, endM] = end.split('-').map(Number)
+    setViewYear(endY)
+    setViewMonth(endM - 1)
   }
 
   function handlePrevMonth() {

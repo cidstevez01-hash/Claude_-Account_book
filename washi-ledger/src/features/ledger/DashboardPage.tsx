@@ -21,6 +21,7 @@ import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
 import { firstOfMonthStr, lastOfMonthStr, formatDateRangeLabel } from '../../lib/date'
 import { consumeDashboardReturnMemory, saveDashboardScrollTop, saveDashboardSearch } from '../../lib/dashboardFocusMemory'
+import { loadDashboardRange, saveDashboardRange } from '../../lib/dateRangeStorage'
 import type { EntryType } from '../../types'
 
 /** 分类明细钻取(#7扩展)——照旧App openMonthDetail(filter, monthKey)真实逻辑，filter
@@ -42,9 +43,15 @@ export function DashboardPage() {
   // 起止日期区间——默认当月完整一个月(1日到月末最后一天)，仪表盘结余/环状图/最近明细
   // 全部跟着这个区间走；区间本身可以自由改成任意起止(#8)，只是初始值不能是"1日到今天"，
   // 那样月中打开App时后半个月的数据(包括预先录入的未来日期记录)会被默认区间挡在外面，
-  // 看起来像"数据缺失"
-  const [startDate, setStartDate] = useState(() => firstOfMonthStr())
-  const [endDate, setEndDate] = useState(() => lastOfMonthStr())
+  // 看起来像"数据缺失"。用户明确要求过要真正跨App重启持久化(不是"这次App进程内有效"
+  // 那种)，优先读dateRangeStorage.ts里localStorage存的上次区间，没存过才退回当月默认
+  const [startDate, setStartDate] = useState(() => loadDashboardRange()?.startDate ?? firstOfMonthStr())
+  const [endDate, setEndDate] = useState(() => loadDashboardRange()?.endDate ?? lastOfMonthStr())
+  // 每次区间变化(不管是预设还是自绘日历选完点確定)都立刻写一次localStorage，不等
+  // 卸载才存——用户可能选完区间直接关掉App，不会有"卸载"这个时机
+  useEffect(() => {
+    saveDashboardRange({ startDate, endDate })
+  }, [startDate, endDate])
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const mainRef = useRef<HTMLElement>(null)
   // R-22：最近记录搜索框——状态放在这里(不是RecentEntriesList自己的useState)，

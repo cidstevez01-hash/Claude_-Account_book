@@ -13,6 +13,7 @@ import { matchesEntrySearch, fullDataRange } from '../../data/summary'
 import { useI18n } from '../../lib/i18n'
 import { firstOfMonthStr, lastOfMonthStr } from '../../lib/date'
 import { loadHistoryViewMemory, saveHistoryViewMemory } from '../../lib/historyViewMemory'
+import { loadHistoryRange, saveHistoryRange } from '../../lib/dateRangeStorage'
 import type { EntryType } from '../../types'
 
 type TypeFilter = 'all' | EntryType
@@ -43,12 +44,24 @@ export function HistoryPage() {
   // R-26：出厂默认值改成"第一条数据到最新一条数据"(全量，可跨月跨年)，不再是"当月"。
   // entries的初始state本来就直接读本地缓存(见useEntries.ts)，挂载这一刻就有数据，
   // 不用等网络请求。真的一条记录都没有(全新用户)才退回"当月"这个还算合理的默认区间
+  //
+  // 起止日期区间单独优先读dateRangeStorage.ts的localStorage(真正跨App重启持久化，
+  // 用户明确要求过)，historyViewMemory只在App进程内有效，退化成第二优先级(处理"在
+  // 同一次App运行期间去新建/编辑页面再返回"这种比localStorage更即时的场景)
   const remembered = loadHistoryViewMemory()
+  const storedRange = loadHistoryRange()
   const defaultRange = fullDataRange(entries)
   const [search, setSearch] = useState(() => remembered?.search ?? '')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>(() => remembered?.typeFilter ?? 'all')
-  const [startDate, setStartDate] = useState(() => remembered?.startDate ?? defaultRange?.start ?? firstOfMonthStr())
-  const [endDate, setEndDate] = useState(() => remembered?.endDate ?? defaultRange?.end ?? lastOfMonthStr())
+  const [startDate, setStartDate] = useState(
+    () => storedRange?.startDate ?? remembered?.startDate ?? defaultRange?.start ?? firstOfMonthStr()
+  )
+  const [endDate, setEndDate] = useState(
+    () => storedRange?.endDate ?? remembered?.endDate ?? defaultRange?.end ?? lastOfMonthStr()
+  )
+  useEffect(() => {
+    saveHistoryRange({ startDate, endDate })
+  }, [startDate, endDate])
 
   const filtered = useMemo(() => {
     return displayEntries.filter((e) => {

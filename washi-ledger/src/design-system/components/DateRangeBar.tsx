@@ -20,11 +20,13 @@ interface DateRangeBarProps {
  * 换什么颜色这里的选中高亮跟着变，不是写死的颜色。 */
 export function DateRangeBar({ startDate, endDate, onChange }: DateRangeBarProps) {
   const [open, setOpen] = useState(false)
-  // B-30后label固定是"起 ~ 止"完整年月日格式，不再有"Y年M月"单段落的情况，不用再
-  // 判断isRange分支。起止两段文字各自紧贴左右两端天然的宽度，中间的~吃掉剩余空间——
-  // 但~两边留白不能无限膨胀(之前flex-1+text-center会把边框内所有剩余宽度都堆到~
-  // 两侧，两个日期一长就显得中间空得离谱)，改成给~一个有上限的宽度(max-w-9)，超出
-  // 上限的部分不再继续加宽~的留白
+  // B-35：按钮宽度必须保持w-full(用户明确要求，要跟下方其它组件对齐，不能自适应
+  // 内容缩窄)，但内容整体居中(justify-center)会把留白甩到最外圈两侧，也不对——
+  // 用户参照的是R-27之前"两个独立输入框"那版观感：那时候起/止各自是一个约半宽的
+  // 输入框，各自的文字在各自那半个框里居中，留白只跟"半个框的宽度-文字宽度"有关，
+  // 不会像单框整组居中那样把一大块留白甩到整条最外侧。改成用两个flex-1的"半区"
+  // (起区/止区)各自内部居中自己的内容，"~"卡在两个半区中间，模拟回"两个输入框
+  // 各自居中"的比例观感，而不是把"起 ~ 止"当一整块拿去在整条按钮里居中 */
   const [startLabel, endLabel] = formatDateRangeLabel(startDate, endDate).split(' ~ ')
 
   return (
@@ -32,12 +34,16 @@ export function DateRangeBar({ startDate, endDate, onChange }: DateRangeBarProps
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 w-full bg-surface-container-low rounded-lg p-3 border-[1.5px] border-dashed border-outline-variant"
+        className="flex items-center w-full bg-surface-container-low rounded-lg p-3 border-[1.5px] border-dashed border-outline-variant"
       >
-        <span className="material-symbols-outlined text-on-surface-variant text-[18px] shrink-0">calendar_today</span>
-        <span className="shrink-0 font-serif text-body-lg text-on-surface">{startLabel}</span>
-        <span className="flex-1 max-w-9 text-center font-serif text-body-lg text-on-surface-variant">~</span>
-        <span className="shrink-0 font-serif text-body-lg text-on-surface">{endLabel}</span>
+        <div className="flex-1 min-w-0 flex items-center justify-center gap-1.5">
+          <span className="material-symbols-outlined text-on-surface-variant text-[18px] shrink-0">calendar_today</span>
+          <span className="truncate font-serif text-body-lg text-on-surface">{startLabel}</span>
+        </div>
+        <span className="shrink-0 px-1 font-serif text-body-lg text-on-surface-variant">~</span>
+        <div className="flex-1 min-w-0 flex items-center justify-center">
+          <span className="truncate font-serif text-body-lg text-on-surface">{endLabel}</span>
+        </div>
       </button>
       <RangeCalendarPicker
         open={open}
