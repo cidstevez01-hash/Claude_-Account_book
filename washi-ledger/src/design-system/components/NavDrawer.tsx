@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useAuth } from '../../features/auth/useAuth'
 import { useI18n } from '../../lib/i18n'
+import { getAvatarPreset } from '../../lib/avatarPresets'
+import { loadAvatarId } from '../../lib/avatarStorage'
 import type { TranslationKey } from '../../lib/i18n'
 
 interface NavDrawerProps {
@@ -36,6 +38,10 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
   // 没反应"。改成点击先用pendingTo这个本地state让对应行立刻显示高亮态(这一帧稳定
   // 画出来)，停顿一小段时间再真正调用navigate()跳转，让绿色反馈有时间被看到 */
   const [pendingTo, setPendingTo] = useState<string | null>(null)
+  // 头像——设定头像后所有展示"账户"的地方都要跟着变，这里(抽屉头部)是其中一处；
+  // 只在真实登录态显示(未登录是引导注册/登录，不该显示"你的"头像)
+  const [avatarId] = useState(() => loadAvatarId())
+  const avatar = getAvatarPreset(avatarId)
 
   function handleClick(to: string) {
     setPendingTo(to)
@@ -62,11 +68,15 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-sm p-md border-b-[1.5px] border-dashed border-outline-variant">
-          <div className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-2xl text-primary">
-              {signedIn ? 'account_circle' : 'menu_book'}
-            </span>
-          </div>
+          {signedIn ? (
+            <div className="w-11 h-11 rounded-full border-2 border-primary overflow-hidden shrink-0">
+              <img src={avatar.src} alt="" className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-2xl text-primary">menu_book</span>
+            </div>
+          )}
           <div className="min-w-0">
             <p className="font-serif text-headline-md text-primary leading-tight">PigBang</p>
             <p className="text-body-md text-on-surface-variant truncate">{signedIn ? user!.email : t('notSignedIn')}</p>

@@ -64,8 +64,15 @@ export function AccountPage() {
   return (
     <AppLayout title={t('accountTitle')} leftButton="back">
       <div className="flex flex-col items-center px-md pt-lg pb-lg">
-        <div className="relative w-20 h-20 rounded-full border-2 border-primary overflow-hidden mb-3">
-          <img src={avatar.src} alt={lang === 'ja' ? avatar.labelJa : avatar.labelZh} className="w-full h-full object-cover" />
+        {/* 头像圆形裁切(overflow-hidden)必须只包住图片本身，不能连编辑徽标一起包进去——
+            徽标故意露出头像圆形边界一点(-right-0.5 bottom-0)，如果跟图片共用一个
+            overflow-hidden+rounded-full容器，超出头像圆形范围的那部分徽标会被这个
+            圆形遮罩连带裁掉，露出来的是个缺了一块的诡异形状(真机截图复现过)。改成
+            外层wrapper不裁切，圆形裁切单独套一层只包图片，徽标作为wrapper的兄弟节点 */}
+        <div className="relative w-20 h-20 mb-3">
+          <div className="w-full h-full rounded-full border-2 border-primary overflow-hidden">
+            <img src={avatar.src} alt={lang === 'ja' ? avatar.labelJa : avatar.labelZh} className="w-full h-full object-cover" />
+          </div>
           <Link
             to="/account/avatar"
             aria-label={t('changeAvatarAria')}

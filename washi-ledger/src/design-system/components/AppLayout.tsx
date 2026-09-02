@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from 'react'
+import { useState, type ReactNode, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
@@ -7,6 +7,9 @@ import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
 import { useDrawer } from '../../hooks/useDrawer'
 import { usePullToRefresh } from '../../hooks/usePullToRefresh'
+import { useAuth } from '../../features/auth/useAuth'
+import { getAvatarPreset } from '../../lib/avatarPresets'
+import { loadAvatarId } from '../../lib/avatarStorage'
 
 interface AppLayoutProps {
   title: string
@@ -37,6 +40,12 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
   const { t } = useI18n()
   const { containerRef, pullDistance, refreshing, dragging, threshold } = usePullToRefresh<HTMLElement>(onRefresh)
   const isSubpage = leftButton === 'back'
+  // 头像——设定头像后所有展示"账户"的地方都要跟着变，这里(每个主页面右上角进"我的
+  // 账户"的入口图标)是其中一处；只在真实登录态显示(未登录时保留原来的通用图标，
+  // 跟AccountPage/NavDrawer的"未登录不显示你的头像"逻辑一致)
+  const { signedIn } = useAuth()
+  const [avatarId] = useState(() => loadAvatarId())
+  const avatar = getAvatarPreset(avatarId)
 
   return (
     <div
@@ -96,7 +105,13 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
             aria-label={t('accountTitle')}
             className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
           >
-            <span className="material-symbols-outlined papercut-text-shadow">{APP_ICONS.account}</span>
+            {signedIn ? (
+              <span className="w-7 h-7 rounded-full border-2 border-primary overflow-hidden block">
+                <img src={avatar.src} alt="" className="w-full h-full object-cover" />
+              </span>
+            ) : (
+              <span className="material-symbols-outlined papercut-text-shadow">{APP_ICONS.account}</span>
+            )}
           </Link>
         )}
       </header>
