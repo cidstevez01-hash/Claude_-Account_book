@@ -43,15 +43,16 @@ export function DashboardPage() {
   // 起止日期区间——默认当月完整一个月(1日到月末最后一天)，仪表盘结余/环状图/最近明细
   // 全部跟着这个区间走；区间本身可以自由改成任意起止(#8)，只是初始值不能是"1日到今天"，
   // 那样月中打开App时后半个月的数据(包括预先录入的未来日期记录)会被默认区间挡在外面，
-  // 看起来像"数据缺失"。用户明确要求过要真正跨App重启持久化(不是"这次App进程内有效"
-  // 那种)，优先读dateRangeStorage.ts里localStorage存的上次区间，没存过才退回当月默认
+  // 看起来像"数据缺失"。
+  //
+  // storedRange(dateRangeStorage.ts，真正跨App重启持久化，用户明确要求过)只在用户
+  // 真的点过日历"确定"/预设选项时才写入(见下面DateRangeBar的onChange)，不是随
+  // state变化无脑存——如果不这样区分，组件挂载时自动算出来的"当月"默认值第一次算出
+  // 就会被当成"用户选择"存进localStorage，之后不管进入几月都只会读到这个存量的旧值，
+  // "每月1日区间该自动跟着变成新的当月"这个需求就实现不了(这正是被报的bug：进了9月
+  // 还停在8月1日~8月31日)
   const [startDate, setStartDate] = useState(() => loadDashboardRange()?.startDate ?? firstOfMonthStr())
   const [endDate, setEndDate] = useState(() => loadDashboardRange()?.endDate ?? lastOfMonthStr())
-  // 每次区间变化(不管是预设还是自绘日历选完点確定)都立刻写一次localStorage，不等
-  // 卸载才存——用户可能选完区间直接关掉App，不会有"卸载"这个时机
-  useEffect(() => {
-    saveDashboardRange({ startDate, endDate })
-  }, [startDate, endDate])
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const mainRef = useRef<HTMLElement>(null)
   // R-22：最近记录搜索框——状态放在这里(不是RecentEntriesList自己的useState)，
@@ -212,6 +213,7 @@ export function DashboardPage() {
               onChange={(s, e) => {
                 setStartDate(s)
                 setEndDate(e)
+                saveDashboardRange({ startDate: s, endDate: e })
               }}
             />
           </div>

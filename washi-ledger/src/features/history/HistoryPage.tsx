@@ -11,7 +11,7 @@ import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { matchesEntrySearch, fullDataRange } from '../../data/summary'
 import { useI18n } from '../../lib/i18n'
-import { firstOfMonthStr, lastOfMonthStr } from '../../lib/date'
+import { firstOfMonthStr, lastOfMonthStr, todayStr } from '../../lib/date'
 import { loadHistoryViewMemory, saveHistoryViewMemory } from '../../lib/historyViewMemory'
 import { loadHistoryRange, saveHistoryRange } from '../../lib/dateRangeStorage'
 import type { EntryType } from '../../types'
@@ -41,13 +41,19 @@ export function HistoryPage() {
   // 明细页每次从别的页面导航回来都是全新挂载的组件实例(这个App的路由结构没有共享
   // Outlet布局)，筛选条件/滚动位置本来会全部重置。改成挂载时优先读上次离开前记住
   // 的状态(见lib/historyViewMemory.ts)，只有从没来过(memory是null)才用出厂默认值——
-  // R-26：出厂默认值改成"第一条数据到最新一条数据"(全量，可跨月跨年)，不再是"当月"。
-  // entries的初始state本来就直接读本地缓存(见useEntries.ts)，挂载这一刻就有数据，
-  // 不用等网络请求。真的一条记录都没有(全新用户)才退回"当月"这个还算合理的默认区间
+  // R-26：出厂默认值改成"第一条数据到今天"(全量，可跨月跨年，终点用todayStr()而不是
+  // 最后一条记录的日期，这样今天新记的账也在默认区间内)，不再是"当月"。entries的
+  // 初始state本来就直接读本地缓存(见useEntries.ts)，挂载这一刻就有数据，不用等网络
+  // 请求。真的一条记录都没有(全新用户)才退回"当月"这个还算合理的默认区间
   //
-  // 起止日期区间单独优先读dateRangeStorage.ts的localStorage(真正跨App重启持久化，
-  // 用户明确要求过)，historyViewMemory只在App进程内有效，退化成第二优先级(处理"在
-  // 同一次App运行期间去新建/编辑页面再返回"这种比localStorage更即时的场景)
+  // 起止日期区间——storedRange(dateRangeStorage.ts，真正跨App重启持久化)只在用户
+  // 真的点过日历"确定"/预设选项时才写入(见下面DateRangeBar的onChange)，不是随
+  // state变化无脑存；这样才能区分"用户手动选的区间"和"组件挂载时自动算出来的默认
+  // 区间"——如果不区分，默认区间第一次算出来就会被当成"用户选择"存进localStorage，
+  // 之后不管日期怎么变都只会读到这个存量值，出入金页/仪表盘"进入新的一天/月份该
+  // 自动跟着变"这个需求就实现不了(这正是被报的bug)。remembered(historyViewMemory，
+  // 只在App进程内有效)还是次优先级，处理"同一次App运行期间去新建/编辑页面再返回"
+  // 这种更即时的场景
   const remembered = loadHistoryViewMemory()
   const storedRange = loadHistoryRange()
   const defaultRange = fullDataRange(entries)
@@ -57,11 +63,8 @@ export function HistoryPage() {
     () => storedRange?.startDate ?? remembered?.startDate ?? defaultRange?.start ?? firstOfMonthStr()
   )
   const [endDate, setEndDate] = useState(
-    () => storedRange?.endDate ?? remembered?.endDate ?? defaultRange?.end ?? lastOfMonthStr()
+    () => storedRange?.endDate ?? remembered?.endDate ?? (defaultRange ? todayStr() : lastOfMonthStr())
   )
-  useEffect(() => {
-    saveHistoryRange({ startDate, endDate })
-  }, [startDate, endDate])
 
   const filtered = useMemo(() => {
     return displayEntries.filter((e) => {
@@ -186,6 +189,7 @@ export function HistoryPage() {
           onChange={(s, e) => {
             setStartDate(s)
             setEndDate(e)
+            saveHistoryRange({ startDate: s, endDate: e })
           }}
         />
       </section>
