@@ -134,6 +134,7 @@ export const dict = {
     newTagPlaceholder: LEGACY_ZH.newTagPlaceholder,
     themeDefaultName: 'PigBang', // 新App专属(默认主题卡片名字，R-19：App名称确定沿用PigBang)
     themeNostalgiaName: '怀旧', // 新App专属(R-14新增主题，颜色/背景改回旧App基本主题色调)
+    themeSummerName: '夏 · 花火', // 旧App data-skin="summerB"同款名字直接搬(见index.html THEME_SKINS)
     emailLabel: LEGACY_ZH.cloudEmailPlaceholder,
     passwordLabel: LEGACY_ZH.cloudPasswordPlaceholder,
     confirmPasswordLabel: '确认密码', // 新App专属(旧App注册没有"确认密码"这一栏，只有设置新密码一栏)
@@ -275,6 +276,7 @@ export const dict = {
     newTagPlaceholder: LEGACY_JA.newTagPlaceholder,
     themeDefaultName: 'PigBang',
     themeNostalgiaName: 'ノスタルジー',
+    themeSummerName: '夏・花火',
     emailLabel: LEGACY_JA.cloudEmailPlaceholder,
     passwordLabel: LEGACY_JA.cloudPasswordPlaceholder,
     confirmPasswordLabel: 'パスワード（確認）',

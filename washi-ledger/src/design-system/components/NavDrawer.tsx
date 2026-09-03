@@ -5,6 +5,7 @@ import { useAuth } from '../../features/auth/useAuth'
 import { useI18n } from '../../lib/i18n'
 import { getAvatarPreset } from '../../lib/avatarPresets'
 import { loadAvatarId } from '../../lib/avatarStorage'
+import { ThemeIcon } from './ThemeIcon'
 import type { TranslationKey } from '../../lib/i18n'
 
 interface NavDrawerProps {
@@ -20,9 +21,12 @@ interface NavDrawerProps {
 // 导航栏+抽屉本身)，点进去时不关闭抽屉——共享的drawerOpen状态(见useDrawer.tsx)保持
 // true，等用户从子页面点返回箭头回到这里时，抽屉自然还是展开的样子
 const SUBPAGE_PATHS = new Set(['/rate', '/settings', '/about'])
-const links: { to: string; icon: string; labelKey: TranslationKey }[] = [
-  { to: '/rate', icon: APP_ICONS.rate, labelKey: 'rateNavLabel' },
-  { to: '/settings', icon: APP_ICONS.settings, labelKey: 'settingsTitle' },
+// R-29："夏 · 花火"下汇率/设置换成旧App对应-fw图标(设置借用的是旧App统计tab的
+// 烟花图标ic-chart-fw，不是它自己的-fw版本——旧App applyThemeIcons()本来就是这样
+// 交叉换的，见index.html)；关于没有对应资源，fwIcon留空自动退回原图标
+const links: { to: string; icon: string; fwIcon?: string; labelKey: TranslationKey }[] = [
+  { to: '/rate', icon: APP_ICONS.rate, fwIcon: '/icons/fw/ic-exchange-fw.svg', labelKey: 'rateNavLabel' },
+  { to: '/settings', icon: APP_ICONS.settings, fwIcon: '/icons/fw/ic-chart-fw.svg', labelKey: 'settingsTitle' },
   { to: '/about', icon: APP_ICONS.about, labelKey: 'aboutTitle' },
 ]
 
@@ -99,7 +103,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
                     : 'text-on-surface-variant hover:bg-surface-variant/30'
                 }`}
               >
-                <span className="material-symbols-outlined">{link.icon}</span>
+                <ThemeIcon icon={link.icon} fw={link.fwIcon} className="w-6 h-6" />
                 {t(link.labelKey)}
               </button>
             )

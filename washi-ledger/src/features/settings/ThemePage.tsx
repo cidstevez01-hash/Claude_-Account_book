@@ -16,6 +16,9 @@ import type { ThemeSkin } from '../../types'
 const THEME_PREVIEWS: Record<ThemeSkin, { primary: string; surface: string; outlineVariant: string }> = {
   default: { primary: '#d1665a', surface: '#fff8f5', outlineVariant: '#dcc0bc' },
   nostalgia: { primary: '#d1665a', surface: '#f7f1e7', outlineVariant: '#e7dcc4' },
+  // R-29：数值抄自index.css :root[data-theme="summer"]的--color-primary/--color-surface/
+  // --color-outline-variant，跟旧App--seal/--paper/--grid对应
+  summer: { primary: '#E85D4A', surface: '#101B33', outlineVariant: '#2A3D63' },
 }
 
 export function ThemePage() {
@@ -23,9 +26,10 @@ export function ThemePage() {
   const { t } = useI18n()
   const { settings, update } = useSettings()
 
-  const cards: { skin: ThemeSkin; nameKey: 'themeDefaultName' | 'themeNostalgiaName' }[] = [
+  const cards: { skin: ThemeSkin; nameKey: 'themeDefaultName' | 'themeNostalgiaName' | 'themeSummerName' }[] = [
     { skin: 'default', nameKey: 'themeDefaultName' },
     { skin: 'nostalgia', nameKey: 'themeNostalgiaName' },
+    { skin: 'summer', nameKey: 'themeSummerName' },
   ]
 
   return (

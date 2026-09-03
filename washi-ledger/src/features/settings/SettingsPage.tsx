@@ -4,16 +4,19 @@ import { useSettings } from '../../hooks/useSettings'
 import { useI18n } from '../../lib/i18n'
 import { APP_ICONS } from '../../lib/appIcons'
 import { CURRENCIES } from '../../data/rate'
+import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import type { Lang } from '../../types'
 
 interface SettingsRowProps {
   icon: string
+  /** R-29："夏 · 花火"下这个位置对应的旧App-fw图标资源路径，见ThemeIcon组件 */
+  fwIcon?: string
   label: string
   children: React.ReactNode
   onClick?: () => void
 }
 
-function SettingsRow({ icon, label, children, onClick }: SettingsRowProps) {
+function SettingsRow({ icon, fwIcon, label, children, onClick }: SettingsRowProps) {
   return (
     <div
       role={onClick ? 'button' : undefined}
@@ -23,7 +26,7 @@ function SettingsRow({ icon, label, children, onClick }: SettingsRowProps) {
     >
       <div className="flex items-center gap-sm">
         <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
-          <span className="material-symbols-outlined">{icon}</span>
+          <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" />
         </div>
         <span className="text-body-lg text-on-surface">{label}</span>
       </div>
@@ -103,13 +106,24 @@ export function SettingsPage() {
           options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.zh} (${c.code})` }))}
         />
 
-        <SettingsRow icon="palette" label={t('themeLabel')} onClick={() => navigate('/theme')}>
+        <SettingsRow
+          icon="palette"
+          fwIcon="/icons/fw/ic-shirt-fw.svg"
+          label={t('themeLabel')}
+          onClick={() => navigate('/theme')}
+        >
           <div className="flex items-center gap-1">
             {/* 之前这里写死显示"PigBang"，跟ThemePage.tsx选卡片切主题完全没接上——
                 切完主题回设置页这一行还是那个死字符串，看起来像"没生效"。改成
                 跟ThemePage.tsx同一套themeDefaultName/themeNostalgiaName翻译键，
                 真实反映settings.themeSkin当前值 */}
-            <span>{settings.themeSkin === 'nostalgia' ? t('themeNostalgiaName') : t('themeDefaultName')}</span>
+            <span>
+              {settings.themeSkin === 'nostalgia'
+                ? t('themeNostalgiaName')
+                : settings.themeSkin === 'summer'
+                  ? t('themeSummerName')
+                  : t('themeDefaultName')}
+            </span>
             <span className="material-symbols-outlined text-[18px]">chevron_right</span>
           </div>
         </SettingsRow>

@@ -74,7 +74,10 @@ export type Lang = 'zh' | 'ja'
 // R-14：新增'nostalgia'("怀旧")主题——颜色/背景改回旧仓库index.html基本主题(--paper/
 // --ink/--grid等)那套暖色调，布局/组件结构完全不变，只切CSS变量(见index.css
 // :root[data-theme="nostalgia"]覆盖块)
-export type ThemeSkin = 'default' | 'nostalgia'
+// 新增'summer'("夏 · 花火")——旧仓库index.html的data-skin="summerB"移植：深藏青底配
+// 朱红/金黄/翡翠绿，卡片/图标发光描边，外加canvas实时烟花+星空动态背景(见
+// FireworksBackground.tsx)，是当前唯一带动态背景的主题
+export type ThemeSkin = 'default' | 'nostalgia' | 'summer'
 
 export interface UserSettings {
   lang: Lang

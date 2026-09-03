@@ -9,6 +9,7 @@ import { useI18n } from '../../lib/i18n'
 import { useDrawer } from '../../hooks/useDrawer'
 import { usePullToRefresh } from '../../hooks/usePullToRefresh'
 import { useAuth } from '../../features/auth/useAuth'
+import { useSettings } from '../../hooks/useSettings'
 import { getAvatarPreset } from '../../lib/avatarPresets'
 import { loadAvatarId } from '../../lib/avatarStorage'
 
@@ -47,10 +48,19 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
   const { signedIn } = useAuth()
   const [avatarId] = useState(() => loadAvatarId())
   const avatar = getAvatarPreset(avatarId)
+  // R-29："夏 · 花火"主题下这个根容器背景要透明，才能让常驻挂在App.tsx根部的
+  // FireworksBackground(星空+烟花canvas)透出来——main内容区(paper-grid-bg)本来
+  // 就没有自己单独的背景色，一直是继承这里；header/底部导航栏胶囊/抽屉自己有
+  // 各自的背景，不受这个影响，仍然是不透明的"纸面"，跟旧App的.header/.fw-bg-layer
+  // 分层关系一致
+  const { settings } = useSettings()
+  const isSummer = settings.themeSkin === 'summer'
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
+      className={`fixed inset-0 mx-auto max-w-[480px] flex flex-col overflow-hidden ${
+        isSummer ? 'bg-transparent' : 'bg-surface'
+      }`}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* B-08：paper-grid-bg之前贴在这个根容器上，顶部安全区(header上方那一小条，

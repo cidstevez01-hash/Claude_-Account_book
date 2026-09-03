@@ -280,7 +280,10 @@ export function DashboardPage() {
         style={{
           right: 'max(20px, calc(50% - 240px + 20px))',
           bottom: 'calc(6rem + 24px)',
-          boxShadow: '0 4px 0 var(--color-primary-container)',
+          // R-29：花火主题下"夏 · 花火"要求FAB加发光描边(照旧App.fab真实box-shadow)，
+          // 默认/怀旧主题维持原来的压印投影——用CSS变量+fallback承载，summer token
+          // 块单独覆盖--shadow-main-fab，不用!important去跟这里的inline style抢
+          boxShadow: 'var(--shadow-main-fab, 0 4px 0 var(--color-primary-container))',
         }}
       >
         <span className="material-symbols-outlined text-3xl">{APP_ICONS.addTransaction}</span>

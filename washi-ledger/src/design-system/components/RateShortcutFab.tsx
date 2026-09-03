@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../../lib/i18n'
+import { ThemeIcon } from './ThemeIcon'
 
 /** R-20：汇率悬浮快捷入口——用户确认稿(design-assets/icons/rate-shortcut-fab/final/)，
  * 位置/图案取方案A(主"记一笔"FAB正上方20px、currency_exchange图标)，呼吸光晕取方案C。
@@ -38,9 +39,13 @@ export function RateShortcutFab() {
         }}
         aria-hidden="true"
       />
-      <span className="material-symbols-outlined relative" style={{ fontSize: 22 }}>
-        currency_exchange
-      </span>
+      {/* R-29：跟NavDrawer汇率行同一个-fw资源，保持一致 */}
+      <ThemeIcon
+        icon="currency_exchange"
+        fw="/icons/fw/ic-exchange-fw.svg"
+        className="relative w-6 h-6"
+        style={{ fontSize: 22 }}
+      />
     </Link>
   )
 }

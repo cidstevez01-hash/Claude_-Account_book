@@ -2,14 +2,18 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { APP_ICONS } from '../../lib/appIcons'
+import { ThemeIcon } from './ThemeIcon'
 
 // 悬浮胶囊样式——DESIGN.md原文"A floating capsule with a backdrop-filter"。
 // 3个tab：仪表盘/明细/统计，设置+汇率不在这里，放左侧抽屉导航(见NavDrawer)。
 // 这条规则来自washi_ledger_markdown.md"交互逻辑提醒"一节，详见HANDOFF文档。
+// R-29：仪表盘/统计两个tab在"夏 · 花火"主题下换成旧App对应的-fw图标(书本→花束
+// 烟花、柱状图→孔明灯，旧App本身就是这样交叉换的，见index.html applyThemeIcons())；
+// 明细没有对应的旧App-fw资源，fwIcon留空，ThemeIcon组件会自动退回原Material图标
 const items = [
-  { to: '/', icon: APP_ICONS.dashboard, labelKey: 'tabDashboard' as const },
-  { to: '/history', icon: APP_ICONS.history, labelKey: 'tabHistory' as const },
-  { to: '/stats', icon: APP_ICONS.stats, labelKey: 'tabStats' as const },
+  { to: '/', icon: APP_ICONS.dashboard, fwIcon: '/icons/fw/ic-book-fw.svg', labelKey: 'tabDashboard' as const },
+  { to: '/history', icon: APP_ICONS.history, fwIcon: undefined, labelKey: 'tabHistory' as const },
+  { to: '/stats', icon: APP_ICONS.stats, fwIcon: '/icons/fw/ic-lantern-fw.svg', labelKey: 'tabStats' as const },
 ]
 
 /** 记录"上一次停在哪个tab"——必须放在组件外面(模块级)，不能放进组件内部的useRef。
@@ -188,12 +192,12 @@ export function BottomNav() {
         >
           {({ isActive }) => (
             <>
-              <span
-                className="material-symbols-outlined"
+              <ThemeIcon
+                icon={item.icon}
+                fw={item.fwIcon}
+                className="w-6 h-6"
                 style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
-              >
-                {item.icon}
-              </span>
+              />
               <span className="text-tab-label font-sans font-normal">{t(item.labelKey)}</span>
             </>
           )}

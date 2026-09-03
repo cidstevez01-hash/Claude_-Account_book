@@ -213,6 +213,114 @@
   --color-expense: #d1665a;
 }
 
+/* R-29："夏 · 花火"主题——移植旧仓库index.html的data-skin="summerB"：深藏青底配
+   朱红/金黄/翡翠绿，色值照抄旧App :root[data-skin="summerB"]那一行(--paper#101B33/
+   --card#1A2C4D/--ink#F0E9D8/--ink-soft#93A6C4/--seal#E85D4A/--seal-soft#F2967F/
+   --jade#4FD1A5/--grid#2A3D63/--grid-bg#1F3155/--accent#F2C94C)，一一对应到新App
+   token名；深浅衍生值仍走color-mix()公式(跟怀旧主题同一套写法)，只有--color-on-primary
+   是手动指定(旧App.save-btn同类按钮在--seal底上直接用了白字，对比度够，不用像
+   怀旧那样另外调深色对比色)。这是当前唯一带动态背景的主题——发光描边只是配色的一部分，
+   真正的星空+烟花canvas动效见FireworksBackground.tsx，挂在App.tsx根部而不是这里 */
+:root[data-theme="summer"] {
+  --color-surface: #101b33;
+  --color-surface-dim: #0c1526;
+  --color-surface-bright: #1a2c4d;
+  --color-surface-container-lowest: #1a2c4d;
+  --color-surface-container-low: #182742;
+  --color-surface-container: #16233b;
+  --color-surface-container-high: #142035;
+  --color-surface-container-highest: #1f3155;
+  --color-surface-variant: #1f3155;
+  --color-on-surface: #f0e9d8;
+  --color-on-surface-variant: #93a6c4;
+  --color-inverse-surface: #f0e9d8;
+  --color-inverse-on-surface: #101b33;
+  --color-outline: #93a6c4;
+  --color-outline-variant: #2a3d63;
+
+  --color-background: #101b33;
+  --color-on-background: #f0e9d8;
+
+  --color-primary: #e85d4a;
+  --color-primary-container: color-mix(in srgb, var(--color-primary) 82%, black 18%);
+  --color-inverse-primary: color-mix(in srgb, var(--color-primary) 55%, white 45%);
+  --color-primary-fixed: color-mix(in srgb, var(--color-primary) 25%, white 75%);
+  --color-primary-fixed-dim: color-mix(in srgb, var(--color-primary) 60%, white 40%);
+
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #fffbff;
+  --color-on-primary-fixed: #431400;
+  --color-on-primary-fixed-variant: #8a4420;
+
+  /* 大标题+头部图标——同样公式化，混黑25%(照怀旧主题同一档比例) */
+  --color-app-title: color-mix(in srgb, var(--color-primary) 75%, black 25%);
+
+  --color-fab-icon: #ffffff;
+
+  /* 收入沿用--color-secondary(下面改成--jade #4FD1A5，还是绿色系，只是更亮更青，
+     跟"支出/收入色相固定"这条规则不冲突)；支出照怀旧主题同一个做法，固定用默认
+     主题原本的复古红，不跟--seal(旧App里这两者本来就是分开的两套语义) */
+  --color-secondary: #4fd1a5;
+  --color-expense: #d1665a;
+
+  /* 金黄强调色——旧App--accent，新App目前没有单独消费这个token的地方，先占位
+     覆盖，以后要用金黄强调随时能接 */
+  --color-tertiary: #f2c94c;
+
+  /* 记一笔主FAB的发光描边——照旧App.fab{box-shadow:0 0 16px -2px seal, 0 3px 0
+     seal-soft}搬，DashboardPage.tsx的inline style读这个变量、没定义时退回默认/
+     怀旧主题原本的压印投影 */
+  --shadow-main-fab:
+    0 0 16px -2px var(--color-primary), 0 3px 0 color-mix(in srgb, var(--color-primary) 70%, white 15%);
+}
+
+/* 星空闪烁——照旧App同名keyframes搬，FireworksBackground.tsx里带fw-star-tw类的
+   那批星星(每6颗取1颗)用这个做微弱的明暗闪烁，不是全部星星一起闪 */
+@keyframes fwstartw {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.fw-star-tw {
+  animation: fwstartw 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fw-star-tw {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/* "夏 · 花火"卡片/图标/FAB发光描边——照旧App对应选择器逐条搬，色值换成上面
+   :root[data-theme="summer"]刚定义的token，box-shadow公式(颜色/透明度/扩散半径)
+   跟旧App完全一致，不是重新设计的一套 */
+[data-theme='summer'] .ledger-card {
+  border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+  box-shadow:
+    0 0 22px -4px color-mix(in srgb, var(--color-primary) 55%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent) inset;
+}
+[data-theme='summer'] .entry-card {
+  border-color: var(--color-outline-variant);
+  box-shadow: 0 0 10px -3px color-mix(in srgb, var(--color-secondary) 40%, transparent);
+}
+[data-theme='summer'] .points-chip {
+  text-shadow: 0 0 6px color-mix(in srgb, var(--color-secondary) 55%, transparent);
+}
+/* 只挑h1标题——.papercut-text-shadow这个类在新App里同时贴在标题和头部图标按钮上
+   (旧App里两者是分开的两个类，.papercut只用在标题)，这里只narrow到h1，不连图标
+   按钮一起变金黄 */
+[data-theme='summer'] h1.papercut-text-shadow {
+  color: var(--color-tertiary);
+  text-shadow:
+    0 0 6px var(--color-tertiary),
+    0 0 16px color-mix(in srgb, var(--color-primary) 60%, transparent);
+}
+
 /* html/body/#root钉死height:100%+overflow:hidden——外壳整个固定，不滚动。每个页面
    自己的根容器是position:fixed;inset:0(见AppLayout.tsx等)，真正会滚动的只有页面
    内部的<main>(overflow-y:auto)，body/html本身不再承担滚动职责。这样处理是因为

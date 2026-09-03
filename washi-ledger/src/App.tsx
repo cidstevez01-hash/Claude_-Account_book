@@ -3,6 +3,7 @@ import { I18nProvider } from './lib/i18n'
 import { SettingsProvider } from './hooks/useSettings'
 import { CatalogProvider } from './hooks/useCatalog'
 import { DrawerProvider } from './hooks/useDrawer'
+import { FireworksBackground } from './design-system/components/FireworksBackground'
 import { DashboardPage } from './features/ledger/DashboardPage'
 import { HistoryPage } from './features/history/HistoryPage'
 import { StatsPage } from './features/stats/StatsPage'
@@ -19,6 +20,10 @@ import { AboutPage } from './features/about/AboutPage'
 export default function App() {
   return (
     <SettingsProvider>
+      {/* R-29：常驻挂在这里(不是某个AppLayout实例内)，只根据themeSkin切换渲染，
+          切页面/路由不会打断动效。渲染顺序在Routes前面，天然沉在下面——AppLayout
+          根容器在"夏 · 花火"下会把自己背景改透明，才会真的透出来(见AppLayout.tsx) */}
+      <FireworksBackground />
       <I18nProvider>
         <CatalogProvider>
           <BrowserRouter>
