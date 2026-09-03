@@ -268,6 +268,38 @@ body {
   animation: picker-zoom-out 0.18s ease-out;
 }
 
+/* 日历格子左右滑动切月(handleGridTouchStart/End)之前完全没有过渡，setViewMonth
+   一变格子内容瞬间重绘，手感是"一跳一跳"。照上面picker-zoom系列同一套技巧：格子
+   容器的key跟着viewYear/viewMonth变，强制每次切月都重新挂载触发动画重播，不用
+   额外的动画库或手动重置状态。左右两个方向分别对应"切到下一月(新内容从右边
+   滑入)"和"切到上一月(新内容从左边滑入)"，用位移方向呼应手指滑动的方向 */
+@keyframes grid-slide-in-left {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes grid-slide-in-right {
+  from {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.grid-slide-in-left {
+  animation: grid-slide-in-left 0.18s ease-out;
+}
+.grid-slide-in-right {
+  animation: grid-slide-in-right 0.18s ease-out;
+}
+
 /* R-27自绘日历面板毛玻璃——研究过其他方案，最后还是用backdrop-filter：
    1) SVG位移滤镜(仓库里.tab-bubble那种#glassLens折射效果)是做"透过玻璃看到背后
       图标轻微变形"这种精致小面积效果的，日历这种大面积、内容本身还要保持清晰

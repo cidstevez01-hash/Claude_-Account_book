@@ -63,6 +63,9 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
   // 不同的操作意图，不是同一个模糊的淡入淡出。具体动画见index.css的
   // .picker-zoom-in/.picker-zoom-out
   const [transitionDir, setTransitionDir] = useState<'in' | 'out'>('in')
+  // 滑动切月的过渡方向——跟transitionDir是两套独立状态，一个管年/月快速跳转页的
+  // 缩放过渡，一个管日历格子本身的左右滑入过渡，互不影响
+  const [monthSlideDir, setMonthSlideDir] = useState<'left' | 'right'>('left')
   // 左右‹›翻月按钮拿掉了，改成日历格子区域本身左右滑动切月——这个ref必须跟其他
   // hooks一样放在"if (!open) return null"之前，不然open从true变false时组件这次
   // 渲染会少调一个hook，触发React"hooks数量不一致"报错(#310)，之前踩过这个坑
@@ -115,11 +118,13 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
 
   function handlePrevMonth() {
     const d = new Date(viewYear, viewMonth - 1, 1)
+    setMonthSlideDir('right')
     setViewYear(d.getFullYear())
     setViewMonth(d.getMonth())
   }
   function handleNextMonth() {
     const d = new Date(viewYear, viewMonth + 1, 1)
+    setMonthSlideDir('left')
     setViewYear(d.getFullYear())
     setViewMonth(d.getMonth())
   }
@@ -285,7 +290,12 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
             </span>
           ))}
         </div>
-        <div className="grid grid-cols-7" onTouchStart={handleGridTouchStart} onTouchEnd={handleGridTouchEnd}>
+        <div
+          key={`${viewYear}-${viewMonth}`}
+          className={`grid grid-cols-7 ${monthSlideDir === 'left' ? 'grid-slide-in-left' : 'grid-slide-in-right'}`}
+          onTouchStart={handleGridTouchStart}
+          onTouchEnd={handleGridTouchEnd}
+        >
           {grid.map(({ date, inMonth }) => {
             const dateStr = ymd(date)
             const isStart = dateStr === pendingStart
