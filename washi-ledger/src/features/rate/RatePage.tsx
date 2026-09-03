@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { fetchRates, fetchRateHistory, CURRENCIES, type RateSnapshot, type RateHistoryPoint } from '../../data/rate'
 import { useI18n } from '../../lib/i18n'
@@ -73,6 +73,11 @@ export function RatePage() {
   // (null表示"还没选，用最后一个")，点任意点会把它移过去；每次历史数据换了(切换时间
   // 范围/切换货币对)都要清空回到"默认最新点"，不然可能残留一个超出新数组长度的下标
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
+  // 走势图默认要看到的是最新数据（汇率第一关心的是"现在"），照旧App
+  // renderRateTrendChart()的scrollEl.scrollLeft = W同一个思路：图表点数多时会超出
+  // 容器宽度、外层套了横向滚动条(见下面渲染部分)，1Y这种档位默认停在最左边(起始点)
+  // 反而看不到最新汇率，chartGeometry每次变化(切换货币对/时间范围/刷新)都滚到最右
+  const chartScrollRef = useRef<HTMLDivElement>(null)
 
   async function refresh(base: string) {
     setLoading(true)
@@ -165,6 +170,11 @@ export function RatePage() {
 
     return { points, line, area, gridLines, labelIdxs, chartWidth }
   }, [history])
+
+  useEffect(() => {
+    if (!chartGeometry || !chartScrollRef.current) return
+    chartScrollRef.current.scrollLeft = chartScrollRef.current.scrollWidth
+  }, [chartGeometry])
 
   // 选中点(R-13)——没手动点过时默认最后一个点(最新数据)，跟旧App一致
   const activeIdx =
@@ -300,7 +310,7 @@ export function RatePage() {
             ) : !chartGeometry ? (
               <p className="w-full h-full flex items-center justify-center text-body-md text-on-surface-variant">{t('rateNoHistory')}</p>
             ) : (
-              <div className="w-full h-full overflow-x-auto overflow-y-hidden">
+              <div ref={chartScrollRef} className="w-full h-full overflow-x-auto overflow-y-hidden">
               <svg width={chartGeometry.chartWidth} height={CHART_H} viewBox={`0 0 ${chartGeometry.chartWidth} ${CHART_H}`} style={{ display: 'block' }}>
                 <defs>
                   <linearGradient id="rateChartGradient" x1="0" x2="0" y1="0" y2="1">

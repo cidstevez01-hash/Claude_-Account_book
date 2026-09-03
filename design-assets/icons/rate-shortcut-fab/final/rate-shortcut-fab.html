@@ -1,0 +1,220 @@
+<title>汇率悬浮入口</title>
+<style>
+  :root {
+    --color-surface: #fff8f5;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #fff1ea;
+    --color-surface-container-highest: #f2dfd4;
+    --color-on-surface: #231a13;
+    --color-on-surface-variant: #56423f;
+    --color-outline-variant: #dcc0bc;
+    --color-primary: #d1665a;
+    --color-on-primary: #ffffff;
+    --color-secondary: #7a9b6e;
+    --canvas-bg: #f1ece4;
+    --canvas-ink: #3a2f28;
+  }
+  @font-face {
+    font-family: "Material Symbols Outlined";
+    font-style: normal;
+    font-weight: 100 700;
+    font-display: block;
+    src: url("./material-symbols-outlined.woff2") format("woff2");
+  }
+  .material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    vertical-align: middle;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--canvas-bg);
+    font-family: "Noto Sans SC", sans-serif;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .intro { position: absolute; top: 16px; left: 20px; right: 20px; text-align: center; }
+  .intro h1 { font-family: "Noto Serif SC", serif; font-size: 18px; margin: 0 0 4px; color: var(--canvas-ink); }
+  .intro p { font-size: 12.5px; color: #8a7c72; margin: 0; }
+
+  .phone {
+    margin-top: 70px;
+    width: 340px;
+    height: 700px;
+    background: var(--color-surface);
+    border-radius: 40px;
+    box-shadow: 0 24px 60px -18px rgba(0,0,0,.35), 0 0 0 8px #0f0c0a;
+    overflow: hidden;
+    position: relative;
+    font-family: "Noto Sans SC", sans-serif;
+    color: var(--color-on-surface);
+  }
+  .paper-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--color-surface-container-highest) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-surface-container-highest) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: .5;
+  }
+  .header {
+    position: relative;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 18px 10px;
+  }
+  .header h2 { font-family: "Noto Serif SC", serif; font-size: 19px; margin: 0; color: var(--color-primary); }
+  .icon-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-primary); }
+
+  .content { position: relative; padding: 8px 18px 100px; }
+
+  .ledger-card {
+    position: relative;
+    background: var(--color-surface-container-lowest);
+    border: 2px dashed var(--color-primary);
+    border-radius: 26px 12px 24px 12px / 12px 24px 12px 26px;
+    box-shadow: 0 2px 0 rgba(58,47,40,.05);
+    padding: 18px;
+    margin-top: 8px;
+  }
+  .washi-tape {
+    position: absolute; top: -6px; right: 20px; width: 44px; height: 16px; border-radius: 2px;
+    background: repeating-linear-gradient(-45deg, rgba(227,178,60,.55) 0 6px, rgba(227,178,60,.32) 6px 12px);
+    transform: rotate(4deg);
+  }
+  .balance-label { font-size: 11px; letter-spacing: .5px; color: var(--color-on-surface-variant); text-align: center; }
+  .balance-amount { font-family: "Noto Serif SC", serif; font-size: 30px; font-weight: 700; text-align: center; margin: 4px 0 14px; }
+  .balance-row { display: flex; justify-content: space-around; border-top: 1px dashed var(--color-outline-variant); padding-top: 10px; }
+  .balance-row div { text-align: center; font-size: 12px; color: var(--color-on-surface-variant); }
+  .balance-row .val { font-family: "Noto Serif SC", serif; font-size: 15px; font-weight: 600; margin-top: 2px; }
+
+  .section-title { font-family: "Noto Serif SC", serif; font-size: 15px; margin: 20px 0 8px; color: var(--color-on-surface); }
+  .entry-row {
+    display: flex; align-items: center; gap: 10px;
+    border: 1.5px solid var(--color-outline-variant); border-radius: 14px;
+    padding: 10px 12px; margin-bottom: 8px;
+  }
+  .entry-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--color-surface-container-low); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .entry-row .name { font-size: 13.5px; font-weight: 500; }
+  .entry-row .sub { font-size: 11px; color: var(--color-on-surface-variant); }
+  .entry-row .amt { margin-left: auto; font-family: "Noto Serif SC", serif; font-size: 13.5px; font-weight: 600; color: var(--color-primary); }
+
+  /* ---- bottom nav ---- */
+  .bottom-nav {
+    position: absolute; left: 20px; right: 20px; bottom: 18px; height: 58px;
+    background: rgba(255,255,255,.55);
+    backdrop-filter: blur(10px);
+    border-radius: 9999px;
+    display: flex; align-items: center; justify-content: space-around;
+    box-shadow: 0 8px 24px -8px rgba(58,47,40,.25);
+  }
+  .bottom-nav .nav-icon { font-size: 20px; color: var(--color-on-surface-variant); }
+  .bottom-nav .nav-icon.active { color: var(--color-primary); }
+
+  /* ---- main FAB (existing, unchanged) ---- */
+  .main-fab {
+    position: absolute; right: 20px; bottom: 88px;
+    width: 58px; height: 58px; border-radius: 50%;
+    background: var(--color-primary); color: var(--color-on-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 300;
+    box-shadow: 0 4px 0 color-mix(in srgb, var(--color-primary) 65%, black 20%);
+  }
+
+  /* ---- new: rate shortcut FAB (position/icon = Option A, breathing glow = Option C) ---- */
+  .rate-fab-wrap {
+    position: absolute; right: 24px; bottom: 156px; /* 20px above main FAB's 58px height */
+    width: 48px; height: 48px;
+  }
+  .rate-fab-glow {
+    position: absolute; inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(122,155,110,.45) 0%, rgba(122,155,110,0) 70%);
+    animation: breathe 2.6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: .35; transform: scale(.9); }
+    50% { opacity: .9; transform: scale(1.15); }
+  }
+  .rate-fab {
+    position: relative;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: color-mix(in srgb, var(--color-surface-container-lowest) 55%, transparent);
+    backdrop-filter: blur(8px) saturate(140%);
+    border: 1.5px dashed var(--color-secondary);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-secondary);
+    box-shadow: 0 3px 10px -4px rgba(58,47,40,.3);
+  }
+  .rate-fab .material-symbols-outlined { font-size: 22px; }
+
+  .callout {
+    position: absolute; left: -108px; top: 50%; transform: translateY(-50%);
+    width: 96px; font-size: 10px; line-height: 1.4; color: var(--color-secondary); font-weight: 600; text-align: right;
+  }
+  .callout::after {
+    content: ""; position: absolute; right: -12px; top: 50%; width: 10px; height: 1.5px; background: var(--color-secondary);
+  }
+</style>
+
+<div class="intro">
+  <h1>汇率快捷入口 · 最终方案</h1>
+  <p>位置/图案取方案A，呼吸光晕取方案C</p>
+</div>
+
+<div class="phone">
+  <div class="paper-grid"></div>
+  <div class="header">
+    <span class="icon-btn">☰</span>
+    <h2>家計簿</h2>
+    <span class="icon-btn">◐</span>
+  </div>
+
+  <div class="content">
+    <div class="ledger-card">
+      <div class="washi-tape"></div>
+      <div class="balance-label">累計残高</div>
+      <div class="balance-amount">JP¥ 10,600.00</div>
+      <div class="balance-row">
+        <div>累計収入<div class="val" style="color:var(--color-secondary)">JP¥4,200</div></div>
+        <div>累計支出<div class="val">JP¥1,850</div></div>
+      </div>
+    </div>
+
+    <div class="section-title">最近記録</div>
+    <div class="entry-row">
+      <div class="entry-dot">🍣</div>
+      <div><div class="name">Sushi Zanmai</div><div class="sub">今日</div></div>
+      <div class="amt">-¥3,500</div>
+    </div>
+    <div class="entry-row">
+      <div class="entry-dot">🚇</div>
+      <div><div class="name">Tokyo Metro</div><div class="sub">交通</div></div>
+      <div class="amt">-¥800</div>
+    </div>
+  </div>
+
+  <div class="main-fab">+</div>
+
+  <div class="rate-fab-wrap">
+    <div class="callout">点击直达<br>汇率换算</div>
+    <div class="rate-fab-glow"></div>
+    <div class="rate-fab"><span class="material-symbols-outlined">currency_exchange</span></div>
+  </div>
+
+  <div class="bottom-nav">
+    <span class="nav-icon active">▦</span>
+    <span class="nav-icon">▤</span>
+    <span class="nav-icon">▥</span>
+  </div>
+</div>

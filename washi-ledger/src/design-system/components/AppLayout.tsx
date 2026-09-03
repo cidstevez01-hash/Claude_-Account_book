@@ -2,6 +2,7 @@ import { useState, type ReactNode, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
+import { RateShortcutFab } from './RateShortcutFab'
 import { CloudDisconnectBanner } from './CloudDisconnectBanner'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
@@ -172,6 +173,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           正展开着)，渲染出来反而会在子页面上叠一层不该出现的抽屉遮罩 */}
       {!isSubpage && (
         <>
+          <RateShortcutFab />
           <BottomNav />
           <NavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
         </>

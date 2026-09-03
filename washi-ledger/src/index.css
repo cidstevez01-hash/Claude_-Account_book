@@ -300,6 +300,25 @@ body {
   animation: grid-slide-in-right 0.18s ease-out;
 }
 
+/* R-20：汇率悬浮快捷入口(RateShortcutFab)呼吸光晕——用户确认稿(design-assets/icons/
+   rate-shortcut-fab/final/)方案C的呼吸感，跟记一笔FAB的.stamp-shadow压印反馈是两种
+   不同语义：这个按钮不是"马上要点"的主操作，呼吸动画是"提醒你这里常驻可用"的
+   弱提示，持续循环、不因交互中断 */
+@keyframes rate-fab-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
+}
+.rate-fab-glow {
+  animation: rate-fab-breathe 2.6s ease-in-out infinite;
+}
+
 /* R-27自绘日历面板毛玻璃——研究过其他方案，最后还是用backdrop-filter：
    1) SVG位移滤镜(仓库里.tab-bubble那种#glassLens折射效果)是做"透过玻璃看到背后
       图标轻微变形"这种精致小面积效果的，日历这种大面积、内容本身还要保持清晰

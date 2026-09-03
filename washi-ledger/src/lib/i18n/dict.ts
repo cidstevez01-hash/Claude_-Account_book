@@ -78,6 +78,7 @@ export const dict = {
     backToDashboardAria: '返回仪表盘', // 新App专属(我的账户页左上角"小房子"按钮)
     accountTitle: '我的账户', // 新App专属(旧App没有独立的"我的账户"页面，账户信息混在设置里)
     rateNavLabel: '汇率换算', // 新App专属(旧App侧边栏/tab用词是"汇率"，新App这里是更完整的页面标题)
+    rateShortcutAria: '快捷跳转汇率换算', // 新App专属(R-20：仪表盘/明细/统计/我的账户页悬浮的汇率快捷入口按钮)
     settingsTitle: LEGACY_ZH.settingsTitle,
     aboutTitle: '关于', // 新App专属(旧App没有独立的"关于"页面)
     notSignedIn: '未登录', // 新App专属
@@ -218,6 +219,7 @@ export const dict = {
     backToDashboardAria: 'ホームに戻る',
     accountTitle: 'マイアカウント',
     rateNavLabel: '為替換算',
+    rateShortcutAria: '為替換算へジャンプ',
     settingsTitle: LEGACY_JA.settingsTitle,
     aboutTitle: 'アプリについて',
     notSignedIn: '未ログイン',
