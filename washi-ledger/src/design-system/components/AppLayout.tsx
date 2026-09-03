@@ -116,8 +116,9 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
             aria-label={t('accountTitle')}
             className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
           >
+            {/* 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态 */}
             {signedIn ? (
-              <span className="w-7 h-7 rounded-full border-2 border-primary overflow-hidden block">
+              <span className="w-7 h-7 rounded-full overflow-hidden block">
                 <img src={avatar.src} alt="" className="w-full h-full object-cover" />
               </span>
             ) : (

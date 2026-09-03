@@ -70,7 +70,9 @@ export function AccountPage() {
             圆形遮罩连带裁掉，露出来的是个缺了一块的诡异形状(真机截图复现过)。改成
             外层wrapper不裁切，圆形裁切单独套一层只包图片，徽标作为wrapper的兄弟节点 */}
         <div className="relative w-20 h-20 mb-3">
-          <div className="w-full h-full rounded-full border-2 border-primary overflow-hidden">
+          {/* 头像图片本身就有色彩/图案，不是"编辑中"状态，不需要再叠一圈border-primary
+              装饰环——那圈环只该出现在ChangeAvatarPage选择网格里表示"当前选中哪一个" */}
+          <div className="w-full h-full rounded-full overflow-hidden">
             <img src={avatar.src} alt={lang === 'ja' ? avatar.labelJa : avatar.labelZh} className="w-full h-full object-cover" />
           </div>
           <Link

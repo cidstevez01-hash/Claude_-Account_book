@@ -73,7 +73,8 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
       >
         <div className="flex items-center gap-sm p-md border-b-[1.5px] border-dashed border-outline-variant">
           {signedIn ? (
-            <div className="w-11 h-11 rounded-full border-2 border-primary overflow-hidden shrink-0">
+            // 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态
+            <div className="w-11 h-11 rounded-full overflow-hidden shrink-0">
               <img src={avatar.src} alt="" className="w-full h-full object-cover" />
             </div>
           ) : (

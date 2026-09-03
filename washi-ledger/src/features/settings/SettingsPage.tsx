@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { useSettings } from '../../hooks/useSettings'
@@ -5,18 +6,25 @@ import { useI18n } from '../../lib/i18n'
 import { APP_ICONS } from '../../lib/appIcons'
 import { CURRENCIES } from '../../data/rate'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
+import { useAuth } from '../auth/useAuth'
+import { getAvatarPreset } from '../../lib/avatarPresets'
+import { loadAvatarId } from '../../lib/avatarStorage'
 import type { Lang } from '../../types'
 
 interface SettingsRowProps {
   icon: string
   /** R-29："夏 · 花火"下这个位置对应的旧App-fw图标资源路径，见ThemeIcon组件 */
   fwIcon?: string
+  /** 头像图——传了就顶替icon/fwIcon显示这张图，不是通用Material图标。给"我的账户"
+   * 行用：抽屉/顶部账户入口都已经接了真实头像(NavDrawer.tsx/AppLayout.tsx)，这一行
+   * 之前漏改，一直显示通用person图标，登录后看起来像没接头像功能 */
+  avatarSrc?: string
   label: string
   children: React.ReactNode
   onClick?: () => void
 }
 
-function SettingsRow({ icon, fwIcon, label, children, onClick }: SettingsRowProps) {
+function SettingsRow({ icon, fwIcon, avatarSrc, label, children, onClick }: SettingsRowProps) {
   return (
     <div
       role={onClick ? 'button' : undefined}
@@ -25,9 +33,15 @@ function SettingsRow({ icon, fwIcon, label, children, onClick }: SettingsRowProp
       className="w-full flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest border-b-2 border-outline-variant"
     >
       <div className="flex items-center gap-sm">
-        <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
-          <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" />
-        </div>
+        {avatarSrc ? (
+          <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
+            <img src={avatarSrc} alt="" className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+            <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" />
+          </div>
+        )}
         <span className="text-body-lg text-on-surface">{label}</span>
       </div>
       <div className="text-body-md text-on-surface-variant">{children}</div>
@@ -83,6 +97,9 @@ export function SettingsPage() {
   const navigate = useNavigate()
   const { lang, setLang, t } = useI18n()
   const { settings, update } = useSettings()
+  const { signedIn } = useAuth()
+  const [avatarId] = useState(() => loadAvatarId())
+  const avatar = getAvatarPreset(avatarId)
 
   return (
     <AppLayout title={t('settingsTitle')} leftButton="back">
@@ -128,7 +145,12 @@ export function SettingsPage() {
           </div>
         </SettingsRow>
 
-        <SettingsRow icon={APP_ICONS.account} label={t('accountTitle')} onClick={() => navigate('/account')}>
+        <SettingsRow
+          icon={APP_ICONS.account}
+          avatarSrc={signedIn ? avatar.src : undefined}
+          label={t('accountTitle')}
+          onClick={() => navigate('/account')}
+        >
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
 

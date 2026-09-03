@@ -25,7 +25,9 @@ export function ChangeAvatarPage() {
     <AppLayout title={t('changeAvatarTitle')} leftButton="back">
       <div className="px-md pt-lg pb-xl flex flex-col gap-lg">
         <div className="flex flex-col items-center gap-2">
-          <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-primary">
+          {/* 不需要border-primary装饰环——这是预览，不是选择态；选中态的环留在下面
+              网格里表示"当前选中哪一个" */}
+          <div className="relative w-24 h-24 rounded-full overflow-hidden">
             <img src={current.src} alt="" className="w-full h-full object-cover" />
           </div>
           <span className="text-body-md text-on-surface-variant">{t('currentAvatarLabel')}</span>
