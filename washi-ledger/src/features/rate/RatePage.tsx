@@ -3,8 +3,13 @@ import { AppLayout } from '../../design-system/components/AppLayout'
 import { fetchRates, fetchRateHistory, CURRENCIES, type RateSnapshot, type RateHistoryPoint } from '../../data/rate'
 import { useI18n } from '../../lib/i18n'
 
+// B-40：1W按7个自然日回溯查询，但汇率数据源(frankfurter.dev，央行参考汇率)周末不
+// 发布，7个自然日基本必然跨一个周末，实际只能拿到约5个交易日的真实数据点(远少于预期
+// 的"一周"，右侧留白大)。改成回溯9个自然日，能多覆盖到的真实交易日更接近7个——不是
+// 插值造假点，只是放宽真实查询窗口，跟fetchRateHistory本身"如实显示不插值"的原则
+// 不冲突
 const TIMEFRAMES = [
-  { key: '1W', days: 7, labelKey: 'rateTimeframe1W' },
+  { key: '1W', days: 9, labelKey: 'rateTimeframe1W' },
   { key: '1M', days: 30, labelKey: 'rateTimeframe1M' },
   { key: '1Y', days: 365, labelKey: 'rateTimeframe1Y' },
 ] as const
@@ -23,7 +28,14 @@ const CHART_W = 320
 const CHART_H = 160
 const CHART_TOP = 12
 const CHART_BASE = 118
-const CHART_LEFT = 40
+// B-40：纵坐标数值文字之前画在这个左边距里、跟折线共用同一个可横向滚动的<svg>——
+// 往右滑看后面的点时纵坐标也跟着一起滑走了。改成纵坐标文字拆到滚动容器外面单独一个
+// 不滚动的<svg>(见AXIS_W)，这里的CHART_LEFT不再需要给文字留位置，只留一点点边距
+// 防止最左边的点/网格线贴边被裁
+const CHART_LEFT = 10
+// 纵坐标固定列的宽度——放在横向滚动容器左边、不跟着滚动，宽度够放下formatAxisValue()
+// 输出的数值文字(比如"19.234")
+const AXIS_W = 44
 // 原来是8——横坐标日期文字是text-anchor="middle"，最后一个点紧贴右边缘时文字有一半会
 // 超出viewBox被裁掉(这才是"08-28被截断"的真正成因，不只是之前非均匀拉伸的问题)，留够
 // 边距让最后一个日期标签完整显示
@@ -310,7 +322,18 @@ export function RatePage() {
             ) : !chartGeometry ? (
               <p className="w-full h-full flex items-center justify-center text-body-md text-on-surface-variant">{t('rateNoHistory')}</p>
             ) : (
-              <div ref={chartScrollRef} className="w-full h-full overflow-x-auto overflow-y-hidden">
+              <div className="flex h-full">
+              {/* B-40：纵坐标数值文字单独一个不滚动的<svg>，固定贴在左边——跟右边可
+                  横向滚动的折线图共用同一套gridLines的y坐标，横向滑动时这一列不动，
+                  数值始终看得到 */}
+              <svg width={AXIS_W} height={CHART_H} className="shrink-0" style={{ display: 'block' }}>
+                {chartGeometry.gridLines.map((g, i) => (
+                  <text key={i} x={AXIS_W - 6} y={g.y + 3} fontSize={9} fill="var(--color-outline)" textAnchor="end">
+                    {formatAxisValue(g.value)}
+                  </text>
+                ))}
+              </svg>
+              <div ref={chartScrollRef} className="flex-1 min-w-0 h-full overflow-x-auto overflow-y-hidden">
               <svg width={chartGeometry.chartWidth} height={CHART_H} viewBox={`0 0 ${chartGeometry.chartWidth} ${CHART_H}`} style={{ display: 'block' }}>
                 <defs>
                   <linearGradient id="rateChartGradient" x1="0" x2="0" y1="0" y2="1">
@@ -319,22 +342,19 @@ export function RatePage() {
                   </linearGradient>
                 </defs>
 
-                {/* 纵坐标网格线+数值 */}
+                {/* 纵坐标网格线(横向虚线本体留在这里，会跟着滚动——只有数值文字挪到
+                    左边固定列，线本身没有"消失"的问题，不用拆) */}
                 {chartGeometry.gridLines.map((g, i) => (
-                  <g key={i}>
-                    <line
-                      x1={CHART_LEFT}
-                      y1={g.y}
-                      x2={chartGeometry.chartWidth - CHART_RIGHT}
-                      y2={g.y}
-                      stroke="var(--color-outline-variant)"
-                      strokeWidth={1}
-                      strokeDasharray="2,3"
-                    />
-                    <text x={CHART_LEFT - 6} y={g.y + 3} fontSize={9} fill="var(--color-outline)" textAnchor="end">
-                      {formatAxisValue(g.value)}
-                    </text>
-                  </g>
+                  <line
+                    key={i}
+                    x1={0}
+                    y1={g.y}
+                    x2={chartGeometry.chartWidth - CHART_RIGHT}
+                    y2={g.y}
+                    stroke="var(--color-outline-variant)"
+                    strokeWidth={1}
+                    strokeDasharray="2,3"
+                  />
                 ))}
 
                 <path d={chartGeometry.area} fill="url(#rateChartGradient)" opacity={0.15} />
@@ -382,6 +402,7 @@ export function RatePage() {
                   </>
                 )}
               </svg>
+              </div>
               </div>
             )}
           </div>
