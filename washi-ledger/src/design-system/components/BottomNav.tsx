@@ -8,11 +8,12 @@ import { ThemeIcon } from './ThemeIcon'
 // 3个tab：仪表盘/明细/统计，设置+汇率不在这里，放左侧抽屉导航(见NavDrawer)。
 // 这条规则来自washi_ledger_markdown.md"交互逻辑提醒"一节，详见HANDOFF文档。
 // R-29：仪表盘/统计两个tab在"夏 · 花火"主题下换成旧App对应的-fw图标(书本→花束
-// 烟花、柱状图→孔明灯，旧App本身就是这样交叉换的，见index.html applyThemeIcons())；
-// 明细没有对应的旧App-fw资源，fwIcon留空，ThemeIcon组件会自动退回原Material图标
+// 烟花、柱状图→孔明灯，旧App本身就是这样交叉换的，见index.html applyThemeIcons())。
+// 明细没有对应的旧App资源(旧App压根没有这个独立tab)——另外找Stitch画了张新的
+// (捞金鱼网+游动的金鱼)，ic-history-fw.svg
 const items = [
   { to: '/', icon: APP_ICONS.dashboard, fwIcon: '/icons/fw/ic-book-fw.svg', labelKey: 'tabDashboard' as const },
-  { to: '/history', icon: APP_ICONS.history, fwIcon: undefined, labelKey: 'tabHistory' as const },
+  { to: '/history', icon: APP_ICONS.history, fwIcon: '/icons/fw/ic-history-fw.svg', labelKey: 'tabHistory' as const },
   { to: '/stats', icon: APP_ICONS.stats, fwIcon: '/icons/fw/ic-lantern-fw.svg', labelKey: 'tabStats' as const },
 ]
 

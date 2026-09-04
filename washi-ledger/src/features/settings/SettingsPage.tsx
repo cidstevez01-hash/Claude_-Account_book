@@ -147,6 +147,7 @@ export function SettingsPage() {
 
         <SettingsRow
           icon={APP_ICONS.account}
+          fwIcon="/icons/fw/ic-account-fw.svg"
           avatarSrc={signedIn ? avatar.src : undefined}
           label={t('accountTitle')}
           onClick={() => navigate('/account')}
@@ -154,7 +155,7 @@ export function SettingsPage() {
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
 
-        <SettingsRow icon={APP_ICONS.about} label={t('aboutTitle')} onClick={() => navigate('/about')}>
+        <SettingsRow icon={APP_ICONS.about} fwIcon="/icons/fw/ic-about-fw.svg" label={t('aboutTitle')} onClick={() => navigate('/about')}>
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
       </div>

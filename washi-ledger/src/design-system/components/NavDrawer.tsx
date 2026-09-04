@@ -23,11 +23,12 @@ interface NavDrawerProps {
 const SUBPAGE_PATHS = new Set(['/rate', '/settings', '/about'])
 // R-29："夏 · 花火"下汇率/设置换成旧App对应-fw图标(设置借用的是旧App统计tab的
 // 烟花图标ic-chart-fw，不是它自己的-fw版本——旧App applyThemeIcons()本来就是这样
-// 交叉换的，见index.html)；关于没有对应资源，fwIcon留空自动退回原图标
+// 交叉换的，见index.html)；关于没有对应旧App资源(新App专属页面)，另外找Stitch
+// 画了张新的(系着蝴蝶结的信息卡片)，ic-about-fw.svg
 const links: { to: string; icon: string; fwIcon?: string; labelKey: TranslationKey }[] = [
   { to: '/rate', icon: APP_ICONS.rate, fwIcon: '/icons/fw/ic-exchange-fw.svg', labelKey: 'rateNavLabel' },
   { to: '/settings', icon: APP_ICONS.settings, fwIcon: '/icons/fw/ic-chart-fw.svg', labelKey: 'settingsTitle' },
-  { to: '/about', icon: APP_ICONS.about, labelKey: 'aboutTitle' },
+  { to: '/about', icon: APP_ICONS.about, fwIcon: '/icons/fw/ic-about-fw.svg', labelKey: 'aboutTitle' },
 ]
 
 export function NavDrawer({ open, onClose }: NavDrawerProps) {

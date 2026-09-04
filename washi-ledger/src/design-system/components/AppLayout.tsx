@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
 import { RateShortcutFab } from './RateShortcutFab'
+import { ThemeIcon } from './ThemeIcon'
 import { CloudDisconnectBanner } from './CloudDisconnectBanner'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
@@ -122,7 +123,11 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
                 <img src={avatar.src} alt="" className="w-full h-full object-cover" />
               </span>
             ) : (
-              <span className="material-symbols-outlined papercut-text-shadow">{APP_ICONS.account}</span>
+              <ThemeIcon
+                icon={APP_ICONS.account}
+                fw="/icons/fw/ic-account-fw.svg"
+                className="material-symbols-outlined papercut-text-shadow w-7 h-7"
+              />
             )}
           </Link>
         )}
