@@ -67,8 +67,25 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
       {/* B-08：paper-grid-bg之前贴在这个根容器上，顶部安全区(header上方那一小条，
           没有header遮住)会透出方格纹理，跟正下方header的纯色bg-surface不一致，看起来
           像缺了一块。改成只贴在真正的内容滚动区(main)上，根容器/header都保持纯色，
-          这样安全区跟header视觉一致 */}
-      <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
+          这样安全区跟header视觉一致
+          R-29：summer主题下header改成跟旧App`.header`一致的近乎透明+毛玻璃
+          (`background:color-mix(in srgb, var(--paper) 1%, transparent); backdrop-filter:
+          blur(1px) saturate(150%)`)——之前这里写死bg-surface不透明，把FireworksBackground
+          星空/烟花挡住了一整条，是真bug，不是"跟旧App分层一致"(那条注释判断错了) */}
+      <header
+        className={`flex items-center justify-between px-md h-16 w-full shrink-0 border-b-[1.5px] border-dashed border-outline-variant ${
+          isSummer ? '' : 'bg-surface'
+        }`}
+        style={
+          isSummer
+            ? {
+                background: 'color-mix(in srgb, var(--color-surface) 1%, transparent)',
+                backdropFilter: 'blur(1px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(1px) saturate(150%)',
+              }
+            : undefined
+        }
+      >
         {leftButton === 'menu' ? (
           <button
             type="button"
@@ -138,7 +155,9 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           containerRef.current = el
           if (mainRef) mainRef.current = el
         }}
-        className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32 paper-grid-bg"
+        className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32 ${
+          isSummer ? '' : 'paper-grid-bg'
+        }`}
         style={
           onRefresh
             ? { paddingTop: pullDistance, transition: dragging ? 'none' : 'padding-top 0.2s ease' }

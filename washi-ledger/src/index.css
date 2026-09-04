@@ -298,14 +298,26 @@
 /* "夏 · 花火"卡片/图标/FAB发光描边——照旧App对应选择器逐条搬，色值换成上面
    :root[data-theme="summer"]刚定义的token，box-shadow公式(颜色/透明度/扩散半径)
    跟旧App完全一致，不是重新设计的一套 */
+/* 卡片透明——用户要求试一版：星空/烟花常驻在背景，卡片底色如果还是不透明的
+   --color-surface-container-lowest(#1A2C4D)，卡片区域会完全盖住背景动效，跟别的
+   主题没区别。这两个类本身只定义描边(见.ledger-card/.entry-card原始定义)，背景色
+   是调用处Tailwind的bg-surface-container-lowest工具类给的，这里用同名class选择器
+   在summer主题下覆盖成半透明+毛玻璃，选择器优先级/书写顺序在Tailwind utility层
+   之后，能正常覆盖(跟border-color那行已经在用的覆盖方式一致) */
 [data-theme='summer'] .ledger-card {
   border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+  background: color-mix(in srgb, var(--color-surface-container-lowest) 55%, transparent) !important;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
   box-shadow:
     0 0 22px -4px color-mix(in srgb, var(--color-primary) 55%, transparent),
     0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent) inset;
 }
 [data-theme='summer'] .entry-card {
   border-color: var(--color-outline-variant);
+  background: color-mix(in srgb, var(--color-surface-container-lowest) 55%, transparent) !important;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
   box-shadow: 0 0 10px -3px color-mix(in srgb, var(--color-secondary) 40%, transparent);
 }
 [data-theme='summer'] .points-chip {
