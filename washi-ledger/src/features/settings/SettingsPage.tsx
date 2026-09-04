@@ -56,19 +56,21 @@ function SettingsRow({ icon, fwIcon, avatarSrc, label, children, onClick }: Sett
  * 跟这一排其他行的图标风格统一 */
 function SelectRow({
   icon,
+  fwIcon,
   label,
   value,
   options,
   onChange,
 }: {
   icon: string
+  fwIcon?: string
   label: string
   value: string
   options: { value: string; label: string }[]
   onChange: (value: string) => void
 }) {
   return (
-    <SettingsRow icon={icon} label={label}>
+    <SettingsRow icon={icon} fwIcon={fwIcon} label={label}>
       <div className="relative flex items-center">
         <select
           value={value}
@@ -106,6 +108,7 @@ export function SettingsPage() {
       <div className="px-md pt-md flex flex-col gap-2">
         <SelectRow
           icon="language"
+          fwIcon="/icons/fw/ic-lang-fw.svg"
           label={t('langLabel')}
           value={lang}
           onChange={(v) => setLang(v as Lang)}
@@ -117,6 +120,7 @@ export function SettingsPage() {
 
         <SelectRow
           icon="payments"
+          fwIcon="/icons/fw/ic-currency-fw.svg"
           label={t('currencyRowLabel')}
           value={settings.currency}
           onChange={(v) => update({ currency: v })}
@@ -152,10 +156,6 @@ export function SettingsPage() {
           label={t('accountTitle')}
           onClick={() => navigate('/account')}
         >
-          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-        </SettingsRow>
-
-        <SettingsRow icon={APP_ICONS.about} fwIcon="/icons/fw/ic-about-fw.svg" label={t('aboutTitle')} onClick={() => navigate('/about')}>
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
       </div>
