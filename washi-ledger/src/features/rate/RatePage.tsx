@@ -116,6 +116,23 @@ export function RatePage() {
     try {
       const points = await fetchRateHistory(base, target, days)
       setHistory(points)
+      // B-41：顶部换算卡片的unitRate来自fetchRates()单独查的"latest快照"接口，走势图
+      // 走的是这里的历史区间接口——两条链路各查各的，历史接口如果查到了比"latest快照"
+      // 更新的一天，顶部就会卡在旧数据上、跟图表最新点对不上(旧App fetchRate()
+      // 2026-08-04已经修过同一类问题，见DEVLOG)。这里拿历史最后一天校正顶部：只要
+      // 不比当前snapshot的日期旧，就用它覆盖snapshot.rates[target]这一项——snapshot
+      // 是多币种快照(base兑11种常用货币)，只改target这一项，其余货币不受影响；
+      // prev.base!==base这层判断防止fromCode已经切换、history还是旧货币对结果的
+      // 竞态场景下错误覆盖
+      if (points.length > 0) {
+        const last = points[points.length - 1]
+        setSnapshot((prev) => {
+          if (!prev || prev.base !== base) return prev
+          if (last.date < prev.date) return prev
+          if (prev.date === last.date && prev.rates[target] === last.rate) return prev
+          return { ...prev, date: last.date, rates: { ...prev.rates, [target]: last.rate } }
+        })
+      }
     } catch (e) {
       setHistoryError(e instanceof Error ? e.message : String(e))
     } finally {
