@@ -29,8 +29,11 @@ export function RateShortcutFab() {
         background: 'color-mix(in srgb, var(--color-surface-container-lowest) 55%, transparent)',
         backdropFilter: 'blur(8px) saturate(140%)',
         WebkitBackdropFilter: 'blur(8px) saturate(140%)',
-        border: '1.5px dashed var(--color-secondary)',
-        color: 'var(--color-secondary)',
+        // B-XX：确认稿(design-assets/icons/summer-fireworks-icon-effects/final/)里
+        // "改成珊瑚红"那版，虚线圆环本身也是珊瑚红，不是只换了光晕颜色——之前漏了
+        // 这条虚线边框，只顾着改光晕，真机上圆环还是薄荷绿、跟图标/光晕对不上
+        border: `1.5px dashed var(${isSummer ? '--color-primary' : '--color-secondary'})`,
+        color: `var(${isSummer ? '--color-primary' : '--color-secondary'})`,
         boxShadow: '0 3px 10px -4px rgba(0,0,0,.3)',
       }}
     >
