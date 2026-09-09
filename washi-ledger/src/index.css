@@ -380,6 +380,103 @@
   }
 }
 
+/* B-XX：萤火虫装饰——只用在语言/货币这两个最早定稿的有圈图标上(设计稿里"着せ替え"
+   行等后补的位置没有这个)，暖色光点绕着圆形容器游走。每个萤火虫两个独立动画：
+   位置(firefly-wander-*，游走轨迹)+发光(firefly-glow，透明度)，各自用负delay让
+   刚挂载就已经"游到一半/亮到一半"，不是全部从同一帧同步起跳——固定几套预设参数
+   而不是运行时JS随机生成，保持结果确定、方便复测，见IconEffects.tsx的Firefly。
+   渐变末端跟icon-ring-glow同一个坑，写死rgba到0而不是字面量transparent，避免
+   fade时颜色被拉向黑色糊成一片 */
+.firefly {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 224, 178, 0.95) 0%,
+    rgba(255, 200, 140, 0.55) 55%,
+    rgba(255, 200, 140, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+}
+@keyframes firefly-glow {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  38% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.15;
+  }
+  75% {
+    opacity: 0;
+  }
+}
+@keyframes firefly-wander-a {
+  0% {
+    transform: translate(-15px, 7px);
+  }
+  25% {
+    transform: translate(9px, -13px);
+  }
+  50% {
+    transform: translate(17px, 9px);
+  }
+  75% {
+    transform: translate(-7px, 15px);
+  }
+  100% {
+    transform: translate(-15px, 7px);
+  }
+}
+@keyframes firefly-wander-b {
+  0% {
+    transform: translate(13px, -9px);
+  }
+  25% {
+    transform: translate(-17px, -5px);
+  }
+  50% {
+    transform: translate(-10px, 13px);
+  }
+  75% {
+    transform: translate(15px, 11px);
+  }
+  100% {
+    transform: translate(13px, -9px);
+  }
+}
+@keyframes firefly-wander-c {
+  0% {
+    transform: translate(1px, -17px);
+  }
+  30% {
+    transform: translate(-15px, 5px);
+  }
+  60% {
+    transform: translate(13px, 13px);
+  }
+  100% {
+    transform: translate(1px, -17px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .firefly {
+    display: none;
+  }
+}
+
 /* "夏 · 花火"卡片/图标/FAB发光描边——照旧App对应选择器逐条搬，色值换成上面
    :root[data-theme="summer"]刚定义的token，box-shadow公式(颜色/透明度/扩散半径)
    跟旧App完全一致，不是重新设计的一套 */

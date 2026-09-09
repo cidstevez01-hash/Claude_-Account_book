@@ -25,16 +25,19 @@ interface ThemeIconProps {
   /** 配合effect用，图标实际渲染尺寸(px)——默认24跟.material-symbols-outlined默认
    * font-size一致，个别位置(比如RateShortcutFab用22px)需要单独传 */
   size?: number
+  /** 只对effect='ring'生效——萤火虫装饰，只有确认稿里最早定稿的语言/货币两个图标带，
+   * 后补的位置(着せ替え行等)不传 */
+  fireflies?: boolean
 }
 
-export function ThemeIcon({ icon, fw, className, style, effect, size = 24 }: ThemeIconProps) {
+export function ThemeIcon({ icon, fw, className, style, effect, size = 24, fireflies }: ThemeIconProps) {
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
   const glyphKey = icon as IconKey
 
   if (isSummer && effect && ICON_GLYPHS[glyphKey]) {
     return effect === 'ring' ? (
-      <RingIconEffect icon={glyphKey} size={size} className={className} />
+      <RingIconEffect icon={glyphKey} size={size} className={className} fireflies={fireflies} />
     ) : (
       <BareIconEffect icon={glyphKey} size={size} className={className} />
     )

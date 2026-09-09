@@ -14,12 +14,14 @@ interface SettingsRowProps {
   /** B-XX：这一行图标是否用新的"复用默认图标形状+单独发光"效果——这个圆形背景是
    * 真实UI常驻存在的(不是为了效果新画的)，所以传'ring'，见ThemeIcon.tsx */
   effect?: 'ring' | 'bare'
+  /** 只对effect='ring'生效——萤火虫装饰，确认稿里只有语言/货币两行带，见ThemeIcon.tsx */
+  fireflies?: boolean
   label: string
   children: React.ReactNode
   onClick?: () => void
 }
 
-function SettingsRow({ icon, fwIcon, effect, label, children, onClick }: SettingsRowProps) {
+function SettingsRow({ icon, fwIcon, effect, fireflies, label, children, onClick }: SettingsRowProps) {
   return (
     <div
       role={onClick ? 'button' : undefined}
@@ -29,7 +31,7 @@ function SettingsRow({ icon, fwIcon, effect, label, children, onClick }: Setting
     >
       <div className="flex items-center gap-sm">
         <div className="relative w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
-          <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" effect={effect} />
+          <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" effect={effect} fireflies={fireflies} />
         </div>
         <span className="text-body-lg text-on-surface">{label}</span>
       </div>
@@ -47,6 +49,7 @@ function SelectRow({
   icon,
   fwIcon,
   effect,
+  fireflies,
   label,
   value,
   options,
@@ -55,13 +58,14 @@ function SelectRow({
   icon: string
   fwIcon?: string
   effect?: 'ring' | 'bare'
+  fireflies?: boolean
   label: string
   value: string
   options: { value: string; label: string }[]
   onChange: (value: string) => void
 }) {
   return (
-    <SettingsRow icon={icon} fwIcon={fwIcon} effect={effect} label={label}>
+    <SettingsRow icon={icon} fwIcon={fwIcon} effect={effect} fireflies={fireflies} label={label}>
       <div className="relative flex items-center">
         <select
           value={value}
@@ -97,6 +101,7 @@ export function SettingsPage() {
         <SelectRow
           icon="language"
           effect="ring"
+          fireflies
           label={t('langLabel')}
           value={lang}
           onChange={(v) => setLang(v as Lang)}
@@ -109,6 +114,7 @@ export function SettingsPage() {
         <SelectRow
           icon="payments"
           effect="ring"
+          fireflies
           label={t('currencyRowLabel')}
           value={settings.currency}
           onChange={(v) => update({ currency: v })}
