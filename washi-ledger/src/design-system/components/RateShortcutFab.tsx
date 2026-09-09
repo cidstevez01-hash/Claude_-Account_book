@@ -41,14 +41,20 @@ export function RateShortcutFab() {
           光效整体的珊瑚红色板(--color-primary)不是同一个色源，是真的没对上，不是
           summer主题特意选的薄荷绿；呼吸节奏(rate-fab-breathe关键帧)本身不动，只在
           summer下把颜色来源换成--color-primary，其它主题保持原来的--color-secondary
-          不受影响 */}
+          不受影响。
+          B-XX：渐变末端之前写的是字面量transparent(=透明黑，不是"这个颜色但透明")，
+          插值会经过一段发暗发浊的过渡色——真机上珊瑚红这版就是因为这个看起来"一片红"
+          糊成一团，不是干净的向外发光。summer下直接写死rgba等值(--color-primary在
+          summer下固定是#e85d4a，这个分支只在summer渲染，硬编码没有跨主题风险)；
+          非summer分支颜色跟主题走、没法硬编码，改成color-mix(...0%, transparent)让
+          "透明"也保持跟起始色同色相、只是alpha到0，规避同样的浑浊过渡 */}
       <span
         className="rate-fab-glow absolute rounded-full pointer-events-none"
         style={{
           inset: -8,
-          background: `radial-gradient(circle, color-mix(in srgb, var(${
-            isSummer ? '--color-primary' : '--color-secondary'
-          }) 45%, transparent) 0%, transparent 70%)`,
+          background: isSummer
+            ? 'radial-gradient(circle, rgba(232, 93, 74, 0.45) 0%, rgba(232, 93, 74, 0) 70%)'
+            : 'radial-gradient(circle, color-mix(in srgb, var(--color-secondary) 45%, transparent) 0%, color-mix(in srgb, var(--color-secondary) 0%, transparent) 70%)',
         }}
         aria-hidden="true"
       />

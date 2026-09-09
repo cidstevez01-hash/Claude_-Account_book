@@ -327,11 +327,17 @@
   position: absolute;
   inset: -9px;
   border-radius: 50%;
+  /* B-XX：这里之前渐变末端用字面量transparent(=rgba(0,0,0,0)，透明黑，不是"珊瑚红
+     but透明")，中间的插值会经过一段发暗发浊的过渡色，叠加blur(5px)后糊成一片，
+     真机截图看起来像"一片红"而不是干净的向外发光。改成显式写同一个色相、alpha渐变
+     到0(rgba(232,93,74,0)，跟--color-primary在summer下的#e85d4a是同一个数值，这个
+     class只在summer才会被渲染出来，硬编码这里没有跨主题风险)，渐变全程颜色相位不变、
+     只有透明度在变，不会再有那段发浊的过渡 */
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--color-primary) 85%, transparent) 0%,
-    color-mix(in srgb, var(--color-primary) 50%, transparent) 55%,
-    transparent 92%
+    rgba(232, 93, 74, 0.85) 0%,
+    rgba(232, 93, 74, 0.5) 55%,
+    rgba(232, 93, 74, 0) 92%
   );
   filter: blur(5px);
   z-index: 0;
