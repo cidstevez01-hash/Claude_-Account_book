@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { APP_ICONS } from '../../lib/appIcons'
-import { useAuth } from '../../features/auth/useAuth'
+import { useAuth, hasEverSignedIn } from '../../features/auth/useAuth'
 import { useI18n } from '../../lib/i18n'
 import { getAvatarPreset } from '../../lib/avatarPresets'
 import { loadAvatarId } from '../../lib/avatarStorage'
@@ -32,7 +32,12 @@ const links: { to: string; icon: string; fwIcon?: string; labelKey: TranslationK
 ]
 
 export function NavDrawer({ open, onClose }: NavDrawerProps) {
-  const { user, signedIn } = useAuth()
+  const { user, signedIn, loading } = useAuth()
+  // B-47：跟AppLayout.tsx同一处修复——loading期间(还没确认真实登录状态)只要
+  // hasEverSignedIn()是true就乐观地先按"已登录"显示头像，避免冷启动时头像闪一下
+  // 变成默认图标；这里只影响头像图片本身，下面user!.email那行文字不能一起乐观
+  // 显示(loading期间user还是null，没有邮箱可显示)，保持原样只看真实signedIn
+  const showAvatar = signedIn || (loading && hasEverSignedIn())
   const { t } = useI18n()
   const location = useLocation()
   const navigate = useNavigate()
@@ -73,7 +78,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-sm p-md border-b-[1.5px] border-dashed border-outline-variant">
-          {signedIn ? (
+          {showAvatar ? (
             // 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态
             <div className="w-11 h-11 rounded-full overflow-hidden shrink-0">
               <img src={avatar.src} alt="" className="w-full h-full object-cover" />

@@ -9,7 +9,7 @@ import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
 import { useDrawer } from '../../hooks/useDrawer'
 import { usePullToRefresh } from '../../hooks/usePullToRefresh'
-import { useAuth } from '../../features/auth/useAuth'
+import { useAuth, hasEverSignedIn } from '../../features/auth/useAuth'
 import { useSettings } from '../../hooks/useSettings'
 import { getAvatarPreset } from '../../lib/avatarPresets'
 import { loadAvatarId } from '../../lib/avatarStorage'
@@ -46,7 +46,14 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
   // 头像——设定头像后所有展示"账户"的地方都要跟着变，这里(每个主页面右上角进"我的
   // 账户"的入口图标)是其中一处；只在真实登录态显示(未登录时保留原来的通用图标，
   // 跟AccountPage/NavDrawer的"未登录不显示你的头像"逻辑一致)
-  const { signedIn } = useAuth()
+  // B-47：signedIn冷启动时有一段"还没确认真实登录状态"的空窗期(初始是false，等
+  // useAuth内部异步getSession()/匿名登录兜底跑完才更新)，这段时间会先渲染成未登录
+  // 分支(通用图标)，等状态更新后再跳回头像——用户就会看到"头像闪一下变成默认图标"。
+  // 照CloudDisconnectBanner.tsx同一个模式：loading期间只要hasEverSignedIn()是true
+  // (本机以前真登录过)，就乐观地先按"已登录"显示头像，不等异步结果；真等loading
+  // 结束才发现其实没登录，才切回未登录状态
+  const { signedIn, loading } = useAuth()
+  const showAvatar = signedIn || (loading && hasEverSignedIn())
   const [avatarId] = useState(() => loadAvatarId())
   const avatar = getAvatarPreset(avatarId)
   // R-29："夏 · 花火"主题下这个根容器背景要透明，才能让常驻挂在App.tsx根部的
@@ -135,7 +142,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
             className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
           >
             {/* 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态 */}
-            {signedIn ? (
+            {showAvatar ? (
               <span className="w-7 h-7 rounded-full overflow-hidden block">
                 <img src={avatar.src} alt="" className="w-full h-full object-cover" />
               </span>
