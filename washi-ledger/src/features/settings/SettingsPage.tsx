@@ -115,12 +115,7 @@ export function SettingsPage() {
           options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.zh} (${c.code})` }))}
         />
 
-        <SettingsRow
-          icon="palette"
-          fwIcon="/icons/fw/ic-shirt-fw.svg"
-          label={t('themeLabel')}
-          onClick={() => navigate('/theme')}
-        >
+        <SettingsRow icon="palette" effect="ring" label={t('themeLabel')} onClick={() => navigate('/theme')}>
           <div className="flex items-center gap-1">
             {/* 之前这里写死显示"PigBang"，跟ThemePage.tsx选卡片切主题完全没接上——
                 切完主题回设置页这一行还是那个死字符串，看起来像"没生效"。改成

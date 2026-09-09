@@ -22,10 +22,9 @@ interface NavDrawerProps {
 // 导航栏+抽屉本身)，点进去时不关闭抽屉——共享的drawerOpen状态(见useDrawer.tsx)保持
 // true，等用户从子页面点返回箭头回到这里时，抽屉自然还是展开的样子
 const SUBPAGE_PATHS = new Set(['/rate', '/settings', '/about'])
-// R-29："夏 · 花火"下设置借用的是旧App统计tab的烟花图标ic-chart-fw，不是它自己的
-// -fw版本(旧App applyThemeIcons()本来就是这样交叉换的，见index.html)。
-// B-XX：汇率/关于原来各自有一张旧App专属插画(-fw资源)，现在改成新的"复用默认图标
-// 形状+单独发光"效果(effect:'bare'，见ThemeIcon.tsx)，那两张插画不再使用
+// B-XX：汇率/设置/关于原来各自有一张旧App专属插画(-fw资源，设置借用的是旧App统计
+// tab的烟花图标ic-chart-fw)，现在改成新的"复用默认图标形状+单独发光"效果
+// (effect:'bare'，见ThemeIcon.tsx)，那几张插画不再使用
 const links: {
   to: string
   icon: string
@@ -34,7 +33,7 @@ const links: {
   labelKey: TranslationKey
 }[] = [
   { to: '/rate', icon: APP_ICONS.rate, effect: 'bare', labelKey: 'rateNavLabel' },
-  { to: '/settings', icon: APP_ICONS.settings, fwIcon: '/icons/fw/ic-chart-fw.svg', labelKey: 'settingsTitle' },
+  { to: '/settings', icon: APP_ICONS.settings, effect: 'bare', labelKey: 'settingsTitle' },
   { to: '/about', icon: APP_ICONS.about, effect: 'bare', labelKey: 'aboutTitle' },
 ]
 
