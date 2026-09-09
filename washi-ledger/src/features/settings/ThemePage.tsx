@@ -26,6 +26,10 @@ export function ThemePage() {
   const navigate = useNavigate()
   const { t } = useI18n()
   const { settings, update } = useSettings()
+  // B-XX：这页是独立整屏子页面，不走AppLayout.tsx，R-29做summer主题(FireworksBackground
+  // 透出来+去掉方格纸背景)那批只改了AppLayout，这页当时漏了——一直是不透明bg-surface+
+  // paper-grid-bg，summer下背景变成一片网格纸，跟其它页面(能看到星空烟花)不一致
+  const isSummer = settings.themeSkin === 'summer'
 
   const cards: { skin: ThemeSkin; nameKey: 'themeDefaultName' | 'themeNostalgiaName' | 'themeSummerName' }[] = [
     { skin: 'default', nameKey: 'themeDefaultName' },
@@ -35,12 +39,31 @@ export function ThemePage() {
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      className={`fixed inset-0 mx-auto max-w-[480px] flex flex-col overflow-hidden ${
+        isSummer ? 'bg-transparent' : 'bg-surface'
+      }`}
     >
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
-          上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致 */}
-      <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface border-b-[1.5px] border-dashed border-outline-variant">
+          上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致
+          B-XX：summer下safe-area这段padding和header的背景/blur要挂在同一层div上，
+          否则真机上能看出两段拼接的接缝(参照AppLayout.tsx同一个修复) */}
+      <div
+        style={
+          isSummer
+            ? {
+                paddingTop: 'env(safe-area-inset-top)',
+                background: 'color-mix(in srgb, var(--color-surface) 1%, transparent)',
+                backdropFilter: 'blur(1px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(1px) saturate(150%)',
+              }
+            : { paddingTop: 'env(safe-area-inset-top)' }
+        }
+      >
+      <header
+        className={`flex items-center justify-between px-md h-16 w-full shrink-0 border-b-[1.5px] border-dashed border-outline-variant ${
+          isSummer ? '' : 'bg-surface'
+        }`}
+      >
         <button
           type="button"
           aria-label={t('backLabel')}
@@ -55,8 +78,13 @@ export function ThemePage() {
             同款的"两侧等宽占位+justify-between"布局，不用负margin就不会有点击区域重叠 */}
         <div className="w-10 h-10 -mr-2" />
       </header>
+      </div>
 
-      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain px-md pt-lg paper-grid-bg">
+      <main
+        className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain px-md pt-lg ${
+          isSummer ? '' : 'paper-grid-bg'
+        }`}
+      >
         <div className="flex justify-center gap-md flex-wrap">
           {cards.map(({ skin, nameKey }) => {
             const active = settings.themeSkin === skin
