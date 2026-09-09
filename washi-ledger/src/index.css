@@ -295,6 +295,85 @@
   }
 }
 
+/* B-XX：路由切换入场渐显——见App.tsx的AnimatedRoutes，用location.pathname当key
+   逼React重新挂载这层包裹div，触发这个动画，把"硬切换页面"缓和成短渐显，跟主题
+   无关，全局适用 */
+@keyframes route-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.route-fade {
+  animation: route-fade-in 200ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-fade {
+    animation: none;
+  }
+}
+
+/* B-XX："夏 · 花火"图标光效——图标形状(lib/iconGlyphs.ts)、颜色(IconGradientDefs.tsx
+   共享渐变)、发光(这里)三层分开维护，改一层不牵连另外两层。这两个class只会在
+   ThemeIcon/IconEffects.tsx判断出summer主题时才被React渲染出来，不靠CSS选择器
+   门控——没有summer主题就不会有.icon-ring-glow/.icon-bare-glow这两个节点存在。
+   有圈组(.icon-ring-glow)：贴着真实UI本来就有的常驻圆形背景外沿发光；
+   裸图标组(.icon-bare-wrap+.icon-bare-glow+.icon-bare-crisp)：真实UI这个位置没有
+   常驻圆形容器，不画假圆圈，改成同一份图标形状复制一层模糊叠底当发光，光晕贴着
+   图标本身轮廓 */
+.icon-ring-glow {
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-primary) 85%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 50%, transparent) 55%,
+    transparent 92%
+  );
+  filter: blur(5px);
+  z-index: 0;
+  pointer-events: none;
+  animation: icon-glow-breathe 5.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.icon-bare-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.icon-bare-glow {
+  position: absolute;
+  inset: 0;
+  display: block;
+  filter: blur(4px);
+  opacity: 0.85;
+  pointer-events: none;
+  animation: icon-glow-breathe 5.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.icon-bare-crisp {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+@keyframes icon-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .icon-ring-glow,
+  .icon-bare-glow {
+    animation: none;
+  }
+}
+
 /* "夏 · 花火"卡片/图标/FAB发光描边——照旧App对应选择器逐条搬，色值换成上面
    :root[data-theme="summer"]刚定义的token，box-shadow公式(颜色/透明度/扩散半径)
    跟旧App完全一致，不是重新设计的一套 */

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
+import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 
 type Mode = 'signup' | 'verify'
 
@@ -84,7 +85,7 @@ export function SignUpPage() {
           onClick={() => setMode('signup')}
           className="flex items-center gap-1 text-label-caps font-sans text-on-surface-variant mb-md self-start"
         >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          <ThemeIcon icon="arrow_back" effect="bare" size={18} className="text-[18px]" />
           {t('backLabel')}
         </button>
       )}

@@ -4,6 +4,7 @@ import { CategoryPicker } from './CategoryPicker'
 import { TagPicker } from './TagPicker'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
+import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
@@ -207,7 +208,7 @@ export function AddTransactionPage() {
           上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致 */}
       <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
         <button type="button" aria-label="返回" onClick={handleBack} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]">
-          <span className="material-symbols-outlined papercut-text-shadow">arrow_back</span>
+          <ThemeIcon icon="arrow_back" effect="bare" className="papercut-text-shadow" />
         </button>
         <h1 className="font-serif text-headline-md text-app-title tracking-tight papercut-text-shadow">{pageTitle}</h1>
         <div className="w-10" />

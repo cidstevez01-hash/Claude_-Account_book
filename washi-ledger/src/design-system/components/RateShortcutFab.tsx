@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../../lib/i18n'
+import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from './ThemeIcon'
+import { AppIcon } from './AppIcon'
 
 /** R-20：汇率悬浮快捷入口——用户确认稿(design-assets/icons/rate-shortcut-fab/final/)，
  * 位置/图案取方案A(主"记一笔"FAB正上方20px、currency_exchange图标)，呼吸光晕取方案C。
@@ -14,6 +16,8 @@ import { ThemeIcon } from './ThemeIcon'
  * `bottom + 58px高度 + 20px间距`基础上算出。 */
 export function RateShortcutFab() {
   const { t } = useI18n()
+  const { settings } = useSettings()
+  const isSummer = settings.themeSkin === 'summer'
   return (
     <Link
       to="/rate"
@@ -30,22 +34,26 @@ export function RateShortcutFab() {
         boxShadow: '0 3px 10px -4px rgba(0,0,0,.3)',
       }}
     >
+      {/* B-XX：这个呼吸光晕之前一直用--color-secondary(薄荷绿)——跟"夏 · 花火"图标
+          光效整体的珊瑚红色板(--color-primary)不是同一个色源，是真的没对上，不是
+          summer主题特意选的薄荷绿；呼吸节奏(rate-fab-breathe关键帧)本身不动，只在
+          summer下把颜色来源换成--color-primary，其它主题保持原来的--color-secondary
+          不受影响 */}
       <span
         className="rate-fab-glow absolute rounded-full pointer-events-none"
         style={{
           inset: -8,
-          background:
-            'radial-gradient(circle, color-mix(in srgb, var(--color-secondary) 45%, transparent) 0%, transparent 70%)',
+          background: `radial-gradient(circle, color-mix(in srgb, var(${
+            isSummer ? '--color-primary' : '--color-secondary'
+          }) 45%, transparent) 0%, transparent 70%)`,
         }}
         aria-hidden="true"
       />
-      {/* R-29：跟NavDrawer汇率行同一个-fw资源，保持一致 */}
-      <ThemeIcon
-        icon="currency_exchange"
-        fw="/icons/fw/ic-exchange-fw.svg"
-        className="relative w-6 h-6"
-        style={{ fontSize: 22 }}
-      />
+      {isSummer ? (
+        <AppIcon icon="currency_exchange" size={22} fill="url(#icon-fill-grad)" className="relative" />
+      ) : (
+        <ThemeIcon icon="currency_exchange" className="relative w-6 h-6" style={{ fontSize: 22 }} />
+      )}
     </Link>
   )
 }

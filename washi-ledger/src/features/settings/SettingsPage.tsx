@@ -8,14 +8,18 @@ import type { Lang } from '../../types'
 
 interface SettingsRowProps {
   icon: string
-  /** R-29："夏 · 花火"下这个位置对应的旧App-fw图标资源路径，见ThemeIcon组件 */
+  /** R-29："夏 · 花火"下这个位置对应的旧App-fw图标资源路径，见ThemeIcon组件。跟
+   * effect二选一，见ThemeIcon.tsx里两者的说明 */
   fwIcon?: string
+  /** B-XX：这一行图标是否用新的"复用默认图标形状+单独发光"效果——这个圆形背景是
+   * 真实UI常驻存在的(不是为了效果新画的)，所以传'ring'，见ThemeIcon.tsx */
+  effect?: 'ring' | 'bare'
   label: string
   children: React.ReactNode
   onClick?: () => void
 }
 
-function SettingsRow({ icon, fwIcon, label, children, onClick }: SettingsRowProps) {
+function SettingsRow({ icon, fwIcon, effect, label, children, onClick }: SettingsRowProps) {
   return (
     <div
       role={onClick ? 'button' : undefined}
@@ -24,8 +28,8 @@ function SettingsRow({ icon, fwIcon, label, children, onClick }: SettingsRowProp
       className="w-full flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest border-b-2 border-outline-variant"
     >
       <div className="flex items-center gap-sm">
-        <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
-          <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" />
+        <div className="relative w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+          <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" effect={effect} />
         </div>
         <span className="text-body-lg text-on-surface">{label}</span>
       </div>
@@ -42,6 +46,7 @@ function SettingsRow({ icon, fwIcon, label, children, onClick }: SettingsRowProp
 function SelectRow({
   icon,
   fwIcon,
+  effect,
   label,
   value,
   options,
@@ -49,13 +54,14 @@ function SelectRow({
 }: {
   icon: string
   fwIcon?: string
+  effect?: 'ring' | 'bare'
   label: string
   value: string
   options: { value: string; label: string }[]
   onChange: (value: string) => void
 }) {
   return (
-    <SettingsRow icon={icon} fwIcon={fwIcon} label={label}>
+    <SettingsRow icon={icon} fwIcon={fwIcon} effect={effect} label={label}>
       <div className="relative flex items-center">
         <select
           value={value}
@@ -90,7 +96,7 @@ export function SettingsPage() {
       <div className="px-md pt-md flex flex-col gap-2">
         <SelectRow
           icon="language"
-          fwIcon="/icons/fw/ic-lang-fw.svg"
+          effect="ring"
           label={t('langLabel')}
           value={lang}
           onChange={(v) => setLang(v as Lang)}
@@ -102,7 +108,7 @@ export function SettingsPage() {
 
         <SelectRow
           icon="payments"
-          fwIcon="/icons/fw/ic-currency-fw.svg"
+          effect="ring"
           label={t('currencyRowLabel')}
           value={settings.currency}
           onChange={(v) => update({ currency: v })}

@@ -100,7 +100,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
             className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             onClick={() => setDrawerOpen(true)}
           >
-            <span className="material-symbols-outlined papercut-text-shadow">{APP_ICONS.menu}</span>
+            <ThemeIcon icon={APP_ICONS.menu} effect="bare" className="papercut-text-shadow" />
           </button>
         ) : leftButton === 'home' ? (
           <button
@@ -121,7 +121,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
             className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             onClick={() => navigate(-1)}
           >
-            <span className="material-symbols-outlined papercut-text-shadow">arrow_back</span>
+            <ThemeIcon icon="arrow_back" effect="bare" className="papercut-text-shadow" />
           </button>
         )}
         {/* 照旧仓库index.html的.papercut真实效果复用(不是随手写的模糊阴影)：8层描边阴影
@@ -143,13 +143,20 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           >
             {/* 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态 */}
             {showAvatar ? (
-              <span className="w-7 h-7 rounded-full overflow-hidden block">
-                <img src={avatar.src} alt="" className="w-full h-full object-cover" />
+              // B-XX：光晕(.icon-ring-glow)贴着头像照片外沿发光，不能放进overflow-hidden
+              // 的圆形照片容器内部——那样会被自己裁掉；外面单独包一层不裁切的div放光晕，
+              // 照片圆形容器缩在里面保持原有裁切行为不变
+              <span className="relative inline-block w-7 h-7">
+                {isSummer && <span className="icon-ring-glow" aria-hidden="true" />}
+                <span className="relative z-[1] block w-7 h-7 rounded-full overflow-hidden">
+                  <img src={avatar.src} alt="" className="w-full h-full object-cover" />
+                </span>
               </span>
             ) : (
               <ThemeIcon
                 icon={APP_ICONS.account}
-                fw="/icons/fw/ic-account-fw.svg"
+                effect="bare"
+                size={28}
                 className="material-symbols-outlined papercut-text-shadow w-7 h-7"
               />
             )}

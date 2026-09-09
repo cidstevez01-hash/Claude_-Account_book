@@ -5,6 +5,7 @@ import { useAuth, hasEverSignedIn } from '../../features/auth/useAuth'
 import { useI18n } from '../../lib/i18n'
 import { getAvatarPreset } from '../../lib/avatarPresets'
 import { loadAvatarId } from '../../lib/avatarStorage'
+import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from './ThemeIcon'
 import type { TranslationKey } from '../../lib/i18n'
 
@@ -21,14 +22,20 @@ interface NavDrawerProps {
 // 导航栏+抽屉本身)，点进去时不关闭抽屉——共享的drawerOpen状态(见useDrawer.tsx)保持
 // true，等用户从子页面点返回箭头回到这里时，抽屉自然还是展开的样子
 const SUBPAGE_PATHS = new Set(['/rate', '/settings', '/about'])
-// R-29："夏 · 花火"下汇率/设置换成旧App对应-fw图标(设置借用的是旧App统计tab的
-// 烟花图标ic-chart-fw，不是它自己的-fw版本——旧App applyThemeIcons()本来就是这样
-// 交叉换的，见index.html)；关于没有对应旧App资源(新App专属页面)，另外找Stitch
-// 画了张新的(系着蝴蝶结的信息卡片)，ic-about-fw.svg
-const links: { to: string; icon: string; fwIcon?: string; labelKey: TranslationKey }[] = [
-  { to: '/rate', icon: APP_ICONS.rate, fwIcon: '/icons/fw/ic-exchange-fw.svg', labelKey: 'rateNavLabel' },
+// R-29："夏 · 花火"下设置借用的是旧App统计tab的烟花图标ic-chart-fw，不是它自己的
+// -fw版本(旧App applyThemeIcons()本来就是这样交叉换的，见index.html)。
+// B-XX：汇率/关于原来各自有一张旧App专属插画(-fw资源)，现在改成新的"复用默认图标
+// 形状+单独发光"效果(effect:'bare'，见ThemeIcon.tsx)，那两张插画不再使用
+const links: {
+  to: string
+  icon: string
+  fwIcon?: string
+  effect?: 'ring' | 'bare'
+  labelKey: TranslationKey
+}[] = [
+  { to: '/rate', icon: APP_ICONS.rate, effect: 'bare', labelKey: 'rateNavLabel' },
   { to: '/settings', icon: APP_ICONS.settings, fwIcon: '/icons/fw/ic-chart-fw.svg', labelKey: 'settingsTitle' },
-  { to: '/about', icon: APP_ICONS.about, fwIcon: '/icons/fw/ic-about-fw.svg', labelKey: 'aboutTitle' },
+  { to: '/about', icon: APP_ICONS.about, effect: 'bare', labelKey: 'aboutTitle' },
 ]
 
 export function NavDrawer({ open, onClose }: NavDrawerProps) {
@@ -38,6 +45,8 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
   // 变成默认图标；这里只影响头像图片本身，下面user!.email那行文字不能一起乐观
   // 显示(loading期间user还是null，没有邮箱可显示)，保持原样只看真实signedIn
   const showAvatar = signedIn || (loading && hasEverSignedIn())
+  const { settings } = useSettings()
+  const isSummer = settings.themeSkin === 'summer'
   const { t } = useI18n()
   const location = useLocation()
   const navigate = useNavigate()
@@ -79,9 +88,14 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
       >
         <div className="flex items-center gap-sm p-md border-b-[1.5px] border-dashed border-outline-variant">
           {showAvatar ? (
-            // 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态
-            <div className="w-11 h-11 rounded-full overflow-hidden shrink-0">
-              <img src={avatar.src} alt="" className="w-full h-full object-cover" />
+            // 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态。
+            // B-XX：光晕贴着照片外沿，同AppLayout头部头像的处理，不能放进
+            // overflow-hidden的圆形照片容器内部
+            <div className="relative shrink-0 w-11 h-11">
+              {isSummer && <span className="icon-ring-glow" aria-hidden="true" />}
+              <div className="relative z-[1] w-11 h-11 rounded-full overflow-hidden">
+                <img src={avatar.src} alt="" className="w-full h-full object-cover" />
+              </div>
             </div>
           ) : (
             <div className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
@@ -110,7 +124,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
                     : 'text-on-surface-variant hover:bg-surface-variant/30'
                 }`}
               >
-                <ThemeIcon icon={link.icon} fw={link.fwIcon} className="w-6 h-6" />
+                <ThemeIcon icon={link.icon} fw={link.fwIcon} effect={link.effect} className="w-6 h-6" />
                 {t(link.labelKey)}
               </button>
             )
