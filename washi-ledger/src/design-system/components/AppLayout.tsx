@@ -69,7 +69,6 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
       className={`fixed inset-0 mx-auto max-w-[480px] flex flex-col overflow-hidden ${
         isSummer ? 'bg-transparent' : 'bg-surface'
       }`}
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* B-08：paper-grid-bg之前贴在这个根容器上，顶部安全区(header上方那一小条，
           没有header遮住)会透出方格纹理，跟正下方header的纯色bg-surface不一致，看起来
@@ -78,20 +77,28 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           R-29：summer主题下header改成跟旧App`.header`一致的近乎透明+毛玻璃
           (`background:color-mix(in srgb, var(--paper) 1%, transparent); backdrop-filter:
           blur(1px) saturate(150%)`)——之前这里写死bg-surface不透明，把FireworksBackground
-          星空/烟花挡住了一整条，是真bug，不是"跟旧App分层一致"(那条注释判断错了) */}
-      <header
-        className={`flex items-center justify-between px-md h-16 w-full shrink-0 border-b-[1.5px] border-dashed border-outline-variant ${
-          isSummer ? '' : 'bg-surface'
-        }`}
+          星空/烟花挡住了一整条，是真bug，不是"跟旧App分层一致"(那条注释判断错了)
+          B-XX：safe-area-inset-top这段padding之前留在根容器(bg-transparent，什么处理
+          都没有)上，header自己另外套了一层背景/blur——真机上能看出这两段接缝：安全区
+          那一条是FireworksBackground原始清晰画面，header那一条是模糊过的，中间一条
+          明显的分界线。改成padding-top和背景/blur一起挪到包住safe-area+header的这层
+          div上，两段用同一层玻璃质感，不再有接缝 */}
+      <div
         style={
           isSummer
             ? {
+                paddingTop: 'env(safe-area-inset-top)',
                 background: 'color-mix(in srgb, var(--color-surface) 1%, transparent)',
                 backdropFilter: 'blur(1px) saturate(150%)',
                 WebkitBackdropFilter: 'blur(1px) saturate(150%)',
               }
-            : undefined
+            : { paddingTop: 'env(safe-area-inset-top)' }
         }
+      >
+      <header
+        className={`flex items-center justify-between px-md h-16 w-full shrink-0 border-b-[1.5px] border-dashed border-outline-variant ${
+          isSummer ? '' : 'bg-surface'
+        }`}
       >
         {leftButton === 'menu' ? (
           <button
@@ -163,6 +170,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           </Link>
         )}
       </header>
+      </div>
 
       <main
         ref={(el) => {
