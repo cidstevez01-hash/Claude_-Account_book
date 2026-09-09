@@ -8,18 +8,21 @@ interface IconEffectProps {
 }
 
 /** 有圈效果——只用在真实UI这个位置本来就有常驻圆形背景的地方(SettingsPage行/
- * RateShortcutFab/头像)，光晕贴着那个圆的外沿发光(见index.css的.icon-ring-glow，
- * inset:-9px)。调用方自己的圆形容器要有position:relative，这里只负责发光层+图标，
- * 不负责画那个圆——那个圆是真实UI本来就有的，不是为了这个效果新加的 */
+ * RateShortcutFab/头像)，光晕要贴着那个真实圆形容器的外沿往外发光(见index.css的
+ * .icon-ring-glow，inset:-9px)。
+ * B-XX：之前这里自己又包了一层跟图标同尺寸(24px)的span当发光的定位基准，
+ * inset:-9px是相对这个小span算的，跟调用方真正的圆形容器(比如SettingsPage行是
+ * 40px)完全对不上——结果发光只在24+18=42px这个跟图标差不多大的范围里，几乎全部
+ * 糊在纯色圆内部，没有真正探出圆外发光，跟设计稿"光晕贴着圆形容器外侧"对不上。
+ * 改成不再自己包裹，直接把发光层和图标作为调用方容器的直接子节点渲染——调用方
+ * 那个真实圆形容器本来就是position:relative+flex居中(SettingsRow等已经是这样)，
+ * inset:-9px改成相对那个真实大小的圆计算，发光才会正确探出圆外 */
 export function RingIconEffect({ icon, size, className }: IconEffectProps) {
   return (
-    <span
-      className={`relative inline-flex items-center justify-center ${className ?? ''}`}
-      style={{ width: size, height: size }}
-    >
+    <>
       <span className="icon-ring-glow" aria-hidden="true" />
-      <AppIcon icon={icon} size={size} fill="url(#icon-fill-grad)" className="relative z-[1]" />
-    </span>
+      <AppIcon icon={icon} size={size} fill="url(#icon-fill-grad)" className={`relative z-[1] ${className ?? ''}`} />
+    </>
   )
 }
 
