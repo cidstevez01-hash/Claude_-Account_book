@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
+import { RouteFade } from '../../design-system/components/RouteFade'
 
 type Mode = 'signup' | 'verify'
 
@@ -79,6 +80,7 @@ export function SignUpPage() {
       className="fixed inset-0 mx-auto max-w-[480px] flex flex-col justify-center px-md bg-surface paper-grid-bg overflow-y-auto overflow-x-hidden overscroll-y-contain"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
+      <RouteFade className="flex flex-col">
       {mode === 'verify' && (
         <button
           type="button"
@@ -173,6 +175,7 @@ export function SignUpPage() {
           </Link>
         </p>
       )}
+      </RouteFade>
     </div>
   )
 }

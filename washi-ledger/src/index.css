@@ -307,7 +307,9 @@
   }
 }
 .route-fade {
-  animation: route-fade-in 200ms ease-out;
+  /* B-XX：用户反馈200ms太快、不够平缓，改成320ms+更"沉稳"的缓动曲线(标准material
+     ease-out，前段走得快、收尾放缓，比线性ease-out更有"落定"的感觉) */
+  animation: route-fade-in 320ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 @media (prefers-reduced-motion: reduce) {
   .route-fade {

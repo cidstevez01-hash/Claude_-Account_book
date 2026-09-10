@@ -1,8 +1,9 @@
 import { useState, type ReactNode, type RefObject } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
 import { RateShortcutFab } from './RateShortcutFab'
+import { RouteFade } from './RouteFade'
 import { ThemeIcon } from './ThemeIcon'
 import { CloudDisconnectBanner } from './CloudDisconnectBanner'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -40,7 +41,6 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
   // 是展开的，本地state做不到这一点(实例卸载就清空了)
   const { open: drawerOpen, setOpen: setDrawerOpen } = useDrawer()
   const navigate = useNavigate()
-  const location = useLocation()
   const { t } = useI18n()
   const { containerRef, pullDistance, refreshing, dragging, threshold } = usePullToRefresh<HTMLElement>(onRefresh)
   const isSubpage = leftButton === 'back'
@@ -92,7 +92,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           RateShortcutFab/BottomNav/NavDrawer/CloudDisconnectBanner留在这层外面
           (见下方渲染)，不再被这个渐显影响——它们本来就该像贴在App外壳上一样，感觉上
           是常驻不动的，不该随每次翻页重新淡入淡出 */}
-      <div key={location.pathname} className="route-fade flex flex-col flex-1 min-h-0">
+      <RouteFade className="flex flex-col flex-1 min-h-0">
       <div
         style={
           isSummer
@@ -232,7 +232,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
         )}
         {children}
       </main>
-      </div>
+      </RouteFade>
 
       <CloudDisconnectBanner />
       {/* R-18：子页面(汇率换算/设置/about)隐藏底部导航栏；抽屉本身也不渲染——这几个

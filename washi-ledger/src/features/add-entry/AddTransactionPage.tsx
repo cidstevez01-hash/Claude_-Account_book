@@ -5,6 +5,7 @@ import { TagPicker } from './TagPicker'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
+import { RouteFade } from '../../design-system/components/RouteFade'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
@@ -205,7 +206,12 @@ export function AddTransactionPage() {
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
-          上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致 */}
+          上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致
+          B-XX：路由切换入场渐显(见AppLayout.tsx的RouteFade说明)——这页是独立整屏
+          子页面不走AppLayout，之前一直没有这个效果。只包header+main，不包下面
+          fixed贴底的保存条(B-XX：main内容本身有position:fixed的记一笔保存条，
+          RouteFade如果连它一起包会有containing block副作用，见RouteFade.tsx说明) */}
+      <RouteFade className="flex flex-col flex-1 min-h-0">
       <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
         <button type="button" aria-label="返回" onClick={handleBack} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]">
           <ThemeIcon icon="arrow_back" effect="bare" className="papercut-text-shadow" />
@@ -384,6 +390,7 @@ export function AddTransactionPage() {
         </>
        )}
       </main>
+      </RouteFade>
 
       <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-md pb-6 bg-gradient-to-t from-surface via-surface to-transparent">
         <button

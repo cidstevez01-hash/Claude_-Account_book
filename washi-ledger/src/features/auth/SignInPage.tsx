@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
+import { RouteFade } from '../../design-system/components/RouteFade'
 
 /** 登录——独立整屏页面，不套AppLayout(照HANDOFF确认过的决定：登录/注册是独立页面，
  * 不嵌在设置弹层里)。视觉照design-assets-v2/_1做。真实逻辑照旧仓库index.html的
@@ -39,6 +40,7 @@ export function SignInPage() {
       className="fixed inset-0 mx-auto max-w-[480px] flex flex-col justify-center px-md bg-surface paper-grid-bg overflow-y-auto overflow-x-hidden overscroll-y-contain"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
+      <RouteFade className="flex flex-col">
       <div className="flex flex-col items-center mb-lg">
         <div className="w-16 h-16 rounded-full border-2 border-primary flex items-center justify-center mb-3">
           <span className="material-symbols-outlined text-3xl text-primary">menu_book</span>
@@ -95,6 +97,7 @@ export function SignInPage() {
           {t('goToSignUpLink')}
         </Link>
       </p>
+      </RouteFade>
     </div>
   )
 }

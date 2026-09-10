@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useI18n } from '../../lib/i18n'
 import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
+import { RouteFade } from '../../design-system/components/RouteFade'
 import type { ThemeSkin } from '../../types'
 
 /** 主题选择——独立整屏子页面，照design-assets-v2/_25的Bento卡片布局做。_25设计稿画了
@@ -46,7 +47,10 @@ export function ThemePage() {
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
           上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致
           B-XX：summer下safe-area这段padding和header的背景/blur要挂在同一层div上，
-          否则真机上能看出两段拼接的接缝(参照AppLayout.tsx同一个修复) */}
+          否则真机上能看出两段拼接的接缝(参照AppLayout.tsx同一个修复)
+          B-XX：路由切换入场渐显(见AppLayout.tsx的RouteFade说明)——这页是独立整屏
+          子页面不走AppLayout，之前一直没有这个效果，切进/退出这页都是硬切 */}
+      <RouteFade className="flex flex-col flex-1 min-h-0">
       <div
         style={
           isSummer
@@ -120,6 +124,7 @@ export function ThemePage() {
           })}
         </div>
       </main>
+      </RouteFade>
     </div>
   )
 }
