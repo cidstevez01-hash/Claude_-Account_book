@@ -261,22 +261,37 @@ export function RatePage() {
           />
 
           <div className="flex flex-col gap-md relative">
-            <div className="flex flex-col gap-1 pb-4 border-b border-dashed border-outline-variant/50">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container">
-                  <span className="material-symbols-outlined text-[18px]">payments</span>
+            {/* R-31：清空金额+刷新汇率——跟"JPY·日元"这行同一个flex行
+                justify-between，保证跟这行文字在同一水平线上对齐；这一整行加了
+                mt-1.5，把行本身往下挪一点点，跟右上角和纸胶带装饰(absolute
+                -top-1.5)拉开一点间距，不再挤在一起 */}
+            <div className="flex flex-col gap-1 pb-4 mt-1.5 border-b border-dashed border-outline-variant/50">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container">
+                    <span className="material-symbols-outlined text-[18px]">payments</span>
+                  </div>
+                  <select
+                    value={fromCode}
+                    onChange={(e) => setFromCode(e.target.value)}
+                    className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold"
+                  >
+                    {CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.code} · {c.zh}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <select
-                  value={fromCode}
-                  onChange={(e) => setFromCode(e.target.value)}
-                  className="bg-transparent border-none text-body-lg text-on-surface focus:outline-none focus:ring-0 font-semibold"
+                <button
+                  type="button"
+                  onClick={handleResetAmounts}
+                  aria-label={t('rateResetAria')}
+                  className="stamp-shadow shrink-0 w-8 h-8 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-primary hover:-translate-y-0.5 active:scale-90 transition-transform"
+                  style={{ boxShadow: '0 2px 0 var(--color-surface-variant)' }}
                 >
-                  {CURRENCIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.code} · {c.zh}
-                    </option>
-                  ))}
-                </select>
+                  <ThemeIcon icon="restart_alt" effect="bare" size={18} className="text-[18px]" />
+                </button>
               </div>
               <input
                 type="number"
@@ -327,26 +342,15 @@ export function RatePage() {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-between gap-2 pl-2 pr-1.5 py-1.5 rounded bg-surface-variant/30 border border-dashed border-outline-variant/50">
-            <span className="flex-1 text-center text-label-caps font-sans text-outline">
-              {loading
-                ? t('rateLoading')
-                : unitRate != null
-                  ? `1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
-                  : t('rateNeverFetched')}
-            </span>
-            {/* B-XX：默认/怀旧主题下的阴影+悬浮反馈照互换按钮(图章)同一套语言——
-                stamp-shadow(按下阴影消失下沉)+boxShadow(静止态的"浮起"感)，只是
-                尺寸缩小配合这条胶囊条的高度。夏·花火下额外走BareIconEffect发光 */}
-            <button
-              type="button"
-              onClick={handleResetAmounts}
-              aria-label={t('rateResetAria')}
-              className="stamp-shadow shrink-0 w-7 h-7 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-primary hover:-translate-y-0.5 active:scale-90 transition-transform"
-              style={{ boxShadow: '0 2px 0 var(--color-surface-variant)' }}
-            >
-              <ThemeIcon icon="restart_alt" effect="bare" size={16} className="text-[16px]" />
-            </button>
+          {/* B-XX：这条胶囊之前mt-6(24px)+上面swap区块自带的间距叠加，跟"0.00"
+              数字之间空出一大截不必要的留白，改成mt-3(12px)收紧，节省出来的空间
+              用来给上面第一行(mt-1.5)腾地方，整张卡片上下重新分配，不是单纯往下堆 */}
+          <div className="mt-3 text-center text-label-caps font-sans text-outline bg-surface-variant/30 py-2 rounded border border-dashed border-outline-variant/50">
+            {loading
+              ? t('rateLoading')
+              : unitRate != null
+                ? `1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
+                : t('rateNeverFetched')}
           </div>
           {error && <p className="mt-2 text-body-md text-primary break-all">{error}</p>}
         </div>
