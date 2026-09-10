@@ -28,9 +28,14 @@ interface ThemeIconProps {
   /** 只对effect='ring'生效——萤火虫装饰，只有确认稿里最早定稿的语言/货币两个图标带，
    * 后补的位置(着せ替え行等)不传 */
   fireflies?: boolean
+  /** 只对effect='bare'生效——B-48，给呼吸发光动画传一个基于真实时间戳算出的负delay，
+   * 用在BottomNav这类"每次切换都会整个重新挂载"的位置，避免动画从0%重新开始看起来
+   * "跳"一下。调用方要用useState(()=>Date.now()%5500)这类只在挂载时算一次的方式算，
+   * 不要每次渲染都重算，见IconEffects.tsx的BareIconEffect */
+  glowDelayMs?: number
 }
 
-export function ThemeIcon({ icon, fw, className, style, effect, size = 24, fireflies }: ThemeIconProps) {
+export function ThemeIcon({ icon, fw, className, style, effect, size = 24, fireflies, glowDelayMs }: ThemeIconProps) {
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
   const glyphKey = icon as IconKey
@@ -39,7 +44,7 @@ export function ThemeIcon({ icon, fw, className, style, effect, size = 24, firef
     return effect === 'ring' ? (
       <RingIconEffect icon={glyphKey} size={size} className={className} fireflies={fireflies} />
     ) : (
-      <BareIconEffect icon={glyphKey} size={size} className={className} />
+      <BareIconEffect icon={glyphKey} size={size} className={className} glowDelayMs={glowDelayMs} />
     )
   }
   if (fw && isSummer) {

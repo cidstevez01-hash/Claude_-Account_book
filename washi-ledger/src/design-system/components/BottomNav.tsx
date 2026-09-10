@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { useSettings } from '../../hooks/useSettings'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -51,6 +51,14 @@ export function BottomNav() {
   const { t } = useI18n()
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
+  // B-48：这个组件每次切tab都会整个销毁重建(见上面lastActiveTab的说明)，图标呼吸
+  // 发光动画(icon-glow-breathe，5.5s一个周期，见index.css)不传delay时新挂载的实例
+  // 永远从0%关键帧重新开始，看起来像"跳"一下。用挂载时算一次的Date.now()%5500当
+  // 负delay，把动画相位锚定在真实时间轴上而不是"这个实例何时诞生"——只要duration不变，
+  // 不管什么时候重新挂载，算出来的相位都落在同一条"连续呼吸"曲线上。用useState的
+  // 惰性初始值(只在挂载这一刻算一次)，不能放在渲染体里直接算(那样每次渲染都会变，
+  // 反而会因为delay值不断变化让浏览器重启动画，比不传delay更抖)
+  const [glowDelayMs] = useState(() => Date.now() % 5500)
   const location = useLocation()
   const navRef = useRef<HTMLElement>(null)
   const bubbleRef = useRef<HTMLDivElement>(null)
@@ -201,7 +209,7 @@ export function BottomNav() {
             <>
               {item.to === '/' ? (
                 isSummer ? (
-                  <BareIconEffect icon="book" size={24} className="w-6 h-6" />
+                  <BareIconEffect icon="book" size={24} className="w-6 h-6" glowDelayMs={glowDelayMs} />
                 ) : (
                   <AppIcon icon="book" size={24} fill="currentColor" className="w-6 h-6" />
                 )
@@ -211,6 +219,7 @@ export function BottomNav() {
                   effect="bare"
                   className="w-6 h-6"
                   style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+                  glowDelayMs={glowDelayMs}
                 />
               )}
               <span className="text-tab-label font-sans font-normal">{t(item.labelKey)}</span>

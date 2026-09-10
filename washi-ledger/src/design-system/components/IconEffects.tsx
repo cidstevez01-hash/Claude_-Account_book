@@ -61,11 +61,24 @@ export function RingIconEffect({ icon, size, className, fireflies }: IconEffectP
 
 /** 裸图标效果——真实UI这个位置没有常驻圆形容器(AppLayout按钮/NavDrawer行/
  * BottomNav tab)，不画假圆圈，改成复制一层同样的图标形状、模糊叠在原图标正下方
- * 当发光(见index.css的.icon-bare-glow)，光晕贴着图标本身轮廓，不是贴一个圆 */
-export function BareIconEffect({ icon, size, className }: IconEffectProps) {
+ * 当发光(见index.css的.icon-bare-glow)，光晕贴着图标本身轮廓，不是贴一个圆。
+ * B-48：BottomNav三个tab图标每次切tab整个组件都会销毁重建(参照BottomNav.tsx
+ * 里lastActiveTab那段注释，这是当初.tab-bubble滑动动画也踩过的架构限制)，新挂载
+ * 的icon-glow-breathe呼吸动画不传delay时永远从0%关键帧重新开始，视觉上像"跳"一下，
+ * 不是接着上次呼吸到哪继续。glowDelayMs让调用方传入一个基于Date.now()真实时间戳
+ * 算出的负delay，把动画相位锚定在真实时间轴上而不是"这个元素何时诞生"——只要duration
+ * (5500ms，跟index.css的icon-glow-breathe保持一致)不变，不管这个元素什么时候重新
+ * 挂载，算出来的相位都对应同一条"连续呼吸"的曲线，看起来就不会跳变。调用方要用
+ * useState(()=>Date.now()%5500)这类"只在挂载时算一次"的方式算，不能每次渲染都重算
+ * (那样反而会因为delay值不断变化而让浏览器重启动画，比不传delay更抖) */
+export function BareIconEffect({ icon, size, className, glowDelayMs }: IconEffectProps & { glowDelayMs?: number }) {
   return (
     <span className={`icon-bare-wrap ${className ?? ''}`} style={{ width: size, height: size }}>
-      <span className="icon-bare-glow" aria-hidden="true">
+      <span
+        className="icon-bare-glow"
+        aria-hidden="true"
+        style={glowDelayMs != null ? { animationDelay: `${-glowDelayMs}ms` } : undefined}
+      >
         <AppIcon icon={icon} size={size} fill="var(--color-primary)" />
       </span>
       <span className="icon-bare-crisp">
