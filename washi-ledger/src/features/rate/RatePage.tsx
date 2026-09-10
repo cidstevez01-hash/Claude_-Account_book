@@ -73,6 +73,14 @@ export function RatePage() {
   const [fromCode, setFromCode] = useState('JPY')
   const [toCode, setToCode] = useState('CNY')
   const [amount, setAmount] = useState('100')
+  // R-30：换算结果那栏原来只是根据amount算出来的纯展示文字，改成也能手动输入、
+  // 反向推算amount——双向互算。convertedAmount存的是用户在"下面那栏"手动输入的
+  // 原始文本；lastEditedField记"哪一栏最后被手动编辑过"，没被编辑的那一栏在渲染时
+  // 用汇率从被编辑的那一栏实时推算显示(见下面displayAmount/displayConverted)，
+  // 不是各自维护一份互不同步的状态——这样切货币对/汇率刷新时，没在编辑的那一栏
+  // 也会自动跟着重新算对
+  const [convertedAmount, setConvertedAmount] = useState('')
+  const [lastEditedField, setLastEditedField] = useState<'from' | 'to'>('from')
   const [snapshot, setSnapshot] = useState<RateSnapshot | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -160,7 +168,23 @@ export function RatePage() {
 
   const unitRate = snapshot && snapshot.base === fromCode ? snapshot.rates[toCode] : null
   const amountNum = parseFloat(amount)
-  const converted = unitRate != null && !isNaN(amountNum) ? amountNum * unitRate : null
+  const convertedAmountNum = parseFloat(convertedAmount)
+  // 没被编辑的那一栏用汇率从被编辑的那一栏实时推算；被编辑的那一栏直接显示用户输入
+  // 的原始文本(不在这里重新格式化，不然打字打到一半"4."会被toFixed(2)吃掉)
+  const derivedConverted = unitRate != null && !isNaN(amountNum) ? amountNum * unitRate : null
+  const derivedAmount = unitRate != null && unitRate !== 0 && !isNaN(convertedAmountNum) ? convertedAmountNum / unitRate : null
+  const displayAmount = lastEditedField === 'to' ? (derivedAmount != null ? derivedAmount.toFixed(2) : '') : amount
+  const displayConverted =
+    lastEditedField === 'from' ? (derivedConverted != null ? derivedConverted.toFixed(2) : '') : convertedAmount
+
+  function handleAmountChange(v: string) {
+    setAmount(v)
+    setLastEditedField('from')
+  }
+  function handleConvertedChange(v: string) {
+    setConvertedAmount(v)
+    setLastEditedField('to')
+  }
 
   const chartGeometry = useMemo(() => {
     if (history.length < 2) return null
@@ -246,8 +270,8 @@ export function RatePage() {
               <input
                 type="number"
                 inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                value={displayAmount}
+                onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="0.00"
                 className="w-full bg-transparent border-none outline-none px-0 py-1 font-serif text-[42px] leading-[48px] font-bold text-primary text-right focus:ring-0"
               />
@@ -281,9 +305,14 @@ export function RatePage() {
                   <span className="material-symbols-outlined text-[18px]">account_balance</span>
                 </div>
               </div>
-              <div className="w-full px-0 py-1 font-serif text-[42px] leading-[48px] font-bold text-on-surface text-right opacity-80">
-                {converted != null ? converted.toFixed(2) : '--'}
-              </div>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={displayConverted}
+                onChange={(e) => handleConvertedChange(e.target.value)}
+                placeholder="0.00"
+                className="w-full bg-transparent border-none outline-none px-0 py-1 font-serif text-[42px] leading-[48px] font-bold text-on-surface text-right opacity-80 focus:ring-0"
+              />
             </div>
           </div>
 
