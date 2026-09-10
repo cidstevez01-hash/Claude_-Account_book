@@ -1,5 +1,5 @@
 import { useState, type ReactNode, type RefObject } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
 import { RateShortcutFab } from './RateShortcutFab'
@@ -40,6 +40,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
   // 是展开的，本地state做不到这一点(实例卸载就清空了)
   const { open: drawerOpen, setOpen: setDrawerOpen } = useDrawer()
   const navigate = useNavigate()
+  const location = useLocation()
   const { t } = useI18n()
   const { containerRef, pullDistance, refreshing, dragging, threshold } = usePullToRefresh<HTMLElement>(onRefresh)
   const isSubpage = leftButton === 'back'
@@ -82,7 +83,16 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           都没有)上，header自己另外套了一层背景/blur——真机上能看出这两段接缝：安全区
           那一条是FireworksBackground原始清晰画面，header那一条是模糊过的，中间一条
           明显的分界线。改成padding-top和背景/blur一起挪到包住safe-area+header的这层
-          div上，两段用同一层玻璃质感，不再有接缝 */}
+          div上，两段用同一层玻璃质感，不再有接缝
+          B-XX：路由切换的入场渐显(.route-fade)之前包在App.tsx整个<Routes>外面，连
+          RateShortcutFab/BottomNav/NavDrawer这些"应该感觉持续存在、不随页面切换重新
+          出现"的常驻元素也被一起罩进去——每次切tab，这些元素的opacity从0淡入，跟
+          BottomNav自己.tab-bubble的滑动动画同时跑，两个动画叠在一起，真机上感觉
+          "切换有凝滞感"。挪到这里，只包住header+main这两块真正算"页面内容"的部分，
+          RateShortcutFab/BottomNav/NavDrawer/CloudDisconnectBanner留在这层外面
+          (见下方渲染)，不再被这个渐显影响——它们本来就该像贴在App外壳上一样，感觉上
+          是常驻不动的，不该随每次翻页重新淡入淡出 */}
+      <div key={location.pathname} className="route-fade flex flex-col flex-1 min-h-0">
       <div
         style={
           isSummer
@@ -222,6 +232,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
         )}
         {children}
       </main>
+      </div>
 
       <CloudDisconnectBanner />
       {/* R-18：子页面(汇率换算/设置/about)隐藏底部导航栏；抽屉本身也不渲染——这几个

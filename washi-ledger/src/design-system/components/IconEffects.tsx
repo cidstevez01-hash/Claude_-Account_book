@@ -53,7 +53,7 @@ export function RingIconEffect({ icon, size, className, fireflies }: IconEffectP
   return (
     <>
       <span className="icon-ring-glow" aria-hidden="true" />
-      <AppIcon icon={icon} size={size} fill="url(#icon-fill-grad)" className={`relative z-[1] ${className ?? ''}`} />
+      <AppIcon icon={icon} size={size} gradient className={`relative z-[1] ${className ?? ''}`} />
       {fireflies && FIREFLY_PRESETS.map((preset, i) => <Firefly key={i} {...preset} />)}
     </>
   )
@@ -82,7 +82,7 @@ export function BareIconEffect({ icon, size, className, glowDelayMs }: IconEffec
         <AppIcon icon={icon} size={size} fill="var(--color-primary)" />
       </span>
       <span className="icon-bare-crisp">
-        <AppIcon icon={icon} size={size} fill="url(#icon-fill-grad)" />
+        <AppIcon icon={icon} size={size} gradient />
       </span>
     </span>
   )

@@ -59,7 +59,7 @@ export function RateShortcutFab() {
         aria-hidden="true"
       />
       {isSummer ? (
-        <AppIcon icon="currency_exchange" size={22} fill="url(#icon-fill-grad)" className="relative" />
+        <AppIcon icon="currency_exchange" size={22} gradient className="relative" />
       ) : (
         <ThemeIcon icon="currency_exchange" className="relative w-6 h-6" style={{ fontSize: 22 }} />
       )}
