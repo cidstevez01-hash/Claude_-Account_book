@@ -83,6 +83,7 @@ export const dict = {
     aboutTitle: '关于', // 新App专属(旧App没有独立的"关于"页面)
     notSignedIn: '未登录', // 新App专属
     swapCurrencyAria: '交换货币', // 新App专属(汇率换算页的"⇅"互换按钮)
+    rateResetAria: '清空金额并刷新汇率', // 新App专属，R-31(汇率换算页实时汇率胶囊条上的重置按钮)
     accountSignInHint: '登录后可以在多个设备间同步账本', // 新App专属，旧App对应的cloudSyncHelpText文案更长，这里是精简版
     signInBtn: LEGACY_ZH.cloudSignInBtn,
     signUpBtn: LEGACY_ZH.cloudSignUpBtn,
@@ -225,6 +226,7 @@ export const dict = {
     aboutTitle: 'アプリについて',
     notSignedIn: '未ログイン',
     swapCurrencyAria: '通貨を入れ替え',
+    rateResetAria: '金額をクリアしてレートを更新',
     accountSignInHint: 'ログインすると複数の端末で家計簿を同期できます',
     signInBtn: LEGACY_JA.cloudSignInBtn,
     signUpBtn: LEGACY_JA.cloudSignUpBtn,

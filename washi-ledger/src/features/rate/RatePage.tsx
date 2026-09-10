@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { fetchRates, fetchRateHistory, CURRENCIES, type RateSnapshot, type RateHistoryPoint } from '../../data/rate'
 import { useI18n } from '../../lib/i18n'
 
@@ -166,6 +167,16 @@ export function RatePage() {
     setToCode(fromCode)
   }
 
+  // R-31：实时汇率胶囊条上的"重置"按钮——只清空上下两个金额输入框恢复默认(不动
+  // 货币对/走势图时间范围)，同时重新拉取一次最新汇率，两件事一起做才对得上图标
+  // 本身的"刷新"语义
+  function handleResetAmounts() {
+    setAmount('100')
+    setConvertedAmount('')
+    setLastEditedField('from')
+    refresh(fromCode)
+  }
+
   const unitRate = snapshot && snapshot.base === fromCode ? snapshot.rates[toCode] : null
   const amountNum = parseFloat(amount)
   const convertedAmountNum = parseFloat(convertedAmount)
@@ -316,12 +327,26 @@ export function RatePage() {
             </div>
           </div>
 
-          <div className="mt-6 text-center text-label-caps font-sans text-outline bg-surface-variant/30 py-2 rounded border border-dashed border-outline-variant/50">
-            {loading
-              ? t('rateLoading')
-              : unitRate != null
-                ? `1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
-                : t('rateNeverFetched')}
+          <div className="mt-6 flex items-center justify-between gap-2 pl-2 pr-1.5 py-1.5 rounded bg-surface-variant/30 border border-dashed border-outline-variant/50">
+            <span className="flex-1 text-center text-label-caps font-sans text-outline">
+              {loading
+                ? t('rateLoading')
+                : unitRate != null
+                  ? `1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
+                  : t('rateNeverFetched')}
+            </span>
+            {/* B-XX：默认/怀旧主题下的阴影+悬浮反馈照互换按钮(图章)同一套语言——
+                stamp-shadow(按下阴影消失下沉)+boxShadow(静止态的"浮起"感)，只是
+                尺寸缩小配合这条胶囊条的高度。夏·花火下额外走BareIconEffect发光 */}
+            <button
+              type="button"
+              onClick={handleResetAmounts}
+              aria-label={t('rateResetAria')}
+              className="stamp-shadow shrink-0 w-7 h-7 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-primary hover:-translate-y-0.5 active:scale-90 transition-transform"
+              style={{ boxShadow: '0 2px 0 var(--color-surface-variant)' }}
+            >
+              <ThemeIcon icon="restart_alt" effect="bare" size={16} className="text-[16px]" />
+            </button>
           </div>
           {error && <p className="mt-2 text-body-md text-primary break-all">{error}</p>}
         </div>
