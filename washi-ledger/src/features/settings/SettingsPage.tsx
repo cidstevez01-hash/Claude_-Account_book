@@ -29,7 +29,11 @@ function SettingsRow({ icon, fwIcon, effect, fireflies, label, children, onClick
       onClick={onClick}
       className="w-full flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest border-b-2 border-outline-variant"
     >
-      <div className="flex items-center gap-sm">
+      {/* B-XX：图标到文字间距从gap-sm(12px)提到gap-md(16px)——"夏·花火"主题下
+          图标光晕视觉边界(66px发光盒子closest-side半径33px，减图标自身20px半径)
+          有13px，比原来的12px间距还宽，肉眼看光晕已经贴到文字上了；提到16px能在
+          光晕视觉边界外留出3-4px干净空隙。只改这一处，不动全局gap-sm这个token */}
+      <div className="flex items-center gap-md">
         <div className="relative w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
           <ThemeIcon icon={icon} fw={fwIcon} className="w-6 h-6" effect={effect} fireflies={fireflies} />
         </div>
@@ -44,7 +48,16 @@ function SettingsRow({ icon, fwIcon, effect, fireflies, label, children, onClick
  * 按钮组)，因为货币这类选项不止两个(CURRENCIES有11种)，按钮组这种"每个选项一个按钮"
  * 的样式选项一多就会挤成一团；<select>本身就是给"任意数量选项"设计的控件，iOS上点开
  * 是系统原生的滚轮选择器，样式上只去掉默认的箭头图案换成Material Symbols的箭头图标，
- * 跟这一排其他行的图标风格统一 */
+ * 跟这一排其他行的图标风格统一
+ *
+ * B-XX：可见文字不再交给<select>自己渲染——用户反馈真机上言語行"日本語"和通貨行
+ * "日元 (JPY)"这两个值的文字没有垂直对齐，根因是原生<select>的可见文字由系统/浏览器
+ * 的表单控件外壳负责画，不完全受我们CSS控制，纯CJK文本("日本語")和CJK+英文括号混排
+ * 文本("日元 (JPY)")在原生控件里可能不是同一套基线算法(iOS尤其明显，桌面Chromium
+ * 复现不出这个差异，量出来是对齐的)。改成自己拿<span>画可见文字(照着せ替え那行本来
+ * 就是自己画span的思路)，行高/垂直对齐完全自己控制，三行渲染方式统一；<select>本身
+ * 保留，但改成盖在上面的透明交互层(不可见但仍可点击/仍会弹出系统原生选择器)，功能
+ * 完全不变 */
 function SelectRow({
   icon,
   fwIcon,
@@ -64,13 +77,22 @@ function SelectRow({
   options: { value: string; label: string }[]
   onChange: (value: string) => void
 }) {
+  const selectedLabel = options.find((opt) => opt.value === value)?.label ?? value
   return (
     <SettingsRow icon={icon} fwIcon={fwIcon} effect={effect} fireflies={fireflies} label={label}>
-      <div className="relative flex items-center">
+      {/* B-XX续：箭头跟文字的间距之前沿用原生select时代遗留的"pr-5撑开文字+
+          chevron绝对定位贴right-0"这套写法，跟着せ替え那行(flex items-center
+          gap-1的正常间距)不是同一套，看起来比那行挤。文字已经改成自己画的span了，
+          没必要再保留这层absolute hack，直接改成同款flex+gap-1，三行箭头间距
+          统一；select这个透明交互层继续用absolute inset-0盖住整块可点区域 */}
+      <div className="relative flex items-center gap-1">
+        <span className="text-body-md text-on-surface-variant">{selectedLabel}</span>
+        <span className="material-symbols-outlined text-[16px] pointer-events-none">expand_more</span>
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="appearance-none bg-transparent border-none text-body-md text-on-surface-variant focus:outline-none focus:ring-0 pr-5 text-right cursor-pointer"
+          aria-label={label}
+          className="absolute inset-0 opacity-0 cursor-pointer"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -78,7 +100,6 @@ function SelectRow({
             </option>
           ))}
         </select>
-        <span className="material-symbols-outlined text-[16px] pointer-events-none absolute right-0">expand_more</span>
       </div>
     </SettingsRow>
   )

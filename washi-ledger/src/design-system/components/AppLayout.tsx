@@ -1,4 +1,4 @@
-import { useState, type ReactNode, type RefObject } from 'react'
+import { useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
@@ -164,7 +164,17 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
               // 的圆形照片容器内部——那样会被自己裁掉；外面单独包一层不裁切的div放光晕，
               // 照片圆形容器缩在里面保持原有裁切行为不变
               <span className="relative inline-block w-7 h-7">
-                {isSummer && <span className="icon-ring-glow" aria-hidden="true" />}
+                {/* B-46续(第11轮)：头像圆形容器是28px(w-7)，不是SettingsPage那个
+                    40px——.icon-ring-glow的mask硬边界靠--icon-size算真实半径，
+                    这里必须覆盖成28px，否则会沿用默认值40px，裁切点还是对着
+                    20px算，比头像自己14px的真实半径多留出一圈空白 */}
+                {isSummer && (
+                  <span
+                    className="icon-ring-glow"
+                    aria-hidden="true"
+                    style={{ '--icon-size': '28px' } as CSSProperties}
+                  />
+                )}
                 <span className="relative z-[1] block w-7 h-7 rounded-full overflow-hidden">
                   <img src={avatar.src} alt="" className="w-full h-full object-cover" />
                 </span>

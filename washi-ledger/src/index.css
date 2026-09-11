@@ -326,6 +326,10 @@
    常驻圆形容器，不画假圆圈，改成同一份图标形状复制一层模糊叠底当发光，光晕贴着
    图标本身轮廓 */
 .icon-ring-glow {
+  /* 调用方真实图标容器的尺寸(px数字，不带单位)——SettingsPage行是40(w-10)，
+     不用每处都传；头像(w-7=28px)等非40px场景通过inline style覆盖，见下方
+     mask-image那段B-46续(第11轮)说明 */
+  --icon-size: 40px;
   position: absolute;
   inset: -13px;
   border-radius: 50%;
@@ -377,7 +381,21 @@
      那段全部裁掉，不用再靠"渐变起点足够晚"这种间接方式凑安全垫，也就不会再有
      多余的空白间隙。mask-image用同一个closest-side坐标系，60.6%是真实硬边界，
      只留极小的0.2个百分点做抗锯齿柔化(不是视觉上的过渡带，只是防止裁切边缘
-     出现锯齿) */
+     出现锯齿)
+     B-46续(第11轮)：头像(AppLayout.tsx，w-7 h-7=28px)复用这个class后又出现
+     "光晕和头像之间有留白"——根因：60.6%/60.8%这两个mask硬边界是按40px图标
+     算出来的百分比(20px真实半径 / 33px光晕盒子半径)，但inset:-13px是固定像素，
+     换成28px的头像，光晕盒子半径变成27px，真实半径14px只占27px的51.9%，
+     mask还卡在60.6%——等于卡在27*0.606≈16.4px处，比头像真实边缘14px多留了
+     2.4px的死区，这段就是留白。改成--icon-size自定义属性(默认40px，调用方
+     按各自真实图标尺寸覆盖)，mask边界直接写成calc(var(--icon-size)/2)这个
+     绝对像素值(不再算百分比)，不管容器多大，裁切点永远精确落在
+     var(--icon-size)/2这个真实半径上——40px图标算出来正好是20px，跟原来的
+     60.6%×33px完全等值(不是新行为，只是把它从"依赖box尺寸的百分比"换成
+     "只依赖图标真实尺寸的绝对值"，两种写法对40px这个原有场景结果一致，但
+     对28px这种新尺寸就不会再错)。background渐变的55%/100%不用同步改——
+     这两个点只决定光晕环本身的亮度分布观感，不承担"贴边零留白"这个硬性
+     要求，真正的硬边界全靠mask */
   background: radial-gradient(
     circle closest-side,
     rgba(232, 93, 74, 0) 0%,
@@ -385,17 +403,17 @@
     rgba(232, 93, 74, 0) 100%
   );
   -webkit-mask-image: radial-gradient(
-    circle closest-side,
-    transparent 0%,
-    transparent 60.6%,
-    white 60.8%,
+    circle,
+    transparent 0,
+    transparent calc(var(--icon-size) / 2),
+    white calc(var(--icon-size) / 2 + 0.2px),
     white 100%
   );
   mask-image: radial-gradient(
-    circle closest-side,
-    transparent 0%,
-    transparent 60.6%,
-    white 60.8%,
+    circle,
+    transparent 0,
+    transparent calc(var(--icon-size) / 2),
+    white calc(var(--icon-size) / 2 + 0.2px),
     white 100%
   );
   filter: blur(3px);

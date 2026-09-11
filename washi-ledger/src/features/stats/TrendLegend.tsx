@@ -29,7 +29,12 @@ export function TrendLegend({
     return (
       <div className="mt-sm">
         <div className="flex items-center justify-between border-b border-dashed border-outline-variant pb-1 mb-2">
-          <span className="text-body-lg text-on-surface">{selectedBucket.label}</span>
+          {/* B-49续：这里之前显示selectedBucket.label——按日视图这个字段只是纯数字
+              (比如"2")，因为同一个字段还要兼职柱状图下方横轴刻度("1 2 3...11"那排)，
+              那边只需要裸数字。选中态详情头改成用selectedBucket.key——这个字段本来
+              就是完整日期"YYYY-MM-DD"(按月视图是"YYYY-MM")，不用新增字段，横轴刻度
+              那边的label不受影响 */}
+          <span className="text-body-lg text-on-surface">{selectedBucket.key}</span>
           <div className="flex items-center gap-2">
             <span className="font-serif text-stat-figure text-primary">
               {valuePrefix}
