@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { useI18n } from '../../lib/i18n'
 import { useSettings } from '../../hooks/useSettings'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -60,6 +61,7 @@ export function BottomNav() {
   // 反而会因为delay值不断变化让浏览器重启动画，比不传delay更抖)
   const [glowDelayMs] = useState(() => Date.now() % 5500)
   const location = useLocation()
+  const navigate = useAppNavigate()
   const navRef = useRef<HTMLElement>(null)
   const bubbleRef = useRef<HTMLDivElement>(null)
   const btnRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
@@ -186,7 +188,7 @@ export function BottomNav() {
   return (
     <nav
       ref={navRef}
-      className="fixed bottom-6 inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
+      className="bottom-nav-shell fixed bottom-6 inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
                  flex items-center px-lg py-xs
                  bg-surface/80 backdrop-blur-md border border-white/20 rounded-full shadow-lg"
     >
@@ -196,6 +198,7 @@ export function BottomNav() {
           key={item.to}
           to={item.to}
           end={item.to === '/'}
+          onClick={(e) => viewTransitionLinkClick(e, navigate, item.to)}
           ref={(el) => {
             btnRefs.current[item.to] = el
           }}

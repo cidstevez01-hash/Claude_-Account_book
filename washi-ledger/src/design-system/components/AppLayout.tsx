@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { BottomNav } from './BottomNav'
 import { NavDrawer } from './NavDrawer'
 import { RateShortcutFab } from './RateShortcutFab'
@@ -40,7 +41,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
   // AppLayout实例(不同路由页面，不是同一个组件实例)，返回上一页时要"记得"抽屉当时
   // 是展开的，本地state做不到这一点(实例卸载就清空了)
   const { open: drawerOpen, setOpen: setDrawerOpen } = useDrawer()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { t } = useI18n()
   const { containerRef, pullDistance, refreshing, dragging, threshold } = usePullToRefresh<HTMLElement>(onRefresh)
   const isSubpage = leftButton === 'back'
@@ -155,6 +156,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
         ) : (
           <Link
             to="/account"
+            onClick={(e) => viewTransitionLinkClick(e, navigate, '/account')}
             aria-label={t('accountTitle')}
             className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
           >

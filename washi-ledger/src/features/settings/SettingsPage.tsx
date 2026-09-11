@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { useSettings } from '../../hooks/useSettings'
 import { useI18n } from '../../lib/i18n'
 import { CURRENCIES } from '../../data/rate'
@@ -112,7 +112,7 @@ function SelectRow({
  * Washi Ledger视觉，点进去是/theme子页面(照design-assets-v2/_25的Bento卡片
  * 布局)，只展示这一张真实存在的主题卡，没有编另外几张假主题 */
 export function SettingsPage() {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { lang, setLang, t } = useI18n()
   const { settings, update } = useSettings()
 

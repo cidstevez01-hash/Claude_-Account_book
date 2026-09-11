@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
+import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { useAuth } from '../auth/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
@@ -19,7 +20,7 @@ import { loadAvatarId } from '../../lib/avatarStorage'
  * 退出登录要有确认弹窗，避免误触(退出登录不会清空本地缓存的账目数据，见useEntries.ts
  * 里的真实缓存/同步逻辑，退出后账目照样能正常看) */
 export function AccountPage() {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { user, loading, signedIn } = useAuth()
   const { t, lang } = useI18n()
   const [confirmSignOut, setConfirmSignOut] = useState(false)
@@ -45,12 +46,14 @@ export function AccountPage() {
           <div className="flex gap-sm w-full max-w-[280px]">
             <Link
               to="/signin"
+              onClick={(e) => viewTransitionLinkClick(e, navigate, '/signin')}
               className="flex-1 h-11 flex items-center justify-center rounded-xl border border-primary text-primary text-body-lg"
             >
               {t('signInBtn')}
             </Link>
             <Link
               to="/register"
+              onClick={(e) => viewTransitionLinkClick(e, navigate, '/register')}
               className="flex-1 h-11 flex items-center justify-center rounded-xl bg-primary text-on-primary text-body-lg"
             >
               {t('signUpBtn')}
@@ -77,6 +80,7 @@ export function AccountPage() {
           </div>
           <Link
             to="/account/avatar"
+            onClick={(e) => viewTransitionLinkClick(e, navigate, '/account/avatar')}
             aria-label={t('changeAvatarAria')}
             className="absolute -right-0.5 bottom-0 w-[26px] h-[26px] rounded-full bg-primary border-2 border-surface flex items-center justify-center active:scale-90 transition-transform"
           >

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { useI18n } from '../../lib/i18n'
 import { AVATAR_PRESETS } from '../../lib/avatarPresets'
 import { loadAvatarId, saveAvatarId } from '../../lib/avatarStorage'
@@ -10,7 +10,7 @@ import { loadAvatarId, saveAvatarId } from '../../lib/avatarStorage'
  * 头像本体只是本机偏好(avatarStorage.ts)，不接入useSettings.tsx那套Supabase同步——
  * 这次需求范围就是"挑个预设图案"，没有"跨端同步头像"这条，不为此改user_settings表。 */
 export function ChangeAvatarPage() {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { t, lang } = useI18n()
   const [initialId] = useState(() => loadAvatarId())
   const [selectedId, setSelectedId] = useState(initialId)

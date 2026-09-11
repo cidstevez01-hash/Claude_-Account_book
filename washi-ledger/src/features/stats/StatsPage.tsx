@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { MonthNavBar } from './MonthNavBar'
@@ -71,7 +71,7 @@ function pad2(n: number): string {
  */
 export function StatsPage() {
   const { t, lang } = useI18n()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { user } = useAuth()
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { entries, reload, removeLocal } = useEntries(user?.id ?? null)

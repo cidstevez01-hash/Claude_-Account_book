@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
 import { RouteFade } from '../../design-system/components/RouteFade'
@@ -9,7 +10,7 @@ import { RouteFade } from '../../design-system/components/RouteFade'
  * cloudSigninForm提交处理：supabase.auth.signInWithPassword */
 export function SignInPage() {
   const { t } = useI18n()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -93,7 +94,7 @@ export function SignInPage() {
 
       <p className="text-center text-body-md text-on-surface-variant mt-md">
         {t('noAccountText')}{' '}
-        <Link to="/register" className="text-primary font-medium">
+        <Link to="/register" onClick={(e) => viewTransitionLinkClick(e, navigate, '/register')} className="text-primary font-medium">
           {t('goToSignUpLink')}
         </Link>
       </p>

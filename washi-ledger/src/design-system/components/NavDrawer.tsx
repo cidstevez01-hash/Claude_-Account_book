@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useAuth, hasEverSignedIn } from '../../features/auth/useAuth'
 import { useI18n } from '../../lib/i18n'
@@ -48,7 +49,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
   const isSummer = settings.themeSkin === 'summer'
   const { t } = useI18n()
   const location = useLocation()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   // B-34：点这三行(汇率换算/设置/关于)本来指望能看到"点中的这行变绿高亮"这个点击
   // 反馈，但这三个都是SUBPAGE_PATHS——AppLayout.tsx对子页面完全不渲染NavDrawer
   // (isSubpage分支)，之前用NavLink直接同步跳转，路由一变、这个组件立刻从DOM里

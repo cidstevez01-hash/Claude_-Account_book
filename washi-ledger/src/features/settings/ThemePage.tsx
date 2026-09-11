@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom'
 import { useI18n } from '../../lib/i18n'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { RouteFade } from '../../design-system/components/RouteFade'
@@ -24,7 +24,7 @@ const THEME_PREVIEWS: Record<ThemeSkin, { primary: string; surface: string; outl
 }
 
 export function ThemePage() {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { t } = useI18n()
   const { settings, update } = useSettings()
   // B-XX：这页是独立整屏子页面，不走AppLayout.tsx，R-29做summer主题(FireworksBackground

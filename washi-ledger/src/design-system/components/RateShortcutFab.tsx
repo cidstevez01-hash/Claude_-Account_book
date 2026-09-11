@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { useI18n } from '../../lib/i18n'
 import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from './ThemeIcon'
@@ -18,11 +19,13 @@ export function RateShortcutFab() {
   const { t } = useI18n()
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
+  const navigate = useAppNavigate()
   return (
     <Link
       to="/rate"
+      onClick={(e) => viewTransitionLinkClick(e, navigate, '/rate')}
       aria-label={t('rateShortcutAria')}
-      className="fixed z-40 flex items-center justify-center w-12 h-12 rounded-full active:scale-90 transition-transform"
+      className="rate-fab-shell fixed z-40 flex items-center justify-center w-12 h-12 rounded-full active:scale-90 transition-transform"
       style={{
         right: 'max(25px, calc(50% - 240px + 25px))',
         bottom: 'calc(6rem + 102px)',

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { DateRangeBar } from '../../design-system/components/DateRangeBar'
@@ -38,7 +38,7 @@ export function DashboardPage() {
   const { entries, reload, removeLocal } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   // 起止日期区间——默认当月完整一个月(1日到月末最后一天)，仪表盘结余/环状图/最近明细
   // 全部跟着这个区间走；区间本身可以自由改成任意起止(#8)，只是初始值不能是"1日到今天"，

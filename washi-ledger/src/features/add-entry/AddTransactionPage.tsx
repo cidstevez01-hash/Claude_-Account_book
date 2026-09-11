@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { CategoryPicker } from './CategoryPicker'
 import { TagPicker } from './TagPicker'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
@@ -29,7 +30,7 @@ function todayStr() {
  * renderTagGrid的"⋯"菜单搬。 */
 export function AddTransactionPage() {
   const { t, lang } = useI18n()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const [searchParams] = useSearchParams()
   const editId = searchParams.get('editId')
   const copyId = searchParams.get('copyId')

@@ -317,6 +317,42 @@
   }
 }
 
+/* B-XX：页面跳转"一跳一跳"根因修复——.route-fade是"旧页面瞬间卸载、新页面单独
+   淡入"，两段动画完全不重叠，感觉是硬切再补一下(见hooks/useAppNavigate.ts的
+   完整说明)。改用浏览器原生View Transitions API做真正的新旧内容交叉淡出淡入
+   (支持的机型走这条路，RouteFade.tsx会跳过自己的.route-fade，把这件事完全交给
+   浏览器；不支持的机型.route-fade原样兜底，两套不会同时生效)。
+   默认的::view-transition-old(root)/new(root)就是一次简单交叉淡出淡入，这里只是
+   把动画时长/缓动曲线跟.route-fade对齐(320ms + 同一条material ease-out曲线)，
+   保持全站过渡节奏统一，不引入新的动效语言(用户明确说了不需要改成滑动/弹出卡片
+   这类新样式，只是要把现有的淡入淡出做平滑) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* 底部导航胶囊/汇率悬浮入口这两个"应该感觉持续存在、不随页面切换重新出现"的常驻
+   元素(每次切页面其实都是全新DOM实例，见BottomNav.tsx/AppLayout.tsx的说明)，如果
+   不特殊处理，会被上面::view-transition-old/new(root)那层默认的整页交叉淡出淡入
+   一起卷进去——旧实例淡出、新实例淡入，两次几乎一样的画面叠在一起，视觉上是"闪一
+   下"而不是"一直在那里"。给它们各自固定的view-transition-name，浏览器就会把新旧
+   两个实例当成"同一个元素在变化"处理(位置/尺寸配对着做平滑过渡而不是交叉淡出淡入)，
+   底部导航栏自己那套Web Animations气泡滑动动画不受干扰，照常运行 */
+.bottom-nav-shell {
+  view-transition-name: bottom-nav-vt;
+}
+.rate-fab-shell {
+  view-transition-name: rate-fab-vt;
+}
+
 /* B-XX："夏 · 花火"图标光效——图标形状(lib/iconGlyphs.ts)、颜色(IconGradientDefs.tsx
    共享渐变)、发光(这里)三层分开维护，改一层不牵连另外两层。这两个class只会在
    ThemeIcon/IconEffects.tsx判断出summer主题时才被React渲染出来，不靠CSS选择器

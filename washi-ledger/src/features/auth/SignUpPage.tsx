@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
@@ -15,7 +16,7 @@ type Mode = 'signup' | 'verify'
  * 不是注册完直接算完成 */
 export function SignUpPage() {
   const { t } = useI18n()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const [mode, setMode] = useState<Mode>('signup')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -170,7 +171,7 @@ export function SignUpPage() {
       {mode === 'signup' && (
         <p className="text-center text-body-md text-on-surface-variant mt-md">
           {t('alreadyHaveAccountText')}{' '}
-          <Link to="/signin" className="text-primary font-medium">
+          <Link to="/signin" onClick={(e) => viewTransitionLinkClick(e, navigate, '/signin')} className="text-primary font-medium">
             {t('goToSignInLink')}
           </Link>
         </p>
