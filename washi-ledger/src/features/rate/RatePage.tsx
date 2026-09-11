@@ -345,11 +345,14 @@ export function RatePage() {
           {/* B-XX：这条胶囊之前mt-6(24px)+上面swap区块自带的间距叠加，跟"0.00"
               数字之间空出一大截不必要的留白，改成mt-3(12px)收紧，节省出来的空间
               用来给上面第一行(mt-1.5)腾地方，整张卡片上下重新分配，不是单纯往下堆 */}
+          {/* R-04(2026-08-22)重构成Stitch这版卡片时这行更新日期被拿掉了(新设计稿本身
+              没画这个元素)，用户要求恢复——日期跟汇率数值同一行显示，不单独起一行，
+              照下面走势图选中点"日期 · 数值"同一种拼接格式(见下方activePoint那段) */}
           <div className="mt-3 text-center text-label-caps font-sans text-outline bg-surface-variant/30 py-2 rounded border border-dashed border-outline-variant/50">
             {loading
               ? t('rateLoading')
               : unitRate != null
-                ? `1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
+                ? `${snapshot?.date ? `${snapshot.date} · ` : ''}1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
                 : t('rateNeverFetched')}
           </div>
           {error && <p className="mt-2 text-body-md text-primary break-all">{error}</p>}
