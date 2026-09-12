@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDayPinned, matchesEntrySearch } from '../../data/summary'
+import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from './EntryCard'
 import { dayLabel } from './dayLabel'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
@@ -10,6 +11,10 @@ interface RecentEntriesListProps {
   categories: Category[]
   tags: Tag[]
   paymentMethods: PaymentMethod[]
+  /** 当日净额的显示币种——调用方(DashboardPage)传入前已经用
+   * data/currencyDisplay.ts的toDisplayEntries()把entries统一换算成这个币种了，
+   * 这里只管格式化显示，不做换算(照HistoryEntryList.tsx同款currency prop搬) */
+  currency: string
   /** 搜索关键词——受控，状态实际存在DashboardPage(不是这个组件自己的useState)，
    * 因为goToAdd()跳转去新建/编辑/复制页面之前要能读到当前搜索词存进
    * dashboardFocusMemory，返回时才能把它还原回来(不然这个App路由结构下，每次
@@ -30,6 +35,7 @@ export function RecentEntriesList({
   categories,
   tags,
   paymentMethods,
+  currency,
   search,
   onSearchChange,
   onViewAll,
@@ -134,11 +140,23 @@ export function RecentEntriesList({
         <p className="text-center text-body-md text-on-surface-variant py-8">{t('historyNoResults')}</p>
       ) : (
       <div className="space-y-2">
-        {groups.map((group) => (
+        {groups.map((group) => {
+          // 当日净额——照HistoryEntryList.tsx同款算法(收入+/支出-求和)，group.entries
+          // 是筛过关键词之后的结果(见上面filteredEntries)，搜索词一变这里跟着重算，
+          // 不用额外处理"检索后要重新计算"这个要求
+          const dayNet = group.entries.reduce((acc, e) => acc + (e.type === 'income' ? e.amount : -e.amount), 0)
+          return (
           <div key={group.date}>
-            <div className="mt-3 mb-1">
+            <div className="mt-3 mb-1 flex items-center justify-between">
               <span className="inline-block bg-surface-variant text-on-surface-variant text-[10px] font-sans px-2 py-1 rounded-md">
                 {dayLabel(group.date, t)}
+              </span>
+              <span
+                className="font-serif text-label-caps"
+                style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
+              >
+                {dayNet >= 0 ? '+' : '-'}
+                {formatCurrency(Math.abs(dayNet), currency)}
               </span>
             </div>
             {group.entries.map((entry) => {
@@ -161,7 +179,8 @@ export function RecentEntriesList({
               )
             })}
           </div>
-        ))}
+          )
+        })}
       </div>
       )}
     </section>

@@ -239,6 +239,7 @@ export function DashboardPage() {
             categories={categories}
             tags={tags}
             paymentMethods={catalog.paymentMethods}
+            currency={settings.currency}
             search={search}
             onSearchChange={setSearch}
             onViewAll={() => navigate('/history')}

@@ -291,14 +291,23 @@ export function StatsPage() {
           <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
             <div className="flex items-center justify-between mb-sm">
               <h3 className="font-serif text-headline-md text-on-surface">{t('statsTrendTitle')}</h3>
-              <select
-                value={trendType}
-                onChange={(e) => changeTrendType(e.target.value as EntryType)}
-                className="bg-transparent border-none text-body-md text-on-surface-variant focus:outline-none focus:ring-0"
-              >
-                <option value="expense">{t('typeExpense')}</option>
-                <option value="income">{t('typeIncome')}</option>
-              </select>
+              {/* B-XX：之前是裸<select>(bg-transparent border-none)，看起来就是纯文字，
+                  看不出能点——改成跟下面TrendControls.tsx"日別/月別"同款分段胶囊样式，
+                  同一张卡片内视觉语言统一，不用再设计一套新样式 */}
+              <div className="flex gap-1 bg-surface-container-highest rounded-lg p-0.5">
+                {(['expense', 'income'] as const).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => changeTrendType(key)}
+                    className={`px-2.5 py-1 rounded text-tab-label font-sans ${
+                      trendType === key ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant'
+                    }`}
+                  >
+                    {key === 'expense' ? t('typeExpense') : t('typeIncome')}
+                  </button>
+                ))}
+              </div>
             </div>
             <TrendControls
               dim={trendDim}
