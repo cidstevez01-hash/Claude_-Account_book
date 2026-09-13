@@ -1,18 +1,14 @@
 /** R-32：小票扫描"全能扫描王"式自动边缘检测+透视纠偏——不再走OCR文字识别那条路
  * (见receiptOcr.ts的说明，日文小票OCR质量不理想，用户明确要求改成保留原始版面的
- * 扫描件样式)。用OpenCV.js(`@techstark/opencv-js`，Apache-2.0开源免费，纯WASM在
- * 浏览器/WebView本地跑，不联网不需要账号)做：灰度化→高斯模糊→Canny边缘检测→
- * 找轮廓→挑最大的四边形轮廓当小票边界→透视变换"拉正"，再做一次基于直方图分位数的
- * 自动对比度拉伸(auto-levels)让画面更接近扫描件的清晰度。
+ * 扫描件样式)。真正的OpenCV.js加载+边缘检测逻辑跑在独立的Worker线程里(见
+ * receiptEdgeDetectWorker.ts)——真机实测确认`import('@techstark/opencv-js')`
+ * 这一步本身会阻塞它所在的线程，放在主线程上连超时保护都触发不了(事件循环被
+ * 同一线程的长时间同步任务占住)，这个文件现在只是主线程这边的薄封装：创建/
+ * 复用Worker、发送拍摄的照片、等待结果、处理超时。
  *
- * 检测不到合适的四边形(比如背景太复杂、小票边缘对比度不够)时不报错、不打断流程，
- * 直接兜底返回没有裁剪的原图(仍然做对比度增强)——"全自动"应该是"尽量做好，做不到
- * 就不裁"，不能因为检测失败就让用户完全扫不了。
- *
- * OpenCV.js这个包的类型声明(dist/src/index.d.ts)只导出了类型名字，跟它运行时
- * 真实的默认导出(整个cv命名空间对象/Promise，见README的用法示例)对不上，是这个包
- * 本身的已知问题；这里用any接管运行时类型，不去跟类型声明较劲，any的范围只收在
- * 这一个文件里，不向外传染 */
+ * 超时(20秒)在主线程这边——因为主线程现在完全不受Worker内部执行进度影响，
+ * 定时器能按预期正常触发；超时后会terminate()掉那个worker(它可能还卡在
+ * 死循环/超长同步任务里)，下次扫描重新起一个干净的 */
 
 import { logIfEnabled } from './appLog'
 
@@ -22,59 +18,16 @@ export interface ScanResult {
   cropped: boolean
 }
 
-// 真机上曾经出现过卡在"処理中…"一直转圈出不来结果的情况——不清楚具体是WASM编译慢
-// 还是别的环境问题，先加一个超时兜底，不管什么原因都不能无限等下去。cvReadyPromise
-// (真正的加载过程本身)不因为超时就作废重来，只是每次loadCv()调用各自套一层超时——
-// 万一只是这次编译慢、后台其实还在正常跑，之后再进扫描弹层时能直接用上已经跑完的结果，
-// 不用重新触发一次完整的下载/编译
 const CV_LOAD_TIMEOUT_MS = 20000
 
-let cvReadyPromise: Promise<any> | null = null
+let worker: Worker | null = null
 
-function getCvReadyPromise(): Promise<any> {
-  if (!cvReadyPromise) {
-    logIfEnabled('开始动态import(@techstark/opencv-js)')
-    const t0 = Date.now()
-    cvReadyPromise = (async () => {
-      const mod: any = await import('@techstark/opencv-js')
-      logIfEnabled(`opencv-js模块import完成(耗时${Date.now() - t0}ms)，取default导出`)
-      const cvModule = mod.default ?? mod
-      if (cvModule instanceof Promise) {
-        logIfEnabled('cv默认导出本身是Promise，等待其resolve')
-        const cv = await cvModule
-        logIfEnabled(`cv Promise已resolve(累计耗时${Date.now() - t0}ms)`)
-        return cv
-      }
-      if (cvModule.Mat) {
-        logIfEnabled('cv模块已经带有Mat，判定为已初始化完成')
-        return cvModule
-      }
-      logIfEnabled('等待cv.onRuntimeInitialized回调')
-      return new Promise((resolve) => {
-        cvModule.onRuntimeInitialized = () => {
-          logIfEnabled(`onRuntimeInitialized触发(累计耗时${Date.now() - t0}ms)`)
-          resolve(cvModule)
-        }
-      })
-    })()
+function getWorker(): Worker {
+  if (!worker) {
+    logIfEnabled('创建receiptEdgeDetectWorker')
+    worker = new Worker(new URL('./receiptEdgeDetectWorker.ts', import.meta.url), { type: 'module' })
   }
-  return cvReadyPromise
-}
-
-async function loadCv(): Promise<any> {
-  const ready = getCvReadyPromise()
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => {
-      logIfEnabled(`OpenCV.js加载超过${CV_LOAD_TIMEOUT_MS / 1000}秒未完成，触发超时`, 'warn')
-      reject(new Error(`OpenCV.js加载超时(${CV_LOAD_TIMEOUT_MS / 1000}秒未完成初始化)`))
-    }, CV_LOAD_TIMEOUT_MS)
-  })
-  try {
-    return await Promise.race([ready, timeout])
-  } finally {
-    clearTimeout(timer)
-  }
+  return worker
 }
 
 export function blobToImage(blob: Blob): Promise<HTMLImageElement> {
@@ -93,168 +46,59 @@ export function blobToImage(blob: Blob): Promise<HTMLImageElement> {
   })
 }
 
-function dist(a: [number, number], b: [number, number]): number {
-  return Math.hypot(a[0] - b[0], a[1] - b[1])
-}
-
-// 四个角点排序成[左上,右上,右下,左下]——x+y最小的是左上、最大的是右下；
-// x-y最大的是右上(x大y小)、最小的是左下(x小y大)。标准的透视变换角点排序算法
-function orderPoints(flat: number[]): [number, number][] {
-  const pts: [number, number][] = [
-    [flat[0], flat[1]],
-    [flat[2], flat[3]],
-    [flat[4], flat[5]],
-    [flat[6], flat[7]],
-  ]
-  const sums = pts.map((p) => p[0] + p[1])
-  const diffs = pts.map((p) => p[0] - p[1])
-  const tl = pts[sums.indexOf(Math.min(...sums))]
-  const br = pts[sums.indexOf(Math.max(...sums))]
-  const tr = pts[diffs.indexOf(Math.max(...diffs))]
-  const bl = pts[diffs.indexOf(Math.min(...diffs))]
-  return [tl, tr, br, bl]
-}
-
-function clamp255(v: number): number {
-  return v < 0 ? 0 : v > 255 ? 255 : v
-}
-
-// 基于亮度直方图1%/99%分位数的自动对比度拉伸(auto-levels)——比直接取绝对
-// min/max更抗噪点干扰，让照片看起来更接近"扫描件"的清晰锐利，不是简单粗暴拉满对比度
-function autoEnhance(canvas: HTMLCanvasElement): void {
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-  const { width, height } = canvas
-  const imageData = ctx.getImageData(0, 0, width, height)
-  const data = imageData.data
-  const hist = new Uint32Array(256)
-  for (let i = 0; i < data.length; i += 4) {
-    const lum = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2])
-    hist[lum]++
-  }
-  const total = width * height
-  const lowCut = total * 0.01
-  const highCut = total * 0.01
-  let acc = 0
-  let lo = 0
-  let hi = 255
-  for (let i = 0; i < 256; i++) {
-    acc += hist[i]
-    if (acc >= lowCut) {
-      lo = i
-      break
-    }
-  }
-  acc = 0
-  for (let i = 255; i >= 0; i--) {
-    acc += hist[i]
-    if (acc >= highCut) {
-      hi = i
-      break
-    }
-  }
-  if (hi <= lo) return
-  const scale = 255 / (hi - lo)
-  for (let i = 0; i < data.length; i += 4) {
-    data[i] = clamp255((data[i] - lo) * scale)
-    data[i + 1] = clamp255((data[i + 1] - lo) * scale)
-    data[i + 2] = clamp255((data[i + 2] - lo) * scale)
-  }
-  ctx.putImageData(imageData, 0, 0)
-}
-
-function detectAndWarp(cv: any, imgEl: HTMLImageElement): ScanResult {
-  logIfEnabled(`开始边缘检测(detectAndWarp)，图片尺寸${imgEl.naturalWidth}x${imgEl.naturalHeight}`)
-  const src = cv.imread(imgEl)
-  const gray = new cv.Mat()
-  const blurred = new cv.Mat()
-  const edges = new cv.Mat()
-  const dilated = new cv.Mat()
-  const kernel = cv.Mat.ones(3, 3, cv.CV_8U)
-  const contours = new cv.MatVector()
-  const hierarchy = new cv.Mat()
-
-  let outCanvas: HTMLCanvasElement
-  let cropped = false
-
-  try {
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY)
-    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0)
-    cv.Canny(blurred, edges, 50, 150)
-    cv.dilate(edges, dilated, kernel)
-    cv.findContours(dilated, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
-
-    const imgArea = src.rows * src.cols
-    let bestQuad: number[] | null = null
-    let bestArea = 0
-
-    for (let i = 0; i < contours.size(); i++) {
-      const cnt = contours.get(i)
-      const peri = cv.arcLength(cnt, true)
-      const approx = new cv.Mat()
-      cv.approxPolyDP(cnt, approx, 0.02 * peri, true)
-      if (approx.rows === 4) {
-        const area = Math.abs(cv.contourArea(approx))
-        // 至少占整张照片20%面积才当作候选，滤掉背景里的小噪点轮廓
-        if (area > bestArea && area > imgArea * 0.2) {
-          bestArea = area
-          const pts: number[] = []
-          for (let j = 0; j < 4; j++) {
-            pts.push(approx.data32S[j * 2], approx.data32S[j * 2 + 1])
-          }
-          bestQuad = pts
-        }
-      }
-      approx.delete()
-      cnt.delete()
-    }
-
-    if (bestQuad) {
-      const [tl, tr, br, bl] = orderPoints(bestQuad)
-      const maxWidth = Math.max(dist(tl, tr), dist(bl, br))
-      const maxHeight = Math.max(dist(tl, bl), dist(tr, br))
-      const srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [...tl, ...tr, ...br, ...bl])
-      const dstTri = cv.matFromArray(
-        4,
-        1,
-        cv.CV_32FC2,
-        [0, 0, maxWidth, 0, maxWidth, maxHeight, 0, maxHeight]
-      )
-      const M = cv.getPerspectiveTransform(srcTri, dstTri)
-      const dst = new cv.Mat()
-      cv.warpPerspective(src, dst, M, new cv.Size(maxWidth, maxHeight))
-      outCanvas = document.createElement('canvas')
-      cv.imshow(outCanvas, dst)
-      cropped = true
-      srcTri.delete()
-      dstTri.delete()
-      M.delete()
-      dst.delete()
-    } else {
-      outCanvas = document.createElement('canvas')
-      cv.imshow(outCanvas, src)
-    }
-  } finally {
-    src.delete()
-    gray.delete()
-    blurred.delete()
-    edges.delete()
-    dilated.delete()
-    kernel.delete()
-    contours.delete()
-    hierarchy.delete()
-  }
-
-  autoEnhance(outCanvas)
-  logIfEnabled(`边缘检测完成，cropped=${cropped}`)
-  return { canvas: outCanvas, cropped }
-}
-
 export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
-  logIfEnabled(`scanReceiptDocument开始，photo.size=${photo.size}字节`)
-  const cv = await loadCv()
-  logIfEnabled('loadCv()完成，开始blobToImage')
-  const imgEl = await blobToImage(photo)
-  logIfEnabled('blobToImage完成，开始detectAndWarp')
-  return detectAndWarp(cv, imgEl)
+  logIfEnabled(`scanReceiptDocument开始(Worker模式)，photo.size=${photo.size}字节`)
+  const w = getWorker()
+
+  const resultPromise = new Promise<{ bitmap: ImageBitmap; cropped: boolean }>((resolve, reject) => {
+    function onMessage(e: MessageEvent) {
+      cleanup()
+      if (e.data?.ok) {
+        resolve({ bitmap: e.data.bitmap, cropped: e.data.cropped })
+      } else {
+        reject(new Error(e.data?.error ?? 'Worker返回未知错误'))
+      }
+    }
+    function onError(e: ErrorEvent) {
+      cleanup()
+      reject(new Error(`Worker出错: ${e.message}`))
+    }
+    function cleanup() {
+      w.removeEventListener('message', onMessage)
+      w.removeEventListener('error', onError)
+    }
+    w.addEventListener('message', onMessage)
+    w.addEventListener('error', onError)
+    logIfEnabled('向Worker发送照片，开始处理')
+    w.postMessage({ photo })
+  })
+
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      logIfEnabled(`Worker处理超过${CV_LOAD_TIMEOUT_MS / 1000}秒未完成，触发超时`, 'warn')
+      // 超时后销毁这个worker——它可能还卡在耗时很长的同步任务里，下次扫描
+      // 重新创建一个干净的，不复用这个可能还在跑的实例
+      worker?.terminate()
+      worker = null
+      reject(new Error(`小票扫描处理超时(${CV_LOAD_TIMEOUT_MS / 1000}秒)`))
+    }, CV_LOAD_TIMEOUT_MS)
+  })
+
+  let result: { bitmap: ImageBitmap; cropped: boolean }
+  try {
+    result = await Promise.race([resultPromise, timeout])
+  } finally {
+    clearTimeout(timer)
+  }
+
+  logIfEnabled(`Worker返回结果，cropped=${result.cropped}`)
+  const canvas = document.createElement('canvas')
+  canvas.width = result.bitmap.width
+  canvas.height = result.bitmap.height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('无法创建canvas 2D上下文')
+  ctx.drawImage(result.bitmap, 0, 0)
+  result.bitmap.close()
+  return { canvas, cropped: result.cropped }
 }
