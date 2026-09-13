@@ -72,6 +72,10 @@ export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
 
   const resultPromise = new Promise<{ bitmap: ImageBitmap; cropped: boolean }>((resolve, reject) => {
     function onMessage(e: MessageEvent) {
+      if (e.data?.kind === 'progress') {
+        logIfEnabled(`Worker进度: ${e.data.stage}`)
+        return
+      }
       cleanup()
       if (e.data?.ok) {
         resolve({ bitmap: e.data.bitmap, cropped: e.data.cropped })

@@ -208,9 +208,16 @@ interface DetectResult {
   cropped: boolean
 }
 
-function detectAndWarp(cv: any, fullImageData: ImageData): DetectResult {
+function detectAndWarp(
+  cv: any,
+  fullImageData: ImageData,
+  report: (stage: string) => void
+): DetectResult {
+  report('resize-start')
   const { data: detectImageData, scale } = resizeImageData(fullImageData, DETECT_MAX_DIM)
+  report('resize-done')
   const bestQuadSmall = findQuad(cv, detectImageData)
+  report(bestQuadSmall ? 'find-quad-done-found' : 'find-quad-done-notfound')
 
   const src = cv.matFromImageData(fullImageData)
   let outData: ImageData
@@ -241,6 +248,7 @@ function detectAndWarp(cv: any, fullImageData: ImageData): DetectResult {
       dstTri.delete()
       M.delete()
       dst.delete()
+      report('warp-done')
     } else {
       outData = new ImageData(new Uint8ClampedArray(src.data), src.cols, src.rows)
     }
@@ -248,24 +256,47 @@ function detectAndWarp(cv: any, fullImageData: ImageData): DetectResult {
     src.delete()
   }
 
+  report('enhance-start')
   autoEnhance(outData)
+  report('enhance-done')
   return { imageData: outData, cropped }
+}
+
+// 主线程(receiptEdgeDetect.ts)拿不到Worker内部执行到哪一步——之前35秒超时
+// 期间日志完全是黑盒，不知道卡在OpenCV.js库加载还是检测计算。这里在每个阶段
+// 边界都postMessage一条进度消息(kind:'progress')回主线程写日志，跟最终结果
+// (kind:'done')用kind字段区分，方便下次真机超时时能看到具体卡在哪一步、
+// 每一步各花了多久
+function reportProgress(stage: string): void {
+  workerSelf.postMessage({ kind: 'progress', stage })
 }
 
 workerSelf.onmessage = async (e) => {
   try {
+    reportProgress('worker-received-photo')
+    reportProgress('cv-load-start')
     const cv = await getCv()
+    reportProgress('cv-load-done')
     const bitmap = await createImageBitmap(e.data.photo)
+    reportProgress('bitmap-decoded')
     const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('ERR_OFFSCREEN_CANVAS_CONTEXT')
     ctx.drawImage(bitmap, 0, 0)
     bitmap.close()
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const result = detectAndWarp(cv, imageData)
+    reportProgress('imagedata-ready')
+    const result = detectAndWarp(cv, imageData, reportProgress)
     const outBitmap = await createImageBitmap(result.imageData)
-    workerSelf.postMessage({ ok: true, bitmap: outBitmap, cropped: result.cropped }, [outBitmap])
+    workerSelf.postMessage(
+      { kind: 'done', ok: true, bitmap: outBitmap, cropped: result.cropped },
+      [outBitmap]
+    )
   } catch (err) {
-    workerSelf.postMessage({ ok: false, error: err instanceof Error ? err.message : String(err) })
+    workerSelf.postMessage({
+      kind: 'done',
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    })
   }
 }
