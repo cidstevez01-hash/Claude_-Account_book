@@ -159,6 +159,13 @@ export function SettingsPage() {
           </div>
         </SettingsRow>
 
+        {/* R-32排查真机卡住问题新加——纯开发调试用途，不是普通用户需要的功能，
+            暂时先放在设置页最后一行(不专门做隐藏手势，等这次问题查完/以后有需要
+            再收起来) */}
+        <SettingsRow icon="bug_report" label={t('debugLogRowLabel')} onClick={() => navigate('/settings/debug-log')}>
+          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+        </SettingsRow>
+
       </div>
     </AppLayout>
   )

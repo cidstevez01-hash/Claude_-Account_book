@@ -1,4 +1,5 @@
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
+import { logIfEnabled } from './appLog'
 
 /** R-32：拍照/选图入口——用@capacitor/camera，CameraSource.Prompt会弹系统原生的
  * "拍照/从相册选"选择框，用户可能没随身带着レシート本体、想挑一张之前拍过的照片，
@@ -9,6 +10,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
  * data/receiptStorage.ts的Storage上传)都是直接吃Blob的标准Web API，用Blob做
  * 这一层的统一"货币"，不用调用方各自转换 */
 export async function captureReceiptPhoto(): Promise<Blob | null> {
+  logIfEnabled('调用Camera.getPhoto()')
   const photo = await Camera.getPhoto({
     resultType: CameraResultType.DataUrl,
     source: CameraSource.Prompt,
@@ -16,7 +18,13 @@ export async function captureReceiptPhoto(): Promise<Blob | null> {
     // レシート是文字为主的静态照片，不需要按A4/4:3这类比例裁切，交给用户自己拍多少
     // 算多少，裁切反而可能把小票边角的金额裁掉
   })
-  if (!photo.dataUrl) return null
+  if (!photo.dataUrl) {
+    logIfEnabled('Camera.getPhoto()返回无dataUrl(用户取消)')
+    return null
+  }
+  logIfEnabled(`Camera.getPhoto()返回dataUrl，长度=${photo.dataUrl.length}字符，开始转Blob`)
   const res = await fetch(photo.dataUrl)
-  return res.blob()
+  const blob = await res.blob()
+  logIfEnabled(`dataUrl转Blob完成，blob.size=${blob.size}字节`)
+  return blob
 }

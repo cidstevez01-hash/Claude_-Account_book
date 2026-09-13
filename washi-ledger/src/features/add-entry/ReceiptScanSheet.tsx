@@ -3,6 +3,7 @@ import { useI18n } from '../../lib/i18n'
 import { captureReceiptPhoto } from '../../lib/receiptCamera'
 import { blobToImage, scanReceiptDocument } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
+import { logIfEnabled } from '../../lib/appLog'
 
 interface ReceiptScanSheetProps {
   open: boolean
@@ -38,12 +39,16 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   async function startCapture() {
     setStage('capturing')
     setDebugMsg(null)
+    logIfEnabled('=== ReceiptScanSheet.startCapture 开始 ===')
     try {
+      logIfEnabled('调用captureReceiptPhoto()')
       const blob = await captureReceiptPhoto()
       if (!blob) {
+        logIfEnabled('用户取消了拍照/选图，关闭弹层')
         onClose() // 用户在系统拍照/选图界面点了取消，直接关掉整个弹层，不停在半吊子状态
         return
       }
+      logIfEnabled(`拍照/选图完成，blob.size=${blob.size}字节`)
       setStage('processing')
       let canvas: HTMLCanvasElement
       let cropped = false
@@ -51,11 +56,13 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
         const result = await scanReceiptDocument(blob)
         canvas = result.canvas
         cropped = result.cropped
+        logIfEnabled(`scanReceiptDocument()返回成功，cropped=${cropped}`)
       } catch (e) {
         // 边缘检测流水线本身出意外(比如OpenCV.js加载超时/失败)不该整个卡住扫描功能，
         // 兜底改用没处理过的原图，用户依然能存下一份凭证；但要把真实报错显示出来
         // (不只是console.error打到看不见的日志里)，不然没法知道具体卡在哪一步
         console.error('レシート边缘检测失败，改用原图', e)
+        logIfEnabled(`scanReceiptDocument()抛错，改用原图兜底: ${errText(e)}`, 'error')
         setDebugMsg(errText(e))
         const imgEl = await blobToImage(blob)
         canvas = document.createElement('canvas')
@@ -68,8 +75,10 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
       setPreviewUrl(canvas.toDataURL('image/jpeg', 0.85))
       setAutoCropped(cropped)
       setStage('review')
+      logIfEnabled('=== startCapture 完成，进入review阶段 ===')
     } catch (e) {
       console.error('レシート拍摄失败', e)
+      logIfEnabled(`startCapture外层捕获错误: ${errText(e)}`, 'error')
       setErrorMsg(`${t('receiptFailedError')}\n(${errText(e)})`)
       setStage('error')
     }

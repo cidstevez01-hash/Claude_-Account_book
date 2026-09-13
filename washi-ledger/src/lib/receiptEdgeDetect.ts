@@ -14,6 +14,8 @@
  * 本身的已知问题；这里用any接管运行时类型，不去跟类型声明较劲，any的范围只收在
  * 这一个文件里，不向外传染 */
 
+import { logIfEnabled } from './appLog'
+
 export interface ScanResult {
   canvas: HTMLCanvasElement
   /** true=检测到四边形并做了透视纠偏裁剪；false=没检测到，返回的是未裁剪的原图(仍增强过) */
@@ -31,13 +33,28 @@ let cvReadyPromise: Promise<any> | null = null
 
 function getCvReadyPromise(): Promise<any> {
   if (!cvReadyPromise) {
+    logIfEnabled('开始动态import(@techstark/opencv-js)')
+    const t0 = Date.now()
     cvReadyPromise = (async () => {
       const mod: any = await import('@techstark/opencv-js')
+      logIfEnabled(`opencv-js模块import完成(耗时${Date.now() - t0}ms)，取default导出`)
       const cvModule = mod.default ?? mod
-      if (cvModule instanceof Promise) return cvModule
-      if (cvModule.Mat) return cvModule
+      if (cvModule instanceof Promise) {
+        logIfEnabled('cv默认导出本身是Promise，等待其resolve')
+        const cv = await cvModule
+        logIfEnabled(`cv Promise已resolve(累计耗时${Date.now() - t0}ms)`)
+        return cv
+      }
+      if (cvModule.Mat) {
+        logIfEnabled('cv模块已经带有Mat，判定为已初始化完成')
+        return cvModule
+      }
+      logIfEnabled('等待cv.onRuntimeInitialized回调')
       return new Promise((resolve) => {
-        cvModule.onRuntimeInitialized = () => resolve(cvModule)
+        cvModule.onRuntimeInitialized = () => {
+          logIfEnabled(`onRuntimeInitialized触发(累计耗时${Date.now() - t0}ms)`)
+          resolve(cvModule)
+        }
       })
     })()
   }
@@ -48,10 +65,10 @@ async function loadCv(): Promise<any> {
   const ready = getCvReadyPromise()
   let timer: ReturnType<typeof setTimeout> | undefined
   const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(
-      () => reject(new Error(`OpenCV.js加载超时(${CV_LOAD_TIMEOUT_MS / 1000}秒未完成初始化)`)),
-      CV_LOAD_TIMEOUT_MS
-    )
+    timer = setTimeout(() => {
+      logIfEnabled(`OpenCV.js加载超过${CV_LOAD_TIMEOUT_MS / 1000}秒未完成，触发超时`, 'warn')
+      reject(new Error(`OpenCV.js加载超时(${CV_LOAD_TIMEOUT_MS / 1000}秒未完成初始化)`))
+    }, CV_LOAD_TIMEOUT_MS)
   })
   try {
     return await Promise.race([ready, timeout])
@@ -147,6 +164,7 @@ function autoEnhance(canvas: HTMLCanvasElement): void {
 }
 
 function detectAndWarp(cv: any, imgEl: HTMLImageElement): ScanResult {
+  logIfEnabled(`开始边缘检测(detectAndWarp)，图片尺寸${imgEl.naturalWidth}x${imgEl.naturalHeight}`)
   const src = cv.imread(imgEl)
   const gray = new cv.Mat()
   const blurred = new cv.Mat()
@@ -228,11 +246,15 @@ function detectAndWarp(cv: any, imgEl: HTMLImageElement): ScanResult {
   }
 
   autoEnhance(outCanvas)
+  logIfEnabled(`边缘检测完成，cropped=${cropped}`)
   return { canvas: outCanvas, cropped }
 }
 
 export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
+  logIfEnabled(`scanReceiptDocument开始，photo.size=${photo.size}字节`)
   const cv = await loadCv()
+  logIfEnabled('loadCv()完成，开始blobToImage')
   const imgEl = await blobToImage(photo)
+  logIfEnabled('blobToImage完成，开始detectAndWarp')
   return detectAndWarp(cv, imgEl)
 }
