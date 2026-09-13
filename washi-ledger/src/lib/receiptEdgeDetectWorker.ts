@@ -34,6 +34,14 @@ interface WorkerScope {
 }
 const workerSelf = self as unknown as WorkerScope
 
+// 脚本顶层、不在onmessage里——只要这个Worker模块本身被成功加载执行就会立刻
+// 发出这条消息，跟"onmessage收到照片后才打的日志"是两件不同的事：如果主线程
+// 连这条都收不到，说明问题出在Worker模块本身没加载起来(比如WKWebView真机上
+// `type:'module'`这种写法的兼容性问题)，不是消息传递或OpenCV.js加载慢；如果
+// 收到了这条但收不到'worker-received-photo'，说明模块加载没问题，是postMessage
+// 传照片过去这一步出了问题
+workerSelf.postMessage({ kind: 'progress', stage: 'worker-module-loaded' })
+
 let cvReadyPromise: Promise<any> | null = null
 
 function getCv(): Promise<any> {

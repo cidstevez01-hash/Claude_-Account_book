@@ -87,12 +87,21 @@ export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
       cleanup()
       reject(new Error(`${tSync('receiptWorkerErrorPrefix')}: ${e.message}`))
     }
+    // 消息本身传输失败(比如postMessage的对象结构化克隆失败)不会走onError，
+    // 是单独的messageerror事件——之前没监听这个，如果是这个原因导致的卡住，
+    // 之前完全看不到任何痕迹，只能等超时
+    function onMessageError() {
+      cleanup()
+      reject(new Error(`${tSync('receiptWorkerErrorPrefix')}: messageerror`))
+    }
     function cleanup() {
       w.removeEventListener('message', onMessage)
       w.removeEventListener('error', onError)
+      w.removeEventListener('messageerror', onMessageError)
     }
     w.addEventListener('message', onMessage)
     w.addEventListener('error', onError)
+    w.addEventListener('messageerror', onMessageError)
     logIfEnabled('向Worker发送照片，开始处理')
     w.postMessage({ photo })
   })
