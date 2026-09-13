@@ -20,7 +20,13 @@
  * Worker全局作用域真实的`DedicatedWorkerGlobalScope`对不上，这里用类型
  * 断言接管，不引入单独的tsconfig project(webworker lib会跟主app用的DOM lib
  * 全局类型冲突)——这个文件本来就跟receiptEdgeDetect.ts的cv:any一样，运行时
- * 类型交给逻辑正确性保证，不用类型系统死磕 */
+ * 类型交给逻辑正确性保证，不用类型系统死磕。
+ *
+ * i18n：这个文件里抛出的Error message**不是**给用户看的翻译文字，是纯英文的
+ * 错误码(如`ERR_OFFSCREEN_CANVAS_CONTEXT`)——Web Storage API(localStorage)
+ * 只挂在Window接口上，Worker全局作用域访问不到，这里没办法调用lib/i18nSync.ts
+ * 读取当前语言。真正翻译成用户可见文字的活在主线程做(receiptEdgeDetect.ts收到
+ * 这些错误码后查表转成zh/ja文案)，不要在这个文件里写死任何一种语言的提示文字 */
 
 interface WorkerScope {
   onmessage: ((e: MessageEvent<{ photo: Blob }>) => void) | null
@@ -108,12 +114,18 @@ function autoEnhance(imageData: ImageData): void {
   }
 }
 
-interface DetectResult {
-  imageData: ImageData
-  cropped: boolean
-}
+// 检测阶段(找小票四个角点)用的最长边上限——手机相机拍的照片常常是十几MP
+// (比如3024×4032)，直接在全分辨率图上跑Canny+找轮廓，计算量跟像素数近似
+// 线性甚至更高增长，真机上实测这是20秒超时还没跑完检测的主要原因。缩到
+// 最长边1200px再跑检测，像素量能降一个数量级以上，检测阶段大幅提速；
+// 检测只是为了拿到四个角点的坐标，跟分辨率无关，缩小不影响角点定位准确度。
+// 真正的透视裁剪(warpPerspective)还是在原图上做，坐标按缩放比例换算回去，
+// 裁出来的成片清晰度不受影响，跟真机原图一样清楚
+const DETECT_MAX_DIM = 1200
 
-function detectAndWarp(cv: any, imageData: ImageData): DetectResult {
+/** 在(可能缩小过的)图像上找小票的四个角点——只返回坐标，不做任何裁剪，
+ * 坐标是相对传入的这张imageData自己的尺寸，调用方按需要换算 */
+function findQuad(cv: any, imageData: ImageData): number[] | null {
   const src = cv.matFromImageData(imageData)
   const gray = new cv.Mat()
   const blurred = new cv.Mat()
@@ -122,9 +134,6 @@ function detectAndWarp(cv: any, imageData: ImageData): DetectResult {
   const kernel = cv.Mat.ones(3, 3, cv.CV_8U)
   const contours = new cv.MatVector()
   const hierarchy = new cv.Mat()
-
-  let outData: ImageData
-  let cropped = false
 
   try {
     cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY)
@@ -157,8 +166,60 @@ function detectAndWarp(cv: any, imageData: ImageData): DetectResult {
       approx.delete()
       cnt.delete()
     }
+    return bestQuad
+  } finally {
+    src.delete()
+    gray.delete()
+    blurred.delete()
+    edges.delete()
+    dilated.delete()
+    kernel.delete()
+    contours.delete()
+    hierarchy.delete()
+  }
+}
 
-    if (bestQuad) {
+/** 把ImageData缩放到目标最长边——先画到一个跟原图同尺寸的canvas上(ImageData
+ * 本身不能直接drawImage)，再画到缩小的canvas上，用浏览器自己的图片缩放算法，
+ * 不用自己写重采样 */
+function resizeImageData(imageData: ImageData, maxDim: number): { data: ImageData; scale: number } {
+  const scale = Math.min(1, maxDim / Math.max(imageData.width, imageData.height))
+  if (scale >= 1) return { data: imageData, scale: 1 }
+
+  const srcCanvas = new OffscreenCanvas(imageData.width, imageData.height)
+  const srcCtx = srcCanvas.getContext('2d')
+  // Worker线程内没有localStorage访问权限(拿不到当前语言)，这里只抛语言无关的
+  // 错误码，翻译成用户可见文字的活交给主线程(见receiptEdgeDetect.ts)
+  if (!srcCtx) throw new Error('ERR_OFFSCREEN_CANVAS_CONTEXT')
+  srcCtx.putImageData(imageData, 0, 0)
+
+  const dstW = Math.max(1, Math.round(imageData.width * scale))
+  const dstH = Math.max(1, Math.round(imageData.height * scale))
+  const dstCanvas = new OffscreenCanvas(dstW, dstH)
+  const dstCtx = dstCanvas.getContext('2d')
+  if (!dstCtx) throw new Error('ERR_OFFSCREEN_CANVAS_CONTEXT')
+  dstCtx.drawImage(srcCanvas, 0, 0, dstW, dstH)
+
+  return { data: dstCtx.getImageData(0, 0, dstW, dstH), scale }
+}
+
+interface DetectResult {
+  imageData: ImageData
+  cropped: boolean
+}
+
+function detectAndWarp(cv: any, fullImageData: ImageData): DetectResult {
+  const { data: detectImageData, scale } = resizeImageData(fullImageData, DETECT_MAX_DIM)
+  const bestQuadSmall = findQuad(cv, detectImageData)
+
+  const src = cv.matFromImageData(fullImageData)
+  let outData: ImageData
+  let cropped = false
+
+  try {
+    if (bestQuadSmall) {
+      // 检测阶段的坐标是缩小图上的，除以scale换算回全分辨率原图的坐标系
+      const bestQuad = bestQuadSmall.map((v) => v / scale)
       const [tl, tr, br, bl] = orderPoints(bestQuad)
       const maxWidth = Math.max(dist(tl, tr), dist(bl, br))
       const maxHeight = Math.max(dist(tl, bl), dist(tr, br))
@@ -185,13 +246,6 @@ function detectAndWarp(cv: any, imageData: ImageData): DetectResult {
     }
   } finally {
     src.delete()
-    gray.delete()
-    blurred.delete()
-    edges.delete()
-    dilated.delete()
-    kernel.delete()
-    contours.delete()
-    hierarchy.delete()
   }
 
   autoEnhance(outData)
@@ -204,7 +258,7 @@ workerSelf.onmessage = async (e) => {
     const bitmap = await createImageBitmap(e.data.photo)
     const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
     const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('OffscreenCanvas 2D上下文创建失败')
+    if (!ctx) throw new Error('ERR_OFFSCREEN_CANVAS_CONTEXT')
     ctx.drawImage(bitmap, 0, 0)
     bitmap.close()
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)

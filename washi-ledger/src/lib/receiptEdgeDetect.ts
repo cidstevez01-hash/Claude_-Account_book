@@ -6,11 +6,18 @@
  * 同一线程的长时间同步任务占住)，这个文件现在只是主线程这边的薄封装：创建/
  * 复用Worker、发送拍摄的照片、等待结果、处理超时。
  *
- * 超时(20秒)在主线程这边——因为主线程现在完全不受Worker内部执行进度影响，
+ * 超时在主线程这边——因为主线程现在完全不受Worker内部执行进度影响，
  * 定时器能按预期正常触发；超时后会terminate()掉那个worker(它可能还卡在
- * 死循环/超长同步任务里)，下次扫描重新起一个干净的 */
+ * 死循环/超长同步任务里)，下次扫描重新起一个干净的。
+ *
+ * 超时时长从20秒放宽到35秒——真机实测过20秒不够(在全分辨率照片上跑边缘检测
+ * 本身就慢)，receiptEdgeDetectWorker.ts那边已经把检测阶段换成缩小图跑(见
+ * DETECT_MAX_DIM说明)大幅提速，这里放宽超时是给"检测阶段之前"的OpenCV.js
+ * 库加载这个一次性固定成本多留一点余量；因为现在跑在Worker里不占用主线程，
+ * 放宽超时不会让App在这期间变得没反应，用户仍然能正常操作其他部分 */
 
 import { logIfEnabled } from './appLog'
+import { tSync } from './i18nSync'
 
 export interface ScanResult {
   canvas: HTMLCanvasElement
@@ -18,7 +25,20 @@ export interface ScanResult {
   cropped: boolean
 }
 
-const CV_LOAD_TIMEOUT_MS = 20000
+const CV_LOAD_TIMEOUT_MS = 35000
+
+// receiptEdgeDetectWorker.ts那边没有localStorage访问权限(拿不到当前语言)，
+// 只能抛语言无关的错误码，这里查表翻译成用户可见文字——不认识的码(比如浏览器
+// 原生抛出的技术性报错)原样透传，那类文本本来也不是我们自己写的中/日文案，
+// 谈不上"翻译"，直接显示原文技术细节反而更有诊断价值
+const WORKER_ERROR_MESSAGES: Record<string, () => string> = {
+  ERR_OFFSCREEN_CANVAS_CONTEXT: () => tSync('receiptOffscreenCanvasError'),
+}
+
+function translateWorkerError(code: string | undefined): string {
+  if (code && WORKER_ERROR_MESSAGES[code]) return WORKER_ERROR_MESSAGES[code]()
+  return code ?? tSync('receiptWorkerUnknownError')
+}
 
 let worker: Worker | null = null
 
@@ -40,7 +60,7 @@ export function blobToImage(blob: Blob): Promise<HTMLImageElement> {
     }
     img.onerror = (e) => {
       URL.revokeObjectURL(url)
-      reject(e instanceof Event ? new Error('图片加载失败') : e)
+      reject(e instanceof Event ? new Error(tSync('receiptImageLoadError')) : e)
     }
     img.src = url
   })
@@ -56,12 +76,12 @@ export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
       if (e.data?.ok) {
         resolve({ bitmap: e.data.bitmap, cropped: e.data.cropped })
       } else {
-        reject(new Error(e.data?.error ?? 'Worker返回未知错误'))
+        reject(new Error(translateWorkerError(e.data?.error)))
       }
     }
     function onError(e: ErrorEvent) {
       cleanup()
-      reject(new Error(`Worker出错: ${e.message}`))
+      reject(new Error(`${tSync('receiptWorkerErrorPrefix')}: ${e.message}`))
     }
     function cleanup() {
       w.removeEventListener('message', onMessage)
@@ -81,7 +101,7 @@ export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
       // 重新创建一个干净的，不复用这个可能还在跑的实例
       worker?.terminate()
       worker = null
-      reject(new Error(`小票扫描处理超时(${CV_LOAD_TIMEOUT_MS / 1000}秒)`))
+      reject(new Error(tSync('receiptScanTimeoutError', { s: String(CV_LOAD_TIMEOUT_MS / 1000) })))
     }, CV_LOAD_TIMEOUT_MS)
   })
 
@@ -97,7 +117,7 @@ export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
   canvas.width = result.bitmap.width
   canvas.height = result.bitmap.height
   const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('无法创建canvas 2D上下文')
+  if (!ctx) throw new Error(tSync('receiptCanvasContextError'))
   ctx.drawImage(result.bitmap, 0, 0)
   result.bitmap.close()
   return { canvas, cropped: result.cropped }

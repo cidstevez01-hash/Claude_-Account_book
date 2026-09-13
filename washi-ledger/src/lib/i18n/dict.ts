@@ -67,6 +67,17 @@ export const dict = {
     receiptPrivacyNote: '※ 拍摄的原始照片本身不会保存，仅裁边增强后的扫描版会生成PDF存档。',
     receiptSaveAsPdf: '存为PDF',
     receiptFailedError: '扫描失败，请重试',
+    // 边缘检测/Worker相关的技术性报错文案——这几条之前直接在receiptEdgeDetect.ts/
+    // receiptEdgeDetectWorker.ts里写死了中文字符串，被用户抓到"语言设成日语了、
+    // 报错还是中文"这个bug；改成走i18n词典，Worker线程内没有localStorage访问权限
+    // (拿不到当前语言)，只返回语言无关的错误码，由主线程(lib/i18nSync.ts)翻译成
+    // 用户可见文字，见receiptEdgeDetect.ts里的错误码映射
+    receiptScanTimeoutError: '小票扫描处理超时({s}秒)',
+    receiptWorkerErrorPrefix: 'Worker出错',
+    receiptWorkerUnknownError: 'Worker返回未知错误',
+    receiptCanvasContextError: '无法创建canvas 2D上下文',
+    receiptOffscreenCanvasError: 'OffscreenCanvas 2D上下文创建失败',
+    receiptImageLoadError: '图片加载失败',
     receiptViewAria: '查看凭证',
     receiptRemoveAria: '移除凭证',
     receiptViewLabel: '凭证',
@@ -249,6 +260,12 @@ export const dict = {
     receiptPrivacyNote: '※ 撮影した元の写真自体は保存されません。トリミング・補正後のスキャン画像のみがPDFとして保存されます。',
     receiptSaveAsPdf: 'PDFとして保存',
     receiptFailedError: 'スキャンに失敗しました。もう一度お試しください',
+    receiptScanTimeoutError: 'レシートスキャン処理がタイムアウトしました({s}秒)',
+    receiptWorkerErrorPrefix: 'Workerエラー',
+    receiptWorkerUnknownError: 'Workerが不明なエラーを返しました',
+    receiptCanvasContextError: 'canvasの2Dコンテキストを作成できませんでした',
+    receiptOffscreenCanvasError: 'OffscreenCanvasの2Dコンテキスト作成に失敗しました',
+    receiptImageLoadError: '画像の読み込みに失敗しました',
     receiptViewAria: 'レシートを見る',
     receiptRemoveAria: 'レシートを削除',
     receiptViewLabel: 'レシート',

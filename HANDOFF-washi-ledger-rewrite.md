@@ -62,6 +62,7 @@ washi-ledger/
    - 关于页：设计稿的版本号/条款/隐私政策/应用商店评分，这个重写项目还没有对应真实内容，不展示假数据/死链接
 4. **图标**：真正的Google Material Symbols字体（自托管`src/assets/fonts/material-symbols-outlined.woff2`），分类图标/颜色、支付方式图标全部复用旧App`index.html`里的真实数据（`lib/iconMap.ts`里有旧图标编号→Material Symbols名的映射表），支付方式品牌logo(Amazon/Rakuten/Merpay/Paidy/Suica)从旧App的`BRAND_LOGO_COLORS`/`BRAND_LOGO_RASTER`常量原样提取成独立文件，不是重新画的。
 5. **数据校验优先用真实数据，不用编的假数据**——之前有一次用记忆里的假分类数据做演示截图被用户发现，之后建立的规矩：改动前先说清楚读了哪个文件；Supabase域名加入代理白名单后，所有涉及真实字段结构的假设都要拿真实查询结果核对（已经靠这个流程抓出过`subcategories`表没有`sort_order`列这种真实的字段假设错误）。
+6. **所有用户可见文字都必须走i18n(zh/ja分开放在`lib/i18n/dict.ts`)，没有例外**——包括错误提示/toast这类容易图省事直接写死一种语言的文字。2026-09-13踩过一次真实bug：R-32レシート扫描功能里`lib/receiptEdgeDetect.ts`/`receiptEdgeDetectWorker.ts`几个`throw new Error('...')`直接写了中文字符串，被用户发现"App语言设成日语，扫描超时报错还是显示中文"。这条规则对**非React组件的普通模块也适用**——`useI18n()`的Context只有组件树里能用，普通模块(比如`lib/`下这类工具函数)要用`lib/i18nSync.ts`里的`tSync(key)`同步查字典(读`localStorage`缓存的当前语言，不经过React)。**Worker线程是唯一的例外**：Web Storage API(`localStorage`)只挂在`Window`接口上，Worker全局作用域访问不到`tSync`，Worker内只能抛语言无关的错误码(比如`ERR_OFFSCREEN_CANVAS_CONTEXT`这种全大写英文标识符)，把翻译成zh/ja文字的活交给收到消息的主线程模块做。
 
 ## 已知的简化/缺口（不是漏做，是明确的取舍，commit message里都有说明）
 
