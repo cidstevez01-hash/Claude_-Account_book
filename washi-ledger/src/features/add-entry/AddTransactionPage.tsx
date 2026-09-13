@@ -152,6 +152,14 @@ export function AddTransactionPage() {
     if (type === 'income') setPoints('')
   }, [type])
 
+  // R-32：レシート只针对支出——新建模式下(编辑/复制typeLocked=true，切不了类型，
+  // 不会走到这里)如果先在支出页签扫描存了凭证，又切到収入页签，不能让这个隐藏起来
+  // 的receiptPath被悄悄带着存进收入记录里；不去删Storage里已经传上去的文件(留成
+  // 孤儿文件，跟放弃整个新建流程不保存时是同一种可接受的取舍)，只清本地状态
+  useEffect(() => {
+    if (mode === 'add' && type !== 'expense' && receiptPath) setReceiptPath(null)
+  }, [type, mode, receiptPath])
+
   useEffect(() => {
     if (!pointsArmed.current) return
     if (type !== 'expense' || !payCode || !catalog) return
@@ -308,6 +316,55 @@ export function AddTransactionPage() {
           </div>
         </div>
 
+        {/* R-32：レシート扫描存档入口——只在支出场景显示(小票只对应支出，切到收入
+            标签页时这个入口不该出现)，位置紧跟在支出/収入页签下面，一进页面不用
+            往下滚就能看到，不是埋在备注下面那么靠后。没有凭证时是一整行虚线框的
+            "扫描"按钮，有凭证之后换成"已保存凭证"状态条(查看/重新扫描/移除三个动作) */}
+        {type === 'expense' && (
+          <div className="px-md pb-6">
+            {receiptPath ? (
+              <div className="flex items-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface-container-lowest">
+                <span className="material-symbols-outlined text-primary shrink-0">picture_as_pdf</span>
+                <button
+                  type="button"
+                  onClick={handleReceiptView}
+                  disabled={receiptBusy}
+                  className="flex-1 text-left text-body-md text-on-surface underline decoration-dashed underline-offset-2 disabled:opacity-50"
+                >
+                  {t('receiptViewAria')}
+                </button>
+                <button
+                  type="button"
+                  aria-label={t('receiptRetakeAria')}
+                  onClick={() => setScanSheetOpen(true)}
+                  disabled={receiptBusy}
+                  className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label={t('receiptRemoveAria')}
+                  onClick={handleReceiptRemove}
+                  disabled={receiptBusy}
+                  className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setScanSheetOpen(true)}
+                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant text-on-surface-variant text-body-md active:bg-surface-container transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                {t('receiptScanEntry')}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* R-10："金额"字样去掉(照旧App没有单独的金额字段标题)；货币符号改成symbolFor()，
             日元/人民币都显示"JP¥"/"CN¥"这种带国别前缀的完整写法，不能只显示裸的"¥"
             (两种货币符号本来就长得一样，裸符号分不清是哪种货币) */}
@@ -436,7 +493,7 @@ export function AddTransactionPage() {
 
         <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
 
-        <div className="px-md py-md">
+        <div className="px-md py-md pb-40">
           <h2 className="text-label-caps font-sans text-on-surface-variant mb-xs tracking-widest uppercase">
             {t('memoLabel')}
           </h2>
@@ -446,53 +503,6 @@ export function AddTransactionPage() {
             placeholder={t('memoPlaceholder')}
             className="w-full bg-transparent border-none outline-none resize-none h-32 p-0 text-body-lg text-on-surface focus:ring-0"
           />
-        </div>
-
-        <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
-
-        {/* R-32：レシート扫描存档入口——没有凭证时是一整行虚线框的"扫描"按钮，
-            有凭证之后换成"已保存凭证"状态条(查看/重新扫描/移除三个动作) */}
-        <div className="px-md py-md pb-[120px]">
-          {receiptPath ? (
-            <div className="flex items-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface-container-lowest">
-              <span className="material-symbols-outlined text-primary shrink-0">picture_as_pdf</span>
-              <button
-                type="button"
-                onClick={handleReceiptView}
-                disabled={receiptBusy}
-                className="flex-1 text-left text-body-md text-on-surface underline decoration-dashed underline-offset-2 disabled:opacity-50"
-              >
-                {t('receiptViewAria')}
-              </button>
-              <button
-                type="button"
-                aria-label={t('receiptRetakeAria')}
-                onClick={() => setScanSheetOpen(true)}
-                disabled={receiptBusy}
-                className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
-              >
-                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
-              </button>
-              <button
-                type="button"
-                aria-label={t('receiptRemoveAria')}
-                onClick={handleReceiptRemove}
-                disabled={receiptBusy}
-                className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
-              >
-                <span className="material-symbols-outlined text-[18px]">delete</span>
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setScanSheetOpen(true)}
-              className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant text-on-surface-variant text-body-md active:bg-surface-container transition-colors"
-            >
-              <span className="material-symbols-outlined text-[18px]">photo_camera</span>
-              {t('receiptScanEntry')}
-            </button>
-          )}
         </div>
         </>
        )}

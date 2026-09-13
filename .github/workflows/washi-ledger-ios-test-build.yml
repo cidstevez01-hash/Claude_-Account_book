@@ -47,7 +47,7 @@ jobs:
       - name: 生成App图标(源文件washi-ledger/assets/icon.jpg，Easy Mode单图生成全套iOS尺寸)
         run: npx capacitor-assets generate --ios --iconBackgroundColor '#fff8f5' --iconBackgroundColorDark '#231a13'
 
-      - name: 锁定竖屏+写版本号(Info.plist每次CI全新生成,只能在这一步patch)
+      - name: 锁定竖屏+写版本号+相机权限描述(Info.plist每次CI全新生成,只能在这一步patch)
         run: |
           set -e
           PLIST=ios/App/App/Info.plist
@@ -59,6 +59,12 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${APP_VERSION}" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${APP_BUILD_NUMBER}" "$PLIST"
+          # R-32：@capacitor/camera在iOS上如果Info.plist缺这三个Usage Description，
+          # 原生CameraPlugin.checkUsageDescriptions()会在调用最开始就直接reject，
+          # 表现就是"点扫描按钮完全没反应"(不是权限弹窗被拒绝，是连弹窗都没弹出来)
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 用于拍摄レシート(小票)以识别并存档记账凭证" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 用于从相册选择レシート(小票)照片以识别并存档记账凭证" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string 用于从相册选择レシート(小票)照片以识别并存档记账凭证" "$PLIST"
 
       - name: 同步网页内容+配置到原生工程
         run: npx cap sync ios
