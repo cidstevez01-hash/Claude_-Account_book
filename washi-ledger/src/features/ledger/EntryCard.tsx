@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
+import { getReceiptSignedUrl } from '../../data/receiptStorage'
 import type { Category, Entry, PaymentMethod } from '../../types'
 
 interface EntryCardProps {
@@ -41,8 +43,26 @@ export function EntryCard({
   highlighted,
 }: EntryCardProps) {
   const { t, lang } = useI18n()
+  const [receiptBusy, setReceiptBusy] = useState(false)
   const isIncome = entry.type === 'income'
-  const hasActions = !!(onEdit || onCopy || onDelete)
+  // R-32：查看凭证按钮不依赖调用方传handler——只要这条记录本身有receiptPath就显示，
+  // 仪表盘和明细页(HistoryEntryList不传onEdit/onCopy/onDelete)都能看，跟"编辑/复制/
+  // 删除只在仪表盘提供"是两回事：那是操作类按钮的产品决定，查看凭证是纯只读展示
+  const hasReceipt = !!entry.receiptPath
+  const hasActions = !!(onEdit || onCopy || onDelete || hasReceipt)
+
+  async function handleViewReceipt() {
+    if (!entry.receiptPath || receiptBusy) return
+    setReceiptBusy(true)
+    try {
+      const url = await getReceiptSignedUrl(entry.receiptPath)
+      window.open(url, '_blank', 'noopener,noreferrer')
+    } catch (e) {
+      console.error('查看レシート凭证失败', e)
+    } finally {
+      setReceiptBusy(false)
+    }
+  }
   // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)；
   // 名字按当前语言取(catLabel/subLabel)，不是硬编码.zh
   const sub = category?.subs.find((s) => s.code === entry.subCode)
@@ -132,6 +152,18 @@ export function EntryCard({
             >
               <span className="material-symbols-outlined text-[20px]">delete</span>
               <span className="text-[10px] font-sans uppercase">{t('deleteLabel')}</span>
+            </button>
+          )}
+          {hasReceipt && (
+            <button
+              type="button"
+              aria-label={t('receiptViewAria')}
+              disabled={receiptBusy}
+              className="flex flex-col items-center gap-1 text-on-surface-variant active:text-primary active:scale-90 transition-[color,transform] disabled:opacity-50"
+              onClick={handleViewReceipt}
+            >
+              <span className="material-symbols-outlined text-[20px]">receipt_long</span>
+              <span className="text-[10px] font-sans uppercase">{t('receiptViewLabel')}</span>
             </button>
           )}
         </div>

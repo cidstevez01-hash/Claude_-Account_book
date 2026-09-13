@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { CategoryPicker } from './CategoryPicker'
 import { TagPicker } from './TagPicker'
+import { ReceiptScanSheet } from './ReceiptScanSheet'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
@@ -12,6 +13,7 @@ import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { upsertEntry, resolvePointRate } from '../../data/catalog'
+import { uploadReceiptPdf, deleteReceiptPdf, getReceiptSignedUrl } from '../../data/receiptStorage'
 import { symbolFor } from '../../data/currencyDisplay'
 import { useI18n } from '../../lib/i18n'
 import { payLabel } from '../../lib/catalogLabel'
@@ -65,6 +67,21 @@ export function AddTransactionPage() {
   const [sourceEntry, setSourceEntry] = useState<Entry | null>(() => initialSourceEntry)
   const [prefilled, setPrefilled] = useState(() => mode === 'add' || initialSourceEntry != null)
 
+  // R-32：レシート扫描存档——path在Supabase Storage里的对象路径，为null表示这条
+  // 记录还没有凭证。复制模式(copy)故意不继承来源记录的凭证(base?.receiptPath)——
+  // 复制出来的是一笔新的独立交易，原来那张レシート对应的是被复制的那一笔，不该
+  // 被两条记录共享同一份凭证；编辑模式(edit)才带出原有凭证，允许查看/替换/移除。
+  // newEntryId：新建/复制模式下这条记录的id要在保存前就先确定下来(不是等
+  // handleSave才生成)，因为上传凭证到Storage需要用entryId拼文件路径，扫描这个
+  // 动作在保存之前就可能发生
+  const [newEntryId] = useState(() => `${Date.now()}${Math.random().toString(16).slice(2)}`)
+  const entryId = mode === 'edit' && sourceEntry ? sourceEntry.id : newEntryId
+  const [receiptPath, setReceiptPath] = useState<string | null>(() =>
+    mode === 'edit' ? (initialSourceEntry?.receiptPath ?? null) : null
+  )
+  const [scanSheetOpen, setScanSheetOpen] = useState(false)
+  const [receiptBusy, setReceiptBusy] = useState(false)
+
   // 积分自动计算只在用户真正改过金额/支付方式/日期之后才触发，预填表单(编辑/复制)时
   // 不能被这个effect覆盖掉原本保存的积分值——照旧App"程序赋值不触发input/change事件、
   // 只有真实用户操作才会重算"的行为
@@ -87,6 +104,7 @@ export function AddTransactionPage() {
     setTagCode(src.tagCode)
     setPoints(src.points != null ? String(src.points) : '')
     setNote(src.note ?? '')
+    if (mode === 'edit') setReceiptPath(src.receiptPath)
     setPrefilled(true)
   }, [entries, sourceId, prefilled, mode])
 
@@ -170,7 +188,7 @@ export function AddTransactionPage() {
     const finalPoints = type === 'expense' && !isNaN(pointsRaw) && pointsRaw > 0 ? pointsRaw : null
     const base = mode === 'edit' && sourceEntry ? sourceEntry : null
     const entry: Entry = {
-      id: base ? base.id : `${Date.now()}${Math.random().toString(16).slice(2)}`,
+      id: entryId,
       type,
       amount: amt,
       currency: base?.currency ?? settings.currency,
@@ -183,6 +201,7 @@ export function AddTransactionPage() {
       date: date || todayStr(),
       recurringId: base?.recurringId ?? null,
       createdAt: base?.createdAt ?? Date.now(),
+      receiptPath,
     }
     await upsertEntry(entry, user.id)
     // 新建/编辑/复制保存后统一navigate(-1)，回到进来之前那个底部大导航页签(仪表盘/
@@ -197,6 +216,46 @@ export function AddTransactionPage() {
   // 点"返回"(不保存，放弃改动)，回到进来之前那个页面，跟保存后的行为一致
   function handleBack() {
     navigate(-1)
+  }
+
+  // R-32：扫描确认后立刻传Storage(不是等整条记录save才一起传)——entryId已经在
+  // 组件挂载时就确定好了(见上面newEntryId的说明)，不需要等真正save entries才能拿到
+  // 一个id；这样用户扫完就能立刻点"查看凭证"核对是否传成功，不用等保存完这一步
+  async function handleReceiptConfirm(pdf: Blob) {
+    if (!user) return
+    setReceiptBusy(true)
+    try {
+      const path = await uploadReceiptPdf(user.id, entryId, pdf)
+      setReceiptPath(path)
+      setScanSheetOpen(false)
+    } catch (e) {
+      console.error('レシート凭证上传失败', e)
+    } finally {
+      setReceiptBusy(false)
+    }
+  }
+
+  async function handleReceiptRemove() {
+    if (!receiptPath) return
+    setReceiptBusy(true)
+    try {
+      await deleteReceiptPdf(receiptPath)
+      setReceiptPath(null)
+    } catch (e) {
+      console.error('レシート凭证删除失败', e)
+    } finally {
+      setReceiptBusy(false)
+    }
+  }
+
+  async function handleReceiptView() {
+    if (!receiptPath) return
+    try {
+      const url = await getReceiptSignedUrl(receiptPath)
+      window.open(url, '_blank')
+    } catch (e) {
+      console.error('レシート凭证签名URL获取失败', e)
+    }
   }
 
   const pageTitle = mode === 'edit' ? t('editTitle') : mode === 'copy' ? t('copyTitle') : t('addTitle')
@@ -377,7 +436,7 @@ export function AddTransactionPage() {
 
         <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
 
-        <div className="px-md py-md pb-[120px]">
+        <div className="px-md py-md">
           <h2 className="text-label-caps font-sans text-on-surface-variant mb-xs tracking-widest uppercase">
             {t('memoLabel')}
           </h2>
@@ -388,10 +447,64 @@ export function AddTransactionPage() {
             className="w-full bg-transparent border-none outline-none resize-none h-32 p-0 text-body-lg text-on-surface focus:ring-0"
           />
         </div>
+
+        <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
+
+        {/* R-32：レシート扫描存档入口——没有凭证时是一整行虚线框的"扫描"按钮，
+            有凭证之后换成"已保存凭证"状态条(查看/重新扫描/移除三个动作) */}
+        <div className="px-md py-md pb-[120px]">
+          {receiptPath ? (
+            <div className="flex items-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface-container-lowest">
+              <span className="material-symbols-outlined text-primary shrink-0">picture_as_pdf</span>
+              <button
+                type="button"
+                onClick={handleReceiptView}
+                disabled={receiptBusy}
+                className="flex-1 text-left text-body-md text-on-surface underline decoration-dashed underline-offset-2 disabled:opacity-50"
+              >
+                {t('receiptViewAria')}
+              </button>
+              <button
+                type="button"
+                aria-label={t('receiptRetakeAria')}
+                onClick={() => setScanSheetOpen(true)}
+                disabled={receiptBusy}
+                className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+              </button>
+              <button
+                type="button"
+                aria-label={t('receiptRemoveAria')}
+                onClick={handleReceiptRemove}
+                disabled={receiptBusy}
+                className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setScanSheetOpen(true)}
+              className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant text-on-surface-variant text-body-md active:bg-surface-container transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+              {t('receiptScanEntry')}
+            </button>
+          )}
+        </div>
         </>
        )}
       </main>
       </RouteFade>
+
+      <ReceiptScanSheet
+        open={scanSheetOpen}
+        entryDate={date || todayStr()}
+        onClose={() => setScanSheetOpen(false)}
+        onConfirm={handleReceiptConfirm}
+      />
 
       <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-md pb-6 bg-gradient-to-t from-surface via-surface to-transparent">
         <button

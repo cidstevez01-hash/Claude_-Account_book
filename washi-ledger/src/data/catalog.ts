@@ -195,6 +195,7 @@ interface EntryRow {
   entry_date: string
   recurring_id: string | null
   created_at: string | null
+  receipt_path: string | null
 }
 
 function dbRowToEntry(row: EntryRow): Entry {
@@ -212,6 +213,7 @@ function dbRowToEntry(row: EntryRow): Entry {
     date: row.entry_date,
     recurringId: row.recurring_id,
     createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
+    receiptPath: row.receipt_path,
   }
 }
 
@@ -241,6 +243,7 @@ export function entryToDbRow(entry: Entry, userId: string): Omit<EntryRow, 'crea
     points: entry.points,
     entry_date: entry.date,
     recurring_id: entry.recurringId,
+    receipt_path: entry.receiptPath,
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260912-dev.1",
+  "version": "0.0.0-20260913-dev.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,14 +11,17 @@
   },
   "dependencies": {
     "@capacitor/app": "^6.0.3",
+    "@capacitor/camera": "^6.1.3",
     "@capacitor/core": "^6.1.2",
     "@capacitor/ios": "^6.1.2",
     "@supabase/supabase-js": "^2.112.3",
     "@tailwindcss/vite": "^4.3.3",
+    "jspdf": "^4.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

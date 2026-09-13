@@ -16,6 +16,7 @@ export interface EntryRow {
   entry_date: string
   recurring_id: string | null
   created_at: string | null
+  receipt_path: string | null
 }
 
 export type EntryRowInput = Omit<EntryRow, 'created_at'>
