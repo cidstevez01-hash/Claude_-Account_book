@@ -25,10 +25,19 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [autoCropped, setAutoCropped] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  // R-32调试用：真机上出现过卡住/处理失败但看不出具体原因的情况，这个字段把
+  // 捕获到的真实错误文本(不是翻译过的友好提示)显示在界面上，方便用户截图反馈——
+  // 不影响正常使用流程(处理失败依然会自动退回原图，只是多显示一行技术细节)
+  const [debugMsg, setDebugMsg] = useState<string | null>(null)
   const resultCanvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  function errText(e: unknown): string {
+    return e instanceof Error ? e.message : String(e)
+  }
 
   async function startCapture() {
     setStage('capturing')
+    setDebugMsg(null)
     try {
       const blob = await captureReceiptPhoto()
       if (!blob) {
@@ -43,9 +52,11 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
         canvas = result.canvas
         cropped = result.cropped
       } catch (e) {
-        // 边缘检测流水线本身出意外(比如OpenCV.js加载失败)不该整个卡住扫描功能，
-        // 兜底改用没处理过的原图，用户依然能存下一份凭证
+        // 边缘检测流水线本身出意外(比如OpenCV.js加载超时/失败)不该整个卡住扫描功能，
+        // 兜底改用没处理过的原图，用户依然能存下一份凭证；但要把真实报错显示出来
+        // (不只是console.error打到看不见的日志里)，不然没法知道具体卡在哪一步
         console.error('レシート边缘检测失败，改用原图', e)
+        setDebugMsg(errText(e))
         const imgEl = await blobToImage(blob)
         canvas = document.createElement('canvas')
         canvas.width = imgEl.naturalWidth
@@ -59,7 +70,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
       setStage('review')
     } catch (e) {
       console.error('レシート拍摄失败', e)
-      setErrorMsg(t('receiptFailedError'))
+      setErrorMsg(`${t('receiptFailedError')}\n(${errText(e)})`)
       setStage('error')
     }
   }
@@ -108,7 +119,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
           {stage === 'error' && (
             <div className="flex flex-col items-center gap-md py-12 px-md text-center">
               <span className="material-symbols-outlined text-4xl text-primary">error</span>
-              <p className="text-body-md text-on-surface">{errorMsg}</p>
+              <p className="text-body-md text-on-surface whitespace-pre-line break-all">{errorMsg}</p>
               <button
                 type="button"
                 onClick={startCapture}
@@ -129,6 +140,11 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                   {autoCropped ? t('receiptAutoCroppedHint') : t('receiptNoCropHint')}
                 </span>
               </div>
+              {/* 调试信息：只在处理流程真的报过错(不是"没检测到边缘"这种正常兜底)时才
+                  显示，红字+可换行，方便用户截图把具体报错发回来 */}
+              {debugMsg && (
+                <p className="text-xs text-primary break-all mb-1.5">⚠ {debugMsg}</p>
+              )}
               <div className="relative w-full rounded-xl overflow-hidden border-[1.5px] border-dashed border-outline-variant mb-md bg-surface-container-lowest">
                 {previewUrl && <img src={previewUrl} alt="" className="w-full max-h-[420px] object-contain" />}
                 <button

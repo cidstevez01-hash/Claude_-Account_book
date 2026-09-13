@@ -20,11 +20,18 @@ export interface ScanResult {
   cropped: boolean
 }
 
-let cvPromise: Promise<any> | null = null
+// 真机上曾经出现过卡在"処理中…"一直转圈出不来结果的情况——不清楚具体是WASM编译慢
+// 还是别的环境问题，先加一个超时兜底，不管什么原因都不能无限等下去。cvReadyPromise
+// (真正的加载过程本身)不因为超时就作废重来，只是每次loadCv()调用各自套一层超时——
+// 万一只是这次编译慢、后台其实还在正常跑，之后再进扫描弹层时能直接用上已经跑完的结果，
+// 不用重新触发一次完整的下载/编译
+const CV_LOAD_TIMEOUT_MS = 20000
 
-async function loadCv(): Promise<any> {
-  if (!cvPromise) {
-    cvPromise = (async () => {
+let cvReadyPromise: Promise<any> | null = null
+
+function getCvReadyPromise(): Promise<any> {
+  if (!cvReadyPromise) {
+    cvReadyPromise = (async () => {
       const mod: any = await import('@techstark/opencv-js')
       const cvModule = mod.default ?? mod
       if (cvModule instanceof Promise) return cvModule
@@ -34,7 +41,23 @@ async function loadCv(): Promise<any> {
       })
     })()
   }
-  return cvPromise
+  return cvReadyPromise
+}
+
+async function loadCv(): Promise<any> {
+  const ready = getCvReadyPromise()
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error(`OpenCV.js加载超时(${CV_LOAD_TIMEOUT_MS / 1000}秒未完成初始化)`)),
+      CV_LOAD_TIMEOUT_MS
+    )
+  })
+  try {
+    return await Promise.race([ready, timeout])
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 export function blobToImage(blob: Blob): Promise<HTMLImageElement> {
