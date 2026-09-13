@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { captureReceiptPhoto } from '../../lib/receiptCamera'
-import { recognizeReceiptText } from '../../lib/receiptOcr'
+import { blobToImage, scanReceiptDocument } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
 
 interface ReceiptScanSheetProps {
@@ -11,22 +11,21 @@ interface ReceiptScanSheetProps {
   onConfirm: (pdf: Blob) => void
 }
 
-type Stage = 'capturing' | 'recognizing' | 'review' | 'error'
+type Stage = 'capturing' | 'processing' | 'review' | 'error'
 
-/** R-32：レシート扫描确认弹层——照Stitch设计稿(用户已确认)做：拍摄原图缩略预览+
- * 重拍按钮、可编辑的OCR识别文字、隐私提示、底部"存为PDF"主按钮。弹层一打开就直接
- * 触发拍照(不用户再多点一次"开始扫描")，拍完自动识别，识别完进入可编辑review态。
+/** R-32：レシート扫描确认弹层——照Stitch设计稿(用户已确认)做：拍摄→自动裁边纠偏+
+ * 增强(lib/receiptEdgeDetect.ts，"全能扫描王"式效果，不是OCR文字识别，见该文件
+ * 说明)→预览确认→存为PDF。弹层一打开就直接触发拍照(不用户再多点一次"开始扫描")，
+ * 拍完自动处理，处理完进入预览确认态。
  *
- * 跟CategoryDetailSheet.tsx同一套底部弹层视觉规范(遮罩+从底部滑入的rounded-t卡片)，
- * 内容区域按Stitch确认稿的信息层级重新排布(这个组件没有照搬底部弹层，因为设计稿
- * 本身画的是整屏页面；改成弹层是因为这个流程本来就嵌在记一笔页面中间，不需要单独
- * 开一个路由页) */
+ * 跟CategoryDetailSheet.tsx同一套底部弹层视觉规范(遮罩+从底部滑入的rounded-t卡片) */
 export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: ReceiptScanSheetProps) {
-  const { t, lang } = useI18n()
+  const { t } = useI18n()
   const [stage, setStage] = useState<Stage>('capturing')
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
-  const [text, setText] = useState('')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [autoCropped, setAutoCropped] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const resultCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
   async function startCapture() {
     setStage('capturing')
@@ -36,18 +35,30 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
         onClose() // 用户在系统拍照/选图界面点了取消，直接关掉整个弹层，不停在半吊子状态
         return
       }
-      setPhotoUrl(URL.createObjectURL(blob))
-      setStage('recognizing')
-      const recognized = await recognizeReceiptText(blob, lang)
-      if (!recognized) {
-        setErrorMsg(t('receiptEmptyError'))
-        setStage('error')
-        return
+      setStage('processing')
+      let canvas: HTMLCanvasElement
+      let cropped = false
+      try {
+        const result = await scanReceiptDocument(blob)
+        canvas = result.canvas
+        cropped = result.cropped
+      } catch (e) {
+        // 边缘检测流水线本身出意外(比如OpenCV.js加载失败)不该整个卡住扫描功能，
+        // 兜底改用没处理过的原图，用户依然能存下一份凭证
+        console.error('レシート边缘检测失败，改用原图', e)
+        const imgEl = await blobToImage(blob)
+        canvas = document.createElement('canvas')
+        canvas.width = imgEl.naturalWidth
+        canvas.height = imgEl.naturalHeight
+        canvas.getContext('2d')?.drawImage(imgEl, 0, 0)
+        cropped = false
       }
-      setText(recognized)
+      resultCanvasRef.current = canvas
+      setPreviewUrl(canvas.toDataURL('image/jpeg', 0.85))
+      setAutoCropped(cropped)
       setStage('review')
     } catch (e) {
-      console.error('レシート识别失败', e)
+      console.error('レシート拍摄失败', e)
       setErrorMsg(t('receiptFailedError'))
       setStage('error')
     }
@@ -55,24 +66,17 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
   useEffect(() => {
     if (!open) return
-    setText('')
-    setPhotoUrl(null)
+    setPreviewUrl(null)
+    resultCanvasRef.current = null
     startCapture()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  // photoUrl是createObjectURL()出来的blob URL，弹层关闭/重新拍摄时要主动释放，
-  // 不然每扫一次都会泄漏一个blob URL
-  useEffect(() => {
-    return () => {
-      if (photoUrl) URL.revokeObjectURL(photoUrl)
-    }
-  }, [photoUrl])
-
   if (!open) return null
 
   function handleConfirm() {
-    const pdf = buildReceiptPdf(text, { entryDate })
+    if (!resultCanvasRef.current) return
+    const pdf = buildReceiptPdf(resultCanvasRef.current, { entryDate })
     onConfirm(pdf)
   }
 
@@ -88,7 +92,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
         </header>
 
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-md py-md">
-          {(stage === 'capturing' || stage === 'recognizing') && (
+          {(stage === 'capturing' || stage === 'processing') && (
             <div className="flex flex-col items-center justify-center py-16 gap-md">
               <span className="ios-spinner text-primary">
                 {Array.from({ length: 8 }, (_, i) => (
@@ -96,7 +100,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                 ))}
               </span>
               <p className="text-body-md text-on-surface-variant">
-                {stage === 'capturing' ? '' : t('receiptRecognizingLabel')}
+                {stage === 'capturing' ? '' : t('receiptProcessingLabel')}
               </p>
             </div>
           )}
@@ -117,11 +121,16 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
           {stage === 'review' && (
             <>
-              <p className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase mb-1.5">
-                {t('receiptCapturedLabel')}
-              </p>
-              <div className="relative w-full rounded-xl overflow-hidden border-[1.5px] border-dashed border-outline-variant mb-md">
-                {photoUrl && <img src={photoUrl} alt="" className="w-full max-h-[200px] object-cover" />}
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">
+                  {t('receiptCapturedLabel')}
+                </p>
+                <span className="text-xs text-on-surface-variant">
+                  {autoCropped ? t('receiptAutoCroppedHint') : t('receiptNoCropHint')}
+                </span>
+              </div>
+              <div className="relative w-full rounded-xl overflow-hidden border-[1.5px] border-dashed border-outline-variant mb-md bg-surface-container-lowest">
+                {previewUrl && <img src={previewUrl} alt="" className="w-full max-h-[420px] object-contain" />}
                 <button
                   type="button"
                   aria-label={t('receiptRetakeAria')}
@@ -132,20 +141,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                 </button>
               </div>
 
-              <div className="flex items-center justify-between mb-1.5">
-                <p className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">
-                  {t('receiptRecognizedLabel')}
-                </p>
-              </div>
-              <p className="text-body-md text-on-surface-variant mb-2">{t('receiptRecognizedHint')}</p>
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                rows={10}
-                className="w-full bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-3 text-body-md text-on-surface focus:outline-none focus:border-primary resize-none font-mono"
-              />
-
-              <div className="flex items-start gap-2 mt-md p-3 rounded-xl bg-surface-container border border-outline-variant/50">
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-surface-container border border-outline-variant/50">
                 <span className="material-symbols-outlined text-primary text-[18px] shrink-0">info</span>
                 <p className="text-xs text-on-surface-variant">{t('receiptPrivacyNote')}</p>
               </div>
@@ -158,8 +154,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
             <button
               type="button"
               onClick={handleConfirm}
-              disabled={!text.trim()}
-              className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif disabled:opacity-50 flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform"
+              className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >
               <span className="material-symbols-outlined">picture_as_pdf</span>
