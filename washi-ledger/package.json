@@ -1,13 +1,14 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260914-dev.2",
+  "version": "0.0.0-20260914-dev.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "node scripts/patch-opencv-js.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^6.0.3",

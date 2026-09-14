@@ -34,6 +34,59 @@ interface WorkerScope {
 }
 const workerSelf = self as unknown as WorkerScope
 
+// dev.2(0914)真机心跳日志实锤：`import('@techstark/opencv-js')`这段同步解码
+// 内嵌base64 WASM数据的代码，会把Worker自己这条线程完全占住(45秒里连一次
+// setInterval心跳都插不进去)。OpenCV.js官方发布默认也是这种内嵌base64的
+// SINGLE_FILE格式，没有现成的"独立.wasm异步加载"版本可以直接换——但这个npm包
+// 内部支持Emscripten标准的`Module.instantiateWasm`钩子，能完全接管WASM实例化
+// 方式。node_modules里这个包被`scripts/patch-opencv-js.mjs`(package.json的
+// postinstall)打了个小补丁，让它在初始化时读取`self.__CV_MODULE_OVERRIDE__`
+// (如果这里提前设置过的话)当作Module配置——下面这段就是利用这个口子，把WASM
+// 加载方式换成`fetch('/opencv.wasm')+WebAssembly.instantiateStreaming()`真异步
+// 加载，不再经过内嵌base64那条同步解码路径。`public/opencv.wasm`是从这同一个
+// 版本的opencv.js里一次性提取出来的原始WASM二进制(见patch-opencv-js.mjs顶部
+// 说明)，必须在`import('@techstark/opencv-js')`真正执行之前设置好这个全局，
+// 不然它会用默认的内嵌base64路径
+function loadOpenCvWasm(
+  imports: WebAssembly.Imports,
+  successCallback: (instance: WebAssembly.Instance) => void
+): Record<string, never> {
+  ;(async () => {
+    try {
+      reportProgress('wasm-fetch-start')
+      const response = await fetch('/opencv.wasm')
+      let instance: WebAssembly.Instance
+      if (typeof WebAssembly.instantiateStreaming === 'function') {
+        try {
+          instance = (await WebAssembly.instantiateStreaming(response, imports)).instance
+        } catch {
+          // instantiateStreaming要求响应的Content-Type是application/wasm，部分静态
+          // 资源服务器/Capacitor本地服务器可能没设对，兜底改成完整下载后再走非流式
+          // instantiate，兼容性更好，只是少了"边下边编译"这个优化
+          reportProgress('wasm-instantiate-streaming-failed-fallback')
+          const bytes = await (await fetch('/opencv.wasm')).arrayBuffer()
+          instance = (await WebAssembly.instantiate(bytes, imports)).instance
+        }
+      } else {
+        const bytes = await response.arrayBuffer()
+        instance = (await WebAssembly.instantiate(bytes, imports)).instance
+      }
+      reportProgress('wasm-instantiate-done')
+      successCallback(instance)
+    } catch (err) {
+      reportProgress('wasm-instantiate-failed')
+      console.error('opencv.wasm加载失败', err)
+    }
+  })()
+  // Emscripten约定：instantiateWasm同步返回一个对象(哪怕是空的)表示"我接管了，
+  // 异步实例化中"，真正的exports通过successCallback异步传回去
+  return {}
+}
+
+;(self as unknown as { __CV_MODULE_OVERRIDE__?: { instantiateWasm: typeof loadOpenCvWasm } }).__CV_MODULE_OVERRIDE__ = {
+  instantiateWasm: loadOpenCvWasm,
+}
+
 // 脚本顶层、不在onmessage里——只要这个Worker模块本身被成功加载执行就会立刻
 // 发出这条消息，跟"onmessage收到照片后才打的日志"是两件不同的事：如果主线程
 // 连这条都收不到，说明问题出在Worker模块本身没加载起来(比如WKWebView真机上
