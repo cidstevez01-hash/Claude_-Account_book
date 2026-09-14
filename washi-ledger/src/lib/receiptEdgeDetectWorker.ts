@@ -44,15 +44,33 @@ workerSelf.postMessage({ kind: 'progress', stage: 'worker-module-loaded' })
 
 let cvReadyPromise: Promise<any> | null = null
 
+// dev.9真机日志确认：卡住的不是找角点/透视裁剪这些检测计算，是这个函数本身——
+// 收到照片后进到'cv-load-start'只要几十毫秒，但之后35秒里再没有任何进度输出。
+// import()本身(下载/解析约11MB的chunk)和WASM的onRuntimeInitialized(实例化)
+// 是两个不同阶段，这里拆开分别打点，才能看清具体卡在哪一段
 function getCv(): Promise<any> {
   if (!cvReadyPromise) {
+    reportProgress('cv-import-start')
     cvReadyPromise = (async () => {
       const mod: any = await import('@techstark/opencv-js')
+      reportProgress('cv-import-resolved')
       const cvModule = mod.default ?? mod
-      if (cvModule instanceof Promise) return cvModule
-      if (cvModule.Mat) return cvModule
+      if (cvModule instanceof Promise) {
+        reportProgress('cv-runtime-promise-path')
+        const ready = await cvModule
+        reportProgress('cv-runtime-ready')
+        return ready
+      }
+      if (cvModule.Mat) {
+        reportProgress('cv-runtime-already-ready')
+        return cvModule
+      }
+      reportProgress('cv-runtime-init-wait-start')
       return new Promise((resolve) => {
-        cvModule.onRuntimeInitialized = () => resolve(cvModule)
+        cvModule.onRuntimeInitialized = () => {
+          reportProgress('cv-runtime-ready')
+          resolve(cvModule)
+        }
       })
     })()
   }
@@ -308,3 +326,15 @@ workerSelf.onmessage = async (e) => {
     })
   }
 }
+
+// 预加载：Worker一创建(模块一加载执行)就主动开始加载OpenCV.js，不等用户拍完
+// 照片、真的发消息过来才触发——OpenCV.js库加载这段固定成本本来就跟"这张照片
+// 是什么"无关，提前开始能把它藏在用户拍照/选图的这几秒里；`getCv()`内部用
+// `cvReadyPromise`单例，`onmessage`里再次调用`getCv()`拿到的是同一个Promise，
+// 如果这时候已经加载完了会立刻resolve，用户体感等待时间大幅缩短
+getCv().catch(() => {
+  // 预加载阶段的失败不需要在这里处理——真正处理照片时onmessage会再调用一次
+  // getCv()，同一个cvReadyPromise会再次reject，那边的try/catch会正常捕获并
+  // 回复给主线程；这里catch只是防止这个"提前触发"的调用产生未处理的Promise
+  // rejection警告
+})

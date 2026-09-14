@@ -46,8 +46,26 @@ function getWorker(): Worker {
   if (!worker) {
     logIfEnabled('创建receiptEdgeDetectWorker')
     worker = new Worker(new URL('./receiptEdgeDetectWorker.ts', import.meta.url), { type: 'module' })
+    // 进度消息在这里统一监听、写日志——预加载(preloadReceiptScanWorker)可能
+    // 在scanReceiptDocument真正被调用之前就已经触发Worker内部开始加载OpenCV.js，
+    // 如果只在scanReceiptDocument内部临时加监听，预加载阶段发出的进度消息会因为
+    // 那时候还没人监听而直接丢失(message事件不会缓冲)，看不到预加载到底有没有效
+    worker.addEventListener('message', (e) => {
+      if (e.data?.kind === 'progress') {
+        logIfEnabled(`Worker进度: ${e.data.stage}`)
+      }
+    })
   }
   return worker
+}
+
+// Worker一创建就会在自己的模块顶层主动开始加载OpenCV.js(见
+// receiptEdgeDetectWorker.ts)，不需要等真的发照片过去才触发——这里只是提前
+// 创建Worker实例，把"用户点开扫描面板"到"用户拍完照片按确认"这段时间利用起来，
+// 好让OpenCV.js加载这个固定成本尽量在用户看不到等待的时候就跑完
+export function preloadReceiptScanWorker(): void {
+  logIfEnabled('预加载receiptEdgeDetectWorker(提前开始加载OpenCV.js)')
+  getWorker()
 }
 
 export function blobToImage(blob: Blob): Promise<HTMLImageElement> {
@@ -72,10 +90,9 @@ export async function scanReceiptDocument(photo: Blob): Promise<ScanResult> {
 
   const resultPromise = new Promise<{ bitmap: ImageBitmap; cropped: boolean }>((resolve, reject) => {
     function onMessage(e: MessageEvent) {
-      if (e.data?.kind === 'progress') {
-        logIfEnabled(`Worker进度: ${e.data.stage}`)
-        return
-      }
+      // progress消息由getWorker()里的常驻监听器统一记日志(预加载阶段发出的
+      // 进度消息也要能被记录到)，这里只处理最终结果，避免重复打日志
+      if (e.data?.kind === 'progress') return
       cleanup()
       if (e.data?.ok) {
         resolve({ bitmap: e.data.bitmap, cropped: e.data.cropped })

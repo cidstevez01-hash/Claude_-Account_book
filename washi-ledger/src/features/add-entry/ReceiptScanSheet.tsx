@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { captureReceiptPhoto } from '../../lib/receiptCamera'
-import { blobToImage, scanReceiptDocument } from '../../lib/receiptEdgeDetect'
+import { blobToImage, preloadReceiptScanWorker, scanReceiptDocument } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
 import { logIfEnabled } from '../../lib/appLog'
 
@@ -88,6 +88,11 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     if (!open) return
     setPreviewUrl(null)
     resultCanvasRef.current = null
+    // 弹层一打开(用户还在原生拍照/选图界面操作，还没拍完)就提前开始加载
+    // OpenCV.js——真机实测确认这个库加载本身要花很久，提前触发能把这段固定
+    // 成本藏在用户拍照/选图这几秒里，等真的拍完调scanReceiptDocument()时
+    // 库很可能已经加载完了
+    preloadReceiptScanWorker()
     startCapture()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
