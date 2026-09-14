@@ -42,6 +42,31 @@ const workerSelf = self as unknown as WorkerScope
 // 传照片过去这一步出了问题
 workerSelf.postMessage({ kind: 'progress', stage: 'worker-module-loaded' })
 
+// dev.1(0914)真机日志：预加载阶段'cv-import-start'打出来了，但真正发照片过去
+// 之后连onmessage最开头的'worker-received-photo'/'cv-load-start'(同步代码，
+// 收到消息应该立刻执行)都没有——怀疑`import('@techstark/opencv-js')`这段
+// 同步解码内嵌WASM数据的代码，把Worker自己这条线程也整个占住了，导致这条
+// 线程连自己的消息队列(postMessage触发的onmessage)都处理不了，不只是"加载慢"。
+// 用一个每秒打一次的心跳日志验证：如果心跳也跟着停了，说明Worker线程确实被
+// 同步代码占住(事件循环排不上定时器)；如果心跳还在正常跳，说明是别的原因。
+// cv加载成功/失败后就停止，不用一直打
+let heartbeatTimer: ReturnType<typeof setInterval> | null = null
+let heartbeatCount = 0
+function startHeartbeat(): void {
+  if (heartbeatTimer) return
+  heartbeatTimer = setInterval(() => {
+    heartbeatCount++
+    reportProgress(`heartbeat-${heartbeatCount}`)
+  }, 1000)
+}
+function stopHeartbeat(): void {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer)
+    heartbeatTimer = null
+  }
+}
+startHeartbeat()
+
 let cvReadyPromise: Promise<any> | null = null
 
 // dev.9真机日志确认：卡住的不是找角点/透视裁剪这些检测计算，是这个函数本身——
@@ -332,9 +357,12 @@ workerSelf.onmessage = async (e) => {
 // 是什么"无关，提前开始能把它藏在用户拍照/选图的这几秒里；`getCv()`内部用
 // `cvReadyPromise`单例，`onmessage`里再次调用`getCv()`拿到的是同一个Promise，
 // 如果这时候已经加载完了会立刻resolve，用户体感等待时间大幅缩短
-getCv().catch(() => {
-  // 预加载阶段的失败不需要在这里处理——真正处理照片时onmessage会再调用一次
-  // getCv()，同一个cvReadyPromise会再次reject，那边的try/catch会正常捕获并
-  // 回复给主线程；这里catch只是防止这个"提前触发"的调用产生未处理的Promise
-  // rejection警告
-})
+getCv()
+  .then(() => stopHeartbeat())
+  .catch(() => {
+    // 预加载阶段的失败不需要在这里处理——真正处理照片时onmessage会再调用一次
+    // getCv()，同一个cvReadyPromise会再次reject，那边的try/catch会正常捕获并
+    // 回复给主线程；这里catch只是防止这个"提前触发"的调用产生未处理的Promise
+    // rejection警告，但心跳还是要停(库加载失败也没必要继续打心跳)
+    stopHeartbeat()
+  })
