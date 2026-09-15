@@ -618,6 +618,21 @@
 [data-theme='summer'] .points-chip {
   text-shadow: 0 0 6px color-mix(in srgb, var(--color-secondary) 55%, transparent);
 }
+/* R-XX：汇率换算页(换算卡片+走势图卡片)从来没接入过这套夏·花火液态玻璃/发光效果——
+   不复用.ledger-card/.entry-card这两个类，因为它们各自的(非summer)基础定义带着
+   专属于结余卡片/记账条目的不对称圆角/描边，套到汇率页的卡片上会在其他主题下
+   也跟着变形；单独开一个只在summer主题下生效的类，不影响默认/怀旧两个主题下
+   这两张卡片本来的Tailwind样式(border-dashed rounded-xl等)。发光公式照抄
+   .ledger-card的summer版本，保持跟其他卡片同一套视觉语言 */
+[data-theme='summer'] .rate-card {
+  border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+  background: color-mix(in srgb, var(--color-surface-container-lowest) 55%, transparent) !important;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  box-shadow:
+    0 0 22px -4px color-mix(in srgb, var(--color-primary) 55%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent) inset;
+}
 /* 只挑h1标题——.papercut-text-shadow这个类在新App里同时贴在标题和头部图标按钮上
    (旧App里两者是分开的两个类，.papercut只用在标题)，这里只narrow到h1，不连图标
    按钮一起变金黄 */

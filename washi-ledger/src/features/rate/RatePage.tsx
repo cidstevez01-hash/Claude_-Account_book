@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
-import { fetchRates, fetchRateHistory, CURRENCIES, type RateSnapshot, type RateHistoryPoint } from '../../data/rate'
+import { fetchRates, fetchRateHistoryStats, CURRENCIES, type RateSnapshot, type RateHistoryStats } from '../../data/rate'
 import { useI18n } from '../../lib/i18n'
 
 // B-40：1W按7个自然日回溯查询，但汇率数据源(frankfurter.dev，央行参考汇率)周末不
@@ -10,9 +10,9 @@ import { useI18n } from '../../lib/i18n'
 // 插值造假点，只是放宽真实查询窗口，跟fetchRateHistory本身"如实显示不插值"的原则
 // 不冲突
 const TIMEFRAMES = [
-  { key: '1W', days: 9, labelKey: 'rateTimeframe1W' },
-  { key: '1M', days: 30, labelKey: 'rateTimeframe1M' },
-  { key: '1Y', days: 365, labelKey: 'rateTimeframe1Y' },
+  { key: '1W', days: 9, labelKey: 'rateTimeframe1W', statsPrefixKey: 'rateStatsPrefix1W' },
+  { key: '1M', days: 30, labelKey: 'rateTimeframe1M', statsPrefixKey: 'rateStatsPrefix1M' },
+  { key: '1Y', days: 365, labelKey: 'rateTimeframe1Y', statsPrefixKey: 'rateStatsPrefix1Y' },
 ] as const
 type TimeframeKey = (typeof TIMEFRAMES)[number]['key']
 
@@ -57,6 +57,30 @@ function formatAxisValue(v: number) {
   return v.toFixed(2)
 }
 
+/** R-XX走势图重设计——把原来逐点直线连接的折线换成Catmull-Rom平滑曲线(转成三次
+ * 贝塞尔控制点，张力取标准的1/6)，视觉上更接近设计稿里的"水墨笔触"曲线，不是
+ * 简单加个border-radius。点数<3时退化成直线(贝塞尔曲线至少需要4个参考点才能算
+ * 控制点，2个点直接连线足够，没必要为2点硬套曲线公式) */
+function smoothLinePath(points: { x: number; y: number }[]): string {
+  if (points.length < 2) return ''
+  if (points.length === 2) {
+    return `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)} L ${points[1].x.toFixed(1)} ${points[1].y.toFixed(1)}`
+  }
+  let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i === 0 ? i : i - 1]
+    const p1 = points[i]
+    const p2 = points[i + 1]
+    const p3 = points[i + 2 < points.length ? i + 2 : i + 1]
+    const cp1x = p1.x + (p2.x - p0.x) / 6
+    const cp1y = p1.y + (p2.y - p0.y) / 6
+    const cp2x = p2.x - (p3.x - p1.x) / 6
+    const cp2y = p2.y - (p3.y - p1.y) / 6
+    d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)} ${cp2x.toFixed(1)} ${cp2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
+  }
+  return d
+}
+
 /** 汇率换算——照design-assets/prototypes/.../ad647758a5e5485e84e33107fb3fac3c
  * ("汇率换算 全新重构版")这份最新Stitch设计稿重做：从"多货币搜索+热门汇率列表"换成
  * "单一货币对换算卡片(和纸胶带装饰+图章式互换按钮+实时汇率胶囊) + 走势图"这个新布局，
@@ -87,7 +111,7 @@ export function RatePage() {
   const [error, setError] = useState('')
 
   const [timeframe, setTimeframe] = useState<TimeframeKey>('1W')
-  const [history, setHistory] = useState<RateHistoryPoint[]>([])
+  const [historyStats, setHistoryStats] = useState<RateHistoryStats | null>(null)
   const [historyLoading, setHistoryLoading] = useState(true)
   const [historyError, setHistoryError] = useState('')
   // 折线图选中点(R-13)——照旧App selectedRatePointIdx同一套逻辑：默认高亮最新一个点
@@ -123,8 +147,8 @@ export function RatePage() {
     setHistoryLoading(true)
     setHistoryError('')
     try {
-      const points = await fetchRateHistory(base, target, days)
-      setHistory(points)
+      const stats = await fetchRateHistoryStats(base, target, days)
+      setHistoryStats(stats)
       // B-41：顶部换算卡片的unitRate来自fetchRates()单独查的"latest快照"接口，走势图
       // 走的是这里的历史区间接口——两条链路各查各的，历史接口如果查到了比"latest快照"
       // 更新的一天，顶部就会卡在旧数据上、跟图表最新点对不上(旧App fetchRate()
@@ -133,6 +157,7 @@ export function RatePage() {
       // 是多币种快照(base兑11种常用货币)，只改target这一项，其余货币不受影响；
       // prev.base!==base这层判断防止fromCode已经切换、history还是旧货币对结果的
       // 竞态场景下错误覆盖
+      const points = stats.points
       if (points.length > 0) {
         const last = points[points.length - 1]
         setSnapshot((prev) => {
@@ -198,6 +223,7 @@ export function RatePage() {
   }
 
   const chartGeometry = useMemo(() => {
+    const history = historyStats?.points ?? []
     if (history.length < 2) return null
     const values = history.map((p) => p.rate)
     const min = Math.min(...values)
@@ -210,7 +236,10 @@ export function RatePage() {
       const y = CHART_BASE - ((p.rate - min) / range) * (CHART_BASE - CHART_TOP)
       return { x, y, date: p.date, rate: p.rate }
     })
-    const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')
+    // R-XX：折线改成smoothLinePath()画的平滑曲线(设计稿要求的"水墨笔触"曲线)，
+    // 不再是逐点直线连接；填充区域的顶边跟着用同一条平滑曲线，只有闭合回底边这
+    // 两段还是直线(L)，不用曲线
+    const line = smoothLinePath(points)
     const area = `${line} L ${points[points.length - 1].x.toFixed(1)} ${CHART_BASE} L ${points[0].x.toFixed(1)} ${CHART_BASE} Z`
 
     // 纵坐标(R-13)——照旧App renderTrendChart()系列图表的网格线公式：GRID_STEPS+1条
@@ -233,7 +262,7 @@ export function RatePage() {
     })
 
     return { points, line, area, gridLines, labelIdxs, chartWidth }
-  }, [history])
+  }, [historyStats])
 
   useEffect(() => {
     if (!chartGeometry || !chartScrollRef.current) return
@@ -249,11 +278,17 @@ export function RatePage() {
         : chartGeometry.points.length - 1
   const activePoint = chartGeometry && activeIdx != null ? chartGeometry.points[activeIdx] : null
 
+  // R-XX走势图重设计——涨跌幅徽标/区间最高最低/波动区间这几项统计值后端已经算好
+  // (worker/src/rate/handlers.ts)，这里只管展示，不再自己算一遍。pctChange为null
+  // (数据点不够)时不显示徽标，不是显示"0.00%"这种编出来的假数值
+  const pctChange = historyStats?.pctChange ?? null
+  const statsPrefixKey = TIMEFRAMES.find((tf) => tf.key === timeframe)!.statsPrefixKey
+
   return (
     <AppLayout title={t('rateNavLabel')} leftButton="back" onRefresh={handleRefresh}>
       <div className="px-md pt-lg pb-xl flex flex-col gap-lg">
         {/* 换算卡片(The Ledger Card)——和纸胶带装饰角+虚线描边，照旧App结余卡片同一套材质语言 */}
-        <div className="relative bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">
+        <div className="rate-card relative bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">
           {/* B-33：同BalanceCard.tsx——换成真实斜纹纹理，尺寸放大，位置/角度不动 */}
           <div
             className="absolute -top-1.5 -right-2 w-14 h-4 rounded-sm washi-tape-texture"
@@ -360,21 +395,41 @@ export function RatePage() {
 
         {/* 走势图(R-13：时间范围去掉1D、剩下三档用翻译文案；加纵坐标网格线+更密的
             横坐标日期标签+点击折线查看选中点数值，逻辑照旧App renderRateTrendChart()搬) */}
-        <div className="flex flex-col gap-md bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">
+        <div className="rate-card flex flex-col gap-md bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md shadow-[0_2px_0_rgba(0,0,0,0.02)]">
           <div className="flex items-center justify-between flex-wrap gap-xs">
-            <h3 className="text-label-caps font-sans text-on-surface-variant">
-              {fromCode}/{toCode} {t('rateTrendLabel')}
-            </h3>
-            <div className="flex gap-xs">
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-label-caps font-sans text-on-surface-variant">
+                {fromCode}/{toCode} {t('rateTrendLabel')}
+              </h3>
+              {/* R-XX：涨跌幅徽标——后端算好的pctChange，null(数据点不够)时不显示，
+                  正数用secondary(草木绿)配色，负数/零用primary(印章红)配色，跟
+                  设计稿"涨绿跌红"的直觉一致 */}
+              {pctChange != null && (
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-sans font-medium ${
+                    pctChange >= 0
+                      ? 'bg-secondary-container/60 text-on-secondary-container'
+                      : 'bg-primary-container/40 text-on-primary-container'
+                  }`}
+                >
+                  {pctChange >= 0 ? '+' : ''}
+                  {pctChange.toFixed(2)}%
+                </span>
+              )}
+            </div>
+            {/* R-XX：时间范围从"三个各自独立的按钮"改成共享同一条底槽的分段控件——
+                外层一个统一的圆角容器(bg-surface-variant/40)当轨道，内部按钮贴着
+                排、没有button-to-button的间隙，选中的那个再叠一层实心背景 */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-full bg-surface-variant/40">
               {TIMEFRAMES.map((tf) => (
                 <button
                   key={tf.key}
                   type="button"
                   onClick={() => setTimeframe(tf.key)}
-                  className={`px-3 py-1.5 rounded text-label-caps whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-label-caps whitespace-nowrap transition-colors ${
                     timeframe === tf.key
                       ? 'bg-primary text-on-primary shadow-sm'
-                      : 'bg-surface-variant/50 text-on-surface-variant'
+                      : 'text-on-surface-variant'
                   }`}
                 >
                   {t(tf.labelKey)}
@@ -383,10 +438,13 @@ export function RatePage() {
             </div>
           </div>
 
-          {/* 选中点数值——照旧App rateTrendPointInfo，默认显示最新点，点折线上任意点会跳过来 */}
+          {/* 选中点数值——照旧App rateTrendPointInfo，默认显示最新点，点折线上任意点会跳过来。
+              R-XX：改成胶囊底色的悬浮提示样式(呼应设计稿里"浮动气泡"的观感)，仍然是固定在
+              图表上方的一行文字，不是跟着选中点在SVG里左右浮动——那种做法需要额外处理
+              tooltip贴近图表左右边缘时被裁切的问题，这版先用更简单可靠的固定位置实现 */}
           {chartGeometry && activePoint && (
-            <div className="text-center text-label-caps font-sans text-on-surface-variant">
-              {activePoint.date} · {formatAxisValue(activePoint.rate)} {toCode}
+            <div className="self-center px-3 py-1 rounded-full bg-surface-container text-label-caps font-sans text-on-surface-variant shadow-sm">
+              {activePoint.date} · <span className="text-primary font-semibold">{formatAxisValue(activePoint.rate)} {toCode}</span>
             </div>
           )}
 
@@ -418,9 +476,18 @@ export function RatePage() {
                     <stop offset="0%" stopColor="var(--color-primary)" />
                     <stop offset="100%" stopColor="transparent" />
                   </linearGradient>
+                  {/* R-XX：网格线改成两端渐隐——之前是通栏均匀虚线，横向拉一条纯色
+                      渐变(两头透明、中间实色)当stroke，配合下面去掉strokeDasharray，
+                      线本身还在，只是视觉上不再是一条生硬贯穿全宽的线 */}
+                  <linearGradient id="rateGridFade" x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="0%" stopColor="var(--color-outline-variant)" stopOpacity={0} />
+                    <stop offset="15%" stopColor="var(--color-outline-variant)" stopOpacity={0.8} />
+                    <stop offset="85%" stopColor="var(--color-outline-variant)" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="var(--color-outline-variant)" stopOpacity={0} />
+                  </linearGradient>
                 </defs>
 
-                {/* 纵坐标网格线(横向虚线本体留在这里，会跟着滚动——只有数值文字挪到
+                {/* 纵坐标网格线(横向线本体留在这里，会跟着滚动——只有数值文字挪到
                     左边固定列，线本身没有"消失"的问题，不用拆) */}
                 {chartGeometry.gridLines.map((g, i) => (
                   <line
@@ -429,9 +496,8 @@ export function RatePage() {
                     y1={g.y}
                     x2={chartGeometry.chartWidth - CHART_RIGHT}
                     y2={g.y}
-                    stroke="var(--color-outline-variant)"
+                    stroke="url(#rateGridFade)"
                     strokeWidth={1}
-                    strokeDasharray="2,3"
                   />
                 ))}
 
@@ -484,6 +550,31 @@ export function RatePage() {
               </div>
             )}
           </div>
+
+          {/* R-XX：底部三栏统计条——区间最高/最低/波动区间，后端算好的值直接展示，
+              标签的"周/月内/年内"前缀跟着当前选中的时间范围变，不是死写"周最高"。
+              historyStats.high/low为null(数据点不够)时这一整条不显示，不展示
+              占位假数据 */}
+          {historyStats && historyStats.high != null && historyStats.low != null && historyStats.volatilityPct != null && (
+            <div className="grid grid-cols-3 gap-1 pt-2 border-t border-dashed border-outline-variant/50 text-center">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] font-sans text-on-surface-variant">
+                  {t(statsPrefixKey)}{t('rateStatHighSuffix')}
+                </span>
+                <span className="text-body-lg font-serif font-semibold text-on-surface">{formatAxisValue(historyStats.high)}</span>
+              </div>
+              <div className="flex flex-col gap-0.5 border-x border-dashed border-outline-variant/50">
+                <span className="text-[10px] font-sans text-on-surface-variant">
+                  {t(statsPrefixKey)}{t('rateStatLowSuffix')}
+                </span>
+                <span className="text-body-lg font-serif font-semibold text-on-surface">{formatAxisValue(historyStats.low)}</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] font-sans text-on-surface-variant">{t('rateStatVolatilityLabel')}</span>
+                <span className="text-body-lg font-serif font-semibold text-on-surface">{historyStats.volatilityPct.toFixed(2)}%</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </AppLayout>

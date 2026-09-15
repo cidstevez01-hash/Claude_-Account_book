@@ -92,6 +92,15 @@ export const dict = {
     rateTimeframe1W: '近1周', // 新App专属(R-13：时间范围按钮去掉1D后，剩下三档改用翻译文案，不再直接显示英文缩写)
     rateTimeframe1M: '近1个月',
     rateTimeframe1Y: '近1年',
+    // R-XX走势图重设计新增：涨跌幅/区间最高最低/波动区间这几项统计文案。
+    // 最高/最低标签带时间范围前缀(周/月内/年内)，跟当前选中的时间档对应，
+    // 不是死写"周最高"——具体前缀+"最高"/"最低"在RatePage.tsx里拼接
+    rateStatsPrefix1W: '周',
+    rateStatsPrefix1M: '月内',
+    rateStatsPrefix1Y: '年内',
+    rateStatHighSuffix: '最高',
+    rateStatLowSuffix: '最低',
+    rateStatVolatilityLabel: '波动区间',
     // B-10：仪表盘/统计页环状图中间的小字之前写死英文"Total Expenses"/"Total Income"，
     // 不跟着语言切换。旧App对应的是typeExpense/typeIncome("支出构成"/"收入构成")这两个
     // 词条——但新App自己的typeExpense/typeIncome已经被"记一笔"页面的收支切换按钮占用了
@@ -280,6 +289,12 @@ export const dict = {
     rateTimeframe1W: '過去1週間',
     rateTimeframe1M: '過去1か月',
     rateTimeframe1Y: '過去1年',
+    rateStatsPrefix1W: '週間',
+    rateStatsPrefix1M: '月間',
+    rateStatsPrefix1Y: '年間',
+    rateStatHighSuffix: '最高値',
+    rateStatLowSuffix: '最安値',
+    rateStatVolatilityLabel: '変動幅',
     donutExpenseTitle: LEGACY_JA.typeExpense,
     donutIncomeTitle: LEGACY_JA.typeIncome,
 

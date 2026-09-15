@@ -4,6 +4,7 @@ import type { Bindings } from './_shared/supabaseClient'
 import { ALLOWED_ORIGINS } from './_shared/cors'
 import { HttpError } from './_shared/errors'
 import entriesRouter from './entries/router'
+import rateRouter from './rate/router'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -20,6 +21,7 @@ app.use(
 )
 
 app.route('/entries', entriesRouter)
+app.route('/rate', rateRouter)
 
 app.onError((err, c) => {
   if (err instanceof HttpError) {
