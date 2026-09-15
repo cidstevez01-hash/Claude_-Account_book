@@ -69,9 +69,8 @@ export interface Entry {
   recurringId: string | null
   createdAt: number
   /** R-32：レシート扫描存档——Supabase Storage里的对象路径(不是完整URL，bucket是
-   * private的，查看时要现取一次签名URL，见data/receiptStorage.ts)。存的是OCR识别
-   * 文字生成的PDF，不是原始照片本身(照片只是识别过程的临时输入，识别完即丢弃，
-   * 见lib/receiptOcr.ts的说明) */
+   * private的，查看时要现取一次签名URL，见data/receiptStorage.ts)。存的是原生
+   * 扫描器裁边+透视校正后的图片生成的PDF，不是原始照片本身(拍摄的原图不会保留) */
   receiptPath: string | null
 }
 

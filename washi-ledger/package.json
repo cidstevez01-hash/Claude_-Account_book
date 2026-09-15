@@ -1,7 +1,7 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260915-dev.5",
+  "version": "0.0.0-20260915-dev.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -21,8 +21,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
-    "tailwindcss": "^4.3.3",
-    "tesseract.js": "^7.0.0"
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
