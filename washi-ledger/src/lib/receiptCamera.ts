@@ -1,57 +1,38 @@
+import { DocumentScanner, ResponseType, ScanDocumentResponseStatus } from '@capgo/capacitor-document-scanner'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { logIfEnabled } from './appLog'
 
-/** R-32二期：拍照页面改成自建取景界面——原来用@capacitor/camera的CameraSource.Prompt
- * 会弹系统原生相机，JS层完全拿不到实时画面，没法做后续可能的实时边界检测；换成
- * getUserMedia()+<video>自建取景器。这一步只做取景本身(暂不带实时检测框)，识别框
- * 留到这一步做完后单独评估是否可行。
+/** R-32三期：拍照页面改成调用系统原生文档扫描能力(iOS VisionKit/Android ML Kit)。
+ * 排查确认OpenCV.js这条路径本身在这台设备的Worker环境里，运行时初始化(不是加载
+ * 方式)就要超过35秒卡死——市面上真正的扫描App在iOS上根本不跑这类WASM库，直接调
+ * VNDocumentCameraViewController这个系统原生能力：硬件加速、零加载时间、自带实时
+ * 边缘检测/透视校正，用@capgo/capacitor-document-scanner这个维护中的Capacitor插件
+ * 封装调用。前一版自建的webcam取景界面(getUserMedia+<video>)不再需要——原生扫描器
+ * 自己就是一个完整的系统级全屏界面，取代了自建取景+OpenCV.js边缘检测这整套。
  *
- * "从相册选择"跟拍照分开成两个独立入口，选图部分仍用@capacitor/camera的
- * CameraSource.Photos——Web端(沙盒/浏览器预览)没有原生相册，Capacitor会自动降级成
- * <input type="file" accept="image/*">这个网页兼容实现，行为等价。 */
-export async function openCameraStream(): Promise<MediaStream> {
-  logIfEnabled('调用getUserMedia()打开取景摄像头')
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: 'environment' },
-    audio: false,
+ * Web端(沙盒/浏览器预览)没有这个原生能力，插件的web fallback会直接抛
+ * "Document scanning is not supported on the web."——不是bug，是插件本身的
+ * 设计，调用方要兜底改用相册选图，这也是沙盒/桌面浏览器开发调试时唯一能走通的路径 */
+export async function scanDocumentNative(): Promise<Blob | null> {
+  logIfEnabled('调用DocumentScanner.scanDocument()')
+  const result = await DocumentScanner.scanDocument({
+    responseType: ResponseType.Base64,
+    letUserAdjustCrop: true,
+    maxNumDocuments: 1,
   })
-  logIfEnabled('getUserMedia()取景摄像头已就绪')
-  return stream
+  if (result.status !== ScanDocumentResponseStatus.Success || !result.scannedImages?.length) {
+    logIfEnabled('DocumentScanner返回取消/无结果')
+    return null
+  }
+  logIfEnabled(`DocumentScanner扫描成功，图片base64长度=${result.scannedImages[0].length}字符`)
+  const res = await fetch(`data:image/jpeg;base64,${result.scannedImages[0]}`)
+  return await res.blob()
 }
 
-export function stopCameraStream(stream: MediaStream): void {
-  stream.getTracks().forEach((track) => track.stop())
-  logIfEnabled('取景摄像头已关闭')
-}
-
-/** 把<video>当前帧画到canvas转成Blob——取代原来Camera.getPhoto()拍照返回的
- * dataUrl，跟下游(边缘检测/PDF生成)统一走Blob这个"货币" */
-export function captureFrameFromVideo(video: HTMLVideoElement): Promise<Blob> {
-  logIfEnabled(`捕获取景帧，videoWidth=${video.videoWidth}, videoHeight=${video.videoHeight}`)
-  const canvas = document.createElement('canvas')
-  canvas.width = video.videoWidth
-  canvas.height = video.videoHeight
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return Promise.reject(new Error('无法创建canvas 2D上下文'))
-  ctx.drawImage(video, 0, 0)
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          logIfEnabled(`取景帧转Blob完成，blob.size=${blob.size}字节`)
-          resolve(blob)
-        } else {
-          reject(new Error('取景帧转Blob失败'))
-        }
-      },
-      'image/jpeg',
-      0.9
-    )
-  })
-}
-
-/** 从系统相册选图——用户可能没随身带着レシート本体、想挑一张之前拍过的照片，
- * 不强制一定要现场拍 */
+/** 从系统相册选图——用户可能没随身带着レシート本体、想挑一张之前拍过的照片；
+ * 同时也是原生扫描器在Web端/权限被拒绝时的兜底路径。Web端(沙盒/浏览器预览)没有
+ * 原生相册，Capacitor会自动降级成<input type="file" accept="image/*">这个网页
+ * 兼容实现，行为等价。 */
 export async function pickFromGallery(): Promise<Blob | null> {
   logIfEnabled('调用Camera.getPhoto()从相册选图')
   const photo = await Camera.getPhoto({
