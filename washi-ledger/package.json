@@ -1,7 +1,7 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260915-dev.2",
+  "version": "0.0.0-20260915-dev.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,10 +11,10 @@
     "postinstall": "node scripts/patch-opencv-js.mjs"
   },
   "dependencies": {
-    "@capacitor/app": "^6.0.3",
-    "@capacitor/camera": "^6.1.3",
-    "@capacitor/core": "^6.1.2",
-    "@capacitor/ios": "^6.1.2",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/camera": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
     "@supabase/supabase-js": "^2.112.3",
     "@tailwindcss/vite": "^4.3.3",
     "@techstark/opencv-js": "^4.12.0-release.1",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^6.1.2",
+    "@capacitor/cli": "^7.0.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
