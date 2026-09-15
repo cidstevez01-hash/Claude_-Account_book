@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { fetchRates, fetchRateHistoryStats, CURRENCIES, type RateSnapshot, type RateHistoryStats } from '../../data/rate'
@@ -43,11 +43,13 @@ const AXIS_W = 44
 const CHART_RIGHT = 20
 const GRID_STEPS = 3
 const MIN_LABEL_GAP_PX = 40
-// B-38：横坐标点数多(比如1Y档365个点)时按点数撑宽图表本身的像素宽度，而不是把固定
-// 320的viewBox用preserveAspectRatio="none"强行拉伸/压扁去塞进容器——那样宽高比不一致
-// 会导致横坐标日期文字被非均匀缩放挤压、看起来截断。改成图表按真实需要的宽度渲染，
-// 外层套滚动容器，点少时Math.max兜底到原来的320不至于比容器还窄显得空荡
-const POINT_GAP = 24
+// 汇率走势图"底部空一大块"bug：B-38当时改成按点数(POINT_GAP)撑宽图表像素宽度+外层
+// 横向滚动、默认滚到最右，是为了避免非均匀拉伸导致文字变形。但纵坐标min/max是按
+// *全部*数据点算的，1Y档365个点撑出的宽度只有最后一屏(~13个点/两三周)会被看到，这
+// 一小段真实波动相对全年range小得多，折线被压扁在中间。改回图表宽度=容器实际可用
+// 像素宽度(用ResizeObserver测量，不是写死320)，不再横向滚动，全部点都摊平显示在
+// 同一屏——SVG的width属性和viewBox宽度用同一个测量值，1单位=1px，不会重演非均匀
+// 拉伸的问题
 
 /** 纵坐标数值精度——汇率数值量级差异很大(比如JPY→CNY在0.05附近，CNY→JPY在19附近)，
  * 固定小数位要么小汇率全显示0.0，要么大汇率一堆无意义的尾数，按量级动态选精度 */
@@ -118,11 +120,25 @@ export function RatePage() {
   // (null表示"还没选，用最后一个")，点任意点会把它移过去；每次历史数据换了(切换时间
   // 范围/切换货币对)都要清空回到"默认最新点"，不然可能残留一个超出新数组长度的下标
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
-  // 走势图默认要看到的是最新数据（汇率第一关心的是"现在"），照旧App
-  // renderRateTrendChart()的scrollEl.scrollLeft = W同一个思路：图表点数多时会超出
-  // 容器宽度、外层套了横向滚动条(见下面渲染部分)，1Y这种档位默认停在最左边(起始点)
-  // 反而看不到最新汇率，chartGeometry每次变化(切换货币对/时间范围/刷新)都滚到最右
-  const chartScrollRef = useRef<HTMLDivElement>(null)
+  // 走势图不再横向滚动，全部数据点摊平显示在容器实际可用宽度内——测量这个宽度用。
+  // 容器div只在chartGeometry非null(有数据)时才挂载，首次进页面/切换时间范围重新
+  // loading的那一刻它会从DOM里消失再重新出现，所以用回调ref而不是useRef+空依赖
+  // 数组的useEffect——后者只在组件首次挂载那一刻跑一次，如果那一刻容器还没渲染出来
+  // (数据还在加载)，就会永远错过绑定ResizeObserver的机会，chartAreaWidth会一直卡
+  // 在初始默认值320，在比320窄的手机屏幕上图表实际比容器宽、右侧被裁切
+  const [chartAreaWidth, setChartAreaWidth] = useState(CHART_W)
+  const chartResizeObserverRef = useRef<ResizeObserver | null>(null)
+  const chartContainerRef = useCallback((el: HTMLDivElement | null) => {
+    chartResizeObserverRef.current?.disconnect()
+    chartResizeObserverRef.current = null
+    if (!el) return
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width
+      if (width && width > 0) setChartAreaWidth(width)
+    })
+    observer.observe(el)
+    chartResizeObserverRef.current = observer
+  }, [])
 
   async function refresh(base: string) {
     setLoading(true)
@@ -229,7 +245,7 @@ export function RatePage() {
     const min = Math.min(...values)
     const max = Math.max(...values)
     const range = max - min || max * 0.02 || 1
-    const chartWidth = Math.max(CHART_W, CHART_LEFT + CHART_RIGHT + (history.length - 1) * POINT_GAP)
+    const chartWidth = chartAreaWidth
     const stepX = (chartWidth - CHART_LEFT - CHART_RIGHT) / (history.length - 1)
     const points = history.map((p, i) => {
       const x = CHART_LEFT + i * stepX
@@ -262,12 +278,7 @@ export function RatePage() {
     })
 
     return { points, line, area, gridLines, labelIdxs, chartWidth }
-  }, [historyStats])
-
-  useEffect(() => {
-    if (!chartGeometry || !chartScrollRef.current) return
-    chartScrollRef.current.scrollLeft = chartScrollRef.current.scrollWidth
-  }, [chartGeometry])
+  }, [historyStats, chartAreaWidth])
 
   // 选中点(R-13)——没手动点过时默认最后一个点(最新数据)，跟旧App一致
   const activeIdx =
@@ -469,7 +480,7 @@ export function RatePage() {
                   </text>
                 ))}
               </svg>
-              <div ref={chartScrollRef} className="flex-1 min-w-0 h-full overflow-x-auto overflow-y-hidden">
+              <div ref={chartContainerRef} className="flex-1 min-w-0 h-full">
               <svg width={chartGeometry.chartWidth} height={CHART_H} viewBox={`0 0 ${chartGeometry.chartWidth} ${CHART_H}`} style={{ display: 'block' }}>
                 <defs>
                   <linearGradient id="rateChartGradient" x1="0" x2="0" y1="0" y2="1">
