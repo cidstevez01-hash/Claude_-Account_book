@@ -4,6 +4,7 @@ import rakutenLogo from '../../assets/payment-brands/rakuten.svg'
 import merpayLogo from '../../assets/payment-brands/pm-merpay.png'
 import paidyLogo from '../../assets/payment-brands/pm-paidy.png'
 import suicaLogo from '../../assets/payment-brands/pm-suica.png'
+import paypayLogo from '../../assets/payment-brands/pm-paypay.png'
 import { mapGenericPaymentMethodIcon } from '../../lib/iconMap'
 import { useI18n } from '../../lib/i18n'
 import { payLabel } from '../../lib/catalogLabel'
@@ -18,6 +19,7 @@ const BRAND_LOGOS: Record<string, string> = {
   'pm-merpay': merpayLogo,
   'pm-paidy': paidyLogo,
   'pm-suica': suicaLogo,
+  'pm-paypay': paypayLogo,
 }
 
 /** 现金/信用卡/银行转账不是具体品牌、没有真实Logo，但旧App没有让它们退化成单色线框图标，
