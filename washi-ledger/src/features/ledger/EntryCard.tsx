@@ -6,6 +6,7 @@ import { formatCurrency } from '../../data/currencyDisplay'
 import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { getReceiptSignedUrl } from '../../data/receiptStorage'
+import { ReceiptPreviewSheet } from './ReceiptPreviewSheet'
 import type { Category, Entry, PaymentMethod } from '../../types'
 
 /** R-32续：レシート凭证常驻角标图标——用户从Stitch的8款变体里选定No.06
@@ -70,6 +71,11 @@ export function EntryCard({
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
   const [receiptBusy, setReceiptBusy] = useState(false)
+  // R-32续：查看凭证改成App内弹层展示(ReceiptPreviewSheet)，取代之前
+  // window.open(url,'_blank')直接跳出系统浏览器——用户反馈"外跳不好"。签名URL有
+  // 时效性，previewUrl只在弹层实际打开期间持有，不长期缓存
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const isIncome = entry.type === 'income'
   // R-32续：查看凭证从"展开抽屉里的第4个按钮"改成卡片右上角常驻角标(骑缝章)，
   // 单独一次点击直接弹出预览，不再占用展开抽屉的位置，也不再计入hasActions——
@@ -83,7 +89,8 @@ export function EntryCard({
     setReceiptBusy(true)
     try {
       const url = await getReceiptSignedUrl(entry.receiptPath)
-      window.open(url, '_blank', 'noopener,noreferrer')
+      setPreviewUrl(url)
+      setPreviewOpen(true)
     } catch (e) {
       console.error('查看レシート凭证失败', e)
     } finally {
@@ -247,6 +254,7 @@ export function EntryCard({
         </span>
         </button>
       )}
+      <ReceiptPreviewSheet open={previewOpen} url={previewUrl} onClose={() => setPreviewOpen(false)} />
     </div>
   )
 }
