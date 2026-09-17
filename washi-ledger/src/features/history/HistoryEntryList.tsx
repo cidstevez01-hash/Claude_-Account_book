@@ -37,8 +37,11 @@ export function HistoryEntryList({ entries, categories, paymentMethods, currency
     <div className="flex flex-col gap-lg px-md">
       {groups.map((group) => {
         const dayNet = group.entries.reduce((acc, e) => acc + (e.type === 'income' ? e.amount : -e.amount), 0)
+        // R-32续：gap-sm(12px)→gap-md(16px)——レシート角标探出卡片顶部最多16px，
+        // 这里header跟第一张卡片之间的间距(靠这个flex gap撑开，header自己没有
+        // margin-bottom)原本12px不够，改成16px正好卡住不会撞线
         return (
-          <section key={group.date} className="flex flex-col gap-sm">
+          <section key={group.date} className="flex flex-col gap-md">
             <div className="flex justify-between items-end border-b-[1.5px] border-dashed border-outline-variant pb-1">
               <span className="inline-block bg-surface-variant text-on-surface-variant px-2 py-1 rounded-md text-label-caps font-sans">
                 {dayLabel(group.date, t)}

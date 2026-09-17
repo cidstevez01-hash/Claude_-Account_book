@@ -152,7 +152,10 @@ export function CategoryDetailSheet({
               const dayNet = group.entries.reduce((acc, e) => acc + (e.type === 'income' ? e.amount : -e.amount), 0)
               return (
               <div key={group.date} className="mb-3">
-                <div className="flex justify-between items-end border-b-[1.5px] border-dashed border-outline-variant mb-1 pb-1">
+                {/* R-32续：mb-1→mb-4，跟EntryCard自己.entry-card的mb-2→mb-4是同一次改动，
+                    给レシート角标(最多探出卡片顶部16px)留够空间，不然当天第一条记录
+                    如果带角标，会跟这行虚线底边撞在一起 */}
+                <div className="flex justify-between items-end border-b-[1.5px] border-dashed border-outline-variant mb-4 pb-1">
                   <span className="inline-block bg-surface-variant text-on-surface-variant text-[10px] font-sans px-2 py-1 rounded-md">
                     {dayLabel(group.date, t)}
                   </span>

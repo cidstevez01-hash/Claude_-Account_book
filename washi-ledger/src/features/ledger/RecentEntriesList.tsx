@@ -147,7 +147,10 @@ export function RecentEntriesList({
           const dayNet = group.entries.reduce((acc, e) => acc + (e.type === 'income' ? e.amount : -e.amount), 0)
           return (
           <div key={group.date}>
-            <div className="mt-3 mb-1 flex items-center justify-between">
+            {/* R-32续：mb-1→mb-4——レシート角标现在会探出卡片顶部最多16px(44×44pt热区)，
+                这里跟.entry-card自己的mb-2→mb-4是同一次改动，两处都要跟着调，不然
+                当天第一条记录如果带角标，会跟上面这行日期标题的虚线底边撞在一起 */}
+            <div className="mt-3 mb-4 flex items-center justify-between">
               <span className="inline-block bg-surface-variant text-on-surface-variant text-[10px] font-sans px-2 py-1 rounded-md">
                 {dayLabel(group.date, t)}
               </span>
