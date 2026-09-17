@@ -459,7 +459,11 @@ export function RatePage() {
             </div>
           )}
 
-          <div className="relative h-52 w-full mt-1">
+          {/* B-XX：高度之前写死h-52(208px)，跟图表实际高度常量CHART_H(160px)对不上，
+              多出的48px在图表下方露出一块空白(用户真机截图确认)。改成inline style
+              直接读CHART_H这个常量本身，两边永远同一个数字，不会再出现"改了图表高度
+              常量、忘了同步改这个Tailwind class"这种偏差 */}
+          <div className="relative w-full mt-1" style={{ height: CHART_H }}>
             {historyLoading ? (
               <p className="w-full h-full flex items-center justify-center text-body-md text-on-surface-variant">{t('rateLoading')}</p>
             ) : historyError ? (
