@@ -33,17 +33,52 @@ export interface RateSnapshot {
   fetchedAt: number
 }
 
-/** 一次性拿base货币兑其余常用货币的汇率(symbols传除base外的全部常用货币代码)，
- * 换算器的目标货币汇率和"热门汇率"列表共用这一份数据，不用分开发两次请求 */
-export async function fetchRates(base: string): Promise<RateSnapshot> {
+/** B-XX：换算卡片"当前汇率"改成主用exchangerate.fun(https://github.com/haxqer/FreeExchangeRateApi)——
+ * 每小时更新，比frankfurter.dev(ECB官方参考汇率，一天只发布一次)更接近实时。这是个人
+ * 维护的第三方免费服务，没有官方SLA，用户已知晓这层风险、明确要求接入；为了不因为这个
+ * 服务不稳定就让换算功能整个不可用，请求失败时自动降级回退到frankfurter.dev(见下面
+ * fetchRatesFallback)。响应字段是{timestamp(unix秒), base, rates}，没有现成的date
+ * 字符串，从timestamp换算成YYYY-MM-DD——RateSnapshot.date这个字段其他地方(比如
+ * RatePage.tsx换算卡片的显示文案)都是当YYYY-MM-DD日期串在用，不在这次改动里顺带
+ * 把"小时级"这个精度也带到UI上，维持现有显示格式，范围只收在"数据源换了、日期更新
+ * 更及时"这一件事上 */
+async function fetchRatesPrimary(base: string): Promise<RateSnapshot> {
+  const res = await fetch(`https://api.exchangerate.fun/latest?base=${base}`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(`汇率接口返回${res.status}`)
+  const data = await res.json()
+  if (!data?.rates || typeof data.rates !== 'object' || typeof data.timestamp !== 'number') {
+    throw new Error('汇率接口返回格式不符')
+  }
+  const date = new Date(data.timestamp * 1000).toISOString().slice(0, 10)
+  return { base, date, rates: data.rates, fetchedAt: Date.now() }
+}
+
+/** 走势图那边(fetchRateHistoryStats)一直用的frankfurter.dev，这里当降级来源沿用
+ * 同一个数据源，不额外引入第三个供应商。之前没加cache:'no-store'是真实bug(B-XX：
+ * 浏览器把frankfurter.dev响应头里的cache-control: max-age=86400缓存了一整天，
+ * App显示的日期比走势图卡在旧了一天，用户真机截图实测复现过)，这次一并修掉 */
+async function fetchRatesFallback(base: string): Promise<RateSnapshot> {
   const symbols = CURRENCIES.map((c) => c.code).filter((c) => c !== base)
-  const res = await fetch(`https://api.frankfurter.dev/v1/latest?base=${base}&symbols=${symbols.join(',')}`)
+  const res = await fetch(`https://api.frankfurter.dev/v1/latest?base=${base}&symbols=${symbols.join(',')}`, {
+    cache: 'no-store',
+  })
   if (!res.ok) throw new Error(`汇率接口返回${res.status}`)
   const data = await res.json()
   if (!data?.rates || typeof data.rates !== 'object') {
     throw new Error('汇率接口返回格式不符')
   }
   return { base, date: data.date, rates: data.rates, fetchedAt: Date.now() }
+}
+
+/** 一次性拿base货币兑其余常用货币的汇率——换算器的目标货币汇率和"热门汇率"列表
+ * 共用这一份数据，不用分开发两次请求 */
+export async function fetchRates(base: string): Promise<RateSnapshot> {
+  try {
+    return await fetchRatesPrimary(base)
+  } catch (e) {
+    console.error('主汇率数据源(exchangerate.fun)请求失败，降级回退frankfurter.dev', e)
+    return await fetchRatesFallback(base)
+  }
 }
 
 export interface RateHistoryPoint {
