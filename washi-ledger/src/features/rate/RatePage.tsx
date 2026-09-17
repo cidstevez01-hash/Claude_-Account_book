@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
-import { fetchRates, fetchRateHistoryStats, CURRENCIES, type RateSnapshot, type RateHistoryStats } from '../../data/rate'
+import {
+  fetchRates,
+  fetchRateHistoryStats,
+  fetchCentralBankRates,
+  CURRENCIES,
+  type RateSnapshot,
+  type RateHistoryStats,
+  type CentralBankRateEntry,
+} from '../../data/rate'
 import { useI18n } from '../../lib/i18n'
 
 // B-40：1W按7个自然日回溯查询，但汇率数据源(frankfurter.dev，央行参考汇率)周末不
@@ -34,22 +42,20 @@ const CHART_BASE = 118
 // 不滚动的<svg>(见AXIS_W)，这里的CHART_LEFT不再需要给文字留位置，只留一点点边距
 // 防止最左边的点/网格线贴边被裁
 const CHART_LEFT = 10
-// 纵坐标固定列的宽度——放在横向滚动容器左边、不跟着滚动，宽度够放下formatAxisValue()
-// 输出的数值文字(比如"19.234")
-const AXIS_W = 44
+// R-XX：纵坐标改成Stitch方案B——独立固定列不跟着横向滚动，宽度从44拓宽到54，
+// 数值多一位(比如三位整数"119.234")也留得下，不会贴边被裁
+const AXIS_W = 54
 // 原来是8——横坐标日期文字是text-anchor="middle"，最后一个点紧贴右边缘时文字有一半会
 // 超出viewBox被裁掉(这才是"08-28被截断"的真正成因，不只是之前非均匀拉伸的问题)，留够
 // 边距让最后一个日期标签完整显示
 const CHART_RIGHT = 20
 const GRID_STEPS = 3
 const MIN_LABEL_GAP_PX = 40
-// 汇率走势图"底部空一大块"bug：B-38当时改成按点数(POINT_GAP)撑宽图表像素宽度+外层
-// 横向滚动、默认滚到最右，是为了避免非均匀拉伸导致文字变形。但纵坐标min/max是按
-// *全部*数据点算的，1Y档365个点撑出的宽度只有最后一屏(~13个点/两三周)会被看到，这
-// 一小段真实波动相对全年range小得多，折线被压扁在中间。改回图表宽度=容器实际可用
-// 像素宽度(用ResizeObserver测量，不是写死320)，不再横向滚动，全部点都摊平显示在
-// 同一屏——SVG的width属性和viewBox宽度用同一个测量值，1单位=1px，不会重演非均匀
-// 拉伸的问题
+// R-XX：横向滚动重新带回来(之前B-38做过、B-40又撤掉，见下面chartLayout/chartGeometry
+// 拆分两段计算的注释)——每个点之间固定留POINT_GAP像素，数据点越多图表越宽，这样1Y档
+// 365个点才不会全挤在一屏里看不清，1W/1M这种点数少的档位如果按点数算出来的宽度小于
+// 容器实际宽度，会在chartLayout里取两者较大值兜底，不会比容器还窄
+const POINT_GAP = 18
 
 /** 纵坐标数值精度——汇率数值量级差异很大(比如JPY→CNY在0.05附近，CNY→JPY在19附近)，
  * 固定小数位要么小汇率全显示0.0，要么大汇率一堆无意义的尾数，按量级动态选精度 */
@@ -120,17 +126,23 @@ export function RatePage() {
   // (null表示"还没选，用最后一个")，点任意点会把它移过去；每次历史数据换了(切换时间
   // 范围/切换货币对)都要清空回到"默认最新点"，不然可能残留一个超出新数组长度的下标
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
-  // 走势图不再横向滚动，全部数据点摊平显示在容器实际可用宽度内——测量这个宽度用。
-  // 容器div只在chartGeometry非null(有数据)时才挂载，首次进页面/切换时间范围重新
-  // loading的那一刻它会从DOM里消失再重新出现，所以用回调ref而不是useRef+空依赖
-  // 数组的useEffect——后者只在组件首次挂载那一刻跑一次，如果那一刻容器还没渲染出来
-  // (数据还在加载)，就会永远错过绑定ResizeObserver的机会，chartAreaWidth会一直卡
-  // 在初始默认值320，在比320窄的手机屏幕上图表实际比容器宽、右侧被裁切
+  // R-XH：chartAreaWidth现在是横向滚动容器的"可见视口宽度"(不是整张图表的总宽度)——
+  // 用来算纵轴要不要动态收窄到当前可见范围。容器div只在chartGeometry非null(有数据)
+  // 时才挂载，首次进页面/切换时间范围重新loading的那一刻它会从DOM里消失再重新出现，
+  // 所以用回调ref而不是useRef+空依赖数组的useEffect——后者只在组件首次挂载那一刻跑
+  // 一次，如果那一刻容器还没渲染出来(数据还在加载)，就会永远错过绑定ResizeObserver
+  // 的机会，chartAreaWidth会一直卡在初始默认值320，在比320窄的手机屏幕上量不准
   const [chartAreaWidth, setChartAreaWidth] = useState(CHART_W)
   const chartResizeObserverRef = useRef<ResizeObserver | null>(null)
+  // R-XH：横向滚动容器本身的ref+当前滚动位置——纵轴min/max现在只按"当前可见窗口"内
+  // 的点动态算(见下面chartGeometry)，需要知道滚到哪了才能算出可见窗口是哪一段
+  const chartScrollElRef = useRef<HTMLDivElement | null>(null)
+  const [scrollLeft, setScrollLeft] = useState(0)
+  const scrollRafRef = useRef<number | null>(null)
   const chartContainerRef = useCallback((el: HTMLDivElement | null) => {
     chartResizeObserverRef.current?.disconnect()
     chartResizeObserverRef.current = null
+    chartScrollElRef.current = el
     if (!el) return
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width
@@ -139,6 +151,16 @@ export function RatePage() {
     observer.observe(el)
     chartResizeObserverRef.current = observer
   }, [])
+  // 滚动事件很密集，节流成每帧最多算一次——不然每次onScroll都重算chartGeometry
+  // (含Catmull-Rom平滑曲线，1Y档365个点)会掉帧
+  function handleChartScroll(e: React.UIEvent<HTMLDivElement>) {
+    const el = e.currentTarget
+    if (scrollRafRef.current != null) return
+    scrollRafRef.current = requestAnimationFrame(() => {
+      scrollRafRef.current = null
+      setScrollLeft(el.scrollLeft)
+    })
+  }
 
   async function refresh(base: string) {
     setLoading(true)
@@ -196,11 +218,38 @@ export function RatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromCode, toCode, timeframe])
 
-  // R-17：下拉刷新——当前货币对的实时汇率快照+走势图历史数据都重新拉一次，两者
+  // R-XH：底部统计条第三项(两国央行利率)——一次性拿全部11个货币的利率(后端有14天
+  // 缓存，不用按需查询)，不跟着fromCode/toCode变化重复请求，只在进页面/下拉刷新时拉
+  const [centralBankRates, setCentralBankRates] = useState<Record<string, CentralBankRateEntry> | null>(null)
+  async function loadCentralBankRates() {
+    try {
+      const rates = await fetchCentralBankRates()
+      setCentralBankRates(rates)
+    } catch (e) {
+      console.error('央行利率拉取失败', e)
+    }
+  }
+  useEffect(() => {
+    loadCentralBankRates()
+  }, [])
+
+  // R-XH：横向滚动默认停在最新数据(最右)——照旧App/B-XX同样的"新进页面/切换货币对
+  // 时间范围时默认看最新"预期。这里直接改DOM的scrollLeft(而不是算数学值)，因为实际
+  // 可滚动宽度由浏览器排版决定(chartLayout.innerWidth虽然算出来了，但真实scrollWidth
+  // 还包含容器自身padding等因素，直接读DOM更准)；historyStats变化后DOM才会重新渲染
+  // 出新的图表宽度，所以在这个effect里做，不在loadHistory里提前算 */
+  useEffect(() => {
+    const el = chartScrollElRef.current
+    if (!el || !historyStats || historyStats.points.length < 2) return
+    el.scrollLeft = el.scrollWidth
+    setScrollLeft(el.scrollLeft)
+  }, [historyStats])
+
+  // R-17：下拉刷新——当前货币对的实时汇率快照+走势图历史数据+央行利率都重新拉一次，
   // 互不依赖并行拉；不重置selectedIdx/timeframe/货币对，用户已经选的东西不因为
   // 刷新一下就被打乱
   async function handleRefresh() {
-    await Promise.all([refresh(fromCode), loadHistory(fromCode, toCode, timeframe)])
+    await Promise.all([refresh(fromCode), loadHistory(fromCode, toCode, timeframe), loadCentralBankRates()])
   }
 
   function handleSwap() {
@@ -238,19 +287,44 @@ export function RatePage() {
     setLastEditedField('to')
   }
 
-  const chartGeometry = useMemo(() => {
+  // R-XH：横向滚动重新带回来，拆成两段算——原因是"纵轴min/max该按哪些点算"这件事
+  // 现在依赖"当前滚动到哪"，但"每个点的x坐标"完全不依赖纵轴，为了避免滚动时重算x坐标
+  // (只有y会变)，先单独算一遍x布局(chartLayout)，再算一遍真正要画的geometry(y坐标/
+  // 曲线/网格线，依赖scrollLeft)。
+  // 图表总宽度按点数*POINT_GAP撑开，比容器可见宽度(chartAreaWidth)大就出现横向滚动条；
+  // 点数少(比如1W档不到10个点)撑出来的宽度比容器还窄时，取容器宽度兜底，不会出现
+  // "一半是图一半是空白"的情况
+  const chartLayout = useMemo(() => {
     const history = historyStats?.points ?? []
     if (history.length < 2) return null
-    const values = history.map((p) => p.rate)
+    const innerWidth = Math.max(chartAreaWidth, CHART_LEFT + CHART_RIGHT + POINT_GAP * (history.length - 1))
+    const stepX = (innerWidth - CHART_LEFT - CHART_RIGHT) / (history.length - 1)
+    const xs = history.map((_, i) => CHART_LEFT + i * stepX)
+    return { history, innerWidth, xs }
+  }, [historyStats, chartAreaWidth])
+
+  // B-38/B-40那个"1Y档滚到最右只看到最后一小段、但纵轴还是按全年range画"导致折线
+  // 被压扁看起来像直线的bug，这次的修法：纵轴min/max只按"当前可见窗口内"的点动态算，
+  // 随scrollLeft变化重新算——滚到哪一段，纵轴就跟着哪一段的真实波动范围显示。可见
+  // 窗口前后各多包一个点，让曲线在窗口边缘也能自然连接，不会看起来突然截断；窗口内
+  // 点数不够2个时(比如缩得极窄的边缘情况)退回用全部点的range兜底，不让图表直接崩掉
+  const chartGeometry = useMemo(() => {
+    if (!chartLayout) return null
+    const { history, innerWidth, xs } = chartLayout
+
+    let lo = 0
+    while (lo < xs.length - 1 && xs[lo + 1] < scrollLeft) lo++
+    let hi = xs.length - 1
+    while (hi > 0 && xs[hi - 1] > scrollLeft + chartAreaWidth) hi--
+    const visibleValues = history.slice(Math.max(0, lo - 1), Math.min(history.length, hi + 2)).map((p) => p.rate)
+    const values = visibleValues.length >= 2 ? visibleValues : history.map((p) => p.rate)
+
     const min = Math.min(...values)
     const max = Math.max(...values)
     const range = max - min || max * 0.02 || 1
-    const chartWidth = chartAreaWidth
-    const stepX = (chartWidth - CHART_LEFT - CHART_RIGHT) / (history.length - 1)
     const points = history.map((p, i) => {
-      const x = CHART_LEFT + i * stepX
       const y = CHART_BASE - ((p.rate - min) / range) * (CHART_BASE - CHART_TOP)
-      return { x, y, date: p.date, rate: p.rate }
+      return { x: xs[i], y, date: p.date, rate: p.rate }
     })
     // R-XX：折线改成smoothLinePath()画的平滑曲线(设计稿要求的"水墨笔触"曲线)，
     // 不再是逐点直线连接；填充区域的顶边跟着用同一条平滑曲线，只有闭合回底边这
@@ -267,8 +341,11 @@ export function RatePage() {
     })
 
     // 底部横坐标(R-13)——照旧App labelIdxs/filteredLabelIdxs同一套"先按间隔取样、
-    // 再按最小像素间距过滤掉挤在一起的"逻辑，不是只显示头尾两个日期
-    const showEvery = points.length > 8 ? Math.ceil(points.length / 6) : 1
+    // 再按最小像素间距过滤掉挤在一起的"逻辑，不是只显示头尾两个日期。R-XH：目标
+    // 标签数改成按图表总宽度算(大约每150px一个)，不再固定"6个"——1Y档图表被撑得
+    // 很宽，固定6个的话滚动到中间某一段基本看不到日期标签
+    const targetLabelCount = Math.max(4, Math.round(innerWidth / 150))
+    const showEvery = points.length > targetLabelCount ? Math.ceil(points.length / targetLabelCount) : 1
     const rawLabelIdxs: number[] = []
     for (let i = 0; i < points.length; i += showEvery) rawLabelIdxs.push(i)
     if (rawLabelIdxs[rawLabelIdxs.length - 1] !== points.length - 1) rawLabelIdxs.push(points.length - 1)
@@ -277,8 +354,8 @@ export function RatePage() {
       return nextIdx === undefined || points[nextIdx].x - points[idx].x >= MIN_LABEL_GAP_PX
     })
 
-    return { points, line, area, gridLines, labelIdxs, chartWidth }
-  }, [historyStats, chartAreaWidth])
+    return { points, line, area, gridLines, labelIdxs, chartWidth: innerWidth }
+  }, [chartLayout, scrollLeft, chartAreaWidth])
 
   // 选中点(R-13)——没手动点过时默认最后一个点(最新数据)，跟旧App一致
   const activeIdx =
@@ -484,7 +561,15 @@ export function RatePage() {
                   </text>
                 ))}
               </svg>
-              <div ref={chartContainerRef} className="flex-1 min-w-0 h-full">
+              {/* R-XH：横向滚动带回来——这个容器本身可以左右滑，不用把全部数据点
+                  硬塞进一屏；默认滚到最右(见上面historyStats变化时那个effect)，
+                  纵轴数值(左边固定列)和这里的滚动互不影响，只是共享同一套
+                  gridLines的y坐标 */}
+              <div
+                ref={chartContainerRef}
+                onScroll={handleChartScroll}
+                className="flex-1 min-w-0 h-full overflow-x-auto overflow-y-hidden"
+              >
               <svg width={chartGeometry.chartWidth} height={CHART_H} viewBox={`0 0 ${chartGeometry.chartWidth} ${CHART_H}`} style={{ display: 'block' }}>
                 <defs>
                   <linearGradient id="rateChartGradient" x1="0" x2="0" y1="0" y2="1">
@@ -566,27 +651,46 @@ export function RatePage() {
             )}
           </div>
 
-          {/* R-XX：底部三栏统计条——区间最高/最低/波动区间，后端算好的值直接展示，
-              标签的"周/月内/年内"前缀跟着当前选中的时间范围变，不是死写"周最高"。
+          {/* R-XH：底部统计条从"3等分"改成左右两栏(Stitch方案A同款布局)——右边
+              "利率"这一格要塞两国各一行，跟左边单值的"最高/最低"没法平均分3列，
+              改成左(最高/最低堆叠)右(两国利率堆叠)。三项各用一个主题色区分开
+              (最高=primary印章红/最低=secondary草木绿/利率=tertiary琥珀)，用户
+              要求过"每格不同色"，不是都用同一个text-on-surface。
               historyStats.high/low为null(数据点不够)时这一整条不显示，不展示
               占位假数据 */}
-          {historyStats && historyStats.high != null && historyStats.low != null && historyStats.volatilityPct != null && (
-            <div className="grid grid-cols-3 gap-1 pt-2 border-t border-dashed border-outline-variant/50 text-center">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] font-sans text-on-surface-variant">
-                  {t(statsPrefixKey)}{t('rateStatHighSuffix')}
-                </span>
-                <span className="text-body-lg font-serif font-semibold text-on-surface">{formatAxisValue(historyStats.high)}</span>
+          {historyStats && historyStats.high != null && historyStats.low != null && (
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-dashed border-outline-variant/50">
+              <div className="flex flex-col gap-2 pr-3 border-r border-dashed border-outline-variant/50">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-sans text-primary">
+                    {t(statsPrefixKey)}{t('rateStatHighSuffix')}
+                  </span>
+                  <span className="text-body-lg font-serif font-semibold text-primary">{formatAxisValue(historyStats.high)}</span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-sans text-secondary">
+                    {t(statsPrefixKey)}{t('rateStatLowSuffix')}
+                  </span>
+                  <span className="text-body-lg font-serif font-semibold text-secondary">{formatAxisValue(historyStats.low)}</span>
+                </div>
               </div>
-              <div className="flex flex-col gap-0.5 border-x border-dashed border-outline-variant/50">
-                <span className="text-[10px] font-sans text-on-surface-variant">
-                  {t(statsPrefixKey)}{t('rateStatLowSuffix')}
-                </span>
-                <span className="text-body-lg font-serif font-semibold text-on-surface">{formatAxisValue(historyStats.low)}</span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] font-sans text-on-surface-variant">{t('rateStatVolatilityLabel')}</span>
-                <span className="text-body-lg font-serif font-semibold text-on-surface">{historyStats.volatilityPct.toFixed(2)}%</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-sans text-tertiary">{t('rateStatRateLabel')}</span>
+                {[fromCode, toCode].map((code) => {
+                  const entry = centralBankRates?.[code]
+                  return (
+                    <div key={code} className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-sans text-on-surface-variant shrink-0">{entry?.country ?? code}</span>
+                      {entry == null ? (
+                        <span className="text-body-md font-serif font-semibold text-tertiary">···</span>
+                      ) : entry.rate == null ? (
+                        <span className="text-[11px] italic font-sans text-on-surface-variant text-right">{t('rateStatNoRateTarget')}</span>
+                      ) : (
+                        <span className="text-body-md font-serif font-semibold text-tertiary">{entry.rate.toFixed(2)}%</span>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}

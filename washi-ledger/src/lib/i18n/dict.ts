@@ -87,7 +87,11 @@ export const dict = {
     rateStatsPrefix1Y: '年内',
     rateStatHighSuffix: '最高',
     rateStatLowSuffix: '最低',
-    rateStatVolatilityLabel: '波动区间',
+    // R-XX：底部第三项统计从"波动区间"(区间最高最低的差值百分比，跟顶部涨跌幅
+    // 徽标意思重复，用户反馈没意义)换成两国央行法定利率(base+target各一行)，
+    // 名称就叫"利率"，不重新造一个更长的词
+    rateStatRateLabel: '利率',
+    rateStatNoRateTarget: '无利率目标',
     // B-10：仪表盘/统计页环状图中间的小字之前写死英文"Total Expenses"/"Total Income"，
     // 不跟着语言切换。旧App对应的是typeExpense/typeIncome("支出构成"/"收入构成")这两个
     // 词条——但新App自己的typeExpense/typeIncome已经被"记一笔"页面的收支切换按钮占用了
@@ -273,7 +277,8 @@ export const dict = {
     rateStatsPrefix1Y: '年間',
     rateStatHighSuffix: '最高値',
     rateStatLowSuffix: '最安値',
-    rateStatVolatilityLabel: '変動幅',
+    rateStatRateLabel: '金利',
+    rateStatNoRateTarget: '金利目標なし',
     donutExpenseTitle: LEGACY_JA.typeExpense,
     donutIncomeTitle: LEGACY_JA.typeIncome,
 

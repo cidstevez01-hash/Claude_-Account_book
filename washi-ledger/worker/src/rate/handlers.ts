@@ -1,7 +1,8 @@
 import type { Context } from 'hono'
 import type { Bindings } from '../_shared/supabaseClient'
 import { HttpError } from '../_shared/errors'
-import type { RateHistoryPoint, RateHistoryStatsResponse } from './types'
+import type { RateHistoryPoint, RateHistoryStatsResponse, CentralBankRatesResponse } from './types'
+import { CENTRAL_BANK_RATES_SEED, parseCentralBankRatesHtml, mergeCentralBankRates } from './centralBankRates'
 
 const CURRENCY_CODE_RE = /^[A-Z]{3}$/
 
@@ -66,4 +67,42 @@ export async function getHistoryStats(c: Context<{ Bindings: Bindings }>) {
 
   const body: RateHistoryStatsResponse = { base, target, points, pctChange, high, low, volatilityPct }
   return c.json(body)
+}
+
+const CENTRAL_BANK_RATES_SOURCE = 'https://unirateapi.com/central-bank-rates'
+// R-XX：央行法定利率——"定时拉取，不用很频繁"，用Cache API缓存14天，缓存过期后
+// 才会真的重新抓一次源站，不是每次请求都打unirateapi.com。这个数据本身变化很慢
+// (央行一年就调几次)，14天的缓存粒度跟数据本身的更新频率是匹配的，不是随便定的数字
+const CENTRAL_BANK_CACHE_TTL_SECONDS = 60 * 60 * 24 * 14
+
+/** GET /rate/central-bank-rates——R-XX走势图重设计里"週間最高値/週間最安値/利率"
+ * 三项底部统计的第三项，从"波动区间"换成两国央行法定利率。这类数据没有免费实时
+ * API(见centralBankRates.ts顶部注释)，源站是个季度更新的静态页面，所以这里的
+ * "抓取"只是尽力而为地去核对是否有更新——抓取失败、解析不出、或者抓到的数据比
+ * 静态兜底表(CENTRAL_BANK_RATES_SEED，2026-09-17手动核实)还旧，都直接用静态表，
+ * 不会因为抓取失败就报错或者显示更旧的数据。这个接口不碰Supabase/不需要用户
+ * 身份，跟/rate/history-stats一样是公开数据 */
+export async function getCentralBankRates(c: Context<{ Bindings: Bindings }>) {
+  const cache = caches.default
+  const cacheKey = new Request(new URL('/rate/central-bank-rates-cache-v1', c.req.url).toString())
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  let merged = CENTRAL_BANK_RATES_SEED
+  try {
+    const upstreamRes = await fetch(CENTRAL_BANK_RATES_SOURCE)
+    if (upstreamRes.ok) {
+      const html = await upstreamRes.text()
+      const scraped = parseCentralBankRatesHtml(html)
+      merged = mergeCentralBankRates(scraped)
+    }
+  } catch (e) {
+    console.error('央行利率源站抓取失败，使用静态兜底表', e)
+  }
+
+  const body: CentralBankRatesResponse = { rates: merged }
+  const response = c.json(body)
+  response.headers.set('Cache-Control', `public, max-age=${CENTRAL_BANK_CACHE_TTL_SECONDS}`)
+  c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()))
+  return response
 }

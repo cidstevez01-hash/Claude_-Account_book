@@ -105,3 +105,22 @@ export interface RateHistoryStats {
 export async function fetchRateHistoryStats(base: string, target: string, days: number): Promise<RateHistoryStats> {
   return apiClient.get<RateHistoryStats>(`/rate/history-stats?base=${base}&target=${target}&days=${days}`)
 }
+
+export interface CentralBankRateEntry {
+  country: string
+  bank: string
+  /** null表示该货币对应的央行没有利率目标(目前只有SGD，见worker那边注释)，前端
+   * 要展示"无利率目标"这种文字态，不是当0%显示 */
+  rate: number | null
+  asOf: string | null
+}
+
+/** 央行法定利率——R-XX走势图底部统计条第三项(週間最高値/週間最安値/利率)，两国
+ * (base+target)各查各的利率。这类数据没有免费实时API，后端(worker/src/rate/
+ * centralBankRates.ts)是"静态兜底表+尽力抓取更新"的口径，一次请求拿回全部11个
+ * 货币的利率(不是只查base/target这两个)，因为后端有14天缓存，没必要为了"只要
+ * 两个"再拆成按需查询增加请求次数 */
+export async function fetchCentralBankRates(): Promise<Record<string, CentralBankRateEntry>> {
+  const res = await apiClient.get<{ rates: Record<string, CentralBankRateEntry> }>('/rate/central-bank-rates')
+  return res.rates
+}

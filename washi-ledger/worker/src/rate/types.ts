@@ -16,3 +16,9 @@ export interface RateHistoryStatsResponse {
   low: number | null
   volatilityPct: number | null
 }
+
+/** GET /rate/central-bank-rates的响应——见rate/centralBankRates.ts里
+ * CentralBankRateEntry/CENTRAL_BANK_RATES_SEED的详细口径说明 */
+export interface CentralBankRatesResponse {
+  rates: Record<string, { country: string; bank: string; rate: number | null; asOf: string | null }>
+}
