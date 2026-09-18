@@ -36,8 +36,14 @@ export function ReceiptPreviewSheet({ open, url, onClose }: ReceiptPreviewSheetP
           </button>
         </header>
 
-        <div className="flex-1 min-h-0 bg-surface-container-lowest">
-          {url && <iframe src={url} title={t('receiptPreviewTitle')} className="w-full h-full border-0" />}
+        <div className="relative flex-1 min-h-0 bg-surface-container-lowest">
+          {/* R-XH：真机反馈这块内容顶到没有标题栏/圆角/遮罩，撑得比屏幕还大——
+             根因是<iframe>套PDF在WebKit下height:100%这套百分比/flex链条不可靠，
+             系统PDF插件经常按自己的原生尺寸撑开，不听CSS里flex-1/h-full的约束。
+             改成父容器position:relative给一个明确的定位基准，iframe本身
+             position:absolute+inset:0直接贴满，不依赖百分比高度传导，是解决
+             "iframe不听height:100%"这类问题的标准做法 */}
+          {url && <iframe src={url} title={t('receiptPreviewTitle')} className="absolute inset-0 w-full h-full border-0" />}
         </div>
 
         {url && (

@@ -651,46 +651,64 @@ export function RatePage() {
             )}
           </div>
 
-          {/* R-XH：底部统计条从"3等分"改成左右两栏(Stitch方案A同款布局)——右边
-              "利率"这一格要塞两国各一行，跟左边单值的"最高/最低"没法平均分3列，
-              改成左(最高/最低堆叠)右(两国利率堆叠)。三项各用一个主题色区分开
-              (最高=primary印章红/最低=secondary草木绿/利率=tertiary琥珀)，用户
-              要求过"每格不同色"，不是都用同一个text-on-surface。
+          {/* R-XH：底部统计条——照方案A设计稿是3列横排+2条分割线(週間最高値｜週間
+              最安値｜央行利率)，不是"最高/最低堆叠成左半+利率占右半"这种2栏布局
+              (我一开始看图看错了，用户拿设计稿逐像素纠正过)。三项各用一个主题色
+              区分开(最高=primary印章红/最低=secondary草木绿/利率=tertiary琥珀)。
+              第三列("央行利率"+"政策利率"标签，下面两行数据外面包一圈虚线边框
+              卡片)比前两列宽，用grid-cols-[1fr_1fr_1.3fr]而不是等分3列，不然
+              两行利率数据会被挤得很窄。
               historyStats.high/low为null(数据点不够)时这一整条不显示，不展示
               占位假数据 */}
           {historyStats && historyStats.high != null && historyStats.low != null && (
-            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-dashed border-outline-variant/50">
-              <div className="flex flex-col gap-2 pr-3 border-r border-dashed border-outline-variant/50">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-sans text-primary">
-                    {t(statsPrefixKey)}{t('rateStatHighSuffix')}
-                  </span>
-                  <span className="text-body-lg font-serif font-semibold text-primary">{formatAxisValue(historyStats.high)}</span>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-sans text-secondary">
-                    {t(statsPrefixKey)}{t('rateStatLowSuffix')}
-                  </span>
-                  <span className="text-body-lg font-serif font-semibold text-secondary">{formatAxisValue(historyStats.low)}</span>
-                </div>
+            <div className="grid grid-cols-[1fr_1fr_1.3fr] gap-2 pt-2 border-t border-dashed border-outline-variant/50">
+              <div className="flex flex-col gap-0.5 pr-2 border-r border-dashed border-outline-variant/50">
+                <span className="flex items-center gap-1 text-[10px] font-sans text-primary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
+                  {t(statsPrefixKey)}{t('rateStatHighSuffix')}
+                </span>
+                <span className="text-body-lg font-serif font-semibold text-primary">{formatAxisValue(historyStats.high)}</span>
+                <span className="text-[10px] font-sans text-on-surface-variant">
+                  {t(statsPrefixKey)}{t('rateStatHighCaptionSuffix')}
+                </span>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-sans text-tertiary">{t('rateStatRateLabel')}</span>
-                {[fromCode, toCode].map((code) => {
-                  const entry = centralBankRates?.[code]
-                  return (
-                    <div key={code} className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-sans text-on-surface-variant shrink-0">{entry?.country ?? code}</span>
-                      {entry == null ? (
-                        <span className="text-body-md font-serif font-semibold text-tertiary">···</span>
-                      ) : entry.rate == null ? (
-                        <span className="text-[11px] italic font-sans text-on-surface-variant text-right">{t('rateStatNoRateTarget')}</span>
-                      ) : (
-                        <span className="text-body-md font-serif font-semibold text-tertiary">{entry.rate.toFixed(2)}%</span>
-                      )}
-                    </div>
-                  )
-                })}
+              <div className="flex flex-col gap-0.5 pr-2 border-r border-dashed border-outline-variant/50">
+                <span className="flex items-center gap-1 text-[10px] font-sans text-secondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" aria-hidden="true" />
+                  {t(statsPrefixKey)}{t('rateStatLowSuffix')}
+                </span>
+                <span className="text-body-lg font-serif font-semibold text-secondary">{formatAxisValue(historyStats.low)}</span>
+                <span className="text-[10px] font-sans text-on-surface-variant">
+                  {t(statsPrefixKey)}{t('rateStatLowCaptionSuffix')}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1 text-[10px] font-sans text-tertiary">
+                    <span className="w-1.5 h-1.5 rounded-full bg-tertiary shrink-0" aria-hidden="true" />
+                    {t('rateStatRateLabel')}
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary text-[9px] font-sans">
+                    {t('rateStatRateTag')}
+                  </span>
+                </div>
+                <div className="rounded-lg border border-dashed border-outline-variant/60 divide-y divide-dashed divide-outline-variant/60 overflow-hidden">
+                  {[fromCode, toCode].map((code) => {
+                    const entry = centralBankRates?.[code]
+                    return (
+                      <div key={code} className="flex items-center justify-between gap-2 px-2 py-1.5">
+                        <span className="text-[11px] font-sans text-on-surface-variant shrink-0">{entry?.country ?? code}</span>
+                        {entry == null ? (
+                          <span className="text-body-md font-serif font-semibold text-tertiary">···</span>
+                        ) : entry.rate == null ? (
+                          <span className="text-[11px] italic font-sans text-on-surface-variant text-right">{t('rateStatNoRateTarget')}</span>
+                        ) : (
+                          <span className="text-body-md font-serif font-semibold text-tertiary">{entry.rate.toFixed(2)}%</span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
           )}

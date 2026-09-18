@@ -94,6 +94,12 @@ export const dict = {
     // 名称就叫"利率"，不重新造一个更长的词
     rateStatRateLabel: '利率',
     rateStatNoRateTarget: '无利率目标',
+    // R-XH：补全方案A设计稿里被漏掉的两处细节——数字下方的小字说明("本周峰值/谷值"，
+    // 用统一的时间范围前缀拼，不是写死"本周"，1月/1年档也要跟着变)，以及利率区块
+    // 标题旁的"政策利率"小标签
+    rateStatHighCaptionSuffix: '峰值',
+    rateStatLowCaptionSuffix: '谷值',
+    rateStatRateTag: '政策利率',
     // B-10：仪表盘/统计页环状图中间的小字之前写死英文"Total Expenses"/"Total Income"，
     // 不跟着语言切换。旧App对应的是typeExpense/typeIncome("支出构成"/"收入构成")这两个
     // 词条——但新App自己的typeExpense/typeIncome已经被"记一笔"页面的收支切换按钮占用了
@@ -283,6 +289,9 @@ export const dict = {
     rateStatLowSuffix: '最安値',
     rateStatRateLabel: '金利',
     rateStatNoRateTarget: '金利目標なし',
+    rateStatHighCaptionSuffix: 'ピーク値',
+    rateStatLowCaptionSuffix: '底値',
+    rateStatRateTag: '政策金利',
     donutExpenseTitle: LEGACY_JA.typeExpense,
     donutIncomeTitle: LEGACY_JA.typeIncome,
 
