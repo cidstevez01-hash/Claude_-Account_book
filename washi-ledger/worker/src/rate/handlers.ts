@@ -2,7 +2,7 @@ import type { Context } from 'hono'
 import type { Bindings } from '../_shared/supabaseClient'
 import { HttpError } from '../_shared/errors'
 import type { RateHistoryPoint, RateHistoryStatsResponse, CentralBankRatesResponse } from './types'
-import { CENTRAL_BANK_RATES_SEED, parseCentralBankRatesHtml, mergeCentralBankRates } from './centralBankRates'
+import { CENTRAL_BANK_RATES_SEED, parseCentralBankRatesHtml, mergeCentralBankRates, fetchBojCallRate } from './centralBankRates'
 
 const CURRENCY_CODE_RE = /^[A-Z]{3}$/
 
@@ -76,15 +76,19 @@ const CENTRAL_BANK_RATES_SOURCE = 'https://unirateapi.com/central-bank-rates'
 const CENTRAL_BANK_CACHE_TTL_SECONDS = 60 * 60 * 24 * 14
 
 /** GET /rate/central-bank-rates——R-XX走势图重设计里"週間最高値/週間最安値/利率"
- * 三项底部统计的第三项，从"波动区间"换成两国央行法定利率。这类数据没有免费实时
- * API(见centralBankRates.ts顶部注释)，源站是个季度更新的静态页面，所以这里的
- * "抓取"只是尽力而为地去核对是否有更新——抓取失败、解析不出、或者抓到的数据比
- * 静态兜底表(CENTRAL_BANK_RATES_SEED，2026-09-17手动核实)还旧，都直接用静态表，
- * 不会因为抓取失败就报错或者显示更旧的数据。这个接口不碰Supabase/不需要用户
- * 身份，跟/rate/history-stats一样是公开数据 */
+ * 三项底部统计的第三项，从"波动区间"换成两国央行法定利率。这类数据大多没有免费
+ * 实时API(见centralBankRates.ts顶部注释)，源站是个季度更新的静态页面，所以这里
+ * 对unirateapi.com的"抓取"只是尽力而为地去核对是否有更新——抓取失败、解析不出、
+ * 或者抓到的数据比静态兜底表(CENTRAL_BANK_RATES_SEED，2026-09-17手动核实)还旧，
+ * 都直接用静态表，不会因为抓取失败就报错或者显示更旧的数据。这个接口不碰
+ * Supabase/不需要用户身份，跟/rate/history-stats一样是公开数据。
+ *
+ * JPY是例外——日本银行有官方免key的时系列API(见fetchBojCallRate())，比unirateapi
+ * 这条通用抓取路径更可靠，所以在unirateapi的结果基础上再单独用日银官方数据覆盖
+ * JPY这一项(同样是"更新的数据才覆盖"的口径，日银API请求失败不影响其余10个货币) */
 export async function getCentralBankRates(c: Context<{ Bindings: Bindings }>) {
   const cache = caches.default
-  const cacheKey = new Request(new URL('/rate/central-bank-rates-cache-v1', c.req.url).toString())
+  const cacheKey = new Request(new URL('/rate/central-bank-rates-cache-v2', c.req.url).toString())
   const cached = await cache.match(cacheKey)
   if (cached) return cached
 
@@ -98,6 +102,16 @@ export async function getCentralBankRates(c: Context<{ Bindings: Bindings }>) {
     }
   } catch (e) {
     console.error('央行利率源站抓取失败，使用静态兜底表', e)
+  }
+
+  try {
+    const boj = await fetchBojCallRate()
+    const current = merged.JPY
+    if (boj && (!current?.asOf || boj.asOf > current.asOf)) {
+      merged = { ...merged, JPY: { country: current.country, bank: current.bank, rate: boj.rate, asOf: boj.asOf } }
+    }
+  } catch (e) {
+    console.error('日银官方API拉取失败，沿用现有JPY数值', e)
   }
 
   const body: CentralBankRatesResponse = { rates: merged }
