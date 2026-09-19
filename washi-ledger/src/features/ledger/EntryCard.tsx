@@ -6,6 +6,7 @@ import { formatCurrency } from '../../data/currencyDisplay'
 import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { getReceiptSignedUrl } from '../../data/receiptStorage'
+import { openReceiptDocumentNative } from '../../lib/receiptViewer'
 import { ReceiptPreviewSheet } from './ReceiptPreviewSheet'
 import type { Category, Entry, PaymentMethod } from '../../types'
 
@@ -71,9 +72,13 @@ export function EntryCard({
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
   const [receiptBusy, setReceiptBusy] = useState(false)
-  // R-32续：查看凭证改成App内弹层展示(ReceiptPreviewSheet)，取代之前
-  // window.open(url,'_blank')直接跳出系统浏览器——用户反馈"外跳不好"。签名URL有
-  // 时效性，previewUrl只在弹层实际打开期间持有，不长期缓存
+  // R-32续：查看凭证最早是window.open(url,'_blank')直接跳出系统浏览器(用户反馈
+  // "外跳不好")，改成App内弹层(ReceiptPreviewSheet，<iframe>内嵌PDF)后真机又反馈
+  // 内容撑爆没有标题栏/圆角/遮罩——根源是iOS WKWebView加载跨域iframe内容本身就有
+  // 已知问题，不是CSS没写对。现在改成原生优先：`FileViewer.openDocumentFromUrl()`
+  // 调系统原生QuickLook预览器(见lib/receiptViewer.ts)，web端(沙盒/浏览器预览)没有
+  // 这个能力时才兜底回退到ReceiptPreviewSheet这套HTML弹层——previewOpen/previewUrl
+  // 只在兜底路径下才用得到，签名URL有时效性，不长期缓存
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const isIncome = entry.type === 'income'
@@ -89,8 +94,11 @@ export function EntryCard({
     setReceiptBusy(true)
     try {
       const url = await getReceiptSignedUrl(entry.receiptPath)
-      setPreviewUrl(url)
-      setPreviewOpen(true)
+      const openedNative = await openReceiptDocumentNative(url)
+      if (!openedNative) {
+        setPreviewUrl(url)
+        setPreviewOpen(true)
+      }
     } catch (e) {
       console.error('查看レシート凭证失败', e)
     } finally {

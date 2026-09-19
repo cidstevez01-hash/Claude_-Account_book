@@ -1,7 +1,7 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260918-dev.3",
+  "version": "0.0.0-20260918-dev.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,7 @@
     "@capacitor/app": "^7.0.0",
     "@capacitor/camera": "^7.0.0",
     "@capacitor/core": "^7.0.0",
+    "@capacitor/file-viewer": "^1.0.7",
     "@capacitor/ios": "^7.0.0",
     "@capgo/capacitor-document-scanner": "^7.2.5",
     "@supabase/supabase-js": "^2.112.3",
