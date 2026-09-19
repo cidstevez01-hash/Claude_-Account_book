@@ -264,7 +264,23 @@ export function EntryCard({
               }}
             />
           )}
-          <ReceiptStampIcon className="relative z-[1] w-4 h-4" />
+          {/* R-XH：点击后要等两段网络请求(查签名URL+原生插件把整个PDF下载到本地
+              才能给QuickLook展示)，这段等待本身没法消除，但之前只有disabled:
+              opacity-50这点淡化几乎看不出来，角标又小又在卡片角落，用户反馈
+              "点了很久没反应"——换成转圈动画(复用ReceiptScanSheet同款.ios-spinner)
+              至少让用户看到点击生效、正在处理，不是卡死 */}
+          {receiptBusy ? (
+            // .ios-spinner的22px尺寸是CSS里跟内部8根小棒的transform-origin/定位
+            // 配套算好的(见index.css)，不能用inline style缩小覆盖——会破坏几何
+            // 关系导致小棒错位，32px的圆形角标容器装得下22px的转圈，不用额外缩放
+            <span className="ios-spinner relative z-[1] text-primary">
+              {Array.from({ length: 8 }, (_, i) => (
+                <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
+              ))}
+            </span>
+          ) : (
+            <ReceiptStampIcon className="relative z-[1] w-4 h-4" />
+          )}
         </span>
         </button>
       )}
