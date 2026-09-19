@@ -118,11 +118,17 @@ export function EntryCard({
           交替规律就全废了。改成外层.entry-card不变(还是列表里直接相邻的那个元素，
           交替规律不受影响)，只在内部单独包一层裁切容器(rounded-[inherit]跟随外层圆角，
           不用关心具体是哪一种角)，レシート角标作为.entry-card的直接子元素、绝对定位，
-          天然不受这层内部裁切影响，能探出卡片边框外 */}
+          天然不受这层内部裁切影响，能探出卡片边框外
+          R-XH：这层wrapper是个普通<div>，不是flex容器——之前<button>直接是.entry-card
+          (flex flex-col)的子元素时，靠flex子元素默认的align-items:stretch自动撑满宽度；
+          套进这层普通div之后<button>脱离了flex-stretch上下文，退回浏览器默认的"按内容
+          收缩宽度"，分类名短/没有支付方式标签的行按钮整体变窄，金额虽然还贴在按钮右边
+          但按钮右边不等于卡片右边，看起来就是"各行金额没对齐"——这是当时漏加w-full
+          导致的真实回归，用户真机截图揪出来的，补上w-full找回原来的满宽行为 */}
       <div className="overflow-hidden rounded-[inherit]">
         <button
           type="button"
-          className="flex items-center p-3 text-left"
+          className="w-full flex items-center p-3 text-left"
           onClick={hasActions ? onToggle : undefined}
         >
           <div
