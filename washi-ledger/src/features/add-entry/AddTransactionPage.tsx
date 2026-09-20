@@ -18,7 +18,17 @@ import { symbolFor } from '../../data/currencyDisplay'
 import { useI18n } from '../../lib/i18n'
 import { payLabel } from '../../lib/catalogLabel'
 import { setDashboardFocusEntryId } from '../../lib/dashboardFocusMemory'
+import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import type { Entry, EntryType } from '../../types'
+
+/** 扫描小票识别出的店名+购入明细拼成备注默认值——店名单独一行，商品列表每行前面
+ * 加"・"项目符号，用户要求的"记得做排版"就是指这个，不是把识别出来的文本原样拼接 */
+function formatReceiptNote(fields: RecognizedReceiptFields): string {
+  const lines: string[] = []
+  if (fields.storeName) lines.push(fields.storeName)
+  for (const item of fields.items) lines.push(`・${item}`)
+  return lines.join('\n')
+}
 
 function todayStr() {
   const d = new Date()
@@ -229,13 +239,21 @@ export function AddTransactionPage() {
   // R-32：扫描确认后立刻传Storage(不是等整条记录save才一起传)——entryId已经在
   // 组件挂载时就确定好了(见上面newEntryId的说明)，不需要等真正save entries才能拿到
   // 一个id；这样用户扫完就能立刻点"查看凭证"核对是否传成功，不用等保存完这一步
-  async function handleReceiptConfirm(pdf: Blob) {
+  // R-XO：扫描识别出的金额/备注只当"默认值"填——用户已经手动填过的字段不能被
+  // 扫描结果覆盖掉(比如先手打了金额，扫描识别出的是另一个数，不该悄悄改掉用户
+  // 已经输入的内容)
+  async function handleReceiptConfirm(pdf: Blob, fields: RecognizedReceiptFields) {
     if (!user) return
     setReceiptBusy(true)
     try {
       const path = await uploadReceiptPdf(user.id, entryId, pdf)
       setReceiptPath(path)
       setScanSheetOpen(false)
+      if (!amount && fields.amount != null) setAmount(String(fields.amount))
+      if (!note.trim()) {
+        const formatted = formatReceiptNote(fields)
+        if (formatted) setNote(formatted)
+      }
     } catch (e) {
       console.error('レシート凭证上传失败', e)
     } finally {

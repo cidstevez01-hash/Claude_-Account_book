@@ -1,7 +1,7 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260918-dev.5",
+  "version": "0.0.0-20260920-dev.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor-community/image-to-text": "^7.0.0",
     "@capacitor/app": "^7.0.0",
     "@capacitor/camera": "^7.0.0",
     "@capacitor/core": "^7.0.0",

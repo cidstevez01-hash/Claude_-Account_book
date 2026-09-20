@@ -3,6 +3,7 @@ import { useI18n } from '../../lib/i18n'
 import { pickFromGallery, scanDocumentNative } from '../../lib/receiptCamera'
 import { blobToImage } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
+import { recognizeReceiptFields, type RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import { logIfEnabled } from '../../lib/appLog'
 
 // R-32三期：拍照页面改成调用系统原生扫描能力(见lib/receiptCamera.ts)，取代之前
@@ -15,7 +16,7 @@ interface ReceiptScanSheetProps {
   open: boolean
   entryDate: string
   onClose: () => void
-  onConfirm: (pdf: Blob) => void
+  onConfirm: (pdf: Blob, fields: RecognizedReceiptFields) => void
 }
 
 /** R-32：レシート扫描确认弹层——照Stitch设计稿(用户已确认)做：原生扫描(系统全屏
@@ -31,6 +32,10 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const resultCanvasRef = useRef<HTMLCanvasElement | null>(null)
+  // R-XO：进入review态就在后台起一次OCR识别(不挡用户看预览图/点确认)，用户点
+  // "存为PDF"时才去等这个promise的结果——大多数情况下用户看几眼预览图确认的这段
+  // 时间，识别早就跑完了，真等到的时候也就是极快的一下
+  const recognizeResultRef = useRef<Promise<RecognizedReceiptFields> | null>(null)
 
   function errText(e: unknown): string {
     return e instanceof Error ? e.message : String(e)
@@ -43,8 +48,10 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     canvas.height = imgEl.naturalHeight
     canvas.getContext('2d')?.drawImage(imgEl, 0, 0)
     resultCanvasRef.current = canvas
-    setPreviewUrl(canvas.toDataURL('image/jpeg', 0.9))
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
+    setPreviewUrl(dataUrl)
     setStage('review')
+    recognizeResultRef.current = recognizeReceiptFields(dataUrl)
   }
 
   async function startScan() {
@@ -93,16 +100,18 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     if (!open) return
     setPreviewUrl(null)
     resultCanvasRef.current = null
+    recognizeResultRef.current = null
     startScan()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   if (!open) return null
 
-  function handleConfirm() {
+  async function handleConfirm() {
     if (!resultCanvasRef.current) return
     const pdf = buildReceiptPdf(resultCanvasRef.current, { entryDate })
-    onConfirm(pdf)
+    const fields = (await recognizeResultRef.current) ?? { amount: null, storeName: null, items: [] }
+    onConfirm(pdf, fields)
   }
 
   return (

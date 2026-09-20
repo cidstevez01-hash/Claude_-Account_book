@@ -165,7 +165,13 @@ export function EntryCard({
                     {payLabel(paymentMethod, lang)}
                   </span>
                 )}
-                {entry.note && <span className="text-xs text-on-surface-variant truncate">{entry.note}</span>}
+                {/* R-XO：flex-wrap容器里flex子项默认min-width是auto(按内容撑开)，
+                    单靠truncate(overflow:hidden)不会生效——备注要真的超长省略显示，
+                    得让这一项能在行内被压缩到剩余空间以内(min-w-0)才行，不是
+                    只加truncate就够 */}
+                {entry.note && (
+                  <span className="min-w-0 flex-1 text-xs text-on-surface-variant truncate">{entry.note}</span>
+                )}
               </div>
             )}
           </div>
