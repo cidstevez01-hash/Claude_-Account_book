@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
+import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import { useI18n } from '../../lib/i18n'
 import { useSettings } from '../../hooks/useSettings'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -62,6 +63,7 @@ export function BottomNav() {
   const [glowDelayMs] = useState(() => Date.now() % 5500)
   const location = useLocation()
   const navigate = useAppNavigate()
+  const keyboardOpen = useKeyboardInset() > 0
   const navRef = useRef<HTMLElement>(null)
   const bubbleRef = useRef<HTMLDivElement>(null)
   const btnRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
@@ -191,6 +193,14 @@ export function BottomNav() {
       className="bottom-nav-shell fixed bottom-6 inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
                  flex items-center px-lg py-xs
                  bg-surface/80 backdrop-blur-md border border-white/20 rounded-full shadow-lg"
+      style={{
+        // 键盘弹出时(见useKeyboardInset.ts说明)这类fixed贴底元素会被顶到键盘上方
+        // 悬空显示，脱离正常的贴底位置——滑出隐藏，键盘收起后再滑回来
+        transform: keyboardOpen ? 'translateY(150%)' : undefined,
+        opacity: keyboardOpen ? 0 : 1,
+        pointerEvents: keyboardOpen ? 'none' : undefined,
+        transition: 'transform 0.2s ease, opacity 0.2s ease',
+      }}
     >
       <div ref={bubbleRef} className="tab-bubble" />
       {items.map((item) => (

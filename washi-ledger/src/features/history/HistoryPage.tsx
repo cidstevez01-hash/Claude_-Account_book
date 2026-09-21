@@ -158,8 +158,22 @@ export function HistoryPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('historySearchPlaceholder')}
-            className="w-full bg-surface-container-highest border-[1.5px] border-dashed border-outline-variant rounded-full py-2 pl-10 pr-4 text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
+            className={`w-full bg-surface-container-highest border-[1.5px] border-dashed border-outline-variant rounded-full py-2 pl-10 text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors ${
+              search ? 'pr-9' : 'pr-4'
+            }`}
           />
+          {/* R-XX：明细/出入金页面之前完全没有清空按钮，仪表盘那边(RecentEntriesList.tsx)
+              R-22就做过同款18px圆形"✕"，这里照搬同一个视觉规范补上，不是重新设计一套 */}
+          {search && (
+            <button
+              type="button"
+              aria-label={t('historyClearSearchAria')}
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center text-[10px]"
+            >
+              ✕
+            </button>
+          )}
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {typeChips.map((chip) => {

@@ -215,6 +215,10 @@ export const dict = {
     retryLabel: '重试', // 新App专属
     dimCategoryOption: LEGACY_ZH.dimCategory,
     tagOtherBucket: LEGACY_ZH.tagOtherBucket,
+    // R-XX：仪表盘"新建"+"汇率"合并成一个可拖拽的悬浮按钮，点开才展开成两个子按钮
+    mainFabAria: '快捷操作', // 收起态按钮本身的aria-label(展开后两个子按钮各自用
+    // addTitle/rateShortcutAria，不新造词)
+    historyClearSearchAria: '清空搜索', // 明细/出入金页面搜索框的清空按钮
   },
   ja: {
     appTitle: LEGACY_JA.appTitle,
@@ -401,5 +405,7 @@ export const dict = {
     retryLabel: '再試行',
     dimCategoryOption: LEGACY_JA.dimCategory,
     tagOtherBucket: LEGACY_JA.tagOtherBucket,
+    mainFabAria: 'クイック操作',
+    historyClearSearchAria: '検索をクリア',
   },
 } as const

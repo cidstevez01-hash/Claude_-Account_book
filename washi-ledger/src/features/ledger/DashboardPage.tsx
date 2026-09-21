@@ -4,6 +4,7 @@ import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { DateRangeBar } from '../../design-system/components/DateRangeBar'
+import { MainActionFab } from '../../design-system/components/MainActionFab'
 import { BalanceCard } from './BalanceCard'
 import { CategoryDonutCard, type TagGroupSelection } from './CategoryDonutCard'
 import { CategoryDetailSheet, type CategoryDetailHeader } from './CategoryDetailSheet'
@@ -194,7 +195,7 @@ export function DashboardPage() {
   }
 
   return (
-    <AppLayout title={t('appTitle')} onRefresh={handleRefresh} mainRef={mainRef}>
+    <AppLayout title={t('appTitle')} onRefresh={handleRefresh} mainRef={mainRef} hideRateFab>
       {/* entries缓存优先(见useEntries.ts)，比只走网络请求的catalog先就绪很多；catalog没
           就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会闪一下"英文图标名
           +统一灰色"的半成品画面——之前用if(!catalog)return null整页提前返回，连header/
@@ -273,22 +274,18 @@ export function DashboardPage() {
         </>
       )}
 
-      <button
-        type="button"
-        aria-label={t('addTitle')}
-        onClick={() => goToAdd('/add')}
-        className="stamp-shadow fixed z-40 flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-fab-icon"
-        style={{
-          right: 'max(20px, calc(50% - 240px + 20px))',
-          bottom: 'calc(6rem + 24px)',
-          // R-29：花火主题下"夏 · 花火"要求FAB加发光描边(照旧App.fab真实box-shadow)，
-          // 默认/怀旧主题维持原来的压印投影——用CSS变量+fallback承载，summer token
-          // 块单独覆盖--shadow-main-fab，不用!important去跟这里的inline style抢
-          boxShadow: 'var(--shadow-main-fab, 0 4px 0 var(--color-primary-container))',
-        }}
-      >
-        <span className="material-symbols-outlined text-3xl">{APP_ICONS.addTransaction}</span>
-      </button>
+      {/* R-XX：原来独立的"+"和RateShortcutFab合并成一个可拖拽展开的悬浮按钮
+          (design-system/components/MainActionFab.tsx)，收起态样式/位置沿用原来
+          "+"按钮的真实值(58px/bg-primary/stamp-shadow投影)，AppLayout那边同步传了
+          hideRateFab跳过原来自动挂载的独立汇率按钮，不会变成两个汇率入口叠在一起 */}
+      <MainActionFab
+        icon={APP_ICONS.addTransaction}
+        ariaLabel={t('mainFabAria')}
+        actions={[
+          { key: 'add', icon: APP_ICONS.addTransaction, ariaLabel: t('addTitle'), onActivate: () => goToAdd('/add') },
+          { key: 'rate', icon: 'currency_exchange', ariaLabel: t('rateShortcutAria'), onActivate: () => navigate('/rate') },
+        ]}
+      />
     </AppLayout>
   )
 }

@@ -10,6 +10,7 @@ import { CloudDisconnectBanner } from './CloudDisconnectBanner'
 import { APP_ICONS } from '../../lib/appIcons'
 import { useI18n } from '../../lib/i18n'
 import { useDrawer } from '../../hooks/useDrawer'
+import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import { usePullToRefresh } from '../../hooks/usePullToRefresh'
 import { useAuth, hasEverSignedIn } from '../../features/auth/useAuth'
 import { useSettings } from '../../hooks/useSettings'
@@ -33,9 +34,14 @@ interface AppLayoutProps {
    * scrollTop——这个节点是AppLayout内部usePullToRefresh的containerRef，页面组件
    * 本来碰不到，通过这个可选prop把同一个DOM节点也同步给调用方 */
   mainRef?: RefObject<HTMLElement | null>
+  /** R-XX：仪表盘把RateShortcutFab合并进了MainActionFab(新建+汇率的可拖拽展开
+   * 按钮)，这个页面不再需要AppLayout原本自动挂的独立汇率悬浮按钮，传true跳过渲染；
+   * 明细/统计/我的账户不传(默认false)，继续保留原来独立的汇率悬浮按钮不受影响。
+   * 以后如果合并按钮要扩展到别的页面，对应页面同样传true即可，不用再改这里 */
+  hideRateFab?: boolean
 }
 
-export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mainRef }: AppLayoutProps) {
+export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mainRef, hideRateFab }: AppLayoutProps) {
   // R-18：抽屉展开状态改用跨路由共享的Context(见useDrawer.tsx)，不再是这个组件的
   // 本地state——汇率换算/设置/about这几个"从抽屉进来的子页面"各自有自己独立的
   // AppLayout实例(不同路由页面，不是同一个组件实例)，返回上一页时要"记得"抽屉当时
@@ -44,6 +50,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
   const navigate = useAppNavigate()
   const { t } = useI18n()
   const { containerRef, pullDistance, refreshing, dragging, threshold } = usePullToRefresh<HTMLElement>(onRefresh)
+  const keyboardInset = useKeyboardInset()
   const isSubpage = leftButton === 'back'
   // 头像——设定头像后所有展示"账户"的地方都要跟着变，这里(每个主页面右上角进"我的
   // 账户"的入口图标)是其中一处；只在真实登录态显示(未登录时保留原来的通用图标，
@@ -202,11 +209,14 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
         className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-32 ${
           isSummer ? '' : 'paper-grid-bg'
         }`}
-        style={
-          onRefresh
-            ? { paddingTop: pullDistance, transition: dragging ? 'none' : 'padding-top 0.2s ease' }
-            : undefined
-        }
+        style={{
+          ...(onRefresh ? { paddingTop: pullDistance, transition: dragging ? 'none' : 'padding-top 0.2s ease' } : {}),
+          // 键盘弹出时(见useKeyboardInset.ts说明)给可滚动区域额外补一截底部内边距，
+          // 让键盘挡住的那部分内容(比如搜索结果)有地方能滚上来，不会卡在键盘底下
+          // 出不来——这个App整体外壳是position:fixed钉死的，iOS不会自动帮这类自定义
+          // 滚动容器收缩可用高度
+          ...(keyboardInset > 0 ? { paddingBottom: keyboardInset } : {}),
+        }}
       >
         {/* 下拉刷新指示器(R-17)——absolute定位不影响main的position:relative给其它
             fixed后代(比如仪表盘的记一笔悬浮按钮)当containing block；如果这里改用
@@ -253,7 +263,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
           正展开着)，渲染出来反而会在子页面上叠一层不该出现的抽屉遮罩 */}
       {!isSubpage && (
         <>
-          <RateShortcutFab />
+          {!hideRateFab && <RateShortcutFab />}
           <BottomNav />
           <NavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
         </>

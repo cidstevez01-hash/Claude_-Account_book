@@ -1,6 +1,8 @@
-import { useRef, useState, type MouseEvent, type PointerEvent } from 'react'
+import { type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
+import { useDraggableFab } from '../../hooks/useDraggableFab'
+import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import { useI18n } from '../../lib/i18n'
 import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from './ThemeIcon'
@@ -17,15 +19,10 @@ import { loadRateFabPosition, saveRateFabPosition } from '../../lib/rateFabPosit
  * max(20px, calc(50% - 240px + 20px))、宽58px，这个按钮宽48px，right在此基础上
  * +5px让两个圆的中心线对齐(不是简单复用同一个right值)；bottom在主FAB的
  * `bottom + 58px高度 + 20px间距`基础上算出。这是没拖拽过时的默认位置——用户反馈过
- * 这个位置在统计页会挡住趋势图(见下面拖拽实现)，拖拽调整后的位置优先生效 */
+ * 这个位置在统计页会挡住趋势图，拖拽调整后的位置优先生效(拖拽逻辑抽成了
+ * hooks/useDraggableFab.ts，跟MainActionFab.tsx共用同一份，不是各写一份)。 */
 
-// 按钮本体48px(w-12/h-12)，拖拽越界限制要用到这个尺寸
 const FAB_SIZE = 48
-// 轻点(点进汇率页)和拖拽(挪位置)靠这个阈值区分——移动距离没超过这个值都算轻点，
-// 超过了才算拖拽开始，避免手指有一点点抖动就被误判成拖拽从而点不进汇率页
-const DRAG_THRESHOLD_PX = 6
-// 拖拽到底也要跟视口边缘留一点空隙，不让按钮整个贴死边缘导致以后再也点不到/拖不动
-const EDGE_MARGIN_PX = 6
 const DEFAULT_RIGHT_CSS = 'max(25px, calc(50% - 240px + 25px))'
 const DEFAULT_BOTTOM_CSS = 'calc(6rem + 102px)'
 
@@ -34,76 +31,17 @@ export function RateShortcutFab() {
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
   const navigate = useAppNavigate()
+  const keyboardOpen = useKeyboardInset() > 0
 
-  // 用户反馈这个悬浮按钮在统计页会遮挡收支推移图表，要求能拖拽挪位置、记住挪动后的
-  // 位置。pos为null表示还没拖拽过，走上面两个DEFAULT_*_CSS默认值(跟主FAB对齐的
-  // calc表达式)；拖拽过一次之后换成像素坐标的right/bottom，并持久化到localStorage
-  // (这是纯粹的单设备UI摆放偏好，不是要跨设备共享的数据，localStorage是合适的落点)
-  const [pos, setPos] = useState(() => loadRateFabPosition())
-  const elRef = useRef<HTMLAnchorElement | null>(null)
-  const dragState = useRef<{
-    pointerId: number
-    startClientX: number
-    startClientY: number
-    startRight: number
-    startBottom: number
-    dragged: boolean
-  } | null>(null)
-  // handlePointerUp里dragState.current就清空了，但click事件是在pointerup之后才触发的
-  // (松手拖出去的那一下会连带触发一次click)，得用这个单独的ref把"刚才是拖拽"这个
-  // 结论带到handleClick里，不然click里已经看不到dragState了
-  const justDraggedRef = useRef(false)
-
-  function handlePointerDown(e: PointerEvent<HTMLAnchorElement>) {
-    if (e.pointerType === 'mouse' && e.button !== 0) return
-    const el = elRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    dragState.current = {
-      pointerId: e.pointerId,
-      startClientX: e.clientX,
-      startClientY: e.clientY,
-      startRight: window.innerWidth - rect.right,
-      startBottom: window.innerHeight - rect.bottom,
-      dragged: false,
-    }
-    el.setPointerCapture(e.pointerId)
-  }
-
-  function handlePointerMove(e: PointerEvent<HTMLAnchorElement>) {
-    const state = dragState.current
-    if (!state || state.pointerId !== e.pointerId) return
-    const dx = e.clientX - state.startClientX
-    const dy = e.clientY - state.startClientY
-    if (!state.dragged && Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return
-    state.dragged = true
-    const maxRight = Math.max(EDGE_MARGIN_PX, window.innerWidth - FAB_SIZE - EDGE_MARGIN_PX)
-    const maxBottom = Math.max(EDGE_MARGIN_PX, window.innerHeight - FAB_SIZE - EDGE_MARGIN_PX)
-    setPos({
-      right: Math.min(Math.max(state.startRight - dx, EDGE_MARGIN_PX), maxRight),
-      bottom: Math.min(Math.max(state.startBottom - dy, EDGE_MARGIN_PX), maxBottom),
-    })
-  }
-
-  function handlePointerUp(e: PointerEvent<HTMLAnchorElement>) {
-    const state = dragState.current
-    if (!state || state.pointerId !== e.pointerId) return
-    if (state.dragged) {
-      justDraggedRef.current = true
-      // 这里不能直接用外层闭包里的pos(可能还是拖拽前那次渲染捕获到的旧值)，用
-      // updater函数拿setPos内部最新的state，存的就是刚才松手那一刻真实停在的位置
-      setPos((current) => {
-        if (current) saveRateFabPosition(current)
-        return current
-      })
-    }
-    dragState.current = null
-  }
+  const { pos, elRef, bind, consumeJustDragged } = useDraggableFab<HTMLAnchorElement>({
+    size: FAB_SIZE,
+    loadPosition: loadRateFabPosition,
+    savePosition: saveRateFabPosition,
+  })
 
   function handleClick(e: MouseEvent<HTMLAnchorElement>) {
-    if (justDraggedRef.current) {
+    if (consumeJustDragged()) {
       // 松手瞬间浏览器会顺带补一次click，这次click不是用户想点进汇率页的意思，拦掉
-      justDraggedRef.current = false
       e.preventDefault()
       return
     }
@@ -115,16 +53,19 @@ export function RateShortcutFab() {
       ref={elRef}
       to="/rate"
       onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      {...bind}
       aria-label={t('rateShortcutAria')}
       className="rate-fab-shell fixed z-40 flex items-center justify-center w-12 h-12 rounded-full active:scale-90 transition-transform"
       style={{
         right: pos ? `${pos.right}px` : DEFAULT_RIGHT_CSS,
         bottom: pos ? `${pos.bottom}px` : DEFAULT_BOTTOM_CSS,
         touchAction: 'none', // 拖拽手势不能被浏览器当成页面滚动/惯性划动来处理
+        // 键盘弹出时(见useKeyboardInset.ts说明)这类fixed贴底元素会被顶到键盘上方
+        // 悬空显示，滑出隐藏、键盘收起后再滑回来，不跟BottomNav各写一套判断逻辑
+        transform: keyboardOpen ? 'translateY(150%)' : undefined,
+        opacity: keyboardOpen ? 0 : 1,
+        pointerEvents: keyboardOpen ? 'none' : undefined,
+        transition: 'transform 0.2s ease, opacity 0.2s ease',
         background: 'color-mix(in srgb, var(--color-surface-container-lowest) 55%, transparent)',
         backdropFilter: 'blur(8px) saturate(140%)',
         WebkitBackdropFilter: 'blur(8px) saturate(140%)',
