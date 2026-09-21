@@ -1,13 +1,14 @@
 {
   "name": "washi-ledger",
   "private": true,
-  "version": "0.0.0-20260920-dev.1",
+  "version": "0.0.0-20260921-dev.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@capacitor-community/image-to-text": "^7.0.0",
@@ -33,6 +34,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
     "oxlint": "^1.75.0",
+    "patch-package": "^8.0.1",
     "typescript": "~6.0.2",
     "vite": "^8.2.0"
   }

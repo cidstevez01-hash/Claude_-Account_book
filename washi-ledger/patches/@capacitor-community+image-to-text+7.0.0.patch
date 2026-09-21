@@ -1,0 +1,16 @@
+diff --git a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift b/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift
+index 7c707e9..353dcde 100644
+--- a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift
++++ b/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift
+@@ -87,6 +87,11 @@ public class TextDetector {
+     lazy var textDetectionRequest: VNRecognizeTextRequest = {
+         // Specifying the image analysis request to perform - text detection here
+         let textDetectRequest = VNRecognizeTextRequest(completionHandler: handleDetectedText)
++        // washi-ledger补丁：插件默认不设置recognitionLanguages，Vision框架识别日文小票时
++        // 会把汉字/片假名大量误判成形近的拉丁字母乱码(数字/纯英文行不受影响，能读对)。
++        // 插件JS端API完全没有暴露语言参数，只能在这里改原生源码显式声明日文+英文
++        textDetectRequest.recognitionLanguages = ["ja-JP", "en-US"]
++        textDetectRequest.usesLanguageCorrection = true
+         return textDetectRequest
+     }()
+ 

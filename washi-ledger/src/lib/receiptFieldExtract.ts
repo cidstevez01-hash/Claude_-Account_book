@@ -27,6 +27,25 @@ const TOTAL_KEYWORDS = ['合計', '小計', 'お会計', '御会計', 'total']
 // (日式小票惯例是"合計"标签在左、金额在右，同一行内金额通常是最后一段数字)
 const NUMBER_RE = /[¥￥]?[\d,]{2,}[円]?/g
 
+// 兜底保险：找不到"合計"行时(比如那一行被识别成乱码、关键词没匹配上)，购入明细会
+// 退化成"店名行之后的所有行"——这时候电话/传真号、インボイス登録番号(T+13位数字，
+// 日本发票登记号真实格式)、日期时间戳这类页眉页脚信息不该被当成商品塞进备注，
+// 这几个格式本身就很固定，能直接按样式排除，不用等准确识别出"合計"才生效
+const METADATA_ROW_PATTERNS = [
+  /\bTEL/i, // 常见写法"TEL03-5355-0607"电话号紧跟在后面没有分隔符，不能用\bTEL\b(数字也是\w，L和0之间不构成词边界)
+  /\bFAX/i,
+  /\bT\d{9,}\b/, // インボイス登録番号
+  /\d{4}\/\d{1,2}\/\d{1,2}/, // 日期
+  /\d{1,2}:\d{2}/, // 时间
+  /^#/, // 交易流水号/レジ番号一类多以#开头
+]
+function isMetadataRow(text: string): boolean {
+  return METADATA_ROW_PATTERNS.some((re) => re.test(text))
+}
+// 找不到金额行时购入明细最多保留这么多行——识别质量差到连"合計"都读不出来，
+// 说明整体不可靠，与其把一整张小票文字原样倒进备注，不如少截一点让用户自己补
+const MAX_FALLBACK_ITEMS = 8
+
 function yCenter(box: TextDetection): number {
   return (box.topLeft[1] + box.bottomLeft[1]) / 2
 }
@@ -83,11 +102,13 @@ export function extractReceiptFields(rows: Row[]): RecognizedReceiptFields {
 
   const storeName = rows[0].text || null
   // 购入明细取店名行之后、金额行之前的中间几行；找不到金额行就取店名行之后的全部
+  // (这种情况下再叠加下面的metadata过滤+数量上限兜底)
   const itemsEnd = totalRowIdx >= 0 ? totalRowIdx : rows.length
-  const items = rows
+  let items = rows
     .slice(1, itemsEnd)
     .map((r) => r.text)
-    .filter((t) => t.length > 0)
+    .filter((t) => t.length > 0 && !isMetadataRow(t))
+  if (totalRowIdx < 0) items = items.slice(0, MAX_FALLBACK_ITEMS)
 
   return { amount, storeName, items }
 }
