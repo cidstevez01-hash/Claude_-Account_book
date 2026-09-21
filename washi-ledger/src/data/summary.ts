@@ -41,8 +41,12 @@ export function fullDataRange(entries: Entry[]): { start: string; end: string } 
 
 /** 明细页搜索(B-25)的haystack匹配逻辑——原来只写在HistoryPage.tsx里，R-22要求仪表盘
  * 的"最近记录"也要能搜、且"复用明细页面的搜索框逻辑"，抽成共享函数两边调同一份，
- * 不是各写一份容易走样(比如再漏掉某个字段)。覆盖分类/子分类/支付方式/标签/备注这几个
- * 真实会显示在卡片上、用户会拿来搜的字段，子串匹配(includes)已经是"模糊搜索" */
+ * 不是各写一份容易走样(比如再漏掉某个字段)。覆盖分类/子分类/支付方式/标签/备注/金额
+ * 这几个真实会显示在卡片上、用户会拿来搜的字段，子串匹配(includes)已经是"模糊搜索"。
+ * entry.amount传进来时已经是按显示币种换算过的金额(调用方传的是toDisplayEntries()
+ * 处理过的entries，见DashboardPage.tsx/HistoryPage.tsx)——四舍五入到2位小数再转成
+ * 字符串，避免多币种换算产生的浮点尾数(比如21.903999999998)把搜索框打出来的"22"
+ * 匹配不上；不带千分位分隔符，卡片上显示的"151,921"用户搜"151921"(不带逗号)也能搜到 */
 export function matchesEntrySearch(
   entry: Entry,
   keyword: string,
@@ -56,8 +60,9 @@ export function matchesEntrySearch(
   const sub = cat?.subs.find((s) => s.code === entry.subCode)
   const pm = paymentMethods.find((p) => p.code === entry.paymentMethod)
   const tag = tags.find((tg) => tg.code === entry.tagCode)
+  const amountStr = String(Math.round(entry.amount * 100) / 100)
   const haystack =
-    `${cat?.zh ?? ''}${cat?.ja ?? ''}${sub?.zh ?? ''}${sub?.ja ?? ''}${pm?.zh ?? ''}${pm?.ja ?? ''}${tag?.zh ?? ''}${tag?.ja ?? ''}${entry.note ?? ''}`.toLowerCase()
+    `${cat?.zh ?? ''}${cat?.ja ?? ''}${sub?.zh ?? ''}${sub?.ja ?? ''}${pm?.zh ?? ''}${pm?.ja ?? ''}${tag?.zh ?? ''}${tag?.ja ?? ''}${entry.note ?? ''}${amountStr}`.toLowerCase()
   return haystack.includes(trimmed)
 }
 

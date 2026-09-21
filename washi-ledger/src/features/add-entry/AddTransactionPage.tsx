@@ -241,7 +241,10 @@ export function AddTransactionPage() {
   // 一个id；这样用户扫完就能立刻点"查看凭证"核对是否传成功，不用等保存完这一步
   // R-XO：扫描识别出的金额/备注只当"默认值"填——用户已经手动填过的字段不能被
   // 扫描结果覆盖掉(比如先手打了金额，扫描识别出的是另一个数，不该悄悄改掉用户
-  // 已经输入的内容)
+  // 已经输入的内容)。编辑模式(mode==='edit')整个自动写入直接关掉，不只靠"字段
+  // 是否为空"这个隐式判断——编辑的是一条已经存在的正式记录，哪怕它的note当初
+  // 就是空的(没写备注的旧数据)，在编辑页重新扫描小票也不该被自动带入内容，
+  // 这跟新建/复制页面"扫描是在帮你起草一条还没定型的新记录"性质不同
   async function handleReceiptConfirm(pdf: Blob, fields: RecognizedReceiptFields) {
     if (!user) return
     setReceiptBusy(true)
@@ -249,10 +252,12 @@ export function AddTransactionPage() {
       const path = await uploadReceiptPdf(user.id, entryId, pdf)
       setReceiptPath(path)
       setScanSheetOpen(false)
-      if (!amount && fields.amount != null) setAmount(String(fields.amount))
-      if (!note.trim()) {
-        const formatted = formatReceiptNote(fields)
-        if (formatted) setNote(formatted)
+      if (mode !== 'edit') {
+        if (!amount && fields.amount != null) setAmount(String(fields.amount))
+        if (!note.trim()) {
+          const formatted = formatReceiptNote(fields)
+          if (formatted) setNote(formatted)
+        }
       }
     } catch (e) {
       console.error('レシート凭证上传失败', e)

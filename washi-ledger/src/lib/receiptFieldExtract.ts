@@ -22,10 +22,23 @@ export interface RecognizedReceiptFields {
   items: string[]
 }
 
-const TOTAL_KEYWORDS = ['合計', '小計', 'お会計', '御会計', 'total']
+// 按优先级找金额行，不是按"从上到下第一个匹配到关键词的行"——日式小票真实顺序
+// 通常是"小計"(税前)先出现、"合計"(税后)在它下面，如果不分优先级直接找第一个
+// 匹配的关键词，会先撞上"小計"就停，拿到税前金额而不是税后合計(真机实测复现过
+// 这个bug：138的"小計"被当成了金额，正确的应该是加了消费税之后的"合計")。
+// "合計"最优先，找不到再依次退而求其次，"小計"放最后垫底
+const TOTAL_KEYWORD_PRIORITY = ['合計', 'お会計', '御会計', 'total', '小計']
 // 数字块：允许千分位逗号/日元符号/円字，取一行里最后出现的一段数字当金额
 // (日式小票惯例是"合計"标签在左、金额在右，同一行内金额通常是最后一段数字)
 const NUMBER_RE = /[¥￥]?[\d,]{2,}[円]?/g
+
+function findTotalRowIndex(rows: Row[]): number {
+  for (const kw of TOTAL_KEYWORD_PRIORITY) {
+    const idx = rows.findIndex((r) => r.text.toLowerCase().includes(kw.toLowerCase()))
+    if (idx >= 0) return idx
+  }
+  return -1
+}
 
 // 兜底保险：找不到"合計"行时(比如那一行被识别成乱码、关键词没匹配上)，购入明细会
 // 退化成"店名行之后的所有行"——这时候电话/传真号、インボイス登録番号(T+13位数字，
@@ -37,7 +50,9 @@ const METADATA_ROW_PATTERNS = [
   /\bT\d{9,}\b/, // インボイス登録番号
   /\d{4}\/\d{1,2}\/\d{1,2}/, // 日期
   /\d{1,2}:\d{2}/, // 时间
-  /^#/, // 交易流水号/レジ番号一类多以#开头
+  /^#/, // 交易流水号/レジ番号一类多以#开头(语言修复前OCR乱码常见开头)
+  /[:：]\s*\d{5,}/, // "取引No/責任者番号"这类流水号/编号行，共同特征是冒号后跟一长串数字
+  // (比如真机实测过的"取7488 責：106964105")，正常商品价格行不会用冒号这种标点
 ]
 function isMetadataRow(text: string): boolean {
   return METADATA_ROW_PATTERNS.some((re) => re.test(text))
@@ -95,9 +110,7 @@ function parseAmountFromRow(text: string): number | null {
 export function extractReceiptFields(rows: Row[]): RecognizedReceiptFields {
   if (rows.length === 0) return { amount: null, storeName: null, items: [] }
 
-  const totalRowIdx = rows.findIndex((r) =>
-    TOTAL_KEYWORDS.some((kw) => r.text.toLowerCase().includes(kw.toLowerCase())),
-  )
+  const totalRowIdx = findTotalRowIndex(rows)
   const amount = totalRowIdx >= 0 ? parseAmountFromRow(rows[totalRowIdx].text) : null
 
   const storeName = rows[0].text || null
