@@ -68,7 +68,7 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
   // 两者时机不一样，不能合并成一个state
   const [subVisible, setSubVisible] = useState(false)
 
-  const { pos, snapping, elRef, bind, consumeJustDragged } = useDraggableFab<HTMLButtonElement>({
+  const { pos, snapping, elRef, bind, consumeJustDragged, consumeJustTapped } = useDraggableFab<HTMLButtonElement>({
     size: FAB_SIZE,
     loadPosition: loadMainFabPosition,
     savePosition: saveMainFabPosition,
@@ -78,6 +78,9 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
     // 参考iOS AssistiveTouch：只能停在左右两侧边缘、纵向避开顶部安全区，不是能
     // 停在屏幕任意位置(RateShortcutFab.tsx保持原样，没开这个)
     snapToEdge: true,
+    // R-XO：真机反馈"点第一下没反应，要点第二下"——不再靠浏览器合成的click事件，
+    // pointerup里判定是轻点就直接展开/收起，见useDraggableFab.ts文件头说明
+    onTap: () => setExpanded((v) => !v),
   })
 
   // 键盘弹出时整组收起隐藏(见下方style)，收起态就没必要保留展开内容，避免键盘
@@ -121,6 +124,10 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
 
   function handleClick() {
     if (consumeJustDragged()) return
+    // pointerup已经通过onTap处理过这次轻点了，这次click是它自然的后续，不能再
+    // 展开/收起一次(不然一次轻点等于toggle两次，视觉上跟"没反应"一样)——只有
+    // 键盘Enter/Space这类没有对应pointer事件序列触发的click才会走到下面这行
+    if (consumeJustTapped()) return
     setExpanded((v) => !v)
   }
 

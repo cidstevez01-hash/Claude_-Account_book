@@ -147,7 +147,7 @@ export function HistoryPage() {
   }
 
   return (
-    <AppLayout title={t('tabHistory')} onRefresh={handleRefresh} mainRef={mainRef}>
+    <AppLayout title={t('tabHistory')} onRefresh={handleRefresh} mainRef={mainRef} hideRateFab>
       <section className="flex flex-col gap-sm px-md pt-md">
         <div className="relative w-full">
           <span className="material-symbols-outlined text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-outline">

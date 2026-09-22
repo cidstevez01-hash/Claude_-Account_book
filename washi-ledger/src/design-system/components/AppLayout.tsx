@@ -35,9 +35,9 @@ interface AppLayoutProps {
    * 本来碰不到，通过这个可选prop把同一个DOM节点也同步给调用方 */
   mainRef?: RefObject<HTMLElement | null>
   /** R-XX：仪表盘把RateShortcutFab合并进了MainActionFab(新建+汇率的可拖拽展开
-   * 按钮)，这个页面不再需要AppLayout原本自动挂的独立汇率悬浮按钮，传true跳过渲染；
-   * 明细/统计/我的账户不传(默认false)，继续保留原来独立的汇率悬浮按钮不受影响。
-   * 以后如果合并按钮要扩展到别的页面，对应页面同样传true即可，不用再改这里 */
+   * 按钮)，这个页面不再需要AppLayout原本自动挂的独立汇率悬浮按钮，传true跳过渲染。
+   * R-XO：用户明确要求明细/统计页面也不要这个独立汇率按钮(不是只有仪表盘)，这两个
+   * 页面现在也传true——目前只有"我的账户"页面还保留着独立汇率按钮 */
   hideRateFab?: boolean
   /** R-XO：贴在AppLayout外壳上、渲染在<main>之外(跟RateShortcutFab/BottomNav同级)
    * 的悬浮内容插槽——MainActionFab.tsx这类需要拖拽手势的悬浮按钮必须放在这里，

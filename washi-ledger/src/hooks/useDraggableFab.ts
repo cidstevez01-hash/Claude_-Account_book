@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent as ReactPointerEvent, type TouchEvent as ReactTouchEvent } from 'react'
+import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { FabPosition } from '../lib/fabPosition'
 
 // 松手贴边动画时长——跟AppLayout.tsx其它过渡(0.2s)保持同一节奏
@@ -7,9 +7,23 @@ const SNAP_DURATION_MS = 220
 /** 悬浮按钮拖拽的通用逻辑——用Pointer Events实现，RateShortcutFab.tsx和
  * MainActionFab.tsx共用同一份，不是各写一份容易走样。核心是靠移动距离区分"轻点"
  * (触发按钮本身的功能，比如跳转/展开)和"拖拽"(挪位置)：移动距离没超过阈值都算轻点，
- * 超过了才算拖拽开始；拖拽松手瞬间浏览器会顺带触发一次click，调用方要在自己的
- * click handler里先调consumeJustDragged()，是true就该拦掉这次click(不执行轻点该做
- * 的事)，不是true才执行正常的轻点逻辑 */
+ * 超过了才算拖拽开始。
+ *
+ * R-XO：真机反馈MainActionFab"点第一下没反应，要点第二下才生效"——排查是
+ * setPointerCapture+touchAction:none+(曾经加过的)触摸事件阻止冒泡这几个机制叠加
+ * 的场景下，iOS WKWebView合成click事件的时机不总是可靠，偶发延迟或者干脆没触发。
+ * 改成不依赖浏览器额外合成的click事件：pointerup那一刻已经能确定这次是不是拖拽，
+ * 是"轻点"就直接调用onTap，不用等click。consumeJustTapped()是给调用方仍然保留的
+ * onClick handler用的(键盘Enter/Space激活这类没有对应pointer事件序列的场景还是要
+ * 走click这条路)——click触发时先检查是不是刚才pointerup已经处理过的同一次轻点，
+ * 是的话跳过，不然会一次轻点触发两次(pointerup调一次onTap，随后合成的click又调
+ * 一次调用方自己的逻辑，两次叠加等于抵消/出现两次副作用)。
+ * consumeJustDragged()同理，是拖拽的话调用方click handler要跳过(比如RateShortcutFab
+ * 这种真实<a>链接，拖拽松手不该触发导航跳转)。
+ *
+ * 曾经加过的touchstart/touchmove阻止冒泡防御性代码已经去掉——两个调用方现在都渲染
+ * 在<main>之外(不再是下拉刷新手势容器的DOM子节点)，这层防御已经没有实际作用，
+ * 反而可能是"需要点两下"这个问题的来源之一，一并清理 */
 export interface UseDraggableFabOptions {
   /** 按钮本体边长(正方形)，拖拽越界clamp要用到 */
   size: number
@@ -22,6 +36,11 @@ export interface UseDraggableFabOptions {
   /** 刚判定为拖拽(第一次超过阈值)时触发——比如展开态的按钮开始被拖拽时要先收起
    * 子按钮，不然子按钮位置跟主按钮对不上 */
   onDragStart?: () => void
+  /** 松手判定为"轻点"(没有触发拖拽)时，在pointerup里直接调用——不等待浏览器
+   * 另外合成一次click事件，见上方文件头说明。可选：RateShortcutFab.tsx是真实
+   * <a>链接，点击涉及修饰键判断(cmd/ctrl+点击新开标签页这类原生语义)，继续用
+   * 自己的onClick+consumeJustDragged()，不传这个 */
+  onTap?: () => void
   /** R-XO：参考iOS原生AssistiveTouch的行为——拖拽范围限制在左右两侧边缘(松手自动
    * 贴到最近一侧，不能停在屏幕中间任意位置)，纵向范围避开顶部安全区(状态栏/灵动岛，
    * 用header实际渲染高度动态测量，不是写死一个数字，不同机型安全区高度不一样)。
@@ -46,6 +65,7 @@ export function useDraggableFab<T extends HTMLElement>({
   loadPosition,
   savePosition,
   onDragStart,
+  onTap,
   snapToEdge = false,
 }: UseDraggableFabOptions) {
   const [pos, setPos] = useState(loadPosition)
@@ -65,9 +85,11 @@ export function useDraggableFab<T extends HTMLElement>({
   } | null>(null)
   const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // handlePointerUp里dragState.current就清空了，但click事件是在pointerup之后才触发的
-  // (松手那一下会连带补一次click)，得用这个单独的ref把"刚才是拖拽"这个结论带到
-  // 调用方的click handler里，不然click里已经看不到dragState了
+  // (松手那一下会连带补一次click)，得用这两个单独的ref把"刚才pointerup已经处理过
+  // 拖拽/轻点"这个结论带到调用方自己的click handler里，不然click里已经看不到
+  // dragState了，也不知道该不该跳过(避免同一次操作被处理两遍)
   const justDraggedRef = useRef(false)
+  const justTappedRef = useRef(false)
 
   function onPointerDown(e: ReactPointerEvent<T>) {
     if (e.pointerType === 'mouse' && e.button !== 0) return
@@ -137,19 +159,21 @@ export function useDraggableFab<T extends HTMLElement>({
         savePosition(final)
         return final
       })
+    } else {
+      // 轻点：不等浏览器另外合成click，这一刻就确定了是轻点，直接触发
+      justTappedRef.current = true
+      onTap?.()
     }
     dragState.current = null
   }
 
-  // 防御性兜底：MainActionFab目前挂在<main>可滚动容器内部，触摸事件默认会往上冒泡到
-  // <main>上usePullToRefresh挂的原生touchstart/touchmove监听器——哪怕这个按钮本身
-  // 已经touchAction:none挡住了浏览器把这次触摸识别成页面滚动，事件本身还是会冒泡，
-  // 下拉刷新那边一样会被同一根手指的下滑触发，两套手势打架。在这里(而不是逐个调用方)
-  // 统一挡掉冒泡，不管这个按钮实际挂在DOM哪个位置，都不会被祖先元素的手势监听器
-  // 误伤——这是防御性的，跟"把MainActionFab挪到<main>外面"这个根治方案叠加，不是
-  // 互相替代
-  function stopTouchPropagation(e: ReactTouchEvent<T>) {
-    e.stopPropagation()
+  // pointercancel是手势被中途打断(比如系统弹了个提示/来电)，不是用户正常完成了一次
+  // 点击——只清状态，不能当成onPointerUp处理，不然会误触发onTap(之前这里直接复用
+  // onPointerUp，被打断的手势也会被判定成"轻点"触发一次操作，是个真实bug)
+  function onPointerCancel(e: ReactPointerEvent<T>) {
+    const state = dragState.current
+    if (!state || state.pointerId !== e.pointerId) return
+    dragState.current = null
   }
 
   function consumeJustDragged(): boolean {
@@ -160,18 +184,20 @@ export function useDraggableFab<T extends HTMLElement>({
     return false
   }
 
+  function consumeJustTapped(): boolean {
+    if (justTappedRef.current) {
+      justTappedRef.current = false
+      return true
+    }
+    return false
+  }
+
   return {
     pos,
     snapping,
     elRef,
-    bind: {
-      onPointerDown,
-      onPointerMove,
-      onPointerUp,
-      onPointerCancel: onPointerUp,
-      onTouchStart: stopTouchPropagation,
-      onTouchMove: stopTouchPropagation,
-    },
+    bind: { onPointerDown, onPointerMove, onPointerUp, onPointerCancel },
     consumeJustDragged,
+    consumeJustTapped,
   }
 }
