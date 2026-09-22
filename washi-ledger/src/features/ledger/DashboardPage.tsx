@@ -195,7 +195,26 @@ export function DashboardPage() {
   }
 
   return (
-    <AppLayout title={t('appTitle')} onRefresh={handleRefresh} mainRef={mainRef} hideRateFab>
+    <AppLayout
+      title={t('appTitle')}
+      onRefresh={handleRefresh}
+      mainRef={mainRef}
+      hideRateFab
+      floatingContent={
+        // R-XO：真机实测拖拽这个按钮会误触<main>的下拉刷新手势(触摸事件冒泡上去
+        // 撞上usePullToRefresh挂在<main>上的原生监听器)——根治方案是不让它成为
+        // <main>的DOM子节点，改用AppLayout.tsx新增的floatingContent插槽渲染在
+        // <main>外面，不是放在这里的children里
+        <MainActionFab
+          icon={APP_ICONS.addTransaction}
+          ariaLabel={t('mainFabAria')}
+          actions={[
+            { key: 'add', icon: APP_ICONS.addTransaction, ariaLabel: t('addTitle'), onActivate: () => goToAdd('/add') },
+            { key: 'rate', icon: 'currency_exchange', ariaLabel: t('rateShortcutAria'), onActivate: () => navigate('/rate') },
+          ]}
+        />
+      }
+    >
       {/* entries缓存优先(见useEntries.ts)，比只走网络请求的catalog先就绪很多；catalog没
           就绪前渲染entries相关UI，分类名/颜色/图标全部找不到对应数据，会闪一下"英文图标名
           +统一灰色"的半成品画面——之前用if(!catalog)return null整页提前返回，连header/
@@ -273,19 +292,6 @@ export function DashboardPage() {
           />
         </>
       )}
-
-      {/* R-XX：原来独立的"+"和RateShortcutFab合并成一个可拖拽展开的悬浮按钮
-          (design-system/components/MainActionFab.tsx)，收起态样式/位置沿用原来
-          "+"按钮的真实值(58px/bg-primary/stamp-shadow投影)，AppLayout那边同步传了
-          hideRateFab跳过原来自动挂载的独立汇率按钮，不会变成两个汇率入口叠在一起 */}
-      <MainActionFab
-        icon={APP_ICONS.addTransaction}
-        ariaLabel={t('mainFabAria')}
-        actions={[
-          { key: 'add', icon: APP_ICONS.addTransaction, ariaLabel: t('addTitle'), onActivate: () => goToAdd('/add') },
-          { key: 'rate', icon: 'currency_exchange', ariaLabel: t('rateShortcutAria'), onActivate: () => navigate('/rate') },
-        ]}
-      />
     </AppLayout>
   )
 }

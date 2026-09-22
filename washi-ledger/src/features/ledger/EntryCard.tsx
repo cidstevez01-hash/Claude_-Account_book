@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { useSettings } from '../../hooks/useSettings'
@@ -260,15 +260,14 @@ export function EntryCard({
             boxShadow: '0 3px 10px -4px rgba(0,0,0,.3)',
           }}
         >
+          {/* R-XO：这里原来是自己手写的radial-gradient(从圆心就有色、没有mask硬裁切)，
+              跟"有圈图标"(SettingsPage行/头像/RateShortcutFab)那套折腾了11轮才修好的
+              .icon-ring-glow(见index.css)是两套独立实现——这个角标从2026-09-16加上后
+              就一直没跟着迁移过去，一直带着已知的"渗色"问题。改成复用同一个已经调好的
+              类，只用--icon-size覆盖成这个角标的真实尺寸(32px，w-8 h-8，不是默认的
+              40px)，不再自己重新发明一套 */}
           {isSummer && (
-            <span
-              aria-hidden="true"
-              className="receipt-badge-glow absolute rounded-full pointer-events-none"
-              style={{
-                inset: -8,
-                background: 'radial-gradient(circle, rgba(232, 93, 74, 0.45) 0%, rgba(232, 93, 74, 0) 70%)',
-              }}
-            />
+            <span className="icon-ring-glow" aria-hidden="true" style={{ '--icon-size': '32px' } as CSSProperties} />
           )}
           {/* R-XH：点击后要等两段网络请求(查签名URL+原生插件把整个PDF下载到本地
               才能给QuickLook展示)，这段等待本身没法消除，但之前只有disabled:

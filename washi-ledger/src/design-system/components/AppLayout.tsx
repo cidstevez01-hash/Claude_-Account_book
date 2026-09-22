@@ -39,9 +39,23 @@ interface AppLayoutProps {
    * 明细/统计/我的账户不传(默认false)，继续保留原来独立的汇率悬浮按钮不受影响。
    * 以后如果合并按钮要扩展到别的页面，对应页面同样传true即可，不用再改这里 */
   hideRateFab?: boolean
+  /** R-XO：贴在AppLayout外壳上、渲染在<main>之外(跟RateShortcutFab/BottomNav同级)
+   * 的悬浮内容插槽——MainActionFab.tsx这类需要拖拽手势的悬浮按钮必须放在这里，
+   * 不能塞进children(那样会变成<main>可滚动容器的DOM子节点，触摸事件冒泡上去会
+   * 跟usePullToRefresh的下拉刷新手势冲突，真机实测复现过)。目前只有仪表盘用，
+   * 其它页面不传就是undefined，不影响 */
+  floatingContent?: ReactNode
 }
 
-export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mainRef, hideRateFab }: AppLayoutProps) {
+export function AppLayout({
+  title,
+  children,
+  leftButton = 'menu',
+  onRefresh,
+  mainRef,
+  hideRateFab,
+  floatingContent,
+}: AppLayoutProps) {
   // R-18：抽屉展开状态改用跨路由共享的Context(见useDrawer.tsx)，不再是这个组件的
   // 本地state——汇率换算/设置/about这几个"从抽屉进来的子页面"各自有自己独立的
   // AppLayout实例(不同路由页面，不是同一个组件实例)，返回上一页时要"记得"抽屉当时
@@ -114,6 +128,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
         }
       >
       <header
+        data-app-header
         className={`flex items-center justify-between px-md h-16 w-full shrink-0 border-b-[1.5px] border-dashed border-outline-variant ${
           isSummer ? '' : 'bg-surface'
         }`}
@@ -256,6 +271,7 @@ export function AppLayout({ title, children, leftButton = 'menu', onRefresh, mai
       </main>
       </RouteFade>
 
+      {floatingContent}
       <CloudDisconnectBanner />
       {/* R-18：子页面(汇率换算/设置/about)隐藏底部导航栏；抽屉本身也不渲染——这几个
           页面左上角是返回箭头，没有汉堡按钮能重新打开它，渲染了也永远打不开、纯粹

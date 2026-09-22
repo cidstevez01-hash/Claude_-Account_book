@@ -748,12 +748,6 @@ body {
 .rate-fab-glow {
   animation: rate-fab-breathe 2.6s ease-in-out infinite;
 }
-/* R-32续：レシート角标(EntryCard.tsx)的summer主题呼吸光晕，跟RateShortcutFab同属
-   "小圆形常驻浮标"这一类，直接复用同一套rate-fab-breathe关键帧(相对值，不含绝对
-   像素，换个尺寸的圆形浮标也能套)，不用再重新定义一套数值一样的动画 */
-.receipt-badge-glow {
-  animation: rate-fab-breathe 2.6s ease-in-out infinite;
-}
 
 /* R-27自绘日历面板毛玻璃——研究过其他方案，最后还是用backdrop-filter：
    1) SVG位移滤镜(仓库里.tab-bubble那种#glassLens折射效果)是做"透过玻璃看到背后
