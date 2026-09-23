@@ -53,21 +53,28 @@
 - 完整背景/架构/已完成页面/设计原则见根目录`HANDOFF-washi-ledger-rewrite.md`，接手这条线之前必须先读完，不要凭记忆重新猜方向。
 - 两条线的CI/开发记录分开维护，`DEVLOG.md`里`washi-ledger-rewrite`分支的行单独记录，不跟`accountbook-YYYYMMDD`那条线的行混着理解。
 
-## 需求 / Bug 追踪表(Smartsheet)
-- 用户不再用聊天原文提需求/报 bug，而是写进 Smartsheet 的两张在线表，**每次会话开始处理任务前，应该去读这两张表**，不要只等用户在对话里重复描述。
-- 通过 Smartsheet MCP connector 读写（`mcp__Smartsheet__*` 工具，先调 `get_resource_guide` 拿编排指南）。如果调用被权限拦住且没有弹出确认提示，跟用户说明这是会话权限模式的问题，不是表本身的问题。
-- **workspace**：`washi-ledger 开发追踪`（workspace id `3865640789403524`）
-  https://app.smartsheet.com/workspaces/J6JCcX7cf2WPj93CjWCgPm6Fg4Gj5hG8RXjRQC51
-- **需求表**（sheet id `4497306844876676`）
-  https://app.smartsheet.com/sheets/VJ6rc5vc57cH39pjhjgMVMRj3m8VgMm4qg6CWGh1
-  字段：`id`(自动编号 R-01/R-02...) / `标题` / `模块`(下拉) / `需求内容` / `状态`(下拉) / `更新版本` / `备注`
-  状态流转：**待处理**(初始) → **处理中**(开始处理时改) → **已处理**(处理完毕时改，并回填`更新版本`列的版本号)
-- **Bug 表**（sheet id `3927270329634692`）
-  https://app.smartsheet.com/sheets/fFVq6qrV62wwFGP64CxmH9PJ4V48FhhCpFJCjVj1
-  字段：`id`(自动编号 B-01/B-02...) / `标题` / `模块`(下拉) / `复现步骤` / `当前现象` / `预期现象` / `状态`(下拉) / `发生版本` / `修复版本` / `测试结果`(下拉 passed/failed) / `备注`
-  状态流转：**待处理**(初始) → **处理中** → **已处理**(回填`修复版本`) → **验证中** → 测试结果填 `failed` 时状态打回**待处理**；填 `passed` 时状态改**已解决**
-- 两张表的 `id` 都是新增一行时 Smartsheet 自动生成，不用手动编号。
-- 处理某一行后要把状态字段实际改掉（不是只在对话里说"处理完了"），这样其他会话/用户刷新表就能看到真实进度。
+## 需求 / Bug 追踪表(GitHub Issues)
+- Smartsheet 已停用(Business plan trial到期)。2026-09-23起改用本仓库的 GitHub Issues 记需求/报bug，**每次会话开始处理任务前，应该去读一遍open状态的issues**(`mcp__github__list_issues` state=open，或直接看下面的Issues页面)，不要只等用户在对话里重复描述。
+- **仓库**：`cidstevez01-hash/Claude_-Account_book`
+  Issues 总览：https://github.com/cidstevez01-hash/Claude_-Account_book/issues
+  新建需求：https://github.com/cidstevez01-hash/Claude_-Account_book/issues/new?template=requirement.yml
+  新建Bug：https://github.com/cidstevez01-hash/Claude_-Account_book/issues/new?template=bug.yml
+  两个模板文件在 `.github/ISSUE_TEMPLATE/`(requirement.yml / bug.yml)，只存在于仓库默认分支(`claude/upload-project-github-ww338s`)——GitHub"New issue"模板选择器只认默认分支的模板文件，这是平台规则，改模板要提交到那条分支，和具体在开发哪个项目(旧App/washi-ledger)无关。
+- **类型**：用GitHub原生Issue Type区分，不额外加标签——`Feature`=需求，`Bug`=Bug(仓库已有这两个type，`list_issue_types`可查)。
+- **字段映射**(对应原Smartsheet的两张表)：
+  - `id` → issue号(#N)，GitHub自动生成
+  - `标题` → issue title
+  - `模块` → issue body里的下拉字段(仪表盘/明细/统计/记一笔/汇率换算/设置/我的账户/登录注册/底部导航/全局/其他，和原Smartsheet选项一致)，同时打一个`模块:xxx`标签方便筛选
+  - 需求的`需求内容`、Bug的`复现步骤`/`当前现象`/`预期现象`/`发生版本` → 模板里对应的body字段
+  - `备注` → body字段，处理过程中的补充说明可以继续往这个字段或issue评论里加
+  - `状态` → 用`状态:xxx`标签追踪(新建issue默认自动带`状态:待处理`标签，模板`labels:`字段里配好的)
+  - `更新版本`/`修复版本` → 处理完毕时编辑issue body回填对应字段(需求填"更新版本"、Bug填"修复版本")，不新开字段
+  - `测试结果` → Bug专用，验证阶段打`测试结果:passed`或`测试结果:failed`标签
+- **状态流转**(用`issue_write`改`labels`和`state`/`state_reason`实现，标签名不存在时GitHub会自动新建，不需要额外建标签的工具)：
+  - 需求：`状态:待处理`(初始) → `状态:处理中`(开始处理时改) → `状态:已处理`(处理完毕时改，并回填body里的`更新版本`)，需求没有验证环节，回填完版本号后可以直接关闭issue(`state: closed`, `state_reason: completed`)
+  - Bug：`状态:待处理`(初始) → `状态:处理中` → `状态:已处理`(回填body里的`修复版本`) → `状态:验证中` → 真机验证后：`测试结果:failed`时改回`状态:待处理`标签重新处理；`测试结果:passed`时关闭issue(`state: closed`, `state_reason: completed`)，对应原来的"已解决"
+- 处理某个issue后要把标签/状态实际改掉、该关的要关闭(不是只在对话里说"处理完了")，这样其他会话/用户刷新Issues列表就能看到真实进度。
+- 2026-09-23迁移时，Smartsheet两张表里除B-50外全部已是"已解决"状态，未再逐条搬来GitHub(历史记录留在Smartsheet原表里可查)；B-50(汇率走势图1年/1月档折线被压扁)当时是"已处理"等待真机验证，已建到 issue #3，之后按上面的状态流转在GitHub里继续走完。
 
 ## 指导用户在本机操作(如wrangler deploy这类沙盒连不上的步骤)
 - 第一步永远先确认/拉取最新代码(`git fetch`+`git checkout`到目标分支，或`git pull`)，不能假设用户本机的仓库是最新的——本机可能是很久之前clone的旧checkout，没有最新分支/最新提交，直接给后续命令会导致后面的步骤全部基于旧代码，白折腾。
