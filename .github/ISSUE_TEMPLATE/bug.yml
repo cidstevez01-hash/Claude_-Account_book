@@ -1,0 +1,55 @@
+name: Bug
+description: 缺陷报告（替代原Smartsheet Bug表）
+title: "[Bug] "
+labels: ["状态:待处理"]
+type: Bug
+body:
+  - type: dropdown
+    id: module
+    attributes:
+      label: 模块
+      options:
+        - 仪表盘
+        - 明细
+        - 统计
+        - 记一笔
+        - 汇率换算
+        - 设置
+        - 我的账户
+        - 登录注册
+        - 底部导航
+        - 全局
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 当前现象
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期现象
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 发生版本
+      description: 第一次发现问题时的版本号，不确定可留空
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: 备注
+    validations:
+      required: false

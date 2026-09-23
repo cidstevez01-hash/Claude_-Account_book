@@ -1,0 +1,37 @@
+name: 需求
+description: 新功能 / 改动需求（替代原Smartsheet需求表）
+title: "[需求] "
+labels: ["状态:待处理"]
+type: Feature
+body:
+  - type: dropdown
+    id: module
+    attributes:
+      label: 模块
+      options:
+        - 仪表盘
+        - 明细
+        - 统计
+        - 记一笔
+        - 汇率换算
+        - 设置
+        - 我的账户
+        - 登录注册
+        - 底部导航
+        - 全局
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: 需求内容
+      description: 具体想要什么效果，越详细越好
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: 备注
+    validations:
+      required: false
