@@ -14,6 +14,8 @@ import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { upsertEntry, resolvePointRate } from '../../data/catalog'
 import { uploadReceiptPdf, deleteReceiptPdf, getReceiptSignedUrl } from '../../data/receiptStorage'
+import { openReceiptDocumentNative } from '../../lib/receiptViewer'
+import { ReceiptPreviewSheet } from '../ledger/ReceiptPreviewSheet'
 import { symbolFor } from '../../data/currencyDisplay'
 import { useI18n } from '../../lib/i18n'
 import { payLabel } from '../../lib/catalogLabel'
@@ -91,6 +93,11 @@ export function AddTransactionPage() {
   )
   const [scanSheetOpen, setScanSheetOpen] = useState(false)
   const [receiptBusy, setReceiptBusy] = useState(false)
+  // B-XX：查看凭证之前直接window.open(url,'_blank')外跳系统浏览器，这个坑
+  // EntryCard.tsx早就踩过修过(原生优先调QuickLook，web端才兜底用这套HTML弹层)，
+  // 这个页面自己的查看按钮当时没跟着一起改，见下面handleReceiptView说明
+  const [receiptPreviewOpen, setReceiptPreviewOpen] = useState(false)
+  const [receiptPreviewUrl, setReceiptPreviewUrl] = useState<string | null>(null)
 
   // 积分自动计算只在用户真正改过金额/支付方式/日期之后才触发，预填表单(编辑/复制)时
   // 不能被这个effect覆盖掉原本保存的积分值——照旧App"程序赋值不触发input/change事件、
@@ -280,12 +287,19 @@ export function AddTransactionPage() {
   }
 
   async function handleReceiptView() {
-    if (!receiptPath) return
+    if (!receiptPath || receiptBusy) return
+    setReceiptBusy(true)
     try {
       const url = await getReceiptSignedUrl(receiptPath)
-      window.open(url, '_blank')
+      const openedNative = await openReceiptDocumentNative(url)
+      if (!openedNative) {
+        setReceiptPreviewUrl(url)
+        setReceiptPreviewOpen(true)
+      }
     } catch (e) {
       console.error('レシート凭证签名URL获取失败', e)
+    } finally {
+      setReceiptBusy(false)
     }
   }
 
@@ -537,6 +551,11 @@ export function AddTransactionPage() {
         entryDate={date || todayStr()}
         onClose={() => setScanSheetOpen(false)}
         onConfirm={handleReceiptConfirm}
+      />
+      <ReceiptPreviewSheet
+        open={receiptPreviewOpen}
+        url={receiptPreviewUrl}
+        onClose={() => setReceiptPreviewOpen(false)}
       />
 
       <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-md pb-6 bg-gradient-to-t from-surface via-surface to-transparent">
