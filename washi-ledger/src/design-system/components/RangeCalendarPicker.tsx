@@ -318,12 +318,12 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
                 )}
                 <span
                   className={`relative z-[1] w-7 h-7 flex items-center justify-center rounded-full font-serif text-body-md ${
-                    isBoundary
-                      ? 'bg-primary text-on-primary'
+                    isBoundary || inRange
+                      ? 'text-[var(--color-selected-day-ink)]'
                       : inMonth
                         ? 'text-on-surface'
                         : 'text-on-surface-variant/40'
-                  }`}
+                  } ${isBoundary ? 'bg-primary' : ''}`}
                 >
                   {date.getDate()}
                 </span>
@@ -410,7 +410,7 @@ function YearPage({
               onClick={() => onPick(y)}
               className={`py-3.5 text-center font-sans text-body-md rounded-lg ${
                 y === activeYear
-                  ? 'bg-primary text-on-primary font-bold'
+                  ? 'bg-primary text-[var(--color-selected-day-ink)] font-bold'
                   : inDecade
                     ? 'text-on-surface'
                     : 'text-on-surface-variant/40'
@@ -479,7 +479,7 @@ function MonthPage({
               onClick={() => onPick(m)}
               className={`py-3.5 text-center font-sans text-body-md rounded-lg ${
                 isActive
-                  ? 'bg-primary text-on-primary font-bold'
+                  ? 'bg-primary text-[var(--color-selected-day-ink)] font-bold'
                   : inRange
                     ? 'bg-primary-fixed text-primary font-semibold'
                     : 'text-on-surface'

@@ -80,6 +80,15 @@
      只有这个"+"图标单独要求改白色，两者用途不一样，不能共用同一个变量 */
   --color-fab-icon: var(--color-on-primary);
 
+  /* B-51：日期区间选择器选中日期的数字专用色——不能直接用--color-on-primary(白色)，
+     实测过对比度：白字在#d1665a上只有约3.65:1，14px小字号远达不到WCAG小字号AA
+     标准(4.5:1)，真机截图反馈"几乎看不清"。跟--color-app-title同样的道理，不能直接
+     改--color-on-primary本身(还有12个文件在用，按钮/大文字上白字本来是够看的，问题
+     只在这种小字号场景)，单独开一个场景专用token，三套主题各自实测过对比度：默认/
+     夏·花火共用这个近黑暖棕色(约5:1+)，怀旧主题的--color-on-primary本身已经是深棕
+     (#6a2f14，4.74:1)够用，不用单独覆盖 */
+  --color-selected-day-ink: #241209;
+
   /* 支出/收入专用固定色系——用户明确要求：不管主题怎么换，支出永远是红色系、收入
      永远是绿色系，主题最多只能调深浅，不能整个换色相。之前BalanceCard/
      CategoryDonutCard这些地方直接复用--color-primary/--color-secondary显示支出/收入
@@ -207,6 +216,10 @@
      深浅公式，换色相后如果对比度不够需要单独重新判断，不会跟着--color-primary公式走 */
   --color-fab-icon: #ffffff;
 
+  /* B-51：这个主题的--color-on-primary(#6a2f14)本身已经是深棕对比色，实测跟这个
+     主题的--color-primary(#ff9459)对比度约4.74:1，够用，不用再单独覆盖 */
+  --color-selected-day-ink: var(--color-on-primary);
+
   /* 支出固定用默认主题原本的复古红，不跟着上面--color-primary这次的珊瑚橙实验走——
      用户明确要求支出/收入的色相固定，主题只能调深浅。收入本来就没改过
      --color-secondary，不用单独覆盖--color-income */
@@ -256,6 +269,11 @@
   --color-app-title: color-mix(in srgb, var(--color-primary) 75%, black 25%);
 
   --color-fab-icon: #ffffff;
+
+  /* B-51：这个主题的--color-on-primary是白色，跟--color-primary(#e85d4a)实测对比度
+     只有约3.44:1，14px小字号的日期数字远达不到WCAG小字号AA标准(4.5:1)，真机截图
+     反馈"几乎看不清"，是这次要修的bug本体。换成近黑暖棕，实测对比度约5.49:1 */
+  --color-selected-day-ink: #241209;
 
   /* 收入沿用--color-secondary(下面改成--jade #4FD1A5，还是绿色系，只是更亮更青，
      跟"支出/收入色相固定"这条规则不冲突)；支出照怀旧主题同一个做法，固定用默认

@@ -361,7 +361,7 @@ export const dict = {
     prevPeriodAria: '前の期間',
     nextPeriodAria: '次の期間',
     closeAria: '閉じる',
-    rangePickerTitle: '期間を選択',
+    rangePickerTitle: '期間を選択する',
     rangePickerYearTitle: '年を選択',
     rangePickerMonthTitle: '年月を選択',
     presetThisMonth: '今月',
