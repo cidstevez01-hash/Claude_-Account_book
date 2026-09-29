@@ -271,7 +271,10 @@ export function AppLayout({
       </main>
       </RouteFade>
 
-      {floatingContent}
+      {/* B-XX：抽屉展开时floatingContent(目前是仪表盘的MainActionFab"+"大按钮)之前
+          无条件渲染，没跟drawerOpen联动，z-index比抽屉还高，会盖在展开的抽屉上面——
+          抽屉展开期间不渲染，收起后自动恢复 */}
+      {!drawerOpen && floatingContent}
       <CloudDisconnectBanner />
       {/* R-18：子页面(汇率换算/设置/about)隐藏底部导航栏；抽屉本身也不渲染——这几个
           页面左上角是返回箭头，没有汉堡按钮能重新打开它，渲染了也永远打不开、纯粹
