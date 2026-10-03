@@ -18,3 +18,4 @@
   - `history/v2.svg`、`history/v3.svg`：手绘贝塞尔曲线尝试版本，已废弃
   - `history/v4-traced.svg`：potrace 逐像素描摹版本，技术上可用但已被找回的真原始文件取代
 - `prototypes/tabbar-liquid-glass-prototype.html`：底部标签栏"液态玻璃"交互效果的原型存档，对应线上 Artifact `双主题UI原型`。
+- `prototypes/washi-ledger-calendar-stats/final/`：washi-ledger"日历"统计页(R-34~R-37)Stitch确认稿截图，四张对应四种状态/主题组合：`default-with-data.png`(默认主题·选中日期有记录)、`default-empty.png`(默认主题·选中日期无记录空状态)、`nostalgia.png`(怀旧主题)、`summer.png`(夏·花火主题，收敛统一配色版)。迭代过程中的中间草稿(月度总览卡片版/未收敛的夏·花火多彩版等)未逐一归档，只存了用户确认定版的这四张。

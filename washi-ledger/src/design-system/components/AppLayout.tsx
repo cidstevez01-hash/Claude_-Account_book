@@ -45,6 +45,10 @@ interface AppLayoutProps {
    * 跟usePullToRefresh的下拉刷新手势冲突，真机实测复现过)。目前只有仪表盘用，
    * 其它页面不传就是undefined，不影响 */
   floatingContent?: ReactNode
+  /** 子页面(leftButton="back")右上角默认是空占位div(保持标题居中)——日历页的
+   * 現金/積分切换按钮需要放在这个位置，传了这个就用它替换空占位div，不传的子页面
+   * (汇率/设置/about)行为不变 */
+  rightHeaderContent?: ReactNode
 }
 
 export function AppLayout({
@@ -55,6 +59,7 @@ export function AppLayout({
   mainRef,
   hideRateFab,
   floatingContent,
+  rightHeaderContent,
 }: AppLayoutProps) {
   // R-18：抽屉展开状态改用跨路由共享的Context(见useDrawer.tsx)，不再是这个组件的
   // 本地state——汇率换算/设置/about这几个"从抽屉进来的子页面"各自有自己独立的
@@ -174,7 +179,7 @@ export function AppLayout({
         {/* R-18：右上角在子页面不显示任何东西——用一个等宽的空div占位，让标题(左右各
             靠一个w-10按钮/占位)还能居中，不是直接不渲染导致标题偏向左边 */}
         {isSubpage ? (
-          <div className="w-10 h-10 -mr-2" />
+          rightHeaderContent ?? <div className="w-10 h-10 -mr-2" />
         ) : (
           <Link
             to="/account"

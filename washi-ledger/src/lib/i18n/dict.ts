@@ -115,6 +115,16 @@ export const dict = {
     rateShortcutAria: '快捷跳转汇率换算', // 新App专属(R-20：仪表盘/明细/统计/我的账户页悬浮的汇率快捷入口按钮)
     settingsTitle: LEGACY_ZH.settingsTitle,
     aboutTitle: '关于', // 新App专属(旧App没有独立的"关于"页面)
+    calendarTitle: '日历', // 新App专属(R-34：抽屉入口标题+页面标题共用同一个key，跟settingsTitle/aboutTitle同样的模式)
+    historyCalendarEntryAria: '查看日历', // 新App专属(R-37：明细页顶部跳转日历页的入口按钮)
+    calendarModeToggleAria: '切换现金/积分显示模式', // 新App专属(日历页頭現金/積分切换按钮)
+    calendarTapHint: '点击上方日历格子可切换查看当日明细', // 新App专属(R-35)
+    calendarDailyDetailTitle: '当日明细', // 新App专属(R-35)
+    calendarEntryCountLabel: '{n}笔明细', // 新App专属(R-35，{n}用实际条数替换)
+    // R-34：日历格子空间很小，付与积分不能用pointsLabel(完整表单字段名"获得积分")拼在
+    // 数字后面，会溢出——照Stitch设计稿的"pt"短单位后缀，复用旧App本来就有的
+    // pointsBadgeUnit(legacy.ts)，之前没在dict.ts里暴露成TranslationKey
+    calendarPointsUnit: LEGACY_ZH.pointsBadgeUnit,
     // 诊断日志——为排查R-32真机扫描卡住问题新加，纯本地localStorage日志，方便
     // 开发阶段真机排查用，不是给普通用户看的功能
     debugLogRowLabel: '诊断日志',
@@ -307,6 +317,13 @@ export const dict = {
     rateShortcutAria: '為替換算へジャンプ',
     settingsTitle: LEGACY_JA.settingsTitle,
     aboutTitle: 'アプリについて',
+    calendarTitle: 'カレンダー',
+    historyCalendarEntryAria: 'カレンダーを見る',
+    calendarModeToggleAria: '現金/ポイント表示モードを切り替える',
+    calendarTapHint: '上のカレンダーをタップすると、その日の明細に切り替わります',
+    calendarDailyDetailTitle: '当日の明細',
+    calendarEntryCountLabel: '{n}件',
+    calendarPointsUnit: LEGACY_JA.pointsBadgeUnit,
     debugLogRowLabel: '診断ログ',
     debugLogTitle: '診断ログ',
     debugLogEnableLabel: 'ログを記録',

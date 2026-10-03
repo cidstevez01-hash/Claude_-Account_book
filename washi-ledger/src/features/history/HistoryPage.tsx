@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { DateRangeBar } from '../../design-system/components/DateRangeBar'
 import { HistoryEntryList } from './HistoryEntryList'
@@ -20,6 +21,7 @@ type TypeFilter = 'all' | EntryType
 
 export function HistoryPage() {
   const { t } = useI18n()
+  const navigate = useAppNavigate()
   const { user } = useAuth()
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { entries, reload } = useEntries(user?.id ?? null)
@@ -175,7 +177,7 @@ export function HistoryPage() {
             </button>
           )}
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {typeChips.map((chip) => {
             const active = typeFilter === chip.key
             return (
@@ -193,6 +195,16 @@ export function HistoryPage() {
               </button>
             )
           })}
+          {/* R-37：日历统计页(R-34)的第二个入口，除了抽屉还能从这里直接跳转；
+              点返回走AppLayout leftButton="back"+navigate(-1)天然回到这个页面 */}
+          <button
+            type="button"
+            aria-label={t('historyCalendarEntryAria')}
+            onClick={() => navigate('/calendar')}
+            className="ml-auto shrink-0 w-9 h-9 rounded-full flex items-center justify-center border-[1.5px] border-dashed border-outline-variant text-on-surface-variant active:scale-90 transition-transform"
+          >
+            <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+          </button>
         </div>
       </section>
 

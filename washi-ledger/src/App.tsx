@@ -17,6 +17,7 @@ import { ChangeAvatarPage } from './features/account/ChangeAvatarPage'
 import { SignInPage } from './features/auth/SignInPage'
 import { SignUpPage } from './features/auth/SignUpPage'
 import { AboutPage } from './features/about/AboutPage'
+import { CalendarPage } from './features/calendar/CalendarPage'
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
                 <Route path="/signin" element={<SignInPage />} />
                 <Route path="/register" element={<SignUpPage />} />
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/calendar" element={<CalendarPage />} />
               </Routes>
             </DrawerProvider>
           </BrowserRouter>

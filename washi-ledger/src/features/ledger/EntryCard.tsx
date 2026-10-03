@@ -48,6 +48,9 @@ interface EntryCardProps {
   /** 仪表盘新建/编辑/复制保存后跳回来，需要有个视觉提示告诉用户"就是这条"，
    * 短暂高亮几秒后自动退场 */
   highlighted?: boolean
+  /** 日历页积分模式用——右侧金额改显示这笔记录的积分数(entry.points)而不是金额，
+   * 不传就是原来的金额展示(其它所有调用处都不传，行为不变) */
+  amountDisplay?: 'currency' | 'points'
 }
 
 /** 单条记账记录的可展开卡片(点击展开编辑/复制/删除操作抽屉)，照design-assets-v2/_44的
@@ -67,6 +70,7 @@ export function EntryCard({
   onDelete,
   id,
   highlighted,
+  amountDisplay = 'currency',
 }: EntryCardProps) {
   const { t, lang } = useI18n()
   const { settings } = useSettings()
@@ -175,13 +179,20 @@ export function EntryCard({
               </div>
             )}
           </div>
-          <p
-            className="font-serif text-entry-amount shrink-0 ml-2"
-            style={{ color: isIncome ? 'var(--color-secondary)' : 'var(--color-primary)' }}
-          >
-            {isIncome ? '+' : '-'}
-            {formatCurrency(entry.amount, entry.currency)}
-          </p>
+          {amountDisplay === 'points' ? (
+            <p className="font-serif text-entry-amount shrink-0 ml-2" style={{ color: 'var(--color-tertiary)' }}>
+              +{entry.points ?? 0}
+              {t('calendarPointsUnit')}
+            </p>
+          ) : (
+            <p
+              className="font-serif text-entry-amount shrink-0 ml-2"
+              style={{ color: isIncome ? 'var(--color-secondary)' : 'var(--color-primary)' }}
+            >
+              {isIncome ? '+' : '-'}
+              {formatCurrency(entry.amount, entry.currency)}
+            </p>
+          )}
         </button>
 
         {expanded && hasActions && (

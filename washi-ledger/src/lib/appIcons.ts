@@ -20,6 +20,7 @@ export const APP_ICONS = {
   addTransaction: 'add',
   settings: 'settings',
   rate: 'currency_exchange',
+  calendar: 'calendar_month',
   account: 'person',
   about: 'info',
   menu: 'menu',
