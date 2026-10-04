@@ -11,7 +11,7 @@ import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
-import { formatCurrency } from '../../data/currencyDisplay'
+import { formatCurrency, formatAmountNoSymbol } from '../../data/currencyDisplay'
 import { hasEntriesInMonth } from '../../data/summary'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
@@ -193,6 +193,17 @@ export function CalendarPage() {
                 </div>
               ))}
             </div>
+            {/* B-58：格子金额去掉formatCurrency()自带的货币符号，只保留+/-和数字本身——
+                7列栅格每格只有~48px宽，塞下带符号+千分位的完整格式太挤；格子下方的
+                汇总卡片/当日明细列表已经有带完整符号的金额，格子本身只是概览。
+                金额文字颜色实测过WCAG对比度后从跟热力图背景同色系(--color-expense/
+                --color-income/--color-tertiary)改成固定的--color-on-surface：背景色
+                本来就是heatColor按heatPct跟transparent做color-mix，heatPct接近1时
+                (当月最高支出/积分那天)背景会被同一个heatColor染到快饱和，文字background
+                同色系只隔透明度，对比度实测跌到1.4~2.0:1(真机反馈"颜色重叠看不清"，
+                远低于WCAG小字号AA的4.5:1)。背景最大混合强度同时从63%降到35%(6+heatPct*29)，
+                两处一起改才能让三套主题×两种模式下on-surface文字对任何强度背景都稳定在
+                5:1以上(脚本实测过，不是估的) */}
             <div className="grid grid-cols-7 gap-1">
               {grid.map((cell) => {
                 const summary = cell.inMonth ? (daySummaries.get(cell.dateStr) ?? EMPTY_SUMMARY) : EMPTY_SUMMARY
@@ -212,7 +223,7 @@ export function CalendarPage() {
                     className={`relative aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 py-1 transition-colors ${
                       isSelected ? 'border-2 border-primary' : 'border border-transparent'
                     } ${cell.inMonth ? '' : 'opacity-0 pointer-events-none'}`}
-                    style={hasData ? { background: `color-mix(in srgb, ${heatColor} ${8 + heatPct * 55}%, transparent)` } : undefined}
+                    style={hasData ? { background: `color-mix(in srgb, ${heatColor} ${6 + heatPct * 29}%, transparent)` } : undefined}
                   >
                     {isToday && (
                       <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-primary" aria-hidden="true" />
@@ -221,19 +232,19 @@ export function CalendarPage() {
                     {mode === 'cash' ? (
                       <>
                         {summary.expense > 0 && (
-                          <span className="text-[9px] leading-none" style={{ color: 'var(--color-expense)' }}>
-                            -{formatCurrency(summary.expense, settings.currency)}
+                          <span className="text-[9px] leading-none text-on-surface">
+                            -{formatAmountNoSymbol(summary.expense, settings.currency)}
                           </span>
                         )}
                         {summary.income > 0 && (
-                          <span className="text-[9px] leading-none" style={{ color: 'var(--color-income)' }}>
-                            +{formatCurrency(summary.income, settings.currency)}
+                          <span className="text-[9px] leading-none text-on-surface">
+                            +{formatAmountNoSymbol(summary.income, settings.currency)}
                           </span>
                         )}
                       </>
                     ) : (
                       summary.points > 0 && (
-                        <span className="text-[9px] leading-none" style={{ color: 'var(--color-tertiary)' }}>
+                        <span className="text-[9px] leading-none text-on-surface">
                           +{summary.points}
                           {t('calendarPointsUnit')}
                         </span>

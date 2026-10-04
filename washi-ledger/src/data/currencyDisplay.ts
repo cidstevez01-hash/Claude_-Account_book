@@ -33,10 +33,20 @@ export function symbolFor(code: string): string {
   return SYMBOLS[code] ?? `${code} `
 }
 
-export function formatCurrency(amount: number, code: string): string {
+function formatAmountNumber(amount: number, code: string): string {
   const decimals = ZERO_DECIMAL_CURRENCIES.has(code) ? 0 : 2
-  const numStr = Number(amount).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
-  return symbolFor(code) + numStr
+  return Number(amount).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+}
+
+export function formatCurrency(amount: number, code: string): string {
+  return symbolFor(code) + formatAmountNumber(amount, code)
+}
+
+/** 不带货币符号的金额——B-58：日历页月历格子只有7列栅格里的一小格(~48px宽)，塞下
+ * 完整的"-JP¥73,440"这种带符号+千分位的格式太挤。格子下方的汇总卡片/当日明细列表
+ * 已经有带完整符号的金额，格子本身只是概览，不需要重复展示币种符号 */
+export function formatAmountNoSymbol(amount: number, code: string): string {
+  return formatAmountNumber(amount, code)
 }
 
 /** rates的base必须等于toCur才能换算(见useDisplayRates.ts的取数方式：固定拉
