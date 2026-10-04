@@ -67,16 +67,29 @@ export function CashPointToggle({ mode, onToggle, ariaLabel }: CashPointTogglePr
   }
 
   return (
-    <span className="relative inline-block w-10 h-10 -mr-2">
+    <span
+      className="relative inline-block w-10 h-10"
+      style={{ marginRight: isSummer ? '6.4px' : '-8px' }}
+    >
       {/* R-29同款光效(.icon-ring-glow)——贴着圆形外沿发光。.icon-ring-glow自身用
           inset:-13px(固定像素，不受--icon-size影响——那个变量只控制mask渐变起点，
           不控制发光层整体尺寸，之前改--icon-size没用就是因为搞错了这点)，发光层尺寸
           = 它的定位父容器尺寸+26px。如果直接挂在40px的按钮容器上，发光层有66px宽，
-          这个按钮紧贴屏幕右边缘(-mr-2)，66px的光晕会直接探出视口外被截断(真机截图
-          发现，实测超出页头390px宽度3.5px)。改成单独包一层28px的定位容器(照抄
+          这个按钮紧贴屏幕右边缘，66px的光晕会直接探出视口外被截断(真机截图发现，
+          实测超出页头390px宽度3.5px)。改成单独包一层28px的定位容器(照抄
           AppLayout.tsx头像同一个位置已验证过不会溢出的尺寸)、绝对定位居中贴在
-          40px徽章正中间，发光层挂在这个28px容器上(变成54px，贴着徽章边缘但不会
-          再探出屏幕) */}
+          40px徽章正中间，发光层挂在这个28px容器上(变成54px，贴着徽章边缘)。
+          B-56续：光晕不溢出之后，真机截图比对又发现左右不对称——返回按钮是"裸"
+          效果(.icon-bare-glow，inset:0，跟图标本身一样大=24px，缩在40px按钮内部，
+          实际可见光晕离页头左边距≈16.5px)，这个徽章是"有圈"效果(54px，比40px按钮
+          更大、向外凸出≈5.9px)，如果两边按钮热区都对称(8px)，实际"肉眼看到的发光
+          圆圈"离边距会不对称(左16.5px/右2.1px)——这才是用户画线看到的真实问题，
+          不是按钮热区偏了。只在summer主题下把margin从-8px(热区对称，等同原来的
+          -mr-2)换成+6.4px(经Playwright实测校准，让发光圆圈的右边距也等于
+          16.5px)——非summer主题没有发光层，肉眼只看得到按钮热区本身，这时必须
+          保持跟返回按钮一样的-8px，否则会在没有光晕解释的情况下凭空多出一截空隙，
+          反而制造新的不对称(这是本轮改之前漏掉的一个坑，改完务必在非夏主题下
+          也验证一遍热区距离) */}
       {isSummer && (
         <span className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
           <span className="relative w-7 h-7">
