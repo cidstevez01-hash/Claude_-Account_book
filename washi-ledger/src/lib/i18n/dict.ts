@@ -125,6 +125,7 @@ export const dict = {
     // 数字后面，会溢出——照Stitch设计稿的"pt"短单位后缀，复用旧App本来就有的
     // pointsBadgeUnit(legacy.ts)，之前没在dict.ts里暴露成TranslationKey
     calendarPointsUnit: LEGACY_ZH.pointsBadgeUnit,
+    calendarHolidayLabel: '祝日', // 新App专属(R-38续：日历页节假日标红+详情卡片，沿用日语"祝日"这个词，不翻成"节假日"——这个App整体是日式记账本风格，zh/ja两个语言包里这个概念本来就统一用"祝日"这个词面，跟旧App闹钟功能"祝日不响"的用词一致)
     // 诊断日志——为排查R-32真机扫描卡住问题新加，纯本地localStorage日志，方便
     // 开发阶段真机排查用，不是给普通用户看的功能
     debugLogRowLabel: '诊断日志',
@@ -324,6 +325,7 @@ export const dict = {
     calendarDailyDetailTitle: '当日の明細',
     calendarEntryCountLabel: '{n}件',
     calendarPointsUnit: LEGACY_JA.pointsBadgeUnit,
+    calendarHolidayLabel: '祝日',
     debugLogRowLabel: '診断ログ',
     debugLogTitle: '診断ログ',
     debugLogEnableLabel: 'ログを記録',

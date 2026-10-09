@@ -10,6 +10,7 @@ import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
+import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { formatCurrency, formatAmountNoSymbol } from '../../data/currencyDisplay'
 import { hasEntriesInMonth } from '../../data/summary'
@@ -65,6 +66,7 @@ export function CalendarPage() {
   const { entries, reload } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
+  const holidays = useJpHolidays()
 
   const categories = useMemo(
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
@@ -155,6 +157,7 @@ export function CalendarPage() {
     [selectedEntries, mode, cashTab]
   )
   const hasSelectedRecord = filteredEntries.length > 0
+  const selectedHolidayName = holidays[selectedDate]
 
   async function handleRefresh() {
     await Promise.all([reload(), reloadCatalog()])
@@ -196,24 +199,37 @@ export function CalendarPage() {
             {/* B-58：格子金额去掉formatCurrency()自带的货币符号，只保留+/-和数字本身——
                 7列栅格每格只有~48px宽，塞下带符号+千分位的完整格式太挤；格子下方的
                 汇总卡片/当日明细列表已经有带完整符号的金额，格子本身只是概览。
-                金额文字颜色实测过WCAG对比度后从跟热力图背景同色系(--color-expense/
-                --color-income/--color-tertiary)改成固定的--color-on-surface：背景色
-                本来就是heatColor按heatPct跟transparent做color-mix，heatPct接近1时
-                (当月最高支出/积分那天)背景会被同一个heatColor染到快饱和，文字background
-                同色系只隔透明度，对比度实测跌到1.4~2.0:1(真机反馈"颜色重叠看不清"，
-                远低于WCAG小字号AA的4.5:1)。背景最大混合强度同时从63%降到35%(6+heatPct*29)，
-                两处一起改才能让三套主题×两种模式下on-surface文字对任何强度背景都稳定在
-                5:1以上(脚本实测过，不是估的) */}
+                B-59→B-61→B-62→B-63续：热力图背景最初用category颜色(--color-expense/
+                --color-tertiary)，heatPct接近1时背景被染到快饱和，金额文字(同样是
+                支出红/收入绿/积分金，用户明确要求这几个语义色不能改)跟背景撞色，
+                对比度实测跌到1.4~2.0:1、加了描边也还是不够清楚(真机反馈多轮"看不清"/
+                "都是白的")。问题根子在背景跟文字抢同一个色相——先试过换成--color-outline
+                中性灰，用户仍不满意；B-62让Stitch出6组候选配色AB对比，但那次对比图
+                是独立实色色块摆在中性背景上看，跟实际"低透明度叠加在格子自己的底色
+                上"是两回事，色块选出来的"クールブルーグレー"落代码后用户反馈"完全
+                和背景重叠了"——拿错测试方式误导了选择。B-63改成直接用这里真实的
+                color-mix公式(45%强度+真实格子底色)现场渲染对比图，这次选出来的
+                "暖棕"方向(见index.css B-63注释)才是所见即所得验证过的。背景最大
+                混合强度保持45%(10+heatPct*35)不变 */}
             <div className="grid grid-cols-7 gap-1">
               {grid.map((cell) => {
                 const summary = cell.inMonth ? (daySummaries.get(cell.dateStr) ?? EMPTY_SUMMARY) : EMPTY_SUMMARY
                 const hasData = mode === 'cash' ? summary.expense > 0 || summary.income > 0 : summary.points > 0
-                const heatColor = mode === 'cash' ? 'var(--color-expense)' : 'var(--color-tertiary)'
+                const heatColor = 'var(--color-calendar-heat)'
                 const heatBase = mode === 'cash' ? summary.expense : summary.points
                 const heatMax = mode === 'cash' ? maxExpense : maxPoints
                 const heatPct = heatMax > 0 ? Math.min(1, heatBase / heatMax) : 0
                 const isSelected = cell.dateStr === selectedDate
                 const isToday = cell.dateStr === today
+                // R-38续：祝日标红只改日期数字颜色这一个独立元素，不碰热力图背景/金额
+                // 文字——用户明确要求"支出会对格子有影响的，不能当金额不存在，要考虑
+                // 两者共存"，日期数字跟下面的金额是完全分开的两行，互不遮挡，不会有
+                // B-61那种同色系/对比度冲突问题
+                const holidayName = cell.inMonth ? holidays[cell.dateStr] : undefined
+                const amountShadow = {
+                  textShadow:
+                    '1px 0 0 var(--color-surface-container-lowest), -1px 0 0 var(--color-surface-container-lowest), 0 1px 0 var(--color-surface-container-lowest), 0 -1px 0 var(--color-surface-container-lowest)',
+                }
                 return (
                   <button
                     key={cell.dateStr}
@@ -223,28 +239,33 @@ export function CalendarPage() {
                     className={`relative aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 py-1 transition-colors ${
                       isSelected ? 'border-2 border-primary' : 'border border-transparent'
                     } ${cell.inMonth ? '' : 'opacity-0 pointer-events-none'}`}
-                    style={hasData ? { background: `color-mix(in srgb, ${heatColor} ${6 + heatPct * 29}%, transparent)` } : undefined}
+                    style={hasData ? { background: `color-mix(in srgb, ${heatColor} ${10 + heatPct * 35}%, transparent)` } : undefined}
                   >
                     {isToday && (
                       <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-primary" aria-hidden="true" />
                     )}
-                    <span className="text-body-sm font-serif text-on-surface leading-none">{cell.day}</span>
+                    <span
+                      className="text-body-sm font-serif leading-none"
+                      style={{ color: holidayName ? 'var(--color-error)' : 'var(--color-on-surface)' }}
+                    >
+                      {cell.day}
+                    </span>
                     {mode === 'cash' ? (
                       <>
                         {summary.expense > 0 && (
-                          <span className="text-[9px] leading-none text-on-surface">
+                          <span className="text-[9px] leading-none" style={{ color: 'var(--color-expense)', ...amountShadow }}>
                             -{formatAmountNoSymbol(summary.expense, settings.currency)}
                           </span>
                         )}
                         {summary.income > 0 && (
-                          <span className="text-[9px] leading-none text-on-surface">
+                          <span className="text-[9px] leading-none" style={{ color: 'var(--color-income)', ...amountShadow }}>
                             +{formatAmountNoSymbol(summary.income, settings.currency)}
                           </span>
                         )}
                       </>
                     ) : (
                       summary.points > 0 && (
-                        <span className="text-[9px] leading-none text-on-surface">
+                        <span className="text-[9px] leading-none" style={{ color: 'var(--color-tertiary)', ...amountShadow }}>
                           +{summary.points}
                           {t('calendarPointsUnit')}
                         </span>
@@ -265,13 +286,28 @@ export function CalendarPage() {
                 {t('calendarEntryCountLabel').replace('{n}', String(filteredEntries.length))}
               </span>
             </div>
+            {/* R-38续：祝日详情卡片，放在支出/収入汇总卡片"上方"(用户原话)，只在选中的
+                这天真的是祝日时才渲染——数据源见hooks/useJpHolidays.ts */}
+            {selectedHolidayName && (
+              <div
+                className="rounded-lg px-sm py-2 border-[1.5px] border-dashed flex items-center gap-2"
+                style={{ borderColor: 'var(--color-error)', background: 'color-mix(in srgb, var(--color-error) 10%, transparent)' }}
+              >
+                <span className="material-symbols-outlined text-[18px]" style={{ color: 'var(--color-error)' }}>
+                  event
+                </span>
+                <span className="text-body-md" style={{ color: 'var(--color-error)' }}>
+                  {t('calendarHolidayLabel')}：{selectedHolidayName}
+                </span>
+              </div>
+            )}
             {mode === 'cash' ? (
               <div className="grid grid-cols-2 gap-sm">
                 <div className="bg-surface-container-low rounded-lg px-2 py-2 border-[1.5px] border-dashed border-outline-variant text-center">
                   <p className="text-label-caps text-on-surface-variant">{t('filterExpense')}</p>
                   <p
                     className="font-serif text-body-md"
-                    style={{ color: hasSelectedRecord && selectedSummary.expense > 0 ? 'var(--color-expense)' : undefined }}
+                    style={{ color: hasSelectedRecord ? 'var(--color-expense)' : undefined }}
                   >
                     {formatCurrency(selectedSummary.expense, settings.currency)}
                   </p>
@@ -280,7 +316,7 @@ export function CalendarPage() {
                   <p className="text-label-caps text-on-surface-variant">{t('filterIncome')}</p>
                   <p
                     className="font-serif text-body-md"
-                    style={{ color: hasSelectedRecord && selectedSummary.income > 0 ? 'var(--color-income)' : undefined }}
+                    style={{ color: hasSelectedRecord ? 'var(--color-income)' : undefined }}
                   >
                     {formatCurrency(selectedSummary.income, settings.currency)}
                   </p>
