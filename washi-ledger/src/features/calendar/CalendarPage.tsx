@@ -4,6 +4,7 @@ import { CashPointToggle } from '../../design-system/components/CashPointToggle'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { MonthNavBar } from '../stats/MonthNavBar'
 import { EntryCard } from '../ledger/EntryCard'
+import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -16,6 +17,7 @@ import { formatCurrency, formatAmountNoSymbol } from '../../data/currencyDisplay
 import { hasEntriesInMonth } from '../../data/summary'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
+import type { Entry } from '../../types'
 
 const WEEKDAY_LABELS_ZH = ['日', '一', '二', '三', '四', '五', '六']
 const WEEKDAY_LABELS_JA = ['日', '月', '火', '水', '木', '金', '土']
@@ -73,6 +75,7 @@ export function CalendarPage() {
     [catalog]
   )
   const paymentMethods = catalog?.paymentMethods ?? []
+  const tags = useMemo(() => [...(catalog?.expenseTags ?? []), ...(catalog?.incomeTags ?? [])], [catalog])
   const displayEntries = useMemo(
     () => toDisplayEntries(entries, settings.currency, rates),
     [entries, settings.currency, rates]
@@ -158,6 +161,8 @@ export function CalendarPage() {
   )
   const hasSelectedRecord = filteredEntries.length > 0
   const selectedHolidayName = holidays[selectedDate]
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
 
   async function handleRefresh() {
     await Promise.all([reload(), reloadCatalog()])
@@ -377,8 +382,9 @@ export function CalendarPage() {
                       entry={entry}
                       category={cat}
                       paymentMethod={pm}
-                      expanded={false}
-                      onToggle={() => {}}
+                      expanded={expandedId === entry.id}
+                      onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
+                      onView={setViewEntry}
                       amountDisplay={mode === 'point' ? 'points' : 'currency'}
                     />
                   )
@@ -393,6 +399,14 @@ export function CalendarPage() {
           </div>
         </div>
       )}
+      <EntryDetailSheet
+        open={!!viewEntry}
+        entry={viewEntry}
+        category={viewEntry ? categories.find((c) => c.code === viewEntry.catCode) : undefined}
+        paymentMethod={viewEntry ? paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
+        tag={viewEntry ? tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
+        onClose={() => setViewEntry(null)}
+      />
     </AppLayout>
   )
 }

@@ -1,37 +1,9 @@
-import { useState, type CSSProperties } from 'react'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
-import { useSettings } from '../../hooks/useSettings'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
-import { getReceiptSignedUrl } from '../../data/receiptStorage'
-import { openReceiptDocumentNative } from '../../lib/receiptViewer'
-import { ReceiptPreviewSheet } from './ReceiptPreviewSheet'
 import type { Category, Entry, PaymentMethod } from '../../types'
-
-/** R-32续：レシート凭证常驻角标图标——用户从Stitch的8款变体里选定No.06
- * "右上折角(Dog-ear)纸张质感"，线条从设计稿1:1量取转换成viewBox 0 0 36 49的
- * 干净坐标(原设计稿以圆心为原点，这里整体平移+18/+28归零)。stroke用currentColor，
- * 颜色由调用处的文字色(var(--color-primary))决定，不在图标内部写死颜色 */
-function ReceiptStampIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 36 49"
-      fill="none"
-      className={className}
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M0 4 C0 2 2 0 4 0 H25 L36 11 V49 L30 45 L24 49 L18 45 L12 49 L6 45 L0 49 Z" strokeWidth={2.6} />
-      <path d="M25 0 V11 H36" strokeWidth={2.2} />
-      <line x1={8} y1={19} x2={25} y2={19} strokeWidth={2.2} />
-      <line x1={8} y1={27} x2={28} y2={27} strokeWidth={2.2} />
-      <line x1={8} y1={35} x2={20} y2={35} strokeWidth={2.2} />
-    </svg>
-  )
-}
 
 interface EntryCardProps {
   entry: Entry
@@ -39,6 +11,9 @@ interface EntryCardProps {
   paymentMethod?: PaymentMethod
   expanded: boolean
   onToggle: () => void
+  /** R-40：查看详情——5个复用EntryCard的地方(仪表盘/我的账户和统计页的分类钻取弹层/
+   * 明细页/日历页)全部开放，是必传的基础功能，不像onEdit/onCopy/onDelete那样可选 */
+  onView: (entry: Entry) => void
   onEdit?: (entry: Entry) => void
   onCopy?: (entry: Entry) => void
   onDelete?: (entry: Entry) => void
@@ -53,18 +28,20 @@ interface EntryCardProps {
   amountDisplay?: 'currency' | 'points'
 }
 
-/** 单条记账记录的可展开卡片(点击展开编辑/复制/删除操作抽屉)，照design-assets-v2/_44的
- * "Expanded Action Drawer"实现。仪表盘的最近记录列表和明细页的完整列表共用这个组件，
- * 避免同一段UI在两个页面各写一遍。编辑/复制/删除操作现在只在仪表盘提供(用户明确
- * 要求"全放在首页操作")，明细页不传onEdit/onCopy/onDelete这三个handler，下面按
- * 有没有传来决定要不要显示对应按钮/整个操作抽屉——不是靠调用方各自维护一份不同的
- * 卡片实现 */
+/** 单条记账记录的可展开卡片(点击展开查看详情/编辑/复制/删除操作抽屉)，照
+ * design-assets-v2/_44的"Expanded Action Drawer"实现。仪表盘的最近记录列表和明细页的
+ * 完整列表共用这个组件，避免同一段UI在两个页面各写一遍。编辑/复制/删除操作只在仪表盘
+ * 提供(用户明确要求"全放在首页操作")，明细页/日历页/分类钻取弹层不传这三个handler，
+ * 下面按有没有传来决定要不要显示对应按钮；R-40续：查看详情没有这个限制，5处全部开放，
+ * 所以点击展开抽屉这个交互本身现在总是生效的，不再像之前那样只在有编辑/复制/删除时
+ * 才响应点击(hasActions这个判断已经去掉) */
 export function EntryCard({
   entry,
   category,
   paymentMethod,
   expanded,
   onToggle,
+  onView,
   onEdit,
   onCopy,
   onDelete,
@@ -73,42 +50,7 @@ export function EntryCard({
   amountDisplay = 'currency',
 }: EntryCardProps) {
   const { t, lang } = useI18n()
-  const { settings } = useSettings()
-  const isSummer = settings.themeSkin === 'summer'
-  const [receiptBusy, setReceiptBusy] = useState(false)
-  // R-32续：查看凭证最早是window.open(url,'_blank')直接跳出系统浏览器(用户反馈
-  // "外跳不好")，改成App内弹层(ReceiptPreviewSheet，<iframe>内嵌PDF)后真机又反馈
-  // 内容撑爆没有标题栏/圆角/遮罩——根源是iOS WKWebView加载跨域iframe内容本身就有
-  // 已知问题，不是CSS没写对。现在改成原生优先：`FileViewer.openDocumentFromUrl()`
-  // 调系统原生QuickLook预览器(见lib/receiptViewer.ts)，web端(沙盒/浏览器预览)没有
-  // 这个能力时才兜底回退到ReceiptPreviewSheet这套HTML弹层——previewOpen/previewUrl
-  // 只在兜底路径下才用得到，签名URL有时效性，不长期缓存
-  const [previewOpen, setPreviewOpen] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const isIncome = entry.type === 'income'
-  // R-32续：查看凭证从"展开抽屉里的第4个按钮"改成卡片右上角常驻角标(骑缝章)，
-  // 单独一次点击直接弹出预览，不再占用展开抽屉的位置，也不再计入hasActions——
-  // 明细页(HistoryEntryList不传onEdit/onCopy/onDelete)如果只是因为有凭证才能展开，
-  // 现在角标本身已经能直接点开预览，展开抽屉对这种卡片就没有存在的意义了
-  const hasReceipt = !!entry.receiptPath
-  const hasActions = !!(onEdit || onCopy || onDelete)
-
-  async function handleViewReceipt() {
-    if (!entry.receiptPath || receiptBusy) return
-    setReceiptBusy(true)
-    try {
-      const url = await getReceiptSignedUrl(entry.receiptPath)
-      const openedNative = await openReceiptDocumentNative(url)
-      if (!openedNative) {
-        setPreviewUrl(url)
-        setPreviewOpen(true)
-      }
-    } catch (e) {
-      console.error('查看レシート凭证失败', e)
-    } finally {
-      setReceiptBusy(false)
-    }
-  }
   // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)；
   // 名字按当前语言取(catLabel/subLabel)，不是硬编码.zh
   const sub = category?.subs.find((s) => s.code === entry.subCode)
@@ -129,20 +71,9 @@ export function EntryCard({
           新的<div>包起来，.entry-card会变成永远是自己那层wrapper的第1个子元素，nth-child
           交替规律就全废了。改成外层.entry-card不变(还是列表里直接相邻的那个元素，
           交替规律不受影响)，只在内部单独包一层裁切容器(rounded-[inherit]跟随外层圆角，
-          不用关心具体是哪一种角)，レシート角标作为.entry-card的直接子元素、绝对定位，
-          天然不受这层内部裁切影响，能探出卡片边框外
-          R-XH：这层wrapper是个普通<div>，不是flex容器——之前<button>直接是.entry-card
-          (flex flex-col)的子元素时，靠flex子元素默认的align-items:stretch自动撑满宽度；
-          套进这层普通div之后<button>脱离了flex-stretch上下文，退回浏览器默认的"按内容
-          收缩宽度"，分类名短/没有支付方式标签的行按钮整体变窄，金额虽然还贴在按钮右边
-          但按钮右边不等于卡片右边，看起来就是"各行金额没对齐"——这是当时漏加w-full
-          导致的真实回归，用户真机截图揪出来的，补上w-full找回原来的满宽行为 */}
+          不用关心具体是哪一种角) */}
       <div className="overflow-hidden rounded-[inherit]">
-        <button
-          type="button"
-          className="w-full flex items-center p-3 text-left"
-          onClick={hasActions ? onToggle : undefined}
-        >
+        <button type="button" className="w-full flex items-center p-3 text-left" onClick={onToggle}>
           <div
             className="w-[38px] h-[38px] rounded-full flex items-center justify-center mr-3 shrink-0"
             style={{ background: category ? tintColor(category.color, 0.85) : 'var(--color-surface-container-highest)' }}
@@ -195,8 +126,17 @@ export function EntryCard({
           )}
         </button>
 
-        {expanded && hasActions && (
+        {expanded && (
           <div className="flex items-center justify-around py-2 px-md bg-surface-container-low border-t border-dashed border-outline-variant/30">
+            <button
+              type="button"
+              aria-label={t('viewDetailAria')}
+              className="flex flex-col items-center gap-1 text-on-surface-variant active:text-primary active:scale-90 transition-[color,transform]"
+              onClick={() => onView(entry)}
+            >
+              <span className="material-symbols-outlined text-[20px]">visibility</span>
+              <span className="text-[10px] font-sans uppercase">{t('viewDetailLabel')}</span>
+            </button>
             {onEdit && (
               <button
                 type="button"
@@ -230,77 +170,6 @@ export function EntryCard({
           </div>
         )}
       </div>
-
-      {/* R-32续：レシート凭证常驻角标——"骑缝章"效果，圆心压在卡片右上角边框线上，
-          一半在卡片内一半探出卡片外(Stitch设计稿确认稿No.06图标+此定位)。
-          stopPropagation()避免跟上面主体的展开/收起点击冲突；只有hasReceipt才渲染，
-          背景/描边用color-mix(in srgb, var(--color-primary) ...)跟随var(--color-primary)，
-          三套主题(default/nostalgia/summer)颜色各不相同，这样自动跟着对应主题走，
-          不用为每个主题单独判断颜色(color-mix在这个代码库里已经是索性用开的既有写法，
-          见index.css大量同类用法)。
-          按钮本体是44×44px的透明热区(iOS HIG最小点击尺寸44×44pt，这是Stitch设计稿里
-          明确写的要求，之前漏做了)，视觉上看到的32px圆章只是内层一个span，热区比
-          视觉图形大一圈但居中对齐，不会看起来"点偏了"——外层44px的定位数值(-top-4
-          -right-3.5)是反推出来的：让内层32px圆章视觉位置跟之前单纯32px按钮时完全一样。
-          悬浮阴影(boxShadow)+summer主题呼吸光晕，照抄RateShortcutFab(同样是"小圆形
-          常驻浮标"这个类型，不是SettingsPage行那种列表内icon，跟IconEffects.tsx的
-          RingIconEffect不是同一挂——那一套是给ICON_GLYPHS里有形状数据的图标用的，
-          这个角标是Stitch给的自定义线条图标，没有登记进那个glyph库，直接复用
-          RateShortcutFab同款的阴影数值/光晕渐变颜色(rgba(232,93,74,...)是summer主题
-          --color-primary的真实rgb值，只在summer分支渲染，硬编码没有跨主题风险，
-          见RateShortcutFab.tsx同款注释)+呼吸关键帧(rate-fab-breathe，见index.css)，
-          不是另起一套新数值 */}
-      {hasReceipt && (
-        <button
-          type="button"
-          aria-label={t('receiptViewAria')}
-          title={t('receiptViewAria')}
-          disabled={receiptBusy}
-          onClick={(e) => {
-            e.stopPropagation()
-            handleViewReceipt()
-          }}
-          className="absolute -top-4 -right-3.5 z-10 w-11 h-11 flex items-center justify-center active:scale-90 transition-transform disabled:opacity-50"
-        >
-        <span
-          className="relative w-8 h-8 rounded-full flex items-center justify-center border-[1.5px]"
-          style={{
-            borderColor: 'var(--color-primary)',
-            background: 'color-mix(in srgb, var(--color-primary) 15%, white)',
-            color: 'var(--color-primary)',
-            boxShadow: '0 3px 10px -4px rgba(0,0,0,.3)',
-          }}
-        >
-          {/* R-XO：这里原来是自己手写的radial-gradient(从圆心就有色、没有mask硬裁切)，
-              跟"有圈图标"(SettingsPage行/头像/RateShortcutFab)那套折腾了11轮才修好的
-              .icon-ring-glow(见index.css)是两套独立实现——这个角标从2026-09-16加上后
-              就一直没跟着迁移过去，一直带着已知的"渗色"问题。改成复用同一个已经调好的
-              类，只用--icon-size覆盖成这个角标的真实尺寸(32px，w-8 h-8，不是默认的
-              40px)，不再自己重新发明一套 */}
-          {isSummer && (
-            <span className="icon-ring-glow" aria-hidden="true" style={{ '--icon-size': '32px' } as CSSProperties} />
-          )}
-          {/* R-XH：点击后要等两段网络请求(查签名URL+原生插件把整个PDF下载到本地
-              才能给QuickLook展示)，这段等待本身没法消除，但之前只有disabled:
-              opacity-50这点淡化几乎看不出来，角标又小又在卡片角落，用户反馈
-              "点了很久没反应"——换成转圈动画(复用ReceiptScanSheet同款.ios-spinner)
-              至少让用户看到点击生效、正在处理，不是卡死 */}
-          {receiptBusy ? (
-            // .ios-spinner的22px尺寸是CSS里跟内部8根小棒的transform-origin/定位
-            // 配套算好的(见index.css)，不能用inline style缩小覆盖——会破坏几何
-            // 关系导致小棒错位，32px的圆形角标容器装得下22px的转圈，不用额外缩放
-            <span className="ios-spinner relative z-[1] text-primary">
-              {Array.from({ length: 8 }, (_, i) => (
-                <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
-              ))}
-            </span>
-          ) : (
-            <ReceiptStampIcon className="relative z-[1] w-4 h-4" />
-          )}
-        </span>
-        </button>
-      )}
-      <ReceiptPreviewSheet open={previewOpen} url={previewUrl} onClose={() => setPreviewOpen(false)} />
     </div>
   )
 }

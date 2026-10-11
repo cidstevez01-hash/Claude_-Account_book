@@ -89,6 +89,7 @@ export function StatsPage() {
     [catalog]
   )
   const paymentMethods = catalog?.paymentMethods ?? []
+  const tags = useMemo(() => [...(catalog?.expenseTags ?? []), ...(catalog?.incomeTags ?? [])], [catalog])
   // 每条记录按settings.currency统一换算后再参与求和/趋势图计算(见data/currencyDisplay.ts)；
   // 积分不是货币，pointsBreakdownByPaymentMethod/积分推移图继续吃原始entries，不用换算
   const displayEntries = useMemo(
@@ -368,6 +369,7 @@ export function StatsPage() {
         header={detailHeader}
         categories={categories}
         paymentMethods={paymentMethods}
+        tags={tags}
         monthLabel={trendPeriodLabel}
         entries={detailEntries}
         currency={settings.currency}

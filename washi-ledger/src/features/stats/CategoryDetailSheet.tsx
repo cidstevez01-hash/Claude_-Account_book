@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from '../ledger/EntryCard'
+import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
 import { useI18n } from '../../lib/i18n'
-import type { Category, Entry, PaymentMethod } from '../../types'
+import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 export interface CategoryDetailHeader {
   icon: string
@@ -22,6 +23,7 @@ interface CategoryDetailSheetProps {
    * 记录)，不能像分类维度那样直接假设"列表里所有记录都是header这一个分类" */
   categories: Category[]
   paymentMethods: PaymentMethod[]
+  tags: Tag[]
   /** 统计页真正按月/按日/按趋势周期导航(MonthNavBar/TrendControls)，没有像仪表盘
    * 那样的自定义日期区间输入框——这里的月份/周期文案是货真价实的"当前统计周期"，
    * 跟仪表盘那份区间弹层(features/ledger/CategoryDetailSheet.tsx)语义完全不同，
@@ -47,6 +49,7 @@ export function CategoryDetailSheet({
   header,
   categories,
   paymentMethods,
+  tags,
   monthLabel,
   entries,
   currency = 'CNY',
@@ -57,6 +60,7 @@ export function CategoryDetailSheet({
 }: CategoryDetailSheetProps) {
   const { t } = useI18n()
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
 
   // 弹出/收起做平缓过渡——照旧仓库index.html真实的.sheet/.sheet.show搬：初始
   // transform:translateY(105%)，show时translateY(0)，0.3s cubic-bezier(.32,.72,0,1)。
@@ -70,12 +74,13 @@ export function CategoryDetailSheet({
     header: CategoryDetailHeader
     categories: Category[]
     paymentMethods: PaymentMethod[]
+    tags: Tag[]
     monthLabel: string
     entries: Entry[]
     currency: string
   } | null>(null)
   if (open && header) {
-    snapshotRef.current = { header, categories, paymentMethods, monthLabel, entries, currency }
+    snapshotRef.current = { header, categories, paymentMethods, tags, monthLabel, entries, currency }
   }
 
   useEffect(() => {
@@ -174,6 +179,7 @@ export function CategoryDetailSheet({
                     paymentMethod={snap.paymentMethods.find((p) => p.code === entry.paymentMethod)}
                     expanded={expandedId === entry.id}
                     onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
+                    onView={setViewEntry}
                     onEdit={onEdit}
                     onCopy={onCopy}
                     onDelete={onDelete}
@@ -185,6 +191,14 @@ export function CategoryDetailSheet({
           )}
         </div>
       </div>
+      <EntryDetailSheet
+        open={!!viewEntry}
+        entry={viewEntry}
+        category={viewEntry ? snap.categories.find((c) => c.code === viewEntry.catCode) : undefined}
+        paymentMethod={viewEntry ? snap.paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
+        tag={viewEntry ? snap.tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
+        onClose={() => setViewEntry(null)}
+      />
     </div>
   )
 }

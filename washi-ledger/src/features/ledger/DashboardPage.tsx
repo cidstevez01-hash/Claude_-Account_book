@@ -282,6 +282,7 @@ export function DashboardPage() {
             header={detailHeader}
             categories={categories}
             paymentMethods={catalog.paymentMethods}
+            tags={tags}
             rangeLabel={rangeLabel}
             entries={detailEntries}
             currency={settings.currency}

@@ -231,6 +231,7 @@ export function HistoryPage() {
             entries={filtered}
             categories={categories}
             paymentMethods={catalog.paymentMethods}
+            tags={tags}
             currency={settings.currency}
           />
         )}

@@ -3,6 +3,7 @@ import { useI18n } from '../../lib/i18n'
 import { groupByDayPinned, matchesEntrySearch } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from './EntryCard'
+import { EntryDetailSheet } from './EntryDetailSheet'
 import { dayLabel } from './dayLabel'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
@@ -60,6 +61,9 @@ export function RecentEntriesList({
   // 点一条记录展开操作抽屉(编辑/复制/删除)，照design-assets-v2/_44的"Expanded Action Drawer"，
   // 同一时间只展开一条，不用给每条记录单独维护一个boolean状态
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  // R-40：查看详情弹层——跟expandedId(展开抽屉)是两个独立状态，详情弹层关掉之后
+  // 抽屉不需要跟着收起
+  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
   // 搜索框收起/展开——照旧仓库index.html的#ledgerSearch真实交互搬：默认是30x30
   // 圆形虚线图标按钮，点了才展开成圆角矩形(12px，不是整胶囊)。失焦时如果没输入
   // 内容才收起，有内容就保持展开(用户还能看到/清空自己搜的词)
@@ -175,6 +179,7 @@ export function RecentEntriesList({
                   paymentMethod={pm}
                   expanded={expandedId === entry.id}
                   onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
+                  onView={setViewEntry}
                   onEdit={onEdit}
                   onCopy={onCopy}
                   onDelete={onDelete}
@@ -186,6 +191,14 @@ export function RecentEntriesList({
         })}
       </div>
       )}
+      <EntryDetailSheet
+        open={!!viewEntry}
+        entry={viewEntry}
+        category={viewEntry ? categories.find((c) => c.code === viewEntry.catCode) : undefined}
+        paymentMethod={viewEntry ? paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
+        tag={viewEntry ? tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
+        onClose={() => setViewEntry(null)}
+      />
     </section>
   )
 }
