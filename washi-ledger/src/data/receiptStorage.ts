@@ -10,19 +10,22 @@ import { supabase } from '../lib/supabase'
  * bucket本身、以及"用户只能读写自己文件夹下的文件"这条RLS策略，都需要在Supabase
  * 后台手动建一次(不是这里的代码能建的)，具体SQL见worker/RECEIPT_STORAGE_SETUP.md。
  *
- * 文件路径约定`${userId}/${entryId}.pdf`——每条记账记录最多一份凭证，重新扫描
- * 是覆盖同一个路径(upsert:true)，不会越攒越多孤儿文件 */
+ * 文件路径约定`${userId}/${entryId}/${uuid}.pdf`——R-41前是`${userId}/${entryId}.pdf`
+ * (每条记录最多一份凭证，重新扫描覆盖同一路径)，多图上传后一条记录能有多张凭证，
+ * 必须各自是独立文件名，不能再互相覆盖；多加一层entryId子目录纯粹是保持同一条
+ * 记录的凭证归堆在一起方便人工在Supabase Storage后台找，不是权限需要——RLS策略
+ * (见worker/RECEIPT_STORAGE_SETUP.md)只按第一级目录(userId)校验，这次路径改动
+ * 不需要改权限策略 */
 const BUCKET = 'receipts'
 
 function pathFor(userId: string, entryId: string): string {
-  return `${userId}/${entryId}.pdf`
+  return `${userId}/${entryId}/${crypto.randomUUID()}.pdf`
 }
 
 export async function uploadReceiptPdf(userId: string, entryId: string, pdf: Blob): Promise<string> {
   const path = pathFor(userId, entryId)
   const { error } = await supabase.storage.from(BUCKET).upload(path, pdf, {
     contentType: 'application/pdf',
-    upsert: true,
   })
   if (error) throw error
   return path

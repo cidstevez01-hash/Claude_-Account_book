@@ -198,6 +198,22 @@ interface EntryRow {
   receipt_path: string | null
 }
 
+/** R-41：receipt_path这一列数据库schema没变(还是单个text)，多张凭证用JSON数组
+ * 字符串存进去，省掉一次要用户手动跑Supabase迁移SQL的操作。旧数据(R-32~R-40时期)
+ * 存的是裸路径字符串(比如"userId/entryId.pdf")，不是JSON——JSON.parse会直接
+ * throw，这里兜底识别"不是JSON就当成旧版单路径"，包成单元素数组；这类记录只要
+ * 被重新保存一次(哪怕只是编辑点了保存没改任何东西)，upsertEntry存回去的时候
+ * 就会自动变成新的JSON数组格式，不需要批量迁移脚本 */
+function parseReceiptPaths(raw: string | null): string[] {
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed.filter((p) => typeof p === 'string') : [raw]
+  } catch {
+    return [raw]
+  }
+}
+
 function dbRowToEntry(row: EntryRow): Entry {
   return {
     id: row.id,
@@ -213,7 +229,7 @@ function dbRowToEntry(row: EntryRow): Entry {
     date: row.entry_date,
     recurringId: row.recurring_id,
     createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
-    receiptPath: row.receipt_path,
+    receiptPaths: parseReceiptPaths(row.receipt_path),
   }
 }
 
@@ -243,7 +259,7 @@ export function entryToDbRow(entry: Entry, userId: string): Omit<EntryRow, 'crea
     points: entry.points,
     entry_date: entry.date,
     recurring_id: entry.recurringId,
-    receipt_path: entry.receiptPath,
+    receipt_path: entry.receiptPaths.length > 0 ? JSON.stringify(entry.receiptPaths) : null,
   }
 }
 

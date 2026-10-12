@@ -16,6 +16,9 @@ export interface EntryRow {
   entry_date: string
   recurring_id: string | null
   created_at: string | null
+  /** R-41：多张凭证场景下，前端把路径数组JSON.stringify后存进这个字段——数据库
+   * schema没变(还是单个text)，这个Worker只做透传，不关心这个字符串里具体装的是
+   * 旧版单路径还是新版JSON数组 */
   receipt_path: string | null
 }
 

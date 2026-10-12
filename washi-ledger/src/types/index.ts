@@ -68,10 +68,14 @@ export interface Entry {
   date: string // YYYY-MM-DD
   recurringId: string | null
   createdAt: number
-  /** R-32：レシート扫描存档——Supabase Storage里的对象路径(不是完整URL，bucket是
-   * private的，查看时要现取一次签名URL，见data/receiptStorage.ts)。存的是原生
-   * 扫描器裁边+透视校正后的图片生成的PDF，不是原始照片本身(拍摄的原图不会保留) */
-  receiptPath: string | null
+  /** R-32→R-41：レシート扫描存档——Supabase Storage里的对象路径数组(不是完整URL，
+   * bucket是private的，查看时要现取一次签名URL，见data/receiptStorage.ts)。存的是
+   * 原生扫描器裁边+透视校正后的图片生成的PDF，不是原始照片本身(拍摄的原图不会保留)。
+   * 一条记录可以有多张凭证(R-41多图上传)，空数组=没有凭证。数据库那列(receipt_path)
+   * 还是单个text字段没有改schema——这个数组在存库前/读库后用JSON.stringify/parse转换
+   * (见data/catalog.ts的fromRow/toRow)，省掉一次要求用户手动跑Supabase迁移SQL的
+   * 操作(旧版本单路径数据读取时做兼容，见fromRow里的说明) */
+  receiptPaths: string[]
 }
 
 export type Lang = 'zh' | 'ja'

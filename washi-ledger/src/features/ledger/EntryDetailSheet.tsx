@@ -19,15 +19,17 @@ interface EntryDetailSheetProps {
   onClose: () => void
 }
 
-/** R-40：记账条目"查看详情"弹层——纯只读展示，不含编辑/删除(用户明确要求"这只是
+/** R-40→R-41：记账条目"查看详情"弹层——纯只读展示，不含编辑/删除(用户明确要求"这只是
  * 详情"，编辑/删除继续走EntryCard展开抽屉原有的入口，不重复放进这里)。跟项目已有的
  * 底部弹层规范共用同一套结构(ReceiptPreviewSheet/ReceiptScanSheet/CategoryDetailSheet
  * 同款：遮罩点击关闭+顶部标题栏右上角✕)，不是另起一套。
  *
  * 原来EntryCard卡片右上角独立的"查看凭证"骑缝章角标在这版合并进来了——有凭证的记录
- * 在详情页里显示一行"凭证"卡片+查看按钮，调用方式(getReceiptSignedUrl+
- * openReceiptDocumentNative原生优先、失败才回退ReceiptPreviewSheet弹层)原样照抄
- * EntryCard.tsx之前handleViewReceipt()的实现，不是重新发明 */
+ * 在详情页里显示凭证列表，每张一行超链接样式(虚线下划线+主色高亮，跟
+ * AddTransactionPage.tsx小票区域同一套视觉语言，只是这里是只读的，没有删除按钮)，
+ * 点开调用方式(getReceiptSignedUrl+openReceiptDocumentNative原生优先、失败才回退
+ * ReceiptPreviewSheet弹层)原样照抄EntryCard.tsx之前handleViewReceipt()的实现，
+ * 不是重新发明 */
 export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, onClose }: EntryDetailSheetProps) {
   const { t, lang } = useI18n()
   const [receiptBusy, setReceiptBusy] = useState(false)
@@ -44,11 +46,11 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
       : catLabel(category, lang)
     : entry.note || '—'
 
-  async function handleViewReceipt() {
-    if (!entry || !entry.receiptPath || receiptBusy) return
+  async function handleViewReceipt(path: string) {
+    if (receiptBusy) return
     setReceiptBusy(true)
     try {
-      const url = await getReceiptSignedUrl(entry.receiptPath)
+      const url = await getReceiptSignedUrl(path)
       const openedNative = await openReceiptDocumentNative(url)
       if (!openedNative) {
         setPreviewUrl(url)
@@ -140,32 +142,24 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
             )}
           </div>
 
-          {entry.receiptPath && (
-            <button
-              type="button"
-              disabled={receiptBusy}
-              onClick={handleViewReceipt}
-              className="mt-md w-full flex items-center gap-3 rounded-xl border-[1.5px] border-dashed border-outline-variant px-3 py-2.5 text-left disabled:opacity-50"
-            >
-              <span
-                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: 'color-mix(in srgb, var(--color-primary) 15%, white)', color: 'var(--color-primary)' }}
-              >
-                <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-              </span>
-              <span className="flex-1 text-body-md text-on-surface">{t('entryDetailReceiptLabel')}</span>
-              {receiptBusy ? (
-                // .ios-spinner尺寸是CSS里跟内部8根小棒的transform-origin配套算好的(见
-                // EntryCard.tsx同款注释)，不能用inline style缩放覆盖，用默认尺寸
-                <span className="ios-spinner relative text-primary">
-                  {Array.from({ length: 8 }, (_, i) => (
-                    <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
-                  ))}
-                </span>
-              ) : (
-                <span className="material-symbols-outlined text-[18px] text-on-surface-variant">chevron_right</span>
-              )}
-            </button>
+          {entry.receiptPaths.length > 0 && (
+            <div className="mt-md">
+              <p className="text-body-sm text-on-surface-variant mb-1.5">{t('entryDetailReceiptLabel')}</p>
+              <div className="flex flex-col rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface-container-lowest overflow-hidden">
+                {entry.receiptPaths.map((path, i) => (
+                  <button
+                    key={path}
+                    type="button"
+                    disabled={receiptBusy}
+                    onClick={() => handleViewReceipt(path)}
+                    className="px-3 py-1.5 border-b border-dashed border-outline-variant/50 last:border-b-0 text-left text-body-md text-primary underline decoration-dashed underline-offset-2 disabled:opacity-50"
+                  >
+                    {t('receiptItemLabel')}
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>

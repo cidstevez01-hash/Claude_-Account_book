@@ -58,6 +58,13 @@ export const dict = {
     // R-32：レシート扫描存档，新App专属(旧App没有这个功能，全部是新写的词条)
     receiptScanEntry: '扫描小票',
     receiptReplace: '重新扫描',
+    // R-41：多图上传——已有至少一张凭证时列表末尾的"继续追加"按钮，跟一张都没有时的
+    // receiptScanEntry文案区分开(那个是"从零开始扫"，这个是"已经有几张了继续加")
+    receiptScanMore: '继续扫描',
+    // 凭证列表每一行的显示文字——没有存真实文件名(扫描出来的是裁边PDF，不是用户
+    // 自己选的文件)，用"凭证1/凭证2..."这种按上传顺序编号的方式标识，够区分、
+    // 够点开预览是哪一张就行，不需要也没必要造一个假文件名
+    receiptItemLabel: '凭证',
     receiptScanTitle: '确认扫描结果',
     receiptCapturedLabel: '扫描结果',
     receiptRetakeAria: '重新拍摄',
@@ -280,6 +287,8 @@ export const dict = {
     // R-32：レシート扫描存档
     receiptScanEntry: 'レシートをスキャン',
     receiptReplace: '撮り直す',
+    receiptScanMore: '追加でスキャン',
+    receiptItemLabel: 'レシート',
     receiptScanTitle: 'スキャン結果を確認',
     receiptCapturedLabel: 'スキャン結果',
     receiptRetakeAria: '撮り直す',

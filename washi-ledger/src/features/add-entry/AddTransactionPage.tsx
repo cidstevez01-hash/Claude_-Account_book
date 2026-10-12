@@ -79,17 +79,17 @@ export function AddTransactionPage() {
   const [sourceEntry, setSourceEntry] = useState<Entry | null>(() => initialSourceEntry)
   const [prefilled, setPrefilled] = useState(() => mode === 'add' || initialSourceEntry != null)
 
-  // R-32：レシート扫描存档——path在Supabase Storage里的对象路径，为null表示这条
-  // 记录还没有凭证。复制模式(copy)故意不继承来源记录的凭证(base?.receiptPath)——
-  // 复制出来的是一笔新的独立交易，原来那张レシート对应的是被复制的那一笔，不该
-  // 被两条记录共享同一份凭证；编辑模式(edit)才带出原有凭证，允许查看/替换/移除。
-  // newEntryId：新建/复制模式下这条记录的id要在保存前就先确定下来(不是等
-  // handleSave才生成)，因为上传凭证到Storage需要用entryId拼文件路径，扫描这个
-  // 动作在保存之前就可能发生
+  // R-32→R-41：レシート扫描存档——receiptPaths是Supabase Storage里的对象路径数组，
+  // 空数组表示这条记录还没有凭证。复制模式(copy)故意不继承来源记录的凭证
+  // (base?.receiptPaths)——复制出来的是一笔新的独立交易，原来那些レシート对应的是
+  // 被复制的那一笔，不该被两条记录共享同一份凭证；编辑模式(edit)才带出原有凭证，
+  // 允许查看/追加/移除。newEntryId：新建/复制模式下这条记录的id要在保存前就先确定
+  // 下来(不是等handleSave才生成)，因为上传凭证到Storage需要用entryId拼文件路径，
+  // 扫描这个动作在保存之前就可能发生
   const [newEntryId] = useState(() => `${Date.now()}${Math.random().toString(16).slice(2)}`)
   const entryId = mode === 'edit' && sourceEntry ? sourceEntry.id : newEntryId
-  const [receiptPath, setReceiptPath] = useState<string | null>(() =>
-    mode === 'edit' ? (initialSourceEntry?.receiptPath ?? null) : null
+  const [receiptPaths, setReceiptPaths] = useState<string[]>(() =>
+    mode === 'edit' ? (initialSourceEntry?.receiptPaths ?? []) : []
   )
   const [scanSheetOpen, setScanSheetOpen] = useState(false)
   const [receiptBusy, setReceiptBusy] = useState(false)
@@ -121,7 +121,7 @@ export function AddTransactionPage() {
     setTagCode(src.tagCode)
     setPoints(src.points != null ? String(src.points) : '')
     setNote(src.note ?? '')
-    if (mode === 'edit') setReceiptPath(src.receiptPath)
+    if (mode === 'edit') setReceiptPaths(src.receiptPaths)
     setPrefilled(true)
   }, [entries, sourceId, prefilled, mode])
 
@@ -170,12 +170,12 @@ export function AddTransactionPage() {
   }, [type])
 
   // R-32：レシート只针对支出——新建模式下(编辑/复制typeLocked=true，切不了类型，
-  // 不会走到这里)如果先在支出页签扫描存了凭证，又切到収入页签，不能让这个隐藏起来
-  // 的receiptPath被悄悄带着存进收入记录里；不去删Storage里已经传上去的文件(留成
+  // 不会走到这里)如果先在支出页签扫描存了凭证，又切到収入页签，不能让这些隐藏起来
+  // 的receiptPaths被悄悄带着存进收入记录里；不去删Storage里已经传上去的文件(留成
   // 孤儿文件，跟放弃整个新建流程不保存时是同一种可接受的取舍)，只清本地状态
   useEffect(() => {
-    if (mode === 'add' && type !== 'expense' && receiptPath) setReceiptPath(null)
-  }, [type, mode, receiptPath])
+    if (mode === 'add' && type !== 'expense' && receiptPaths.length > 0) setReceiptPaths([])
+  }, [type, mode, receiptPaths])
 
   useEffect(() => {
     if (!pointsArmed.current) return
@@ -226,7 +226,7 @@ export function AddTransactionPage() {
       date: date || todayStr(),
       recurringId: base?.recurringId ?? null,
       createdAt: base?.createdAt ?? Date.now(),
-      receiptPath,
+      receiptPaths,
     }
     await upsertEntry(entry, user.id)
     // 新建/编辑/复制保存后统一navigate(-1)，回到进来之前那个底部大导航页签(仪表盘/
@@ -252,12 +252,15 @@ export function AddTransactionPage() {
   // 是否为空"这个隐式判断——编辑的是一条已经存在的正式记录，哪怕它的note当初
   // 就是空的(没写备注的旧数据)，在编辑页重新扫描小票也不该被自动带入内容，
   // 这跟新建/复制页面"扫描是在帮你起草一条还没定型的新记录"性质不同
+  // R-41：扫描确认后追加到receiptPaths末尾(不再是setReceiptPath整个覆盖)——一次
+  // 只扫一张的交互本身不变(ReceiptScanSheet职责不变)，"能扫多张"是这里的列表管理
+  // 逻辑，用户扫完一张想再加一张，自己点列表末尾的"继续扫描"再次打开这个弹层
   async function handleReceiptConfirm(pdf: Blob, fields: RecognizedReceiptFields) {
     if (!user) return
     setReceiptBusy(true)
     try {
       const path = await uploadReceiptPdf(user.id, entryId, pdf)
-      setReceiptPath(path)
+      setReceiptPaths((prev) => [...prev, path])
       setScanSheetOpen(false)
       if (mode !== 'edit') {
         if (!amount && fields.amount != null) setAmount(String(fields.amount))
@@ -273,12 +276,11 @@ export function AddTransactionPage() {
     }
   }
 
-  async function handleReceiptRemove() {
-    if (!receiptPath) return
+  async function handleReceiptRemove(path: string) {
     setReceiptBusy(true)
     try {
-      await deleteReceiptPdf(receiptPath)
-      setReceiptPath(null)
+      await deleteReceiptPdf(path)
+      setReceiptPaths((prev) => prev.filter((p) => p !== path))
     } catch (e) {
       console.error('レシート凭证删除失败', e)
     } finally {
@@ -286,11 +288,11 @@ export function AddTransactionPage() {
     }
   }
 
-  async function handleReceiptView() {
-    if (!receiptPath || receiptBusy) return
+  async function handleReceiptView(path: string) {
+    if (receiptBusy) return
     setReceiptBusy(true)
     try {
-      const url = await getReceiptSignedUrl(receiptPath)
+      const url = await getReceiptSignedUrl(path)
       const openedNative = await openReceiptDocumentNative(url)
       if (!openedNative) {
         setReceiptPreviewUrl(url)
@@ -353,40 +355,48 @@ export function AddTransactionPage() {
           </div>
         </div>
 
-        {/* R-32：レシート扫描存档入口——只在支出场景显示(小票只对应支出，切到收入
-            标签页时这个入口不该出现)，位置紧跟在支出/収入页签下面，一进页面不用
+        {/* R-32→R-41：レシート扫描存档入口——只在支出场景显示(小票只对应支出，切到
+            收入标签页时这个入口不该出现)，位置紧跟在支出/収入页签下面，一进页面不用
             往下滚就能看到，不是埋在备注下面那么靠后。没有凭证时是一整行虚线框的
-            "扫描"按钮，有凭证之后换成"已保存凭证"状态条(查看/重新扫描/移除三个动作) */}
+            "扫描"按钮；有凭证之后换成列表——每张凭证一行，文字本身就是可点的超链接
+            (虚线下划线+主色高亮，照这个App里链接一贯的视觉语言)，不单独放文件类型
+            图标(没有真实文件名，点进去才是重点，不需要图标强调"这是个文件")，右侧
+            一个小删除图标；列表最后一行"继续扫描"，不管已经有几张都能继续追加，
+            不是"有了就不能再扫" */}
         {type === 'expense' && (
           <div className="px-md pb-6">
-            {receiptPath ? (
-              <div className="flex items-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface-container-lowest">
-                <span className="material-symbols-outlined text-primary shrink-0">picture_as_pdf</span>
+            {receiptPaths.length > 0 ? (
+              <div className="flex flex-col rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface-container-lowest overflow-hidden">
+                {receiptPaths.map((path, i) => (
+                  <div key={path} className="flex items-center gap-2 px-3 py-1.5 border-b border-dashed border-outline-variant/50">
+                    <button
+                      type="button"
+                      onClick={() => handleReceiptView(path)}
+                      disabled={receiptBusy}
+                      className="flex-1 min-w-0 text-left text-body-md text-primary underline decoration-dashed underline-offset-2 truncate disabled:opacity-50"
+                    >
+                      {t('receiptItemLabel')}
+                      {i + 1}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={t('receiptRemoveAria')}
+                      onClick={() => handleReceiptRemove(path)}
+                      disabled={receiptBusy}
+                      className="w-7 h-7 shrink-0 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">delete</span>
+                    </button>
+                  </div>
+                ))}
                 <button
                   type="button"
-                  onClick={handleReceiptView}
-                  disabled={receiptBusy}
-                  className="flex-1 text-left text-body-md text-on-surface underline decoration-dashed underline-offset-2 disabled:opacity-50"
-                >
-                  {t('receiptViewAria')}
-                </button>
-                <button
-                  type="button"
-                  aria-label={t('receiptRetakeAria')}
                   onClick={() => setScanSheetOpen(true)}
                   disabled={receiptBusy}
-                  className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
+                  className="flex items-center justify-center gap-1.5 py-1.5 text-on-surface-variant text-body-md active:bg-surface-container transition-colors disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined text-[18px]">photo_camera</span>
-                </button>
-                <button
-                  type="button"
-                  aria-label={t('receiptRemoveAria')}
-                  onClick={handleReceiptRemove}
-                  disabled={receiptBusy}
-                  className="w-8 h-8 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                  <span className="material-symbols-outlined text-[16px]">photo_camera</span>
+                  {t('receiptScanMore')}
                 </button>
               </div>
             ) : (
