@@ -359,10 +359,17 @@ export function AddTransactionPage() {
             收入标签页时这个入口不该出现)，位置紧跟在支出/収入页签下面，一进页面不用
             往下滚就能看到，不是埋在备注下面那么靠后。没有凭证时是一整行虚线框的
             "扫描"按钮；有凭证之后换成列表——每张凭证一行，文字本身就是可点的超链接
-            (虚线下划线+主色高亮，照这个App里链接一贯的视觉语言)，不单独放文件类型
+            (虚线下划线+高亮色，照这个App里链接一贯的视觉语言)，不单独放文件类型
             图标(没有真实文件名，点进去才是重点，不需要图标强调"这是个文件")，右侧
             一个小删除图标；列表最后一行"继续扫描"，不管已经有几张都能继续追加，
-            不是"有了就不能再扫" */}
+            不是"有了就不能再扫"。
+
+            链接文字颜色用index.css新增的--color-link，不是直接用--color-primary——
+            实测过三套主题下--color-primary在这里实际会出现的卡片底色(surface-
+            container-lowest)上的WCAG对比度：默认3.65:1、"怀旧"仅2.14:1，都不够14px
+            正文小字号的AA标准(4.5:1)，是B-51当初踩过的同一类"没对着实际背景量过
+            对比度"问题，这次改成专门开一个token，三套主题各自调过(见index.css该
+            token定义处) */}
         {type === 'expense' && (
           <div className="px-md pb-6">
             {receiptPaths.length > 0 ? (
@@ -373,7 +380,7 @@ export function AddTransactionPage() {
                       type="button"
                       onClick={() => handleReceiptView(path)}
                       disabled={receiptBusy}
-                      className="flex-1 min-w-0 text-left text-body-md text-primary underline decoration-dashed underline-offset-2 truncate disabled:opacity-50"
+                      className="flex-1 min-w-0 text-left text-body-md text-[var(--color-link)] underline decoration-dashed underline-offset-2 truncate disabled:opacity-50"
                     >
                       {t('receiptItemLabel')}
                       {i + 1}

@@ -152,7 +152,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
                     type="button"
                     disabled={receiptBusy}
                     onClick={() => handleViewReceipt(path)}
-                    className="px-3 py-1.5 border-b border-dashed border-outline-variant/50 last:border-b-0 text-left text-body-md text-primary underline decoration-dashed underline-offset-2 disabled:opacity-50"
+                    className="px-3 py-1.5 border-b border-dashed border-outline-variant/50 last:border-b-0 text-left text-body-md text-[var(--color-link)] underline decoration-dashed underline-offset-2 disabled:opacity-50"
                   >
                     {t('receiptItemLabel')}
                     {i + 1}

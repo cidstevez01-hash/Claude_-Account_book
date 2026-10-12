@@ -104,6 +104,18 @@
      不会有明显差异) */
   --color-calendar-heat: #c4a992;
 
+  /* R-41：带色高亮的正文超链接(比如小票列表每一行的"凭证N")专用token——不能直接
+     用--color-primary本身，实测WCAG对比度：默认主题primary(#d1665a)在最常见的卡片
+     底色surface-container-lowest(#ffffff)上只有约3.65:1，不够14px正文小字号的AA
+     标准(4.5:1)；"怀旧"主题更糟，primary(#ff9459)在该主题底色(#fffdf8)上只有约
+     2.14:1，远不够——这正是B-51当初踩过的同一类问题(直接拿--color-primary/
+     --color-on-primary原值套到新场景，没对着实际背景重新量一遍对比度)，这次改成
+     一开始就建独立token，不是等真机反馈再来回修。默认主题用color-mix(primary 80%
+     黑20%)压暗到约5.33:1；"怀旧"/"夏·花火"两个主题各自覆盖(见下方两处)，不能共用
+     同一个固定值——怀旧底色接近白、primary本身是浅橙，要压得更暗；夏主题底色是深
+     藏青，必须反向调亮而不是压暗 */
+  --color-link: color-mix(in srgb, var(--color-primary) 80%, black 20%);
+
   /* 支出/收入专用固定色系——用户明确要求：不管主题怎么换，支出永远是红色系、收入
      永远是绿色系，主题最多只能调深浅，不能整个换色相。之前BalanceCard/
      CategoryDonutCard这些地方直接复用--color-primary/--color-secondary显示支出/收入
@@ -239,6 +251,11 @@
      用户明确要求支出/收入的色相固定，主题只能调深浅。收入本来就没改过
      --color-secondary，不用单独覆盖--color-income */
   --color-expense: #d1665a;
+
+  /* R-41：这个主题的primary(#ff9459浅橙)比默认主题更浅，混黑20%还是不够(实测
+     约2.64:1)，这个主题单独加大到混黑35%，实测在该主题卡片底色(#fffdf8)上约
+     4.74:1，刚过AA标准 */
+  --color-link: color-mix(in srgb, var(--color-primary) 65%, black 35%);
 }
 
 /* R-29："夏 · 花火"主题——移植旧仓库index.html的data-skin="summerB"：深藏青底配
@@ -299,6 +316,10 @@
      主题原本的复古红，不跟--seal(旧App里这两者本来就是分开的两套语义) */
   --color-secondary: #4fd1a5;
   --color-expense: #d1665a;
+
+  /* R-41：这个主题底色是深藏青(#1a2c4d)，跟默认/怀旧两个浅色底主题方向相反——
+     要把primary调亮而不是压暗，混白15%，实测在该主题卡片底色上约4.81:1 */
+  --color-link: color-mix(in srgb, var(--color-primary) 85%, white 15%);
 
   /* 金黄强调色——旧App--accent，新App目前没有单独消费这个token的地方，先占位
      覆盖，以后要用金黄强调随时能接 */
