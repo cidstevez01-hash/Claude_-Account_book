@@ -175,8 +175,6 @@ export const dict = {
     editLabel: LEGACY_ZH.edit,
     copyLabel: LEGACY_ZH.copy,
     // R-40：记账条目"查看详情"弹层——新App专属，旧App没有这个功能
-    viewDetailLabel: '详情', // 展开操作抽屉里的按钮文字(编辑/复制/删除旁边)
-    viewDetailAria: '查看详情',
     entryDetailTitle: '详情',
     entryDetailPaymentLabel: '支付方式',
     entryDetailReceiptLabel: '凭证',
@@ -380,8 +378,6 @@ export const dict = {
     deleteLabel: LEGACY_JA.delete,
     editLabel: LEGACY_JA.edit,
     copyLabel: LEGACY_JA.copy,
-    viewDetailLabel: '詳細',
-    viewDetailAria: '詳細を見る',
     entryDetailTitle: '詳細',
     entryDetailPaymentLabel: '支払い方法',
     entryDetailReceiptLabel: 'レシート',

@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
+import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { DateRangeBar } from '../../design-system/components/DateRangeBar'
+import { MainActionFab } from '../../design-system/components/MainActionFab'
 import { HistoryEntryList } from './HistoryEntryList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -11,11 +13,15 @@ import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { matchesEntrySearch, fullDataRange } from '../../data/summary'
+import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
+import { APP_ICONS } from '../../lib/appIcons'
 import { firstOfMonthStr, lastOfMonthStr, todayStr } from '../../lib/date'
 import { loadHistoryViewMemory, saveHistoryViewMemory } from '../../lib/historyViewMemory'
 import { loadHistoryRange, saveHistoryRange } from '../../lib/dateRangeStorage'
-import type { EntryType } from '../../types'
+import { consumeHistoryFocusEntryId } from '../../lib/historyFocusMemory'
+import { setAddEntryOrigin } from '../../lib/addEntryOrigin'
+import type { Entry, EntryType } from '../../types'
 
 type TypeFilter = 'all' | EntryType
 
@@ -24,10 +30,48 @@ export function HistoryPage() {
   const navigate = useAppNavigate()
   const { user } = useAuth()
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
-  const { entries, reload } = useEntries(user?.id ?? null)
+  const { entries, reload, removeLocal } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
   const mainRef = useRef<HTMLElement>(null)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  // R-42：新建/编辑/复制保存后跳回明细页，要定位/高亮到这条记录——照仪表盘
+  // DashboardPage.tsx同一套做法(先用consumeHistoryFocusEntryId拿到目标id存进ref，
+  // entries真的同步到这条记录之后再去找DOM滚动+高亮，不是固定帧数硬等)
+  const [focusEntryId, setFocusEntryId] = useState<string | null>(null)
+  const pendingFocusIdRef = useRef<string | null>(null)
+  const focusConsumedRef = useRef(false)
+  useLayoutEffect(() => {
+    if (focusConsumedRef.current) return
+    focusConsumedRef.current = true
+    const id = consumeHistoryFocusEntryId()
+    if (id) pendingFocusIdRef.current = id
+  }, [])
+  useEffect(() => {
+    const pendingId = pendingFocusIdRef.current
+    if (!pendingId || !entries.some((e) => e.id === pendingId)) return
+    pendingFocusIdRef.current = null
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`entry-${pendingId}`)
+      if (!el) return
+      el.scrollIntoView({ block: 'center' })
+      setFocusEntryId(pendingId)
+      window.setTimeout(() => setFocusEntryId(null), 2000)
+    })
+  }, [entries])
+
+  function goToAdd(path: string) {
+    setAddEntryOrigin('history')
+    navigate(path)
+  }
+
+  async function confirmDelete() {
+    if (!user || !pendingDeleteId) return
+    await deleteEntry(pendingDeleteId, user.id)
+    removeLocal(pendingDeleteId)
+    setPendingDeleteId(null)
+    reload()
+  }
 
   const categories = useMemo(
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
@@ -149,7 +193,22 @@ export function HistoryPage() {
   }
 
   return (
-    <AppLayout title={t('tabHistory')} onRefresh={handleRefresh} mainRef={mainRef} hideRateFab>
+    <AppLayout
+      title={t('tabHistory')}
+      onRefresh={handleRefresh}
+      mainRef={mainRef}
+      hideRateFab
+      floatingContent={
+        <MainActionFab
+          icon={APP_ICONS.addTransaction}
+          ariaLabel={t('mainFabAria')}
+          actions={[
+            { key: 'add', icon: APP_ICONS.addTransaction, ariaLabel: t('addTitle'), onActivate: () => goToAdd('/add') },
+            { key: 'rate', icon: 'currency_exchange', ariaLabel: t('rateShortcutAria'), onActivate: () => navigate('/rate') },
+          ]}
+        />
+      }
+    >
       <section className="flex flex-col gap-sm px-md pt-md">
         <div className="relative w-full">
           <span className="material-symbols-outlined text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-outline">
@@ -233,9 +292,20 @@ export function HistoryPage() {
             paymentMethods={catalog.paymentMethods}
             tags={tags}
             currency={settings.currency}
+            onEdit={(entry: Entry) => goToAdd(`/add?editId=${entry.id}`)}
+            onCopy={(entry: Entry) => goToAdd(`/add?copyId=${entry.id}`)}
+            onDelete={(entry: Entry) => setPendingDeleteId(entry.id)}
+            focusEntryId={focusEntryId}
           />
         )}
       </div>
+      <ConfirmDialog
+        open={pendingDeleteId != null}
+        title={t('confirmDeleteTitle')}
+        message={t('confirmDeleteMessage')}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </AppLayout>
   )
 }

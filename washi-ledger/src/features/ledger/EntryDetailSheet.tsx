@@ -17,26 +17,52 @@ interface EntryDetailSheetProps {
   paymentMethod?: PaymentMethod
   tag?: Tag
   onClose: () => void
+  /** R-42：编辑/复制/删除——原来挂在EntryCard展开抽屉上的三个操作，这版统一挪进
+   * 详情弹层自己的头部(左上角图标组)，"只在仪表盘提供"这条R-40定下的限制也跟着
+   * 取消了，复用EntryDetailSheet的5处现在都要传这三个handler，所以定成必传(不是
+   * 可选)——用tsc -b的报错逐一揪出所有调用点，照搬R-40给onView做过的同一招，
+   * 不会漏改 */
+  onEdit: (entry: Entry) => void
+  onCopy: (entry: Entry) => void
+  onDelete: (entry: Entry) => void
 }
 
-/** R-40→R-41：记账条目"查看详情"弹层——纯只读展示，不含编辑/删除(用户明确要求"这只是
- * 详情"，编辑/删除继续走EntryCard展开抽屉原有的入口，不重复放进这里)。跟项目已有的
- * 底部弹层规范共用同一套结构(ReceiptPreviewSheet/ReceiptScanSheet/CategoryDetailSheet
- * 同款：遮罩点击关闭+顶部标题栏右上角✕)，不是另起一套。
+/** R-40→R-42：记账条目"查看详情"弹层。跟项目已有的底部弹层规范共用同一套结构
+ * (ReceiptPreviewSheet/ReceiptScanSheet/CategoryDetailSheet同款：遮罩点击关闭+
+ * 顶部标题栏右上角✕)，不是另起一套。R-42续：头部左上角新增删除/复制/编辑三个
+ * 图标(布局参考用户提供的参考App截图：左上图标组+居中标题+右上✕，只参考按钮
+ * 位置，不是照抄那个App别的东西)，点击后关掉详情弹层本身(onClose)再触发对应
+ * handler(跳转编辑页/复制页，或者交给调用方弹删除确认框)——不堆叠两层弹层。
  *
- * 原来EntryCard卡片右上角独立的"查看凭证"骑缝章角标在这版合并进来了——有凭证的记录
- * 在详情页里显示凭证列表，每张一行超链接样式(虚线下划线+主色高亮，跟
+ * 原来EntryCard卡片右上角独立的"查看凭证"骑缝章角标在R-41合并进来了——有凭证的记录
+ * 在详情页里显示凭证列表，每张一行超链接样式(虚线下划线+高亮色，跟
  * AddTransactionPage.tsx小票区域同一套视觉语言，只是这里是只读的，没有删除按钮)，
  * 点开调用方式(getReceiptSignedUrl+openReceiptDocumentNative原生优先、失败才回退
  * ReceiptPreviewSheet弹层)原样照抄EntryCard.tsx之前handleViewReceipt()的实现，
  * 不是重新发明 */
-export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, onClose }: EntryDetailSheetProps) {
+export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, onClose, onEdit, onCopy, onDelete }: EntryDetailSheetProps) {
   const { t, lang } = useI18n()
   const [receiptBusy, setReceiptBusy] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   if (!open || !entry) return null
+  // TS的null narrowing不会延续进下面这几个闭包里，单独存一份非空引用给它们用，
+  // 不用每次都写entry!
+  const currentEntry = entry
+
+  function handleEdit() {
+    onClose()
+    onEdit(currentEntry)
+  }
+  function handleCopy() {
+    onClose()
+    onCopy(currentEntry)
+  }
+  function handleDelete() {
+    onClose()
+    onDelete(currentEntry)
+  }
 
   const isIncome = entry.type === 'income'
   const sub = category?.subs.find((s) => s.code === entry.subCode)
@@ -67,13 +93,42 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
       <div className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px]" onClick={onClose} />
       <div className="relative z-10 w-full max-w-[480px] max-h-[85vh] bg-surface rounded-t-[24px] shadow-xl flex flex-col overflow-hidden">
-        <header className="flex items-center justify-between px-md h-16 border-b-[1.5px] border-dashed border-outline-variant shrink-0">
-          <h2 className="font-serif text-headline-md text-on-surface">{t('entryDetailTitle')}</h2>
+        {/* 头部用三栏grid(两侧1fr+中间auto)而不是flex justify-between——左边图标组
+            (3个)跟右边关闭按钮(1个)宽度本来就不对称，justify-between会让标题视觉
+            偏左，grid两侧轨道等宽能保证标题真正居中，不受两边按钮数量不一致影响 */}
+        <header className="grid grid-cols-[1fr_auto_1fr] items-center px-md h-16 border-b-[1.5px] border-dashed border-outline-variant shrink-0">
+          <div className="flex items-center gap-1 -ml-1.5 justify-self-start">
+            <button
+              type="button"
+              aria-label={t('deleteLabel')}
+              onClick={handleDelete}
+              className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+            >
+              <span className="material-symbols-outlined text-[20px]">delete</span>
+            </button>
+            <button
+              type="button"
+              aria-label={t('copyLabel')}
+              onClick={handleCopy}
+              className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+            >
+              <span className="material-symbols-outlined text-[20px]">content_copy</span>
+            </button>
+            <button
+              type="button"
+              aria-label={t('editLabel')}
+              onClick={handleEdit}
+              className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+            >
+              <span className="material-symbols-outlined text-[20px]">edit</span>
+            </button>
+          </div>
+          <h2 className="font-serif text-headline-md text-on-surface whitespace-nowrap">{t('entryDetailTitle')}</h2>
           <button
             type="button"
             aria-label={t('closeAria')}
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+            className="w-8 h-8 flex items-center justify-center text-on-surface-variant justify-self-end"
           >
             <span className="material-symbols-outlined">close</span>
           </button>

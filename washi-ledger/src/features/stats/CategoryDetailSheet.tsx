@@ -34,9 +34,9 @@ interface CategoryDetailSheetProps {
    * 这个币种了，这里只管格式化，不做换算 */
   currency?: string
   onClose: () => void
-  onEdit?: (entry: Entry) => void
-  onCopy?: (entry: Entry) => void
-  onDelete?: (entry: Entry) => void
+  onEdit: (entry: Entry) => void
+  onCopy: (entry: Entry) => void
+  onDelete: (entry: Entry) => void
 }
 
 /** 分类/标签明细钻取——统计页专属版本，点收支趋势图例或分类环状图的图例行，弹出
@@ -59,7 +59,6 @@ export function CategoryDetailSheet({
   onDelete,
 }: CategoryDetailSheetProps) {
   const { t } = useI18n()
-  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
 
   // 弹出/收起做平缓过渡——照旧仓库index.html真实的.sheet/.sheet.show搬：初始
@@ -177,12 +176,7 @@ export function CategoryDetailSheet({
                     entry={entry}
                     category={snap.categories.find((c) => c.code === entry.catCode)}
                     paymentMethod={snap.paymentMethods.find((p) => p.code === entry.paymentMethod)}
-                    expanded={expandedId === entry.id}
-                    onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
-                    onView={setViewEntry}
-                    onEdit={onEdit}
-                    onCopy={onCopy}
-                    onDelete={onDelete}
+                    onOpenDetail={setViewEntry}
                   />
                 ))}
               </div>
@@ -198,6 +192,9 @@ export function CategoryDetailSheet({
         paymentMethod={viewEntry ? snap.paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? snap.tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
         onClose={() => setViewEntry(null)}
+        onEdit={onEdit}
+        onCopy={onCopy}
+        onDelete={onDelete}
       />
     </div>
   )

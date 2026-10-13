@@ -20,6 +20,9 @@ import { symbolFor } from '../../data/currencyDisplay'
 import { useI18n } from '../../lib/i18n'
 import { payLabel } from '../../lib/catalogLabel'
 import { setDashboardFocusEntryId } from '../../lib/dashboardFocusMemory'
+import { setHistoryFocusEntryId } from '../../lib/historyFocusMemory'
+import { markStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
+import { consumeAddEntryOrigin } from '../../lib/addEntryOrigin'
 import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import type { Entry, EntryType } from '../../types'
 
@@ -229,12 +232,15 @@ export function AddTransactionPage() {
       receiptPaths,
     }
     await upsertEntry(entry, user.id)
-    // 新建/编辑/复制保存后统一navigate(-1)，回到进来之前那个底部大导航页签(仪表盘/
-    // 明细都可能是来源)，不强制跳明细页——"新建"入口目前只在仪表盘的悬浮按钮上，
-    // 保存完跳去明细页反而是跑题了。编辑/复制/删除操作现已收拢到仪表盘("全放在
-    // 首页操作"，明细页不再提供这几个按钮)，回到仪表盘后要定位/高亮到这条记录，
-    // 不能让它埋没在整页列表里——写一次性信号给DashboardPage.tsx挂载时消费
-    setDashboardFocusEntryId(entry.id)
+    // 新建/编辑/复制保存后统一navigate(-1)，回到进来之前那个底部大导航页签——R-42起
+    // "+"和编辑/复制入口三大页签(仪表盘/明细/统计)都有了，具体回去之后要做什么收尾
+    // (定位高亮哪条/要不要强制刷新)按发起页分流，发起页自己在跳转来/add之前已经调
+    // setAddEntryOrigin()写好了信号，这里消费掉决定分流到哪一条(见addEntryOrigin.ts
+    // 顶部注释)
+    const origin = consumeAddEntryOrigin()
+    if (origin === 'dashboard') setDashboardFocusEntryId(entry.id)
+    else if (origin === 'history') setHistoryFocusEntryId(entry.id)
+    else if (origin === 'stats') markStatsNeedsRefresh()
     navigate(-1)
   }
 

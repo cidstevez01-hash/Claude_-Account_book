@@ -16,18 +16,23 @@ interface HistoryEntryListProps {
    * data/currencyDisplay.ts的toDisplayEntries()把entries统一换算成这个币种了，
    * 这里只管格式化显示，不做换算 */
   currency: string
+  onEdit: (entry: Entry) => void
+  onCopy: (entry: Entry) => void
+  onDelete: (entry: Entry) => void
+  /** R-42：明细页新建/编辑/复制保存后跳回来，要定位/高亮到这条记录——见
+   * lib/historyFocusMemory.ts，HistoryPage挂载后consume一次传下来，跟仪表盘
+   * RecentEntriesList同款做法 */
+  focusEntryId?: string | null
 }
 
 /** 明细页的按日分组列表——跟仪表盘的RecentEntriesList不同点：不限条数、每日标题
- * 旁边带当日净额(照design-assets-v2/_13)，没有"最近记录/查看全部"标题。编辑/复制/
- * 删除操作按用户要求收拢到仪表盘("全放在首页操作")，这里不传onEdit/onCopy/
- * onDelete这三个handler给EntryCard——EntryCard自己会按有没有传来决定要不要显示
- * 对应的操作抽屉。R-40续：查看详情不受这条限制，onView必传，明细页这边之前点击条目
- * 完全没反应(expanded写死false)，现在真正接上展开态+详情弹层 */
-export function HistoryEntryList({ entries, categories, paymentMethods, tags, currency }: HistoryEntryListProps) {
+ * 旁边带当日净额(照design-assets-v2/_13)，没有"最近记录/查看全部"标题。R-42起
+ * 编辑/复制/删除不再限制"只能在仪表盘操作"，这里也要传onEdit/onCopy/onDelete给
+ * EntryDetailSheet(原来点击条目完全没反应、后来R-40接上只读详情弹层，这版详情
+ * 弹层自己头部多了这三个操作图标) */
+export function HistoryEntryList({ entries, categories, paymentMethods, tags, currency, onEdit, onCopy, onDelete, focusEntryId }: HistoryEntryListProps) {
   const { t } = useI18n()
   const groups = groupByDay(entries)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
 
   if (entries.length === 0) {
@@ -70,12 +75,12 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
               return (
                 <EntryCard
                   key={entry.id}
+                  id={`entry-${entry.id}`}
+                  highlighted={focusEntryId === entry.id}
                   entry={entry}
                   category={cat}
                   paymentMethod={pm}
-                  expanded={expandedId === entry.id}
-                  onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
-                  onView={setViewEntry}
+                  onOpenDetail={setViewEntry}
                 />
               )
             })}
@@ -89,6 +94,9 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
         paymentMethod={viewPaymentMethod}
         tag={viewTag}
         onClose={() => setViewEntry(null)}
+        onEdit={onEdit}
+        onCopy={onCopy}
+        onDelete={onDelete}
       />
     </div>
   )

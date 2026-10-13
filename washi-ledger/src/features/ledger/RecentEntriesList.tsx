@@ -23,9 +23,9 @@ interface RecentEntriesListProps {
   search: string
   onSearchChange: (value: string) => void
   onViewAll?: () => void
-  onEdit?: (entry: Entry) => void
-  onCopy?: (entry: Entry) => void
-  onDelete?: (entry: Entry) => void
+  onEdit: (entry: Entry) => void
+  onCopy: (entry: Entry) => void
+  onDelete: (entry: Entry) => void
   /** 新建/编辑/复制保存后跳回仪表盘，要定位/高亮到这条记录——见
    * lib/dashboardFocusMemory.ts，DashboardPage挂载后consume一次传下来 */
   focusEntryId?: string | null
@@ -58,11 +58,8 @@ export function RecentEntriesList({
   // 范围，范围内该有多少条就得显示多少条，不然调节范围时列表看起来"没反应"(范围内
   // 已经有6条以上时，不管怎么调都还是那6条)
   const groups = groupByDayPinned(filteredEntries)
-  // 点一条记录展开操作抽屉(编辑/复制/删除)，照design-assets-v2/_44的"Expanded Action Drawer"，
-  // 同一时间只展开一条，不用给每条记录单独维护一个boolean状态
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  // R-40：查看详情弹层——跟expandedId(展开抽屉)是两个独立状态，详情弹层关掉之后
-  // 抽屉不需要跟着收起
+  // R-40→R-42：点一条记录直接打开详情弹层(原来点了先展开操作抽屉那套在R-42去掉了，
+  // 编辑/复制/删除现在是详情弹层自己头部的图标)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
   // 搜索框收起/展开——照旧仓库index.html的#ledgerSearch真实交互搬：默认是30x30
   // 圆形虚线图标按钮，点了才展开成圆角矩形(12px，不是整胶囊)。失焦时如果没输入
@@ -177,12 +174,7 @@ export function RecentEntriesList({
                   entry={entry}
                   category={cat}
                   paymentMethod={pm}
-                  expanded={expandedId === entry.id}
-                  onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
-                  onView={setViewEntry}
-                  onEdit={onEdit}
-                  onCopy={onCopy}
-                  onDelete={onDelete}
+                  onOpenDetail={setViewEntry}
                 />
               )
             })}
@@ -198,6 +190,9 @@ export function RecentEntriesList({
         paymentMethod={viewEntry ? paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
         onClose={() => setViewEntry(null)}
+        onEdit={onEdit}
+        onCopy={onCopy}
+        onDelete={onDelete}
       />
     </section>
   )

@@ -22,6 +22,7 @@ import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
 import { firstOfMonthStr, lastOfMonthStr, formatDateRangeLabel } from '../../lib/date'
 import { consumeDashboardReturnMemory, saveDashboardScrollTop, saveDashboardSearch } from '../../lib/dashboardFocusMemory'
+import { setAddEntryOrigin } from '../../lib/addEntryOrigin'
 import { loadDashboardRange, saveDashboardRange } from '../../lib/dateRangeStorage'
 import type { EntryType } from '../../types'
 
@@ -124,6 +125,7 @@ export function DashboardPage() {
   function goToAdd(path: string) {
     if (mainRef.current) saveDashboardScrollTop(mainRef.current.scrollTop)
     saveDashboardSearch(search)
+    setAddEntryOrigin('dashboard')
     navigate(path)
   }
   // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail搬：

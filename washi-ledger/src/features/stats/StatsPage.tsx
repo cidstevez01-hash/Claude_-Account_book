@@ -3,6 +3,7 @@ import { AppLayout } from '../../design-system/components/AppLayout'
 import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
+import { MainActionFab } from '../../design-system/components/MainActionFab'
 import { MonthNavBar } from './MonthNavBar'
 import { TrendControls } from './TrendControls'
 import { TrendLegend } from './TrendLegend'
@@ -29,6 +30,9 @@ import { toDisplayEntries, formatCurrency, symbolFor } from '../../data/currency
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
+import { APP_ICONS } from '../../lib/appIcons'
+import { setAddEntryOrigin } from '../../lib/addEntryOrigin'
+import { consumeStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
 import type { EntryType } from '../../types'
 
 type StatsTab = 'cashflow' | 'points'
@@ -232,8 +236,36 @@ export function StatsPage() {
     await Promise.all([reload(), reloadCatalog()])
   }
 
+  // R-42："+"和编辑/复制入口统计页也开放了，保存成功跳回来要"同时刷新页面"(用户
+  // 原话)——统计页是图表汇总，不像仪表盘/明细页能具体定位到某一行，只需要强制
+  // 重新拉一次数据重新算汇总。挂载时consume一次信号，只有真的是从/add保存回来
+  // 才会触发，不是每次进统计页都刷新
+  useEffect(() => {
+    if (consumeStatsNeedsRefresh()) handleRefresh()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function goToAdd(path: string) {
+    setAddEntryOrigin('stats')
+    navigate(path)
+  }
+
   return (
-    <AppLayout title={t('tabStats')} onRefresh={handleRefresh} hideRateFab>
+    <AppLayout
+      title={t('tabStats')}
+      onRefresh={handleRefresh}
+      hideRateFab
+      floatingContent={
+        <MainActionFab
+          icon={APP_ICONS.addTransaction}
+          ariaLabel={t('mainFabAria')}
+          actions={[
+            { key: 'add', icon: APP_ICONS.addTransaction, ariaLabel: t('addTitle'), onActivate: () => goToAdd('/add') },
+            { key: 'rate', icon: 'currency_exchange', ariaLabel: t('rateShortcutAria'), onActivate: () => navigate('/rate') },
+          ]}
+        />
+      }
+    >
       <div className="px-md pt-md mb-md">
         <div className="w-full bg-surface-container rounded-full p-1 flex relative border-[1.5px] border-dashed border-outline-variant/50">
           <div
@@ -374,8 +406,8 @@ export function StatsPage() {
         entries={detailEntries}
         currency={settings.currency}
         onClose={() => setDetailCatCode(null)}
-        onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-        onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+        onEdit={(entry) => goToAdd(`/add?editId=${entry.id}`)}
+        onCopy={(entry) => goToAdd(`/add?copyId=${entry.id}`)}
         onDelete={(entry) => setPendingDeleteId(entry.id)}
       />
 

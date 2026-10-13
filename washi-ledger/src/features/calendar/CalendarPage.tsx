@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { CashPointToggle } from '../../design-system/components/CashPointToggle'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
+import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { MonthNavBar } from '../stats/MonthNavBar'
 import { EntryCard } from '../ledger/EntryCard'
 import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
@@ -15,6 +17,7 @@ import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { formatCurrency, formatAmountNoSymbol } from '../../data/currencyDisplay'
 import { hasEntriesInMonth } from '../../data/summary'
+import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
 import type { Entry } from '../../types'
@@ -63,9 +66,10 @@ const EMPTY_SUMMARY: DaySummary = { expense: 0, income: 0, points: 0 }
  * 区域内容为那一天"，切月份本身没提过要重置选中) */
 export function CalendarPage() {
   const { t, lang } = useI18n()
+  const navigate = useAppNavigate()
   const { user } = useAuth()
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
-  const { entries, reload } = useEntries(user?.id ?? null)
+  const { entries, reload, removeLocal } = useEntries(user?.id ?? null)
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
   const holidays = useJpHolidays()
@@ -161,11 +165,19 @@ export function CalendarPage() {
   )
   const hasSelectedRecord = filteredEntries.length > 0
   const selectedHolidayName = holidays[selectedDate]
-  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
   async function handleRefresh() {
     await Promise.all([reload(), reloadCatalog()])
+  }
+
+  async function confirmDelete() {
+    if (!user || !pendingDeleteId) return
+    await deleteEntry(pendingDeleteId, user.id)
+    removeLocal(pendingDeleteId)
+    setPendingDeleteId(null)
+    reload()
   }
 
   return (
@@ -382,9 +394,7 @@ export function CalendarPage() {
                       entry={entry}
                       category={cat}
                       paymentMethod={pm}
-                      expanded={expandedId === entry.id}
-                      onToggle={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
-                      onView={setViewEntry}
+                      onOpenDetail={setViewEntry}
                       amountDisplay={mode === 'point' ? 'points' : 'currency'}
                     />
                   )
@@ -406,6 +416,16 @@ export function CalendarPage() {
         paymentMethod={viewEntry ? paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
         onClose={() => setViewEntry(null)}
+        onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
+        onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+        onDelete={(entry) => setPendingDeleteId(entry.id)}
+      />
+      <ConfirmDialog
+        open={pendingDeleteId != null}
+        title={t('confirmDeleteTitle')}
+        message={t('confirmDeleteMessage')}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
       />
     </AppLayout>
   )
