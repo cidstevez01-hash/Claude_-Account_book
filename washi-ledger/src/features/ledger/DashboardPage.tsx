@@ -23,6 +23,7 @@ import { APP_ICONS } from '../../lib/appIcons'
 import { firstOfMonthStr, lastOfMonthStr, formatDateRangeLabel } from '../../lib/date'
 import { consumeDashboardReturnMemory, saveDashboardScrollTop, saveDashboardSearch } from '../../lib/dashboardFocusMemory'
 import { setAddEntryOrigin } from '../../lib/addEntryOrigin'
+import { consumeDetailSheetReturnMemory, setDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import { loadDashboardRange, saveDashboardRange } from '../../lib/dateRangeStorage'
 import type { EntryType } from '../../types'
 
@@ -131,6 +132,20 @@ export function DashboardPage() {
   // 点分类环状图图例钻取明细——照design-assets-v2/_40，逻辑照旧App openMonthDetail搬：
   // 记住点的是分类还是标签维度、具体是哪一个+当时环状图在看支出还是收入
   const [detailSelection, setDetailSelection] = useState<DetailSelection | null>(null)
+  // B-66：从CategoryDetailSheet里嵌套的详情弹层点编辑/复制跳去/add又点返回，要
+  // 重新张开这个分类钻取弹层+里面那条记录的详情弹层。DashboardPage跳/add会整个
+  // 卸载重挂载，detailSelection也丢了，回来后先从memory里恢复detailSelection
+  // 重新张开CategoryDetailSheet，entryId转发给它的initialViewEntryId prop，
+  // 由它自己挂载后的effect去打开嵌套的详情弹层(不在这里直接consume两次，避免
+  // 和CategoryDetailSheet自己的逻辑抢着读同一份memory)
+  const [categoryDetailInitialEntryId, setCategoryDetailInitialEntryId] = useState<string | null>(null)
+  useEffect(() => {
+    const m = consumeDetailSheetReturnMemory('dashboard-category')
+    if (!m) return
+    setDetailSelection((m.categorySelection as DetailSelection | undefined) ?? null)
+    setCategoryDetailInitialEntryId(m.entryId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const categories = useMemo(
     () => [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])],
     [catalog]
@@ -265,8 +280,14 @@ export function DashboardPage() {
             search={search}
             onSearchChange={setSearch}
             onViewAll={() => navigate('/history')}
-            onEdit={(entry) => goToAdd(`/add?editId=${entry.id}`)}
-            onCopy={(entry) => goToAdd(`/add?copyId=${entry.id}`)}
+            onEdit={(entry) => {
+              setDetailSheetReturnMemory('dashboard', entry.id)
+              goToAdd(`/add?editId=${entry.id}`)
+            }}
+            onCopy={(entry) => {
+              setDetailSheetReturnMemory('dashboard', entry.id)
+              goToAdd(`/add?copyId=${entry.id}`)
+            }}
             onDelete={(entry) => setPendingDeleteId(entry.id)}
             focusEntryId={focusEntryId}
           />
@@ -289,9 +310,16 @@ export function DashboardPage() {
             entries={detailEntries}
             currency={settings.currency}
             onClose={() => setDetailSelection(null)}
-            onEdit={(entry) => goToAdd(`/add?editId=${entry.id}`)}
-            onCopy={(entry) => goToAdd(`/add?copyId=${entry.id}`)}
+            onEdit={(entry) => {
+              setDetailSheetReturnMemory('dashboard-category', entry.id, detailSelection)
+              goToAdd(`/add?editId=${entry.id}`)
+            }}
+            onCopy={(entry) => {
+              setDetailSheetReturnMemory('dashboard-category', entry.id, detailSelection)
+              goToAdd(`/add?copyId=${entry.id}`)
+            }}
             onDelete={(entry) => setPendingDeleteId(entry.id)}
+            initialViewEntryId={categoryDetailInitialEntryId}
           />
         </>
       )}

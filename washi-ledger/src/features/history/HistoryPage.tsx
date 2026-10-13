@@ -21,6 +21,7 @@ import { loadHistoryViewMemory, saveHistoryViewMemory } from '../../lib/historyV
 import { loadHistoryRange, saveHistoryRange } from '../../lib/dateRangeStorage'
 import { consumeHistoryFocusEntryId } from '../../lib/historyFocusMemory'
 import { setAddEntryOrigin } from '../../lib/addEntryOrigin'
+import { setDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import type { Entry, EntryType } from '../../types'
 
 type TypeFilter = 'all' | EntryType
@@ -292,8 +293,14 @@ export function HistoryPage() {
             paymentMethods={catalog.paymentMethods}
             tags={tags}
             currency={settings.currency}
-            onEdit={(entry: Entry) => goToAdd(`/add?editId=${entry.id}`)}
-            onCopy={(entry: Entry) => goToAdd(`/add?copyId=${entry.id}`)}
+            onEdit={(entry: Entry) => {
+              setDetailSheetReturnMemory('history', entry.id)
+              goToAdd(`/add?editId=${entry.id}`)
+            }}
+            onCopy={(entry: Entry) => {
+              setDetailSheetReturnMemory('history', entry.id)
+              goToAdd(`/add?copyId=${entry.id}`)
+            }}
             onDelete={(entry: Entry) => setPendingDeleteId(entry.id)}
             focusEntryId={focusEntryId}
           />

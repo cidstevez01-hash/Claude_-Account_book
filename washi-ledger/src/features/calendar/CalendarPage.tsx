@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { CashPointToggle } from '../../design-system/components/CashPointToggle'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
@@ -20,6 +20,7 @@ import { hasEntriesInMonth } from '../../data/summary'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
+import { consumeDetailSheetReturnMemory, setDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import type { Entry } from '../../types'
 
 const WEEKDAY_LABELS_ZH = ['日', '一', '二', '三', '四', '五', '六']
@@ -167,6 +168,21 @@ export function CalendarPage() {
   const selectedHolidayName = holidays[selectedDate]
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
+  // B-66：同RecentEntriesList.tsx——从详情弹层点编辑/复制跳去/add又点返回要重新
+  // 打开详情弹层；删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录
+  // 移除，这里跟着自动关掉详情弹层。CalendarPage跳/add不走goToAdd(日历页故意不传
+  // addEntryOrigin，R-42就是这么设计的，这里的返回定位信号是独立的另一套，不受影响)
+  useEffect(() => {
+    const m = consumeDetailSheetReturnMemory('calendar')
+    if (!m) return
+    const found = entries.find((e) => e.id === m.entryId)
+    if (found) setViewEntry(found)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  useEffect(() => {
+    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
+  }, [entries, viewEntry])
 
   async function handleRefresh() {
     await Promise.all([reload(), reloadCatalog()])
@@ -416,8 +432,14 @@ export function CalendarPage() {
         paymentMethod={viewEntry ? paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
         onClose={() => setViewEntry(null)}
-        onEdit={(entry) => navigate(`/add?editId=${entry.id}`)}
-        onCopy={(entry) => navigate(`/add?copyId=${entry.id}`)}
+        onEdit={(entry) => {
+          setDetailSheetReturnMemory('calendar', entry.id)
+          navigate(`/add?editId=${entry.id}`)
+        }}
+        onCopy={(entry) => {
+          setDetailSheetReturnMemory('calendar', entry.id)
+          navigate(`/add?copyId=${entry.id}`)
+        }}
         onDelete={(entry) => setPendingDeleteId(entry.id)}
       />
       <ConfirmDialog

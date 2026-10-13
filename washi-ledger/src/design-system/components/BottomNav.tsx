@@ -190,10 +190,15 @@ export function BottomNav() {
   return (
     <nav
       ref={navRef}
-      className="bottom-nav-shell fixed bottom-6 inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
+      className="bottom-nav-shell fixed inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
                  flex items-center px-lg py-xs
                  bg-surface/80 backdrop-blur-md border border-white/20 rounded-full shadow-lg"
       style={{
+        // B-65：原来写死bottom-6(24px)，iPhone Home Indicator那截安全区没有算进去，
+        // 悬浮导航栏会贴到物理圆角/Home Indicator区域里。改成跟项目里已有的
+        // paddingTop: 'env(safe-area-inset-top)'同一套写法，用max()保证没有安全区
+        // 的机型(或桌面浏览器预览)依然保持原来24px的视觉间距，不会变成贴边
+        bottom: 'max(24px, calc(env(safe-area-inset-bottom) + 12px))',
         // 键盘弹出时(见useKeyboardInset.ts说明)这类fixed贴底元素会被顶到键盘上方
         // 悬空显示，脱离正常的贴底位置——滑出隐藏，键盘收起后再滑回来
         transform: keyboardOpen ? 'translateY(150%)' : undefined,

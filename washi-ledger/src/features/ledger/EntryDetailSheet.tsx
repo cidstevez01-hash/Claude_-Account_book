@@ -43,7 +43,10 @@ interface EntryDetailSheetProps {
  * 不是重新发明 */
 export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, onClose, onEdit, onCopy, onDelete }: EntryDetailSheetProps) {
   const { t, lang } = useI18n()
-  const [receiptBusy, setReceiptBusy] = useState(false)
+  // B-68：之前disabled:opacity-50整组变暗看不出点的是哪一条、也看不出在转；改成
+  // 记录具体是哪个path在加载，点击的那一行单独换成.ios-spinner转圈(照抄
+  // ReceiptScanSheet.tsx同款markup)，其余行继续禁用但不参与转圈视觉
+  const [loadingReceiptPath, setLoadingReceiptPath] = useState<string | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
@@ -60,8 +63,13 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
     onClose()
     onCopy(currentEntry)
   }
+  // B-66：删除不像编辑/复制要跳转路由，确认框就在当前页面弹出——不用先onClose()
+  // 关掉详情弹层再弹确认框，让确认框直接盖在详情弹层上面(调用方的ConfirmDialog
+  // 层级已经调高过，见ConfirmDialog.tsx的z-index说明)。点"取消"时详情弹层本来
+  // 就还开着，天然就是"取消后回到预览页"，不需要额外的记忆信号；点"确认"真的删掉
+  // 后，调用方会把这条记录从entries里移除，留给各复用点自己的"entries里找不到
+  // 当前查看的这条就自动关掉详情弹层"效果来收尾
   function handleDelete() {
-    onClose()
     onDelete(currentEntry)
   }
 
@@ -74,8 +82,8 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
     : entry.note || '—'
 
   async function handleViewReceipt(path: string) {
-    if (receiptBusy) return
-    setReceiptBusy(true)
+    if (loadingReceiptPath) return
+    setLoadingReceiptPath(path)
     try {
       const url = await getReceiptSignedUrl(path)
       const openedNative = await openReceiptDocumentNative(url)
@@ -86,7 +94,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
     } catch (e) {
       console.error('查看レシート凭证失败', e)
     } finally {
-      setReceiptBusy(false)
+      setLoadingReceiptPath(null)
     }
   }
 
@@ -103,7 +111,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
               type="button"
               aria-label={t('deleteLabel')}
               onClick={handleDelete}
-              className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             >
               <ThemeIcon icon="delete" effect="bare" size={20} className="text-[20px]" />
             </button>
@@ -111,7 +119,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
               type="button"
               aria-label={t('copyLabel')}
               onClick={handleCopy}
-              className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             >
               <ThemeIcon icon="content_copy" effect="bare" size={20} className="text-[20px]" />
             </button>
@@ -119,7 +127,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
               type="button"
               aria-label={t('editLabel')}
               onClick={handleEdit}
-              className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             >
               <ThemeIcon icon="edit" effect="bare" size={20} className="text-[20px]" />
             </button>
@@ -129,13 +137,20 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
             type="button"
             aria-label={t('closeAria')}
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-on-surface-variant justify-self-end"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant justify-self-end hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
           >
             <ThemeIcon icon="close" effect="bare" />
           </button>
         </header>
 
-        <div className="flex-1 min-h-0 overflow-y-auto p-md">
+        {/* B-65：弹层贴着视口最底部(items-end)，内容区原来只有py-md(16px)固定
+            底部内边距，没算iPhone Home Indicator安全区，滚动到底时最后一行会
+            紧贴/陷进物理圆角区域。用calc叠加env(safe-area-inset-bottom)，没有
+            安全区的机型/桌面预览calc结果等于原来的16px，不受影响 */}
+        <div
+          className="flex-1 min-h-0 overflow-y-auto p-md"
+          style={{ paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))' }}
+        >
           <div className="flex flex-col items-center text-center gap-2 pb-md">
             <div
               className="w-14 h-14 rounded-full flex items-center justify-center"
@@ -184,7 +199,17 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
                 }
               />
             )}
-            {entry.note && <DetailRow label={t('memoLabel')} value={entry.note} />}
+            {/* B-64：备注跟日期/支付方式等短字段不一样，内容可能很长(OCR识别出的
+                逐行小票明细)，不能复用DetailRow的flex justify-between——那套布局
+                两边内容都变长时会一起被压缩，标签"メモ"会被挤到按字符换行。改成
+                单独的块级布局：标签在上、内容在下各自占满整行宽度，长文本正常
+                换行，不会反过来挤压标签 */}
+            {entry.note && (
+              <div className="py-2.5 border-b border-dashed border-outline-variant/40 last:border-b-0">
+                <p className="text-body-sm text-on-surface-variant mb-1">{t('memoLabel')}</p>
+                <p className="text-body-md text-on-surface whitespace-pre-wrap break-words">{entry.note}</p>
+              </div>
+            )}
             {!!entry.points && (
               <DetailRow
                 label={t('pointsLabel')}
@@ -206,12 +231,25 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
                   <button
                     key={path}
                     type="button"
-                    disabled={receiptBusy}
+                    disabled={loadingReceiptPath !== null}
                     onClick={() => handleViewReceipt(path)}
-                    className="px-3 py-1.5 border-b border-dashed border-outline-variant/50 last:border-b-0 text-left text-body-md text-[var(--color-link)] underline decoration-dashed underline-offset-2 disabled:opacity-50"
+                    className="px-3 py-1.5 border-b border-dashed border-outline-variant/50 last:border-b-0 flex items-center text-left text-body-md text-[var(--color-link)] underline decoration-dashed underline-offset-2 disabled:opacity-50"
                   >
-                    {t('receiptItemLabel')}
-                    {i + 1}
+                    {loadingReceiptPath === path ? (
+                      // B-68：.ios-spinner的22px是固定几何关系(内部8根小棒的transform-origin
+                      // 跟着22px配套算好)，不能用inline style缩放覆盖——这个坑B-55/B-59已经
+                      // 踩过，这里直接按原尺寸用，不额外包小尺寸容器
+                      <span className="ios-spinner text-[var(--color-link)]">
+                        {Array.from({ length: 8 }, (_, j) => (
+                          <i key={j} style={{ transform: `rotate(${j * 45}deg)`, animationDelay: `${j * 0.125 - 1}s` }} />
+                        ))}
+                      </span>
+                    ) : (
+                      <>
+                        {t('receiptItemLabel')}
+                        {i + 1}
+                      </>
+                    )}
                   </button>
                 ))}
               </div>

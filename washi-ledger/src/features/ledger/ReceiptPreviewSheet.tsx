@@ -47,7 +47,12 @@ export function ReceiptPreviewSheet({ open, url, onClose }: ReceiptPreviewSheetP
         </div>
 
         {url && (
-          <div className="p-md shrink-0 border-t-[1.5px] border-dashed border-outline-variant">
+          // B-65：这一行是面板贴底的最后一个元素，叠加env(safe-area-inset-bottom)
+          // 避免链接文字陷进iPhone Home Indicator安全区
+          <div
+            className="p-md shrink-0 border-t-[1.5px] border-dashed border-outline-variant"
+            style={{ paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))' }}
+          >
             <a
               href={url}
               target="_blank"

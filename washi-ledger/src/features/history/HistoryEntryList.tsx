@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from '../ledger/EntryCard'
 import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
+import { consumeDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 interface HistoryEntryListProps {
@@ -34,6 +35,20 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
   const { t } = useI18n()
   const groups = groupByDay(entries)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+
+  // B-66：同RecentEntriesList.tsx——从详情弹层点编辑/复制跳去/add又点返回要重新
+  // 打开详情弹层；删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录
+  // 移除，这里跟着自动关掉详情弹层
+  useEffect(() => {
+    const m = consumeDetailSheetReturnMemory('history')
+    if (!m) return
+    const found = entries.find((e) => e.id === m.entryId)
+    if (found) setViewEntry(found)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  useEffect(() => {
+    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
+  }, [entries, viewEntry])
 
   if (entries.length === 0) {
     return (

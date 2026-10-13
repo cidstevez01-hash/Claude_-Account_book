@@ -38,6 +38,11 @@ interface CategoryDetailSheetProps {
   onEdit: (entry: Entry) => void
   onCopy: (entry: Entry) => void
   onDelete: (entry: Entry) => void
+  /** B-66：DashboardPage从detailSheetReturnMemory里恢复detailSelection重新张开这个
+   * 弹层后，转发过来的"要重新打开哪条记录的详情弹层"——不在这个组件自己内部直接消费
+   * memory，避免跟DashboardPage自己consume('dashboard-category')抢着读同一份数据，
+   * 见detailSheetReturnMemory.ts的说明 */
+  initialViewEntryId?: string | null
 }
 
 /** 分类/标签明细钻取——点仪表盘分类环状图的图例行，弹出该分类(或该标签，见#7)当月的
@@ -58,9 +63,25 @@ export function CategoryDetailSheet({
   onEdit,
   onCopy,
   onDelete,
+  initialViewEntryId,
 }: CategoryDetailSheetProps) {
   const { t } = useI18n()
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+
+  // B-66：initialViewEntryId由DashboardPage在恢复detailSelection、重新张开这个
+  // 弹层时一并转发过来，这里再找到对应的entry打开嵌套的详情弹层
+  useEffect(() => {
+    if (!initialViewEntryId) return
+    const found = entries.find((e) => e.id === initialViewEntryId)
+    if (found) setViewEntry(found)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialViewEntryId])
+
+  // B-66：删除确认框现在盖在详情弹层上面而不是先关掉详情弹层，确认删除后entries
+  // 会把这条记录移除，这里跟着自动关掉详情弹层，不留"僵尸"详情弹层
+  useEffect(() => {
+    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
+  }, [entries, viewEntry])
 
   // 弹出/收起做平缓过渡——照旧仓库index.html真实的.sheet/.sheet.show搬：初始
   // transform:translateY(105%)，show时translateY(0)，0.3s cubic-bezier(.32,.72,0,1)。
@@ -136,7 +157,11 @@ export function CategoryDetailSheet({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto overflow-x-hidden px-md py-md">
+        {/* B-65：同EntryDetailSheet，叠加env(safe-area-inset-bottom)避让Home Indicator */}
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden px-md py-md"
+          style={{ paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))' }}
+        >
           <div className="flex flex-col items-center mb-md">
             <span className="text-label-caps font-sans text-on-surface-variant uppercase">
               {snap.rangeLabel}

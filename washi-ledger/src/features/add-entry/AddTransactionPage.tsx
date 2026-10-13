@@ -23,6 +23,7 @@ import { setDashboardFocusEntryId } from '../../lib/dashboardFocusMemory'
 import { setHistoryFocusEntryId } from '../../lib/historyFocusMemory'
 import { markStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
 import { consumeAddEntryOrigin } from '../../lib/addEntryOrigin'
+import { clearDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import type { Entry, EntryType } from '../../types'
 
@@ -81,6 +82,17 @@ export function AddTransactionPage() {
   const [note, setNote] = useState(() => initialSourceEntry?.note ?? '')
   const [sourceEntry, setSourceEntry] = useState<Entry | null>(() => initialSourceEntry)
   const [prefilled, setPrefilled] = useState(() => mode === 'add' || initialSourceEntry != null)
+  // B-64：textarea本身不会跟着内容自动变高(min-height只是下限，不是自动增长)，
+  // 固定h-32装不下OCR识别出的多行小票备注；改成随内容实时测scrollHeight调整
+  // style.height，封顶MEMO_MAX_HEIGHT_PX，超过才在内部滚动，而不是让整页无限变高
+  const noteRef = useRef<HTMLTextAreaElement>(null)
+  const MEMO_MAX_HEIGHT_PX = 224
+  useEffect(() => {
+    const el = noteRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, MEMO_MAX_HEIGHT_PX)}px`
+  }, [note])
 
   // R-32→R-41：レシート扫描存档——receiptPaths是Supabase Storage里的对象路径数组，
   // 空数组表示这条记录还没有凭证。复制模式(copy)故意不继承来源记录的凭证
@@ -241,10 +253,16 @@ export function AddTransactionPage() {
     if (origin === 'dashboard') setDashboardFocusEntryId(entry.id)
     else if (origin === 'history') setHistoryFocusEntryId(entry.id)
     else if (origin === 'stats') markStatsNeedsRefresh()
+    // B-66：保存成功走的是上面这套"按入口高亮/刷新"逻辑，不该再触发"重新打开详情
+    // 弹层"(那是给点返回取消时用的)——如果是从详情弹层点编辑/复制进来的，这里要把
+    // detailSheetReturnMemory主动清空，不留给目标页面误用
+    clearDetailSheetReturnMemory()
     navigate(-1)
   }
 
-  // 点"返回"(不保存，放弃改动)，回到进来之前那个页面，跟保存后的行为一致
+  // 点"返回"(不保存，放弃改动)，回到进来之前那个页面。如果是从详情弹层点编辑/复制
+  // 进来的，detailSheetReturnMemory在那之前已经写好了，这里不用做任何事——原样
+  // 留给目标页面挂载后的effect去consume、重新打开详情弹层(见各复用点consume的说明)
   function handleBack() {
     navigate(-1)
   }
@@ -557,11 +575,17 @@ export function AddTransactionPage() {
           <h2 className="text-label-caps font-sans text-on-surface-variant mb-xs tracking-widest uppercase">
             {t('memoLabel')}
           </h2>
+          {/* B-64：固定h-32(128px)装不下OCR识别出的多行小票备注，看着像被截断/
+              排版乱；改成随内容自动增高(见上面的useEffect)，封顶224px后textarea
+              内部滚动(而不是让整个页面无限变高)，-webkit-overflow-scrolling保证
+              iOS WebKit下惯性滚动顺滑 */}
           <textarea
+            ref={noteRef}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder={t('memoPlaceholder')}
-            className="w-full bg-transparent border-none outline-none resize-none h-32 p-0 text-body-lg text-on-surface focus:ring-0"
+            className="w-full bg-transparent border-none outline-none resize-none min-h-32 overflow-y-auto p-0 text-body-lg text-on-surface focus:ring-0"
+            style={{ WebkitOverflowScrolling: 'touch' }}
           />
         </div>
         </>

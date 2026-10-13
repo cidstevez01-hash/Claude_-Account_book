@@ -34,7 +34,11 @@ export function ConfirmDialog({
   const finalCancelLabel = cancelLabel ?? t('cancelLabel')
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-md">
+    // B-66：z-index从100提到110，原来跟EntryDetailSheet(z-[100])同级——现在删除
+    // 走"确认框盖在详情弹层上面、取消就还留在详情弹层"这套逻辑(见EntryDetailSheet.tsx
+    // handleDelete的说明)，必须确保ConfirmDialog严格盖过详情弹层，不能靠谁的DOM
+    // 顺序在后面这种不稳的隐式规则
+    <div className="fixed inset-0 z-[110] flex items-center justify-center px-md">
       <div className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[4px]" onClick={onCancel} />
       <div className="relative z-10 w-full max-w-[360px] bg-surface rounded-[20px] shadow-xl flex flex-col items-center p-lg">
         <div

@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDayPinned, matchesEntrySearch } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { EntryCard } from './EntryCard'
 import { EntryDetailSheet } from './EntryDetailSheet'
 import { dayLabel } from './dayLabel'
+import { consumeDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 interface RecentEntriesListProps {
@@ -61,6 +62,24 @@ export function RecentEntriesList({
   // R-40→R-42：点一条记录直接打开详情弹层(原来点了先展开操作抽屉那套在R-42去掉了，
   // 编辑/复制/删除现在是详情弹层自己头部的图标)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+
+  // B-66：从详情弹层点编辑/复制跳去/add后又点返回(不保存)，应该重新打开刚才那条
+  // 记录的详情弹层——DashboardPage跳转/add会整个卸载重挂载，这个组件自己的
+  // viewEntry状态也跟着没了，回来后从detailSheetReturnMemory里找回来
+  useEffect(() => {
+    const m = consumeDetailSheetReturnMemory('dashboard')
+    if (!m) return
+    const found = entries.find((e) => e.id === m.entryId)
+    if (found) setViewEntry(found)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // B-66：删除确认框现在盖在详情弹层上面而不是先关掉详情弹层(见EntryDetailSheet.tsx
+  // handleDelete的说明)，确认删除后entries会把这条记录移除，这里跟着自动关掉详情
+  // 弹层，不然会留一个显示着已经不存在的记录的"僵尸"详情弹层
+  useEffect(() => {
+    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
+  }, [entries, viewEntry])
   // 搜索框收起/展开——照旧仓库index.html的#ledgerSearch真实交互搬：默认是30x30
   // 圆形虚线图标按钮，点了才展开成圆角矩形(12px，不是整胶囊)。失焦时如果没输入
   // 内容才收起，有内容就保持展开(用户还能看到/清空自己搜的词)

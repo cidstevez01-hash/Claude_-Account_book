@@ -33,6 +33,7 @@ import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
 import { setAddEntryOrigin } from '../../lib/addEntryOrigin'
 import { consumeStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
+import { consumeDetailSheetReturnMemory, setDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import type { EntryType } from '../../types'
 
 type StatsTab = 'cashflow' | 'points'
@@ -212,6 +213,18 @@ export function StatsPage() {
 
   // 点收支趋势图的聚合图例一行——钻取那个分类在当前趋势图可见范围(按日=当月，按月=当年)内的明细
   const [detailCatCode, setDetailCatCode] = useState<string | null>(null)
+  // B-66：从CategoryDetailSheet嵌套的详情弹层点编辑/复制跳去/add又点返回，要重新
+  // 张开这个分类钻取弹层+里面那条记录的详情弹层——只恢复detailCatCode本身，当时
+  // 趋势图具体翻到哪个月/哪一天(trendDim/trendDayYear等)不在恢复范围内，回来后
+  // 退回当前默认周期，这是有意的范围限定，不是漏做
+  const [categoryDetailInitialEntryId, setCategoryDetailInitialEntryId] = useState<string | null>(null)
+  useEffect(() => {
+    const m = consumeDetailSheetReturnMemory('stats-category')
+    if (!m) return
+    setDetailCatCode((m.categorySelection as string | undefined) ?? null)
+    setCategoryDetailInitialEntryId(m.entryId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const detailCategory = categories.find((c) => c.code === detailCatCode) ?? null
   const detailHeader: CategoryDetailHeader | null = detailCategory
     ? { icon: detailCategory.icon, color: detailCategory.color, label: catLabel(detailCategory, lang) }
@@ -406,9 +419,16 @@ export function StatsPage() {
         entries={detailEntries}
         currency={settings.currency}
         onClose={() => setDetailCatCode(null)}
-        onEdit={(entry) => goToAdd(`/add?editId=${entry.id}`)}
-        onCopy={(entry) => goToAdd(`/add?copyId=${entry.id}`)}
+        onEdit={(entry) => {
+          setDetailSheetReturnMemory('stats-category', entry.id, detailCatCode)
+          goToAdd(`/add?editId=${entry.id}`)
+        }}
+        onCopy={(entry) => {
+          setDetailSheetReturnMemory('stats-category', entry.id, detailCatCode)
+          goToAdd(`/add?copyId=${entry.id}`)
+        }}
         onDelete={(entry) => setPendingDeleteId(entry.id)}
+        initialViewEntryId={categoryDetailInitialEntryId}
       />
 
       <ConfirmDialog
