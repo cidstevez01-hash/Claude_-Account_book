@@ -77,6 +77,10 @@ export const dict = {
     receiptUseGalleryInstead: '改用相册选择',
     receiptPreviewTitle: '凭证预览',
     receiptOpenExternalLabel: '在浏览器中打开',
+    // R-43：账目卡片恢复小票角标，多张凭证时预览弹层内支持左右切换，这两条是
+    // 切换箭头的aria-label
+    receiptPrevAria: '上一张',
+    receiptNextAria: '下一张',
     rateUpdatedLabel: LEGACY_ZH.rateUpdateLabel,
     refreshRate: LEGACY_ZH.refreshRate,
     rateNeverFetched: LEGACY_ZH.neverFetched,
@@ -299,6 +303,8 @@ export const dict = {
     receiptUseGalleryInstead: 'アルバムから選択する',
     receiptPreviewTitle: 'レシートプレビュー',
     receiptOpenExternalLabel: 'ブラウザで開く',
+    receiptPrevAria: '前へ',
+    receiptNextAria: '次へ',
     rateUpdatedLabel: LEGACY_JA.rateUpdateLabel,
     refreshRate: LEGACY_JA.refreshRate,
     rateNeverFetched: LEGACY_JA.neverFetched,

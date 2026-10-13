@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { formatCurrency } from '../../data/currencyDisplay'
 import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
+import { ThemeIcon } from '../../design-system/components/ThemeIcon'
+import { getReceiptSignedUrl } from '../../data/receiptStorage'
+import { ReceiptPreviewSheet } from './ReceiptPreviewSheet'
 import type { Category, Entry, PaymentMethod } from '../../types'
 
 interface EntryCardProps {
@@ -32,6 +36,28 @@ interface EntryCardProps {
 export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, highlighted, amountDisplay = 'currency' }: EntryCardProps) {
   const { t, lang } = useI18n()
   const isIncome = entry.type === 'income'
+
+  // R-43：恢复卡片右上角"骑缝章"小票角标(2026-09-16定稿，R-41合并进详情弹层时被
+  // 删掉)——方便不点进详情弹层就能一眼看出哪条记录带凭证，角标本身也是独立的
+  // "快速预览"入口。跟详情弹层里逐行点开单张不同，这里一次性把整条记录的
+  // receiptPaths都传给ReceiptPreviewSheet，默认打开第1张，弹层内可以左右切换
+  // 查看其余几张(R-41之前是单张receiptPath，角标点了直接原生优先/网页兜底；
+  // 现在是多张数组，原生QuickLook插件不支持"1/2"这种自定义页码+左右切换，只能
+  // 一次开一个文档，所以角标统一走网页内弹层，不区分张数，保持行为一致可预期)
+  const [receiptPreviewOpen, setReceiptPreviewOpen] = useState(false)
+  const [receiptIndex, setReceiptIndex] = useState(0)
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
+
+  async function openReceiptAt(i: number) {
+    setReceiptIndex(i)
+    setReceiptUrl(null)
+    try {
+      const url = await getReceiptSignedUrl(entry.receiptPaths[i])
+      setReceiptUrl(url)
+    } catch (e) {
+      console.error('查看レシート凭证失败', e)
+    }
+  }
   // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)；
   // 名字按当前语言取(catLabel/subLabel)，不是硬编码.zh
   const sub = category?.subs.find((s) => s.code === entry.subCode)
@@ -107,6 +133,48 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
           )}
         </button>
       </div>
+
+      {/* R-43：角标是.entry-card(relative)的直接子节点，跟上面overflow-hidden的
+          裁切容器是兄弟关系而不是嵌套在它里面——这样"一半探出卡片外"才不会被
+          overflow-hidden裁掉。不能嵌进上面那个<button>内部(HTML不允许button套
+          button)，所以只能放在这里，用stopPropagation()防止点击角标时顺带冒泡
+          触发卡片整体的onOpenDetail */}
+      {entry.receiptPaths.length > 0 && (
+        <button
+          type="button"
+          aria-label={t('receiptViewAria')}
+          onClick={(e) => {
+            e.stopPropagation()
+            setReceiptPreviewOpen(true)
+            openReceiptAt(0)
+          }}
+          // R-43：定位数值(-top-4 -right-3.5)不是随手写的——2026-09-16历史设计
+          // 就反推验证过这组数值，让44px透明热区内居中的32px视觉圆章落在"圆心压在
+          // 卡片右上角边框线上，一半在卡片内一半探出卡片外"这个位置，之前随手写的
+          // -top-2 -right-2偏了，这次改回历史定稿的数值，不是另起一套
+          className="absolute -top-4 -right-3.5 z-10 w-11 h-11 flex items-center justify-center"
+        >
+          <span
+            className="relative w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md shadow-md"
+            style={{
+              background: 'color-mix(in srgb, var(--color-surface-container-lowest) 70%, transparent)',
+              border: '1.5px dashed var(--color-primary)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <ThemeIcon icon="receipt_long" effect="ring" size={16} className="text-[16px]" />
+          </span>
+        </button>
+      )}
+
+      <ReceiptPreviewSheet
+        open={receiptPreviewOpen}
+        url={receiptUrl}
+        onClose={() => setReceiptPreviewOpen(false)}
+        paths={entry.receiptPaths}
+        index={receiptIndex}
+        onIndexChange={openReceiptAt}
+      />
     </div>
   )
 }
