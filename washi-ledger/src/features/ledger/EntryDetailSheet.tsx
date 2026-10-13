@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { tintColor } from '../../lib/color'
 import { useI18n } from '../../lib/i18n'
 import { formatCurrency } from '../../data/currencyDisplay'
@@ -104,7 +105,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
               onClick={handleDelete}
               className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
             >
-              <span className="material-symbols-outlined text-[20px]">delete</span>
+              <ThemeIcon icon="delete" effect="bare" size={20} className="text-[20px]" />
             </button>
             <button
               type="button"
@@ -112,7 +113,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
               onClick={handleCopy}
               className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
             >
-              <span className="material-symbols-outlined text-[20px]">content_copy</span>
+              <ThemeIcon icon="content_copy" effect="bare" size={20} className="text-[20px]" />
             </button>
             <button
               type="button"
@@ -120,7 +121,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
               onClick={handleEdit}
               className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
             >
-              <span className="material-symbols-outlined text-[20px]">edit</span>
+              <ThemeIcon icon="edit" effect="bare" size={20} className="text-[20px]" />
             </button>
           </div>
           <h2 className="font-serif text-headline-md text-on-surface whitespace-nowrap">{t('entryDetailTitle')}</h2>
@@ -130,7 +131,7 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center text-on-surface-variant justify-self-end"
           >
-            <span className="material-symbols-outlined">close</span>
+            <ThemeIcon icon="close" effect="bare" />
           </button>
         </header>
 
