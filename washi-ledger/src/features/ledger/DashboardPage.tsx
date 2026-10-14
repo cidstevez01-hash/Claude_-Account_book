@@ -12,11 +12,14 @@ import { RecentEntriesList } from './RecentEntriesList'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
+import { useRecurringRules } from '../../hooks/useRecurringRules'
+import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { summarizeRange, categoryBreakdownRange, TAG_MATCHED_COLOR, TAG_OTHER_COLOR } from '../../data/summary'
 import { toDisplayEntries } from '../../data/currencyDisplay'
-import { deleteEntry } from '../../data/catalog'
+import { deleteEntry, pushEntriesBulkUpsert } from '../../data/catalog'
+import { computeRecurringEntriesToGenerate } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
 import { APP_ICONS } from '../../lib/appIcons'
@@ -39,6 +42,8 @@ export function DashboardPage() {
   const { user } = useAuth()
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { entries, reload, removeLocal } = useEntries(user?.id ?? null)
+  const { rules: recurringRules } = useRecurringRules(user?.id ?? null)
+  const jpHolidays = useJpHolidays()
   const { settings } = useSettings()
   const rates = useDisplayRates(settings.currency)
   const navigate = useAppNavigate()
@@ -151,6 +156,24 @@ export function DashboardPage() {
     [catalog]
   )
   const tags = useMemo(() => [...(catalog?.expenseTags ?? []), ...(catalog?.incomeTags ?? [])], [catalog])
+
+  // R-44：固定收支规则——仪表盘是登录后最先落地的页面，照旧App init()在App启动时跑
+  // ensureRecurringEntries()的时机，放在这里做一次性检查。只有categories/jpHolidays
+  // 没加载好时computeRecurringEntriesToGenerate会对每条规则都判定"分类没找到"直接跳过
+  // (见该函数说明)，返回空数组——这种情况下面不会标记"已经跑过"，等依赖数据
+  // (entries/categories/jpHolidays)下一次变化时会自动再检查一次，不需要额外的加载
+  // 完成信号；真的生成过东西才标记，避免重复推送
+  const recurringGenDoneRef = useRef(false)
+  useEffect(() => {
+    if (!user || recurringGenDoneRef.current) return
+    const toCreate = computeRecurringEntriesToGenerate(recurringRules, entries, categories, jpHolidays)
+    if (toCreate.length === 0) return
+    recurringGenDoneRef.current = true
+    pushEntriesBulkUpsert(toCreate, user.id)
+      .then(() => reload())
+      .catch((e) => console.error('固定收支规则自动生成记录失败', e))
+  }, [user, recurringRules, entries, categories, jpHolidays, reload])
+
   // 每条记录按settings.currency统一换算后再参与后面的求和/占比计算(照旧App
   // dayTotal用reduce(...+toBase(...))的真实模式，见data/currencyDisplay.ts的说明)
   const displayEntries = useMemo(

@@ -78,6 +78,33 @@ export interface Entry {
   receiptPaths: string[]
 }
 
+/** R-44：固定收支规则——App启动时/服务器pg_cron按这些规则自动生成记账记录，
+ * 原来是旧App里写死的RECURRING_RULES/RECURRING_BIWEEKLY_RULES，这次改成前台
+ * 可增删改查、存数据库(sql/2026-10-14_recurring_rules.sql)。两种规则类型用
+ * ruleKind区分，二选一，互不混用：
+ * - 'dayOfMonth'：每月固定几号(dayOfMonth: '1'~'31' 或 'last')，可选节假日顺延
+ *   (bizDayAdjust)；anchorDate/intervalDays这两个此时应为null
+ * - 'intervalDays'：从anchorDate起每隔intervalDays天一次，不支持节假日顺延
+ *   (bizDayAdjust应为null)；dayOfMonth应为null
+ */
+export interface RecurringRule {
+  id: string
+  type: EntryType
+  amount: number
+  currency: string
+  catCode: string
+  subCode: string | null
+  paymentMethod: string | null
+  tagCode: string | null
+  note: string | null
+  ruleKind: 'dayOfMonth' | 'intervalDays'
+  dayOfMonth: string | null
+  bizDayAdjust: 'before' | 'after' | null
+  anchorDate: string | null // YYYY-MM-DD
+  intervalDays: number | null
+  enabled: boolean
+}
+
 export type Lang = 'zh' | 'ja'
 // R-14：新增'nostalgia'("怀旧")主题——颜色/背景改回旧仓库index.html基本主题(--paper/
 // --ink/--grid等)那套暖色调，布局/组件结构完全不变，只切CSS变量(见index.css

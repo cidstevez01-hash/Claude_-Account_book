@@ -55,12 +55,17 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
   // 不用每次都写entry!
   const currentEntry = entry
 
+  // B-69：之前先onClose()再onEdit/onCopy两步走——onClose()的setState会在
+  // useAppNavigate.ts的View Transition真正捕捉"旧状态"快照之前单独提交+绘制一帧
+  // (弹层突然关闭、露出干净列表页)，这帧闪给用户看到了才轮到跟/add页面交叉淡入
+  // 淡出，就是报的"闪跳一下"。四个调用点(Dashboard/History/Calendar/Stats)的
+  // onEdit/onCopy最终都会跳到/add这个不同路由，整页(连同这个弹层)本来就会被
+  // 路由切换自然卸载，不需要先手动onClose()——去掉这一步，让弹层随路由跳转一起
+  // 被View Transition捕进"旧状态"快照，不再单独抢先绘制
   function handleEdit() {
-    onClose()
     onEdit(currentEntry)
   }
   function handleCopy() {
-    onClose()
     onCopy(currentEntry)
   }
   // B-66：删除不像编辑/复制要跳转路由，确认框就在当前页面弹出——不用先onClose()

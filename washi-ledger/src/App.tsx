@@ -12,6 +12,8 @@ import { RatePage } from './features/rate/RatePage'
 import { SettingsPage } from './features/settings/SettingsPage'
 import { ThemePage } from './features/settings/ThemePage'
 import { DebugLogPage } from './features/settings/DebugLogPage'
+import { RecurringRulesPage } from './features/settings/RecurringRulesPage'
+import { RecurringRuleFormPage } from './features/settings/RecurringRuleFormPage'
 import { AccountPage } from './features/account/AccountPage'
 import { ChangeAvatarPage } from './features/account/ChangeAvatarPage'
 import { SignInPage } from './features/auth/SignInPage'
@@ -46,6 +48,8 @@ export default function App() {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/theme" element={<ThemePage />} />
                 <Route path="/settings/debug-log" element={<DebugLogPage />} />
+                <Route path="/settings/recurring-rules" element={<RecurringRulesPage />} />
+                <Route path="/settings/recurring-rules/form" element={<RecurringRuleFormPage />} />
                 <Route path="/account" element={<AccountPage />} />
                 <Route path="/account/avatar" element={<ChangeAvatarPage />} />
                 <Route path="/signin" element={<SignInPage />} />

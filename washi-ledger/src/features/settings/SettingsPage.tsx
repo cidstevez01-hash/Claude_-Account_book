@@ -169,6 +169,12 @@ export function SettingsPage() {
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
 
+        {/* R-44：固定收支规则入口——旧App RECURRING_RULES/RECURRING_BIWEEKLY_RULES
+            写死在代码里，这里改成前台可增删改查的独立页面 */}
+        <SettingsRow icon="event_repeat" effect="ring" label={t('recurringRulesRowLabel')} onClick={() => navigate('/settings/recurring-rules')}>
+          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+        </SettingsRow>
+
       </div>
     </AppLayout>
   )
