@@ -6,6 +6,7 @@ import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
 import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { getReceiptSignedUrl } from '../../data/receiptStorage'
+import { openReceiptDocumentNative } from '../../lib/receiptViewer'
 import { ReceiptPreviewSheet } from './ReceiptPreviewSheet'
 import type { Category, Entry, PaymentMethod } from '../../types'
 
@@ -39,23 +40,40 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
 
   // R-43：恢复卡片右上角"骑缝章"小票角标(2026-09-16定稿，R-41合并进详情弹层时被
   // 删掉)——方便不点进详情弹层就能一眼看出哪条记录带凭证，角标本身也是独立的
-  // "快速预览"入口。跟详情弹层里逐行点开单张不同，这里一次性把整条记录的
-  // receiptPaths都传给ReceiptPreviewSheet，默认打开第1张，弹层内可以左右切换
-  // 查看其余几张(R-41之前是单张receiptPath，角标点了直接原生优先/网页兜底；
-  // 现在是多张数组，原生QuickLook插件不支持"1/2"这种自定义页码+左右切换，只能
-  // 一次开一个文档，所以角标统一走网页内弹层，不区分张数，保持行为一致可预期)
-  const [receiptPreviewOpen, setReceiptPreviewOpen] = useState(false)
-  const [receiptIndex, setReceiptIndex] = useState(0)
-  const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
+  // "快速预览"入口。点击行为照抄去掉角标之前的handleViewReceipt()：原生优先调
+  // FileViewer走系统QuickLook全屏预览，网页/沙盒没有这个能力才兜底用
+  // ReceiptPreviewSheet弹层——跟详情弹层里逐行点开单张完全同一套，不是另起一套。
+  // 多张凭证时原生QuickLook没法做"当前第几张/左右切换"这种自定义UI，一次只能开
+  // 一个文档，所以先弹一个轻量选择列表(receiptPickerOpen)挑是哪一张，选中后再按
+  // 上面同一套原生优先/网页兜底逻辑打开那一张，不做应用内翻页
+  const [receiptBusyPath, setReceiptBusyPath] = useState<string | null>(null)
+  const [receiptPickerOpen, setReceiptPickerOpen] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
-  async function openReceiptAt(i: number) {
-    setReceiptIndex(i)
-    setReceiptUrl(null)
+  async function handleViewReceipt(path: string) {
+    if (receiptBusyPath) return
+    setReceiptBusyPath(path)
     try {
-      const url = await getReceiptSignedUrl(entry.receiptPaths[i])
-      setReceiptUrl(url)
+      const url = await getReceiptSignedUrl(path)
+      const openedNative = await openReceiptDocumentNative(url)
+      if (!openedNative) {
+        setPreviewUrl(url)
+        setPreviewOpen(true)
+      }
+      setReceiptPickerOpen(false)
     } catch (e) {
       console.error('查看レシート凭证失败', e)
+    } finally {
+      setReceiptBusyPath(null)
+    }
+  }
+
+  function handleReceiptBadgeClick() {
+    if (entry.receiptPaths.length === 1) {
+      handleViewReceipt(entry.receiptPaths[0])
+    } else {
+      setReceiptPickerOpen(true)
     }
   }
   // "分类·子分类"——照旧App renderEntry()的catLine真实格式(有子分类才拼，没有就只显示分类)；
@@ -145,8 +163,7 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
           aria-label={t('receiptViewAria')}
           onClick={(e) => {
             e.stopPropagation()
-            setReceiptPreviewOpen(true)
-            openReceiptAt(0)
+            handleReceiptBadgeClick()
           }}
           // R-43：定位数值(-top-4 -right-3.5)不是随手写的——2026-09-16历史设计
           // 就反推验证过这组数值，让44px透明热区内居中的32px视觉圆章落在"圆心压在
@@ -167,14 +184,65 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
         </button>
       )}
 
-      <ReceiptPreviewSheet
-        open={receiptPreviewOpen}
-        url={receiptUrl}
-        onClose={() => setReceiptPreviewOpen(false)}
-        paths={entry.receiptPaths}
-        index={receiptIndex}
-        onIndexChange={openReceiptAt}
-      />
+      {/* 多张凭证先选哪一张——行样式照抄设置页SettingsRow同一套列表项语言(左侧圆形
+          图标+文字+右侧chevron_right)，不是详情弹层那套超链接文字行，让它看起来
+          是"点了会跳转查看"的列表项而不是段落里的文字链接。外壳(遮罩+从底部滑入的
+          圆角卡片+虚线分隔)还是跟ReceiptPreviewSheet/CategoryDetailSheet同一套规范，
+          没换。单张凭证不会用到这个，直接在handleReceiptBadgeClick()里跳过 */}
+      {receiptPickerOpen && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px]" onClick={() => setReceiptPickerOpen(false)} />
+          <div className="relative z-10 w-full max-w-[480px] bg-surface rounded-t-[24px] shadow-xl flex flex-col overflow-hidden">
+            <header className="flex items-center justify-between px-md h-16 border-b-[1.5px] border-dashed border-outline-variant shrink-0">
+              <h2 className="font-serif text-headline-md text-on-surface">{t('receiptPickerTitle')}</h2>
+              <button
+                type="button"
+                aria-label={t('closeAria')}
+                onClick={() => setReceiptPickerOpen(false)}
+                className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </header>
+            <div
+              className="px-md pt-md flex flex-col gap-2"
+              style={{ paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))' }}
+            >
+              {entry.receiptPaths.map((path, i) => (
+                <button
+                  key={path}
+                  type="button"
+                  disabled={receiptBusyPath !== null}
+                  onClick={() => handleViewReceipt(path)}
+                  className="w-full flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest border-b-2 border-outline-variant disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-md">
+                    <div className="relative w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+                      {receiptBusyPath === path ? (
+                        // B-55/B-59踩过的坑：.ios-spinner的22px是固定几何关系，不能用inline
+                        // style缩放覆盖，直接按原尺寸用——22px在这个40px圆里刚好居中不挤
+                        <span className="ios-spinner text-on-surface-variant">
+                          {Array.from({ length: 8 }, (_, j) => (
+                            <i key={j} style={{ transform: `rotate(${j * 45}deg)`, animationDelay: `${j * 0.125 - 1}s` }} />
+                          ))}
+                        </span>
+                      ) : (
+                        <ThemeIcon icon="receipt_long" effect="bare" className="w-5 h-5" />
+                      )}
+                    </div>
+                    <span className="text-body-lg text-on-surface">
+                      {t('entryDetailReceiptLabel')} {i + 1}
+                    </span>
+                  </div>
+                  <span className="material-symbols-outlined text-[18px] text-on-surface-variant">chevron_right</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ReceiptPreviewSheet open={previewOpen} url={previewUrl} onClose={() => setPreviewOpen(false)} />
     </div>
   )
 }
