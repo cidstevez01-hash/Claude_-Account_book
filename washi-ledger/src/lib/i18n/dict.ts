@@ -385,12 +385,16 @@ export const dict = {
     debugLogCopiedToast: 'クリップボードにコピーしました',
     debugLogRefreshAria: '更新',
     debugLogClearConfirm: 'ログをすべてクリアしますか？元に戻せません。',
-    recurringRulesRowLabel: '固定収支',
-    recurringRulesTitle: '固定収支ルール',
-    recurringRuleAddAria: '新規ルール',
-    recurringRuleAddTitle: '新規ルール',
-    recurringRuleEditTitle: 'ルールを編集',
-    recurringRuleEmptyState: '固定収支ルールがまだありません。右上の＋から追加できます',
+    // B-70続：「固定収支」「固定収支ルール」は直訳感が強いとユーザー指摘を受けて見直し
+    // ——マネーフォワードME公式ヘルプ(support.me.moneyforward.com)が同種機能を
+    // 「繰り返し入力」と呼んでいるのを確認、同じ語に揃えた(主要家計簿アプリの既存
+    // 用語に合わせる、独自に意訳しない)
+    recurringRulesRowLabel: '繰り返し入力',
+    recurringRulesTitle: '繰り返し入力',
+    recurringRuleAddAria: '繰り返し入力を追加',
+    recurringRuleAddTitle: '繰り返し入力を追加',
+    recurringRuleEditTitle: '繰り返し入力を編集',
+    recurringRuleEmptyState: '繰り返し入力はまだありません。右上の＋から追加できます',
     recurringRuleKindLabel: '繰り返し方法',
     recurringRuleKindDayOfMonth: '毎月指定日',
     recurringRuleKindIntervalDays: 'N日ごと',

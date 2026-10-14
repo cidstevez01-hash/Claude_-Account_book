@@ -328,32 +328,35 @@ export function RecurringRuleFormPage() {
                 />
               </div>
 
-              {sourceRule && (
-                <div className="px-md py-md">
-                  <button
-                    type="button"
-                    onClick={() => setPendingDelete(true)}
-                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-error text-error text-body-md active:scale-95 transition-transform"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">delete</span>
-                    {t('deleteLabel')}
-                  </button>
-                </div>
-              )}
             </>
           )}
         </main>
 
         {catalog && (
+          // 删除按钮之前放在可滚动内容区最下面(备注框下方)，用户反馈"滑到底才看得到，
+          // 谁看得到"——改成跟"保存"一起挪进这条贴底固定(fixed bottom-0)的操作栏，
+          // 不用滚动就能同时看到。两个按钮等宽平分(flex-1各占一半)，不是保存占大、
+          // 删除占小；只有编辑已有规则(sourceRule存在)时才出现删除，新建时还是
+          // 保存独占整行
           <div
-            className="fixed bottom-0 inset-x-0 mx-auto max-w-[480px] p-md bg-surface border-t-[1.5px] border-dashed border-outline-variant"
+            className="fixed bottom-0 inset-x-0 mx-auto max-w-[480px] p-md bg-surface border-t-[1.5px] border-dashed border-outline-variant flex gap-2"
             style={{ paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))' }}
           >
+            {sourceRule && (
+              <button
+                type="button"
+                onClick={() => setPendingDelete(true)}
+                className="flex-1 h-[58px] flex items-center justify-center gap-1.5 rounded-xl border-2 border-error text-error text-body-lg font-sans active:scale-95 transition-transform"
+              >
+                <span className="material-symbols-outlined text-[20px]">delete</span>
+                {t('deleteLabel')}
+              </button>
+            )}
             <button
               type="button"
               onClick={handleSave}
               disabled={!amount || parseFloat(amount) <= 0 || !catCode}
-              className="w-full h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >
               <span className="material-symbols-outlined">how_to_reg</span>
