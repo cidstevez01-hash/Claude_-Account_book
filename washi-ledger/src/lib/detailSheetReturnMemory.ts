@@ -39,9 +39,17 @@ export function consumeDetailSheetReturnMemory(origin: DetailSheetOrigin): Detai
   return m
 }
 
-/** AddTransactionPage保存成功时调用——保存走的是R-42既有的"按入口高亮/刷新"逻辑，
- * 不应该再触发这里的"重新打开详情弹层"，所以保存成功后要主动清空，不留给下一次
- * consume误用 */
+/** AddTransactionPage新建(FAB进来，mode==='add')保存成功时调用——新建没有"来源
+ * 详情弹层"可言，这里只是防御性清空，避免残留的旧memory被误用 */
 export function clearDetailSheetReturnMemory(): void {
   memory = null
+}
+
+/** R-XX：编辑/复制保存成功后调用——不再像原来那样保存成功就clearDetailSheetReturnMemory()
+ * 把这套"重新打开详情弹层"机制让给取消/返回专用，而是让保存成功也走同一套机制(回去后
+ * 一样重新弹出详情弹层，只是内容已经是保存后的新数据)。编辑复用原来记的id不用改；
+ * 复制生成的是一条全新id的记录，要把这里记的entryId换成新记录的，origin/
+ * categorySelection原样保留不变 */
+export function updateDetailSheetReturnMemoryEntryId(entryId: string): void {
+  if (memory) memory = { ...memory, entryId }
 }

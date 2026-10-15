@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { CashPointToggle } from '../../design-system/components/CashPointToggle'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
@@ -14,6 +14,7 @@ import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { useJpHolidays } from '../../hooks/useJpHolidays'
+import { useEntryHighlight } from '../../hooks/useEntryHighlight'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { formatCurrency, formatAmountNoSymbol } from '../../data/currencyDisplay'
 import { hasEntriesInMonth } from '../../data/summary'
@@ -97,7 +98,6 @@ export function CalendarPage() {
   const disableNext = !hasEntriesInMonth(entries, nextAnchor.getFullYear(), nextAnchor.getMonth() + 1)
 
   const [selectedDate, setSelectedDate] = useState(() => todayStr())
-  const today = todayStr()
 
   // 現金/積分切换——哪个图标在徽章左下角哪个就高亮，这个规则在CashPointToggle组件
   // 内部处理，这里只管页面内容跟着mode切换哪些东西显示。cashTab只在現金模式下用
@@ -168,18 +168,31 @@ export function CalendarPage() {
   const selectedHolidayName = holidays[selectedDate]
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const { highlightedId, highlightEntry } = useEntryHighlight('entry')
 
-  // B-66：同RecentEntriesList.tsx——从详情弹层点编辑/复制跳去/add又点返回要重新
-  // 打开详情弹层；删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录
-  // 移除，这里跟着自动关掉详情弹层。CalendarPage跳/add不走goToAdd(日历页故意不传
-  // addEntryOrigin，R-42就是这么设计的，这里的返回定位信号是独立的另一套，不受影响)
+  // B-66→R-XX：同RecentEntriesList.tsx——从详情弹层点编辑/复制跳去/add，不管点返回
+  // 还是保存成功，都要重新打开那条记录的详情弹层。CalendarPage跳/add不走goToAdd
+  // (日历页故意不传addEntryOrigin，R-42就是这么设计的，这里的返回定位信号是独立的
+  // 另一套，不受影响)。复制保存后entryId换成了新记录，要等它真的同步回本地entries
+  // 才查得到，不能只在挂载这一刻查一次
+  const pendingEntryIdRef = useRef<string | null>(null)
   useEffect(() => {
     const m = consumeDetailSheetReturnMemory('calendar')
     if (!m) return
-    const found = entries.find((e) => e.id === m.entryId)
-    if (found) setViewEntry(found)
+    pendingEntryIdRef.current = m.entryId
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useEffect(() => {
+    const pendingId = pendingEntryIdRef.current
+    if (!pendingId) return
+    const found = entries.find((e) => e.id === pendingId)
+    if (found) {
+      setViewEntry(found)
+      pendingEntryIdRef.current = null
+    }
+  }, [entries])
+  // 删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录移除，这里跟着
+  // 自动关掉详情弹层
   useEffect(() => {
     if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
   }, [entries, viewEntry])
@@ -253,7 +266,6 @@ export function CalendarPage() {
                 const heatMax = mode === 'cash' ? maxExpense : maxPoints
                 const heatPct = heatMax > 0 ? Math.min(1, heatBase / heatMax) : 0
                 const isSelected = cell.dateStr === selectedDate
-                const isToday = cell.dateStr === today
                 // R-38续：祝日标红只改日期数字颜色这一个独立元素，不碰热力图背景/金额
                 // 文字——用户明确要求"支出会对格子有影响的，不能当金额不存在，要考虑
                 // 两者共存"，日期数字跟下面的金额是完全分开的两行，互不遮挡，不会有
@@ -274,12 +286,19 @@ export function CalendarPage() {
                     } ${cell.inMonth ? '' : 'opacity-0 pointer-events-none'}`}
                     style={hasData ? { background: `color-mix(in srgb, ${heatColor} ${10 + heatPct * 35}%, transparent)` } : undefined}
                   >
-                    {isToday && (
-                      <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-primary" aria-hidden="true" />
+                    {/* B-XX：之前这个角标圆点标的是"今天"，用户反馈没什么用——改成标
+                        "祝日"，跟下面日期数字变红是同一个holidayName判断，两处一起
+                        提示"这天是祝日" */}
+                    {holidayName && (
+                      <span
+                        className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full"
+                        style={{ background: 'var(--color-holiday)' }}
+                        aria-hidden="true"
+                      />
                     )}
                     <span
                       className="text-body-sm font-serif leading-none"
-                      style={{ color: holidayName ? 'var(--color-error)' : 'var(--color-on-surface)' }}
+                      style={{ color: holidayName ? 'var(--color-holiday)' : 'var(--color-on-surface)' }}
                     >
                       {cell.day}
                     </span>
@@ -324,12 +343,12 @@ export function CalendarPage() {
             {selectedHolidayName && (
               <div
                 className="rounded-lg px-sm py-2 border-[1.5px] border-dashed flex items-center gap-2"
-                style={{ borderColor: 'var(--color-error)', background: 'color-mix(in srgb, var(--color-error) 10%, transparent)' }}
+                style={{ borderColor: 'var(--color-holiday)', background: 'color-mix(in srgb, var(--color-holiday) 10%, transparent)' }}
               >
-                <span className="material-symbols-outlined text-[18px]" style={{ color: 'var(--color-error)' }}>
+                <span className="material-symbols-outlined text-[18px]" style={{ color: 'var(--color-holiday)' }}>
                   event
                 </span>
-                <span className="text-body-md" style={{ color: 'var(--color-error)' }}>
+                <span className="text-body-md" style={{ color: 'var(--color-holiday)' }}>
                   {t('calendarHolidayLabel')}：{selectedHolidayName}
                 </span>
               </div>
@@ -407,6 +426,8 @@ export function CalendarPage() {
                   return (
                     <EntryCard
                       key={entry.id}
+                      id={`entry-${entry.id}`}
+                      highlighted={highlightedId === entry.id}
                       entry={entry}
                       category={cat}
                       paymentMethod={pm}
@@ -431,7 +452,10 @@ export function CalendarPage() {
         category={viewEntry ? categories.find((c) => c.code === viewEntry.catCode) : undefined}
         paymentMethod={viewEntry ? paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
-        onClose={() => setViewEntry(null)}
+        onClose={() => {
+          if (viewEntry) highlightEntry(viewEntry.id)
+          setViewEntry(null)
+        }}
         onEdit={(entry) => {
           setDetailSheetReturnMemory('calendar', entry.id)
           navigate(`/add?editId=${entry.id}`)

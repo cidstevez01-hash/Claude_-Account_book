@@ -5,6 +5,7 @@ import { EntryCard } from './EntryCard'
 import { EntryDetailSheet } from './EntryDetailSheet'
 import { dayLabel } from './dayLabel'
 import { useI18n } from '../../lib/i18n'
+import { useEntryHighlight } from '../../hooks/useEntryHighlight'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 export interface CategoryDetailHeader {
@@ -67,15 +68,28 @@ export function CategoryDetailSheet({
 }: CategoryDetailSheetProps) {
   const { t } = useI18n()
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const { highlightedId, highlightEntry } = useEntryHighlight('cat-entry')
 
-  // B-66：initialViewEntryId由DashboardPage在恢复detailSelection、重新张开这个
-  // 弹层时一并转发过来，这里再找到对应的entry打开嵌套的详情弹层
+  // B-66→R-XX：initialViewEntryId由DashboardPage在恢复detailSelection、重新张开这个
+  // 弹层时一并转发过来，这里再找到对应的entry打开嵌套的详情弹层。复制保存后转发
+  // 过来的是新记录的id，这条记录要等真的同步回本地entries(进而被DashboardPage
+  // 按分类/标签重新筛进这个entries prop)才查得到，不能只在initialViewEntryId这一次
+  // 变化时查一次就放弃——用pendingViewIdRef存住、配合entries变化持续轮询直到查到，
+  // 查到后清空ref，避免用户手动关掉详情弹层后entries又变化一次，被这个effect重新
+  // 打开(找到同一个initialViewEntryId还在entries里，不清掉ref就会反复重开)
+  const pendingViewIdRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!initialViewEntryId) return
-    const found = entries.find((e) => e.id === initialViewEntryId)
-    if (found) setViewEntry(found)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    pendingViewIdRef.current = initialViewEntryId ?? null
   }, [initialViewEntryId])
+  useEffect(() => {
+    const pendingId = pendingViewIdRef.current
+    if (!pendingId) return
+    const found = entries.find((e) => e.id === pendingId)
+    if (found) {
+      setViewEntry(found)
+      pendingViewIdRef.current = null
+    }
+  }, [entries])
 
   // B-66：删除确认框现在盖在详情弹层上面而不是先关掉详情弹层，确认删除后entries
   // 会把这条记录移除，这里跟着自动关掉详情弹层，不留"僵尸"详情弹层
@@ -189,7 +203,7 @@ export function CategoryDetailSheet({
                     {dayLabel(group.date, t)}
                   </span>
                   <span
-                    className="font-serif text-stat-figure"
+                    className="font-serif text-stat-figure font-semibold"
                     style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
                   >
                     {dayNet >= 0 ? '+' : '-'}
@@ -199,6 +213,8 @@ export function CategoryDetailSheet({
                 {group.entries.map((entry) => (
                   <EntryCard
                     key={entry.id}
+                    id={`cat-entry-${entry.id}`}
+                    highlighted={highlightedId === entry.id}
                     entry={entry}
                     category={snap.categories.find((c) => c.code === entry.catCode)}
                     paymentMethod={snap.paymentMethods.find((p) => p.code === entry.paymentMethod)}
@@ -217,7 +233,10 @@ export function CategoryDetailSheet({
         category={viewEntry ? snap.categories.find((c) => c.code === viewEntry.catCode) : undefined}
         paymentMethod={viewEntry ? snap.paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? snap.tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
-        onClose={() => setViewEntry(null)}
+        onClose={() => {
+          if (viewEntry) highlightEntry(viewEntry.id)
+          setViewEntry(null)
+        }}
         onEdit={onEdit}
         onCopy={onCopy}
         onDelete={onDelete}

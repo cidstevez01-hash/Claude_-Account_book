@@ -42,7 +42,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
             <span className="material-symbols-outlined text-sm">arrow_downward</span>
             {t('rangeIncome')}
           </p>
-          <p className="font-serif text-stat-figure text-income">{formatCurrency(summary.income, currency)}</p>
+          <p className="font-serif text-stat-figure font-semibold text-income">{formatCurrency(summary.income, currency)}</p>
         </div>
         <div className="w-[1.5px] h-10 bg-outline-variant" />
         <div className="flex-1 text-center">
@@ -50,7 +50,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
             <span className="material-symbols-outlined text-sm">arrow_upward</span>
             {t('rangeExpense')}
           </p>
-          <p className="font-serif text-stat-figure text-expense">{formatCurrency(summary.expense, currency)}</p>
+          <p className="font-serif text-stat-figure font-semibold text-expense">{formatCurrency(summary.expense, currency)}</p>
         </div>
       </div>
     </section>

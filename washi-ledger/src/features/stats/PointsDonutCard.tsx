@@ -28,7 +28,7 @@ export function PointsDonutCard({ shares, resetKey }: PointsDonutCardProps) {
             <DonutRing shares={shares.map((s) => ({ key: s.payCode, color: s.color, ratio: s.ratio }))} />
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
               <span className="text-[10px] font-sans text-on-surface-variant uppercase">Total Points</span>
-              <span className="font-serif text-stat-figure text-primary">{total.toLocaleString()} pt</span>
+              <span className="font-serif text-stat-figure font-semibold text-primary">{total.toLocaleString()} pt</span>
             </div>
           </div>
 

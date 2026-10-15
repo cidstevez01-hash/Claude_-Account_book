@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDayPinned, matchesEntrySearch } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
@@ -6,6 +6,7 @@ import { EntryCard } from './EntryCard'
 import { EntryDetailSheet } from './EntryDetailSheet'
 import { dayLabel } from './dayLabel'
 import { consumeDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
+import { useEntryHighlight } from '../../hooks/useEntryHighlight'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 interface RecentEntriesListProps {
@@ -62,17 +63,31 @@ export function RecentEntriesList({
   // R-40→R-42：点一条记录直接打开详情弹层(原来点了先展开操作抽屉那套在R-42去掉了，
   // 编辑/复制/删除现在是详情弹层自己头部的图标)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const { highlightedId, highlightEntry } = useEntryHighlight('entry')
 
-  // B-66：从详情弹层点编辑/复制跳去/add后又点返回(不保存)，应该重新打开刚才那条
-  // 记录的详情弹层——DashboardPage跳转/add会整个卸载重挂载，这个组件自己的
-  // viewEntry状态也跟着没了，回来后从detailSheetReturnMemory里找回来
+  // B-66→R-XX：从详情弹层点编辑/复制跳去/add后，不管是点返回(不保存)还是保存成功，
+  // 都应该重新打开那条记录的详情弹层——DashboardPage跳转/add会整个卸载重挂载，这个
+  // 组件自己的viewEntry状态也跟着没了，回来后从detailSheetReturnMemory里找回来。
+  // 复制保存后这里的entryId已经被AddTransactionPage换成新记录的id了，而新记录要
+  // 等真的同步回本地entries才会出现——用pendingEntryIdRef存住、配合下面依赖entries
+  // 的effect持续轮询，不能只在挂载这一刻查一次就放弃(编辑/取消返回因为是老id本来
+  // 就在本地缓存里，不受影响，第一次就能查到)
+  const pendingEntryIdRef = useRef<string | null>(null)
   useEffect(() => {
     const m = consumeDetailSheetReturnMemory('dashboard')
     if (!m) return
-    const found = entries.find((e) => e.id === m.entryId)
-    if (found) setViewEntry(found)
+    pendingEntryIdRef.current = m.entryId
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useEffect(() => {
+    const pendingId = pendingEntryIdRef.current
+    if (!pendingId) return
+    const found = entries.find((e) => e.id === pendingId)
+    if (found) {
+      setViewEntry(found)
+      pendingEntryIdRef.current = null
+    }
+  }, [entries])
 
   // B-66：删除确认框现在盖在详情弹层上面而不是先关掉详情弹层(见EntryDetailSheet.tsx
   // handleDelete的说明)，确认删除后entries会把这条记录移除，这里跟着自动关掉详情
@@ -175,7 +190,7 @@ export function RecentEntriesList({
                 {dayLabel(group.date, t)}
               </span>
               <span
-                className="font-serif text-label-caps"
+                className="font-serif text-stat-figure font-semibold"
                 style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
               >
                 {dayNet >= 0 ? '+' : '-'}
@@ -189,7 +204,7 @@ export function RecentEntriesList({
                 <EntryCard
                   key={entry.id}
                   id={`entry-${entry.id}`}
-                  highlighted={focusEntryId === entry.id}
+                  highlighted={focusEntryId === entry.id || highlightedId === entry.id}
                   entry={entry}
                   category={cat}
                   paymentMethod={pm}
@@ -208,7 +223,10 @@ export function RecentEntriesList({
         category={viewEntry ? categories.find((c) => c.code === viewEntry.catCode) : undefined}
         paymentMethod={viewEntry ? paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
-        onClose={() => setViewEntry(null)}
+        onClose={() => {
+          if (viewEntry) highlightEntry(viewEntry.id)
+          setViewEntry(null)
+        }}
         onEdit={onEdit}
         onCopy={onCopy}
         onDelete={onDelete}

@@ -98,7 +98,17 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
           交替规律不受影响)，只在内部单独包一层裁切容器(rounded-[inherit]跟随外层圆角，
           不用关心具体是哪一种角) */}
       <div className="overflow-hidden rounded-[inherit]">
-        <button type="button" className="w-full flex items-center p-3 text-left" onClick={() => onOpenDetail(entry)}>
+        {/* B-73：有小票角标的卡片右侧多留16px(p-3的12px基础上加到pr-7=28px)，
+            让金额数字跟角标可见32px圆章之间留出实测够用的间距(实测验证过28px能让
+            横向重叠归零，留约4px空隙)——角标自己的-top-4/-right-3.5定位历史上就
+            没变过(查过从R-32首次加上到R-40删除到R-43恢复全部提交，这组数值从没
+            被调过)，不去碰它避免牵连出之前修过的"角标压日期分组标题"那个问题，
+            只调金额这边留白。只给有小票的卡片加，没有角标的卡片不需要多留白 */}
+        <button
+          type="button"
+          className={`w-full flex items-center p-3 text-left ${entry.receiptPaths.length > 0 ? 'pr-7' : ''}`}
+          onClick={() => onOpenDetail(entry)}
+        >
           <div
             className="w-[38px] h-[38px] rounded-full flex items-center justify-center mr-3 shrink-0"
             style={{ background: category ? tintColor(category.color, 0.85) : 'var(--color-surface-container-highest)' }}
@@ -179,7 +189,19 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
               color: 'var(--color-primary)',
             }}
           >
-            <ThemeIcon icon="receipt_long" effect="ring" size={16} className="text-[16px]" />
+            {/* B-XX：b34f6a2加过的"点击角标等签名URL+原生插件下载PDF期间换成转圈"
+                效果，R-43恢复角标+B-70改成原生优先逻辑时漏接了receiptBusyPath这个
+                状态判断，角标图标一直是静态的。补上——32px圆形容器装22px的
+                .ios-spinner(跟选择列表里那行用的同一套)，不用额外缩放 */}
+            {receiptBusyPath ? (
+              <span className="ios-spinner relative z-[1] text-primary">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
+                ))}
+              </span>
+            ) : (
+              <ThemeIcon icon="receipt_long" effect="ring" size={16} className="text-[16px]" />
+            )}
           </span>
         </button>
       )}

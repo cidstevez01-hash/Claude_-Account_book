@@ -36,7 +36,7 @@ export function TrendLegend({
               那边的label不受影响 */}
           <span className="text-body-lg text-on-surface">{selectedBucket.key}</span>
           <div className="flex items-center gap-2">
-            <span className="font-serif text-stat-figure text-primary">
+            <span className="font-serif text-stat-figure font-semibold text-primary">
               {valuePrefix}
               {selectedBucket.total.toLocaleString()}
             </span>

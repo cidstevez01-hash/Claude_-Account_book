@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
@@ -6,6 +6,7 @@ import { EntryCard } from '../ledger/EntryCard'
 import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
 import { consumeDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
+import { useEntryHighlight } from '../../hooks/useEntryHighlight'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 interface HistoryEntryListProps {
@@ -35,17 +36,29 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
   const { t } = useI18n()
   const groups = groupByDay(entries)
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const { highlightedId, highlightEntry } = useEntryHighlight('entry')
 
-  // B-66：同RecentEntriesList.tsx——从详情弹层点编辑/复制跳去/add又点返回要重新
-  // 打开详情弹层；删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录
-  // 移除，这里跟着自动关掉详情弹层
+  // B-66→R-XX：同RecentEntriesList.tsx——从详情弹层点编辑/复制跳去/add，不管点返回
+  // 还是保存成功，都要重新打开那条记录的详情弹层；复制保存后entryId换成了新记录，
+  // 要等它真的同步回本地entries才查得到，不能只在挂载这一刻查一次
+  const pendingEntryIdRef = useRef<string | null>(null)
   useEffect(() => {
     const m = consumeDetailSheetReturnMemory('history')
     if (!m) return
-    const found = entries.find((e) => e.id === m.entryId)
-    if (found) setViewEntry(found)
+    pendingEntryIdRef.current = m.entryId
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useEffect(() => {
+    const pendingId = pendingEntryIdRef.current
+    if (!pendingId) return
+    const found = entries.find((e) => e.id === pendingId)
+    if (found) {
+      setViewEntry(found)
+      pendingEntryIdRef.current = null
+    }
+  }, [entries])
+  // 删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录移除，这里跟着
+  // 自动关掉详情弹层
   useEffect(() => {
     if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
   }, [entries, viewEntry])
@@ -77,7 +90,7 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
                 {dayLabel(group.date, t)}
               </span>
               <span
-                className="font-serif text-stat-figure"
+                className="font-serif text-stat-figure font-semibold"
                 style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
               >
                 {dayNet >= 0 ? '+' : '-'}
@@ -91,7 +104,7 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
                 <EntryCard
                   key={entry.id}
                   id={`entry-${entry.id}`}
-                  highlighted={focusEntryId === entry.id}
+                  highlighted={focusEntryId === entry.id || highlightedId === entry.id}
                   entry={entry}
                   category={cat}
                   paymentMethod={pm}
@@ -108,7 +121,10 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
         category={viewCategory}
         paymentMethod={viewPaymentMethod}
         tag={viewTag}
-        onClose={() => setViewEntry(null)}
+        onClose={() => {
+          if (viewEntry) highlightEntry(viewEntry.id)
+          setViewEntry(null)
+        }}
         onEdit={onEdit}
         onCopy={onCopy}
         onDelete={onDelete}

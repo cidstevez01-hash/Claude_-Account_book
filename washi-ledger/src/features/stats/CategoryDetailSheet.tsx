@@ -5,6 +5,7 @@ import { EntryCard } from '../ledger/EntryCard'
 import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
 import { useI18n } from '../../lib/i18n'
+import { useEntryHighlight } from '../../hooks/useEntryHighlight'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 export interface CategoryDetailHeader {
@@ -65,14 +66,22 @@ export function CategoryDetailSheet({
 }: CategoryDetailSheetProps) {
   const { t } = useI18n()
   const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const { highlightedId, highlightEntry } = useEntryHighlight('cat-entry')
 
-  // B-66：同features/ledger/CategoryDetailSheet.tsx
+  // B-66→R-XX：同features/ledger/CategoryDetailSheet.tsx
+  const pendingViewIdRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!initialViewEntryId) return
-    const found = entries.find((e) => e.id === initialViewEntryId)
-    if (found) setViewEntry(found)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    pendingViewIdRef.current = initialViewEntryId ?? null
   }, [initialViewEntryId])
+  useEffect(() => {
+    const pendingId = pendingViewIdRef.current
+    if (!pendingId) return
+    const found = entries.find((e) => e.id === pendingId)
+    if (found) {
+      setViewEntry(found)
+      pendingViewIdRef.current = null
+    }
+  }, [entries])
 
   useEffect(() => {
     if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
@@ -184,7 +193,7 @@ export function CategoryDetailSheet({
                     {dayLabel(group.date, t)}
                   </span>
                   <span
-                    className="font-serif text-stat-figure"
+                    className="font-serif text-stat-figure font-semibold"
                     style={{ color: dayNet >= 0 ? 'var(--color-secondary)' : 'var(--color-primary)' }}
                   >
                     {dayNet >= 0 ? '+' : '-'}
@@ -194,6 +203,8 @@ export function CategoryDetailSheet({
                 {group.entries.map((entry) => (
                   <EntryCard
                     key={entry.id}
+                    id={`cat-entry-${entry.id}`}
+                    highlighted={highlightedId === entry.id}
                     entry={entry}
                     category={snap.categories.find((c) => c.code === entry.catCode)}
                     paymentMethod={snap.paymentMethods.find((p) => p.code === entry.paymentMethod)}
@@ -212,7 +223,10 @@ export function CategoryDetailSheet({
         category={viewEntry ? snap.categories.find((c) => c.code === viewEntry.catCode) : undefined}
         paymentMethod={viewEntry ? snap.paymentMethods.find((p) => p.code === viewEntry.paymentMethod) : undefined}
         tag={viewEntry ? snap.tags.find((tg) => tg.code === viewEntry.tagCode) : undefined}
-        onClose={() => setViewEntry(null)}
+        onClose={() => {
+          if (viewEntry) highlightEntry(viewEntry.id)
+          setViewEntry(null)
+        }}
         onEdit={onEdit}
         onCopy={onCopy}
         onDelete={onDelete}

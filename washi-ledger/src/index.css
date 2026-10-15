@@ -153,6 +153,13 @@
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
+  /* B-XX：日历页祝日标红之前直接复用--color-error，"祝日"和"错误"本来就是
+     两个不相关的语义，只是凑巧共用了同一个Material标准红——跟--color-link/
+     --color-calendar-heat这些专用token同一个理由，拆成独立token。默认主题
+     这个颜色本身对比度已经够(≥5.75:1)，先保持原值，真正要调的是summer主题
+     那份(见下面[data-theme="summer"]里的说明) */
+  --color-holiday: #ba1a1a;
+
   --font-serif: "Noto Serif SC", serif;
   --font-sans: "Noto Sans SC", sans-serif;
 
@@ -256,6 +263,10 @@
      约2.64:1)，这个主题单独加大到混黑35%，实测在该主题卡片底色(#fffdf8)上约
      4.74:1，刚过AA标准 */
   --color-link: color-mix(in srgb, var(--color-primary) 65%, black 35%);
+
+  /* 跟默认主题一样，这个浅色背景上原本的--color-error本身对比度已经够(实测
+     ≥6.36:1)，--color-holiday保持同一个值，不用重新调 */
+  --color-holiday: #ba1a1a;
 }
 
 /* R-29："夏 · 花火"主题——移植旧仓库index.html的data-skin="summerB"：深藏青底配
@@ -324,6 +335,17 @@
   /* 金黄强调色——旧App--accent，新App目前没有单独消费这个token的地方，先占位
      覆盖，以后要用金黄强调随时能接 */
   --color-tertiary: #f2c94c;
+
+  /* B-XX：日历页祝日标红之前直接复用--color-error(#ba1a1a)，这个深藏青底色上
+     实测只有2.1~2.65:1(WCAG小字号AA标准4.5:1)，暗红叠暗底看不清——跟B-51/
+     B-62→B-63同一类"token没跟着这个深色主题重新调"的问题。不能简单"错误红+白"
+     往亮了混(实测会偏冷粉色，跟"夏·花火"暖色调不搭)，改成分两步：先用错误红
+     混一点金黄--color-tertiary提暖出朱红色(70%错误红+30%金黄)，再混白提亮到
+     够对比度(60%朱红+40%白)，兼顾"读起来还是红(跟日历祝日/日曜日标红的惯例
+     一致)"和"色相暖、贴这个主题"。Python算过WCAG对比度：格子无数据(对
+     #101b33)7.15:1、格子有数据(对#1a2c4d)5.81:1、最坏情况——选中这天同时是
+     当月最重热力格子(对45%--color-calendar-heat叠加的背景)4.85:1，都留了余量 */
+  --color-holiday: #e0957f;
 
   /* 记一笔主FAB的发光描边——照旧App.fab{box-shadow:0 0 16px -2px seal, 0 3px 0
      seal-soft}搬，DashboardPage.tsx的inline style读这个变量、没定义时退回默认/

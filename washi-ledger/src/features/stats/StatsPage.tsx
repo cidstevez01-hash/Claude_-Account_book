@@ -327,11 +327,11 @@ export function StatsPage() {
           <div className="flex gap-sm px-md mb-lg">
             <div className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-sm text-center">
               <p className="text-label-caps font-sans text-on-surface-variant uppercase">{t('monthIncome')}</p>
-              <p className="font-serif text-stat-figure text-secondary">{formatCurrency(summary.income, settings.currency)}</p>
+              <p className="font-serif text-stat-figure font-semibold text-secondary">{formatCurrency(summary.income, settings.currency)}</p>
             </div>
             <div className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-sm text-center">
               <p className="text-label-caps font-sans text-on-surface-variant uppercase">{t('monthExpense')}</p>
-              <p className="font-serif text-stat-figure text-primary">{formatCurrency(summary.expense, settings.currency)}</p>
+              <p className="font-serif text-stat-figure font-semibold text-primary">{formatCurrency(summary.expense, settings.currency)}</p>
             </div>
           </div>
           <section className="mx-md mb-lg bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
