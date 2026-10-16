@@ -14,7 +14,9 @@ interface SettingsRowProps {
   /** B-XX：这一行图标是否用新的"复用默认图标形状+单独发光"效果——这个圆形背景是
    * 真实UI常驻存在的(不是为了效果新画的)，所以传'ring'，见ThemeIcon.tsx */
   effect?: 'ring' | 'bare'
-  /** 只对effect='ring'生效——萤火虫装饰，确认稿里只有语言/货币两行带，见ThemeIcon.tsx */
+  /** 只对effect='ring'生效——萤火虫装饰。B-75：之前只有语言/货币两行带(确认稿最早
+   * 定稿范围)，后补的着せ替え/診断ログ/繰り返し入力三行一直没跟进，导致设置页5行图标
+   * 效果看着不统一——改成5行全部统一带萤火虫，不再按"哪行设计稿更新过"分 */
   fireflies?: boolean
   label: string
   children: React.ReactNode
@@ -142,7 +144,7 @@ export function SettingsPage() {
           options={CURRENCIES.map((c) => ({ value: c.code, label: `${c.zh} (${c.code})` }))}
         />
 
-        <SettingsRow icon="palette" effect="ring" label={t('themeLabel')} onClick={() => navigate('/theme')}>
+        <SettingsRow icon="palette" effect="ring" fireflies label={t('themeLabel')} onClick={() => navigate('/theme')}>
           <div className="flex items-center gap-1">
             {/* 之前这里写死显示"PigBang"，跟ThemePage.tsx选卡片切主题完全没接上——
                 切完主题回设置页这一行还是那个死字符串，看起来像"没生效"。改成
@@ -163,15 +165,15 @@ export function SettingsPage() {
             暂时先放在设置页最后一行(不专门做隐藏手势，等这次问题查完/以后有需要
             再收起来)。加完后发现这行图标一直没传effect="ring"，"夏 · 花火"主题下
             没有光晕效果，跟着せ替え/language/currency这几行不统一——用fontTools
-            从字体里补提取了bug_report的形状数据(iconGlyphs.ts)后补上，跟palette
-            这行一样只用ring效果不带萤火虫 */}
-        <SettingsRow icon="bug_report" effect="ring" label={t('debugLogRowLabel')} onClick={() => navigate('/settings/debug-log')}>
+            从字体里补提取了bug_report的形状数据(iconGlyphs.ts)后补上。B-75续：
+            fireflies也补上了，见下面统一说明 */}
+        <SettingsRow icon="bug_report" effect="ring" fireflies label={t('debugLogRowLabel')} onClick={() => navigate('/settings/debug-log')}>
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
 
         {/* R-44：固定收支规则入口——旧App RECURRING_RULES/RECURRING_BIWEEKLY_RULES
             写死在代码里，这里改成前台可增删改查的独立页面 */}
-        <SettingsRow icon="event_repeat" effect="ring" label={t('recurringRulesRowLabel')} onClick={() => navigate('/settings/recurring-rules')}>
+        <SettingsRow icon="event_repeat" effect="ring" fireflies label={t('recurringRulesRowLabel')} onClick={() => navigate('/settings/recurring-rules')}>
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
 

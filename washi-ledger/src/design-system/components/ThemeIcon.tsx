@@ -25,8 +25,9 @@ interface ThemeIconProps {
   /** 配合effect用，图标实际渲染尺寸(px)——默认24跟.material-symbols-outlined默认
    * font-size一致，个别位置(比如RateShortcutFab用22px)需要单独传 */
   size?: number
-  /** 只对effect='ring'生效——萤火虫装饰，只有确认稿里最早定稿的语言/货币两个图标带，
-   * 后补的位置(着せ替え行等)不传 */
+  /** 只对effect='ring'生效——萤火虫装饰。B-75：最早定稿只有语言/货币两个图标带，
+   * 后补的位置一直没跟进导致设置页5行图标效果不统一，现在改成effect='ring'的位置
+   * 统一传true，不再分"哪个位置设计稿更新过" */
   fireflies?: boolean
   /** 只对effect='bare'生效——B-48，给呼吸发光动画传一个基于真实时间戳算出的负delay，
    * 用在BottomNav这类"每次切换都会整个重新挂载"的位置，避免动画从0%重新开始看起来

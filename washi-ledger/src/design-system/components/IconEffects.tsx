@@ -47,8 +47,8 @@ function Firefly({ wander, wanderDuration, wanderDelay, glowDuration, glowDelay 
  * 改成不再自己包裹，直接把发光层和图标作为调用方容器的直接子节点渲染——调用方
  * 那个真实圆形容器本来就是position:relative+flex居中(SettingsRow等已经是这样)，
  * inset:-9px改成相对那个真实大小的圆计算，发光才会正确探出圆外。
- * fireflies——只有最早定稿的语言/货币两个图标带这个装饰(见确认稿)，后补的位置
- * (比如着せ替え行)不带，调用方按需传 */
+ * fireflies——B-75：最早定稿只有语言/货币两个图标带这个装饰，后补的位置一直没跟进
+ * 导致设置页图标效果不统一，现在改成effect='ring'的位置统一传true */
 export function RingIconEffect({ icon, size, className, fireflies }: IconEffectProps & { fireflies?: boolean }) {
   return (
     <>
