@@ -32,9 +32,16 @@ const TOTAL_KEYWORD_PRIORITY = ['合計', 'お会計', '御会計', 'total', '�
 // (日式小票惯例是"合計"标签在左、金额在右，同一行内金额通常是最后一段数字)
 const NUMBER_RE = /[¥￥]?[\d,]{2,}[円]?/g
 
+// B-76：同一张小票上"割引前合計"(折扣前小计)和"合計"(折扣后实付总额)可能同时
+// 出现，而且前者的字面本身就包含"合計"这个子串——用findIndex从上往下找第一个
+// 匹配，排版通常是"割引前合計"先列、折扣后的真实"合計"排在它下面，会先撞上
+// "割引前合計"拿到折扣前的金额，读错。改成findLastIndex从下往上找最后一个
+// 匹配——小票上真正要付的那个"合計"/"お会計"永远是整张票最靠下的汇总行(付款方式/
+// 找零说明还在它下面，但那些行不含"合計"字样不会误撞)，不需要额外写"排除割引"
+// 这类特判规则，天然就会跳过排在上面的"割引前合計"
 function findTotalRowIndex(rows: Row[]): number {
   for (const kw of TOTAL_KEYWORD_PRIORITY) {
-    const idx = rows.findIndex((r) => r.text.toLowerCase().includes(kw.toLowerCase()))
+    const idx = rows.findLastIndex((r) => r.text.toLowerCase().includes(kw.toLowerCase()))
     if (idx >= 0) return idx
   }
   return -1

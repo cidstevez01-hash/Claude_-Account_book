@@ -289,7 +289,14 @@ export function AddTransactionPage() {
       setReceiptPaths((prev) => [...prev, path])
       setScanSheetOpen(false)
       if (mode !== 'edit') {
-        if (!amount && fields.amount != null) setAmount(String(fields.amount))
+        // R-46：多张小票依次扫描，金额要叠加而不是只取第一张——之前"金额栏为空
+        // 才填"这个判断，扫完第一张之后金额栏有值了，后面几张的识别结果全部被
+        // 忽略。改成每次都把这张的识别金额加进当前金额(第一张时当前值是空/0，
+        // 加出来效果跟原来"直接填"一样，不改变单张小票时的行为)
+        if (fields.amount != null) {
+          const current = parseFloat(amount) || 0
+          setAmount(String(current + fields.amount))
+        }
         if (!note.trim()) {
           const formatted = formatReceiptNote(fields)
           if (formatted) setNote(formatted)
