@@ -19,6 +19,7 @@
 ## 已完成
 - `voltaction-blue-mercard-jcb/`：蓝底黑发眼镜角色卡（同示例换法）
 - `voltaction-red-mercard-jcb/`：红底角色卡，修正 mercard 图标白边、删除 © A/N
+- `voltaction-navy-mercard-jcb/`：深蓝底紫发角色卡（同示例换法）
 
 ## 示例
 `_example-voltaction-mercard-jcb/`：`1-original.webp` + `2-reference-fullbody.webp` → `3-result.webp`
