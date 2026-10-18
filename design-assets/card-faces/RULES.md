@@ -16,6 +16,9 @@
 3. **角色被标志遮挡/破坏的部分，用参考图补全**：去掉旧标志后，若露出或破坏了人物图像，把参考图对齐（缩放/平移到与原图角色重合）后直接取对应像素补上。**不许 AI 凭空猜测重画**，避免改坏。
 4. **标志用素材贴合，不用 AI 生成**：旧标志用代码擦除，新标志用清晰的标志素材贴上，保证文字/图形不变形。只有参考图也覆盖不到、确实需要补画的背景区域，才考虑 `baoyu-image-gen`，且要先跟用户确认。
 
+## 已完成
+- `voltaction-blue-mercard-jcb/`：蓝底黑发眼镜角色卡（同示例换法）
+
 ## 示例
 `_example-voltaction-mercard-jcb/`：`1-original.webp` + `2-reference-fullbody.webp` → `3-result.webp`
 - 左上 `MITSUI SUMITOMO CARD` + `©A/N` → mercard 标志
