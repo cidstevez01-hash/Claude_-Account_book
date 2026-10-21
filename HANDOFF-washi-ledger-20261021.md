@@ -144,6 +144,32 @@
 
 ---
 
+### 2.10 非代码工具（完整清单）
+
+下面是这个项目的工作过程中实际用过的、非代码类的工具。统计来自会话记录（2026-10-15 之后的部分，以及压缩摘要里记录的更早工作）。
+
+| 工具 | 用途 | 用法与规则 | 使用次数（会话记录） |
+|---|---|---|---|
+| **Smartsheet MCP**（`mcp__Smartsheet__*`） | 需求表 / Bug 表 | 先 `get_resource_guide`（intent `smartsheet-intelligence`）；新增 `add_rows`，修改 `update_rows`，列用数字列 ID；多选字段用 `MULTI_PICKLIST`；cells 里不要放 `value: null` 占位（会报 invalid parameters）。每个修复都要登记，并改状态、回填版本号。 | add_rows 9 次，update_rows 8 次，get_columns 2 次，get_sheet_summary 1 次，get_resource_guide 1 次 |
+| **GitHub MCP**（`mcp__github__*`） | 查看、触发 GitHub Actions | `actions_run_trigger`（method `run_workflow`）触发 iOS 测试包，`ref` 指定分支；`actions_list`（`list_workflow_runs`）查看运行状态。触发工作流需要用户明确同意（这是一条远程操作）。 | run_trigger 3 次，actions_list 3 次 |
+| **Playwright（Chromium）** | 浏览器里跑真实页面、截图、量像素 | 在 Bash 里用 `node` 脚本；`chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })`；脚本里 `require('/opt/node22/lib/node_modules/playwright')`；不要 `playwright install`。需要 `washi-ledger/.env`（从 `.env.example` 复制，已被 .gitignore 忽略），否则页面报 `缺少 VITE_SUPABASE_URL`。 | 没有单独计数（通过 Bash 运行） |
+| **WebSearch** | 调研资料（术语、设计做法、漏洞） | 用户说"调研"时用；调研结果要带来源链接。用户明确说"不要查官网、只是小道消息"时，不去官网查，只说明信息来源的可靠程度。 | 3 次 |
+| **SendUserFile** | 把文件发给用户（如交接文档） | 发文件要给一句说明（caption），`status` 用 normal 或 proactive。 | 1 次 |
+| **Claude Artifact**（claude.ai 私有页面） | 交互式预览（如节假日圆点位置调整的预览工具） | 发布后每次更新用同一个链接覆盖，不新建。已发布过的链接：https://claude.ai/artifact/CwLtSM65cKPr56BCEaqWiK （来自压缩摘要，不在上面的统计里）。 | 1 次（摘要记录） |
+| **Stitch MCP**（`stitch`，Google 设计工具） | 生成界面设计稿（R-32 小票扫描界面等） | 配置在仓库根目录 `.mcp.json`，key 从环境变量 `STITCH_API_KEY` 读取，**不写进仓库**。设计稿要存进 `design-assets/`（`final/` 放当前接入的版本，`history/` 放历次版本）。 | 摘要记录，会话里没有直接调用计数 |
+| **ToolSearch** | 加载延迟加载的工具定义 | 只在需要时用，按 `select:<工具名>` 加载。 | 4 次 |
+| **Explore 子代理**（Agent 工具） | 大范围查代码结构 | 只在要做架构梳理、代码量很大时使用。压缩摘要记录过一次。 | 摘要记录 |
+| **npm audit** | 查依赖的已知漏洞（只读） | `npm audit --omit=dev`，前端和 `worker/` 各跑一次。 | Bash 中运行 |
+| **Python（PIL、WCAG 对比度计算）** | 颜色对比度计算、图片像素分析 | 用脚本算 WCAG 对比度（不靠肉眼）。 | Bash 中运行 |
+| **esbuild** | 把 TypeScript 模块打成独立的 `.mjs` 用于单元测试 | 例：`npx esbuild src/lib/receiptFieldExtract.ts --bundle --format=esm --platform=node`，依赖的原生插件用 stub 替代。 | Bash 中运行 |
+
+**共同规则**
+- 所有工具的 token、密钥都从环境变量或 `.mcp.json` 读取，不写进仓库，也不写进交接文档。
+- 沙盒连不上 Cloudflare、Supabase 的真实登录、真机 iOS。依赖这些的工具（Worker 部署、真机测试）要用户在本机做。
+- 遇到工具被拒绝的权限弹窗，先确认是会话权限问题，还是服务本身的问题，再决定要不要换工具。
+
+---
+
 ## 3. 数据库（Supabase Postgres）
 
 ### 3.1 表
