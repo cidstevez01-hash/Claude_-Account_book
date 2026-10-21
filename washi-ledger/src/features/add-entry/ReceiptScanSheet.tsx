@@ -16,7 +16,28 @@ interface ReceiptScanSheetProps {
   open: boolean
   entryDate: string
   onClose: () => void
-  onConfirm: (pdf: Blob, fields: RecognizedReceiptFields) => void
+  onConfirm: (pdf: Blob, fields: RecognizedReceiptFields) => Promise<boolean>
+}
+
+const OCR_WAIT_MS = 5000
+const EMPTY_FIELDS: RecognizedReceiptFields = { amount: null, storeName: null, items: [] }
+
+// OCR识别慢或卡住时不能让保存一直转圈——超时就按空结果保存，金额/备注留给用户手填
+function waitForFields(pending: Promise<RecognizedReceiptFields> | null): Promise<RecognizedReceiptFields> {
+  if (!pending) return Promise.resolve(EMPTY_FIELDS)
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => resolve(EMPTY_FIELDS), OCR_WAIT_MS)
+    pending.then(
+      (fields) => {
+        window.clearTimeout(timer)
+        resolve(fields)
+      },
+      () => {
+        window.clearTimeout(timer)
+        resolve(EMPTY_FIELDS)
+      },
+    )
+  })
 }
 
 /** R-32：レシート扫描确认弹层——照Stitch设计稿(用户已确认)做：原生扫描(系统全屏
@@ -36,6 +57,11 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   // "存为PDF"时才去等这个promise的结果——大多数情况下用户看几眼预览图确认的这段
   // 时间，识别早就跑完了，真等到的时候也就是极快的一下
   const recognizeResultRef = useRef<Promise<RecognizedReceiptFields> | null>(null)
+  // 保存中状态：savingRef是真正的防重入开关(state更新是异步的，快速连点时挡不住)，
+  // saving只负责界面上禁用按钮、显示转圈
+  const savingRef = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
 
   function errText(e: unknown): string {
     return e instanceof Error ? e.message : String(e)
@@ -108,10 +134,19 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   if (!open) return null
 
   async function handleConfirm() {
-    if (!resultCanvasRef.current) return
-    const pdf = buildReceiptPdf(resultCanvasRef.current, { entryDate })
-    const fields = (await recognizeResultRef.current) ?? { amount: null, storeName: null, items: [] }
-    onConfirm(pdf, fields)
+    if (savingRef.current || !resultCanvasRef.current) return
+    savingRef.current = true
+    setSaving(true)
+    setSaveFailed(false)
+    try {
+      const pdf = buildReceiptPdf(resultCanvasRef.current, { entryDate })
+      const fields = await waitForFields(recognizeResultRef.current)
+      const ok = await onConfirm(pdf, fields)
+      if (!ok) setSaveFailed(true)
+    } finally {
+      savingRef.current = false
+      setSaving(false)
+    }
   }
 
   return (
@@ -187,13 +222,23 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
         {stage === 'review' && (
           <div className="p-md shrink-0 border-t-[1.5px] border-dashed border-outline-variant">
+            {saveFailed && <p className="text-xs text-primary text-center mb-2">{t('receiptSaveFailed')}</p>}
             <button
               type="button"
               onClick={handleConfirm}
-              className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform"
+              disabled={saving}
+              className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform disabled:opacity-70"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >
-              <span className="material-symbols-outlined">picture_as_pdf</span>
+              {saving ? (
+                <span className="ios-spinner text-on-primary">
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
+                  ))}
+                </span>
+              ) : (
+                <span className="material-symbols-outlined">picture_as_pdf</span>
+              )}
               {t('receiptSaveAsPdf')}
             </button>
           </div>

@@ -281,8 +281,8 @@ export function AddTransactionPage() {
   // R-41：扫描确认后追加到receiptPaths末尾(不再是setReceiptPath整个覆盖)——一次
   // 只扫一张的交互本身不变(ReceiptScanSheet职责不变)，"能扫多张"是这里的列表管理
   // 逻辑，用户扫完一张想再加一张，自己点列表末尾的"继续扫描"再次打开这个弹层
-  async function handleReceiptConfirm(pdf: Blob, fields: RecognizedReceiptFields) {
-    if (!user) return
+  async function handleReceiptConfirm(pdf: Blob, fields: RecognizedReceiptFields): Promise<boolean> {
+    if (!user) return false
     setReceiptBusy(true)
     try {
       const path = await uploadReceiptPdf(user.id, entryId, pdf)
@@ -302,8 +302,10 @@ export function AddTransactionPage() {
           if (formatted) setNote(formatted)
         }
       }
+      return true
     } catch (e) {
       console.error('レシート凭证上传失败', e)
+      return false
     } finally {
       setReceiptBusy(false)
     }
