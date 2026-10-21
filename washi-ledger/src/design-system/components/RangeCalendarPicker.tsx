@@ -16,16 +16,15 @@ function ymd(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-/** 月历格子——固定6行42格(含跨到上/下月的灰显日期)，保证每个月视图高度一致，
- * 不会因为当月周数不同导致弹层高度跳动 */
-function buildMonthGrid(year: number, month: number): { date: Date; inMonth: boolean }[] {
-  const first = new Date(year, month, 1)
-  const startWeekday = first.getDay()
-  const gridStart = new Date(year, month, 1 - startWeekday)
-  return Array.from({ length: 42 }, (_, i) => {
-    const d = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i)
-    return { date: d, inMonth: d.getMonth() === month }
-  })
+/** 月历格子只排当月的日期：月初之前、月末之后的空位用null占位，保证星期列对齐。
+ * 不显示上/下月的日期，行数按当月实际需要排(4~6行)，不补满固定6行 */
+function buildMonthGrid(year: number, month: number): (Date | null)[] {
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const startWeekday = new Date(year, month, 1).getDay()
+  const cells: (Date | null)[] = Array.from({ length: startWeekday }, () => null)
+  for (let day = 1; day <= daysInMonth; day++) cells.push(new Date(year, month, day))
+  while (cells.length % 7 !== 0) cells.push(null)
+  return cells
 }
 
 /** R-27自绘日历——起止日期单框触发，弹出这个月历面板做真正的区间选择(不再是原生
@@ -296,7 +295,8 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
           onTouchStart={handleGridTouchStart}
           onTouchEnd={handleGridTouchEnd}
         >
-          {grid.map(({ date, inMonth }) => {
+          {grid.map((date, i) => {
+            if (!date) return <span key={`blank-${i}`} className="h-9" />
             const dateStr = ymd(date)
             const isStart = dateStr === pendingStart
             const isEnd = pendingEnd != null && dateStr === pendingEnd
@@ -318,11 +318,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
                 )}
                 <span
                   className={`relative z-[1] w-7 h-7 flex items-center justify-center rounded-full font-serif text-body-md ${
-                    isBoundary || inRange
-                      ? 'text-[var(--color-selected-day-ink)]'
-                      : inMonth
-                        ? 'text-on-surface'
-                        : 'text-on-surface-variant/40'
+                    isBoundary || inRange ? 'text-[var(--color-selected-day-ink)]' : 'text-on-surface'
                   } ${isBoundary ? 'bg-primary' : ''}`}
                 >
                   {date.getDate()}
