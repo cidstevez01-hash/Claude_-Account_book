@@ -157,12 +157,44 @@ function parseAmountFromRow(text: string): number | null {
   return Number.isFinite(n) && n > 0 ? n : null
 }
 
+function parseYenToken(token: string): number | null {
+  const n = Number(token.replace(/[¥￥円,]/g, ''))
+  return Number.isFinite(n) && n >= 10 ? n : null
+}
+
+/** 实付合计在小票上会重复出现(合計行、内税/税込行、支付行)，而税额、单价、找零通常只出现一两次，
+ * 所以不依赖"支払"等标签文字(支付方式、行位置都不固定)，统计整张小票上每个金额出现的次数。
+ * 合計行读出的值只作为基准：只在比它大的、重复出现的金额里挑，这样税额(一定比合计小)不会被选中；
+ * 合计行读错成税额时，正确的合计会因为出现次数更多而被选中 */
+function pickTotal(rows: Row[], totalRowIdx: number): number | null {
+  const rowValue = totalRowIdx >= 0 ? parseAmountFromRow(rows[totalRowIdx].text) : null
+  if (rowValue == null) return null
+  const counts = new Map<number, number>()
+  for (const r of rows) {
+    for (const m of r.text.matchAll(NUMBER_RE)) {
+      const n = parseYenToken(m[0])
+      if (n != null) counts.set(n, (counts.get(n) ?? 0) + 1)
+    }
+  }
+  let best = rowValue
+  let bestCount = counts.get(rowValue) ?? 0
+  for (const [n, c] of counts) {
+    if (n < rowValue || c < 2) continue
+    if (c > bestCount || (c === bestCount && n > best)) {
+      best = n
+      bestCount = c
+    }
+  }
+  logIfEnabled(`合計判定: 合計行=${rowValue}(出现${counts.get(rowValue) ?? 0}次), 选=${best}(出现${bestCount}次)`)
+  return best
+}
+
 /** 从识别出的文本行里拆金额/店名/购入明细——见文件头注释的整体思路 */
 export function extractReceiptFields(rows: Row[]): RecognizedReceiptFields {
   if (rows.length === 0) return { amount: null, storeName: null, items: [] }
 
   const totalRowIdx = findTotalRowIndex(rows)
-  const amount = totalRowIdx >= 0 ? parseAmountFromRow(rows[totalRowIdx].text) : null
+  const amount = pickTotal(rows, totalRowIdx)
 
   const storeNameIdx = pickStoreNameIndex(rows)
   const storeName = rows[storeNameIdx]?.text || null
