@@ -188,7 +188,13 @@ export async function recognizeReceiptFields(imageDataUrl: string): Promise<Reco
     const { textDetections } = await Ocr.detectText({ base64: imageDataUrl })
     logIfEnabled(`Ocr.detectText()识别出${textDetections.length}个文本块`)
     const rows = groupIntoRows(textDetections)
-    return extractReceiptFields(rows)
+    logIfEnabled(`OCR原始行(${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
+    const totalIdx = findTotalRowIndex(rows)
+    const fields = extractReceiptFields(rows)
+    logIfEnabled(
+      `OCR解析: 合計行=${totalIdx >= 0 ? `#${totalIdx} "${rows[totalIdx].text}"` : '未找到'}, 金额=${fields.amount}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
+    )
+    return fields
   } catch (e) {
     logIfEnabled(`Ocr.detectText()失败(web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
     return { amount: null, storeName: null, items: [] }

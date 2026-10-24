@@ -25,6 +25,7 @@ import { markStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
 import { consumeAddEntryOrigin } from '../../lib/addEntryOrigin'
 import { clearDetailSheetReturnMemory, updateDetailSheetReturnMemoryEntryId } from '../../lib/detailSheetReturnMemory'
 import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
+import { logIfEnabled } from '../../lib/appLog'
 import type { Entry, EntryType } from '../../types'
 
 /** 扫描小票识别出的店名+购入明细拼成备注默认值——店名单独一行，商品列表每行前面
@@ -293,13 +294,19 @@ export function AddTransactionPage() {
         // 才填"这个判断，扫完第一张之后金额栏有值了，后面几张的识别结果全部被
         // 忽略。改成每次都把这张的识别金额加进当前金额(第一张时当前值是空/0，
         // 加出来效果跟原来"直接填"一样，不改变单张小票时的行为)
+        const current = parseFloat(amount) || 0
         if (fields.amount != null) {
-          const current = parseFloat(amount) || 0
-          setAmount(String(current + fields.amount))
+          const sum = current + fields.amount
+          logIfEnabled(`小票金额叠加: 当前金额栏=${current}, 本张识别=${fields.amount}, 叠加后=${sum}`)
+          setAmount(String(sum))
+        } else {
+          logIfEnabled(`小票金额叠加: 本张未识别到金额，金额栏保持${current}`)
         }
-        if (!note.trim()) {
-          const formatted = formatReceiptNote(fields)
-          if (formatted) setNote(formatted)
+        // 备注：每张小票的店名+明细都追加到已有备注后面，两张之间空一行，不再只在备注为空时写入
+        const formatted = formatReceiptNote(fields)
+        if (formatted) {
+          setNote((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${formatted}` : formatted))
+          logIfEnabled(`小票备注追加: ${formatted.split('\n').length}行`)
         }
       }
       return true
