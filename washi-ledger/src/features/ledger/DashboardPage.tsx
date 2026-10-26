@@ -196,12 +196,18 @@ export function DashboardPage() {
     [displayEntries, startDate, endDate]
   )
 
+  const deletingRef = useRef(false)
   async function confirmDelete() {
-    if (!user || !pendingDeleteId) return
-    await deleteEntry(pendingDeleteId, user.id)
-    removeLocal(pendingDeleteId)
-    setPendingDeleteId(null)
-    reload()
+    if (!user || !pendingDeleteId || deletingRef.current) return
+    deletingRef.current = true
+    try {
+      await deleteEntry(pendingDeleteId, user.id)
+      removeLocal(pendingDeleteId)
+      setPendingDeleteId(null)
+      reload()
+    } finally {
+      deletingRef.current = false
+    }
   }
 
   const detailEntries = useMemo(() => {

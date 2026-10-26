@@ -25,6 +25,7 @@ import { markStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
 import { consumeAddEntryOrigin } from '../../lib/addEntryOrigin'
 import { clearDetailSheetReturnMemory, updateDetailSheetReturnMemoryEntryId } from '../../lib/detailSheetReturnMemory'
 import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
+import { addToOutbox, flushOutbox, removeFromOutbox } from '../../lib/entryOutbox'
 import { logIfEnabled } from '../../lib/appLog'
 import type { Entry, EntryType } from '../../types'
 
@@ -109,6 +110,15 @@ export function AddTransactionPage() {
   )
   const [scanSheetOpen, setScanSheetOpen] = useState(false)
   const [receiptBusy, setReceiptBusy] = useState(false)
+  // 保存防重复：savingRef是真正的开关(快速连点时state还没更新，挡不住)，saving只负责禁用按钮和转圈
+  const savingRef = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
+  // 上次保存超时或页面被切走时，结果可能已经写进了服务器，这里把待确认的记录重新提交一次(同一个id，后端去重)
+  useEffect(() => {
+    if (user) void flushOutbox(user.id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
   // B-XX：查看凭证之前直接window.open(url,'_blank')外跳系统浏览器，这个坑
   // EntryCard.tsx早就踩过修过(原生优先调QuickLook，web端才兜底用这套HTML弹层)，
   // 这个页面自己的查看按钮当时没跟着一起改，见下面handleReceiptView说明
@@ -244,7 +254,26 @@ export function AddTransactionPage() {
       createdAt: base?.createdAt ?? Date.now(),
       receiptPaths,
     }
-    await upsertEntry(entry, user.id)
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
+    setSaveFailed(false)
+    let saved = false
+    try {
+      addToOutbox(user.id, entry)
+      await upsertEntry(entry, user.id)
+      removeFromOutbox(user.id, entry.id)
+      saved = true
+    } catch (e) {
+      console.error('记录保存失败', e)
+    } finally {
+      savingRef.current = false
+      setSaving(false)
+    }
+    if (!saved) {
+      setSaveFailed(true)
+      return
+    }
     // R-XX：新建(mode==='add')保存后还是走原来R-42那套"按入口高亮/刷新"逻辑，回到
     // 列表页定位高亮这条新记录——FAB新建没有"来源详情弹层"，这套逻辑继续保留不变。
     // 编辑/复制则改成保存后直接回到详情弹层(不再回列表+高亮)：详情弹层一定是从
@@ -624,14 +653,23 @@ export function AddTransactionPage() {
       />
 
       <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-md pb-6 bg-gradient-to-t from-surface via-surface to-transparent">
+        {saveFailed && <p className="text-xs text-primary text-center mb-2">{t('entrySaveFailed')}</p>}
         <button
           type="button"
           onClick={handleSave}
-          disabled={!amount || parseFloat(amount) <= 0}
-          className="w-full h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          disabled={!amount || parseFloat(amount) <= 0 || saving}
+          className="w-full h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-70"
           style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
         >
-          <span className="material-symbols-outlined">how_to_reg</span>
+          {saving ? (
+            <span className="ios-spinner text-on-primary">
+              {Array.from({ length: 8 }, (_, i) => (
+                <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
+              ))}
+            </span>
+          ) : (
+            <span className="material-symbols-outlined">how_to_reg</span>
+          )}
           {t('saveEntry')}
         </button>
       </div>

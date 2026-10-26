@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
@@ -236,12 +236,18 @@ export function StatsPage() {
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
+  const deletingRef = useRef(false)
   async function confirmDelete() {
-    if (!user || !pendingDeleteId) return
-    await deleteEntry(pendingDeleteId, user.id)
-    removeLocal(pendingDeleteId)
-    setPendingDeleteId(null)
-    reload()
+    if (!user || !pendingDeleteId || deletingRef.current) return
+    deletingRef.current = true
+    try {
+      await deleteEntry(pendingDeleteId, user.id)
+      removeLocal(pendingDeleteId)
+      setPendingDeleteId(null)
+      reload()
+    } finally {
+      deletingRef.current = false
+    }
   }
 
   // R-17：下拉刷新——重新拉一次账目记录+分类/支付方式目录，两个互不依赖并行拉

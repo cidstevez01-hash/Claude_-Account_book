@@ -69,11 +69,13 @@ export async function deleteEntry(c: Context<{ Bindings: Bindings }>) {
   const userId = await getVerifiedUserId(client)
   const id = c.req.param('id')
 
+  // 只对还没删除的行生效：已经删除过的再删一次更新0行，直接返回成功，不覆盖第一次的删除时间
   const { error } = await client
     .from('entries')
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
     .eq('user_id', userId)
+    .is('deleted_at', null)
   if (error) throw new HttpError(500, error.message)
 
   return c.json({ ok: true })
