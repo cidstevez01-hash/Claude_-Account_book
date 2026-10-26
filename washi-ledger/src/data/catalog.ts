@@ -313,11 +313,13 @@ export function buildNewSubcategory(label: string): Subcategory {
   return { id: crypto.randomUUID(), code: genCustomKey(), zh: label, ja: label, custom: true }
 }
 
+// 23505=主键冲突：同一个id已经落库(双击，或上一次请求其实已经写进去、只是客户端没收到回包)，
+// 视为成功，不再报错，也不会因为重试多出一行
 export async function insertCustomSubcategory(catCode: string, sub: Subcategory, userId: string): Promise<void> {
   const { error } = await supabase
     .from('subcategories')
     .insert({ id: sub.id, code: sub.code, cat_code: catCode, zh: sub.zh, ja: sub.ja, is_preset: false, user_id: userId })
-  if (error) throw error
+  if (error && error.code !== '23505') throw error
 }
 
 export async function updateCustomSubcategory(id: string, label: string): Promise<void> {
@@ -337,11 +339,12 @@ export function buildNewTag(type: EntryType, label: string): Tag {
   return { id: crypto.randomUUID(), code: genCustomKey(), type, zh: label, ja: label, custom: true }
 }
 
+// 同insertCustomSubcategory：主键冲突(23505)视为已经写入，不重复报错
 export async function insertCustomTag(tag: Tag, userId: string): Promise<void> {
   const { error } = await supabase
     .from('tags')
     .insert({ id: tag.id, code: tag.code, type: tag.type, zh: tag.zh, ja: tag.ja, is_preset: false, user_id: userId })
-  if (error) throw error
+  if (error && error.code !== '23505') throw error
 }
 
 export async function updateCustomTag(id: string, label: string): Promise<void> {

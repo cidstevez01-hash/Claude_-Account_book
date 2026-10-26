@@ -47,7 +47,8 @@ export async function upsertRules(c: Context<{ Bindings: Bindings }>) {
 
 /** DELETE /recurring-rules/:id——软删除，照抄entries/handlers.ts的deleteEntry，
  * 不删掉这条规则已经生成出来的历史账目记录(entries里那些recurring_id指向这条
- * 规则的行不受影响，继续作为独立的正常记录存在) */
+ * 规则的行不受影响，继续作为独立的正常记录存在)。
+ * .is('deleted_at', null)：已经删除过的再删一次更新0行、直接返回成功，不覆盖第一次的删除时间 */
 export async function deleteRule(c: Context<{ Bindings: Bindings }>) {
   const client = getUserScopedClient(c.env, c.req.raw)
   const userId = await getVerifiedUserId(client)
@@ -58,6 +59,7 @@ export async function deleteRule(c: Context<{ Bindings: Bindings }>) {
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
     .eq('user_id', userId)
+    .is('deleted_at', null)
   if (error) throw new HttpError(500, error.message)
 
   return c.json({ ok: true })

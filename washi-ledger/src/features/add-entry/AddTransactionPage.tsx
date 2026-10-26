@@ -114,6 +114,8 @@ export function AddTransactionPage() {
   const savingRef = useRef(false)
   const [saving, setSaving] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
+  // 小票删除同样用ref挡双击：receiptBusy是state，快速连点时还没更新
+  const receiptRemovingRef = useRef(false)
   // 上次保存超时或页面被切走时，结果可能已经写进了服务器，这里把待确认的记录重新提交一次(同一个id，后端去重)
   useEffect(() => {
     if (user) void flushOutbox(user.id)
@@ -348,6 +350,8 @@ export function AddTransactionPage() {
   }
 
   async function handleReceiptRemove(path: string) {
+    if (receiptRemovingRef.current) return
+    receiptRemovingRef.current = true
     setReceiptBusy(true)
     try {
       await deleteReceiptPdf(path)
@@ -355,6 +359,7 @@ export function AddTransactionPage() {
     } catch (e) {
       console.error('レシート凭证删除失败', e)
     } finally {
+      receiptRemovingRef.current = false
       setReceiptBusy(false)
     }
   }

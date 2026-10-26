@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { RouteFade } from '../../design-system/components/RouteFade'
@@ -51,17 +51,27 @@ export function RecurringRuleFormPage() {
   const [intervalDays, setIntervalDays] = useState(() => (sourceRule?.intervalDays ? String(sourceRule.intervalDays) : '14'))
   const [enabled, setEnabled] = useState(() => sourceRule?.enabled ?? true)
   const [pendingDelete, setPendingDelete] = useState(false)
+  // 新建规则的id在挂载时就定下来，而不是每次点保存才生成：失败后重试沿用同一个id，不会多出一条
+  const [newRuleId] = useState(() => crypto.randomUUID())
+  // 防重复：savingRef/deletingRef是真正的开关(快速连点时state还没更新，挡不住)，saving只负责禁用按钮
+  const savingRef = useRef(false)
+  const deletingRef = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
 
   function handleBack() {
     navigate(-1)
   }
 
   async function handleSave() {
-    if (!user || !catCode) return
+    if (!user || !catCode || savingRef.current) return
     const amt = parseFloat(amount)
     if (!amt || amt <= 0) return
+    savingRef.current = true
+    setSaving(true)
+    setSaveFailed(false)
     const rule: RecurringRule = {
-      id: sourceRule?.id ?? crypto.randomUUID(),
+      id: sourceRule?.id ?? newRuleId,
       type,
       amount: amt,
       currency: sourceRule?.currency ?? settings.currency,
@@ -77,16 +87,29 @@ export function RecurringRuleFormPage() {
       intervalDays: ruleKind === 'intervalDays' ? parseInt(intervalDays, 10) || 1 : null,
       enabled,
     }
-    await upsertRecurringRule(rule, user.id)
-    navigate(-1)
+    try {
+      await upsertRecurringRule(rule, user.id)
+      navigate(-1)
+    } catch (e) {
+      console.error('固定收支规则保存失败', e)
+      setSaveFailed(true)
+    } finally {
+      savingRef.current = false
+      setSaving(false)
+    }
   }
 
   async function confirmDelete() {
-    if (!user || !sourceRule) return
+    if (!user || !sourceRule || deletingRef.current) return
+    deletingRef.current = true
     removeLocal(sourceRule.id)
     setPendingDelete(false)
-    await deleteRecurringRule(sourceRule.id, user.id)
-    navigate(-1)
+    try {
+      await deleteRecurringRule(sourceRule.id, user.id)
+      navigate(-1)
+    } finally {
+      deletingRef.current = false
+    }
   }
 
   const pageTitle = sourceRule ? t('recurringRuleEditTitle') : t('recurringRuleAddTitle')
@@ -339,9 +362,10 @@ export function RecurringRuleFormPage() {
           // 删除占小；只有编辑已有规则(sourceRule存在)时才出现删除，新建时还是
           // 保存独占整行
           <div
-            className="fixed bottom-0 inset-x-0 mx-auto max-w-[480px] p-md bg-surface border-t-[1.5px] border-dashed border-outline-variant flex gap-2"
+            className="fixed bottom-0 inset-x-0 mx-auto max-w-[480px] p-md bg-surface border-t-[1.5px] border-dashed border-outline-variant flex flex-wrap gap-2"
             style={{ paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))' }}
           >
+            {saveFailed && <p className="basis-full text-xs text-primary text-center">{t('entrySaveFailed')}</p>}
             {sourceRule && (
               <button
                 type="button"
@@ -355,7 +379,7 @@ export function RecurringRuleFormPage() {
             <button
               type="button"
               onClick={handleSave}
-              disabled={!amount || parseFloat(amount) <= 0 || !catCode}
+              disabled={!amount || parseFloat(amount) <= 0 || !catCode || saving}
               className="flex-1 h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >
