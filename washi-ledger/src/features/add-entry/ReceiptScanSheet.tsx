@@ -4,7 +4,7 @@ import { pickFromGallery, scanDocumentNative } from '../../lib/receiptCamera'
 import { blobToImage } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
 import { recognizeReceiptFields, type RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
-import { logIfEnabled } from '../../lib/appLog'
+import { logModule } from '../../lib/appLog'
 
 // R-32三期：拍照页面改成调用系统原生扫描能力(见lib/receiptCamera.ts)，取代之前
 // 自建webcam取景界面+OpenCV.js边缘检测那整套——原生扫描器自己就是一个完整的
@@ -83,40 +83,40 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   async function startScan() {
     setStage('scanning')
     setErrorMsg(null)
-    logIfEnabled('=== ReceiptScanSheet.startScan 开始(原生扫描) ===')
+    logModule('receipt', '=== ReceiptScanSheet.startScan 开始(原生扫描) ===')
     try {
       const blob = await scanDocumentNative()
       if (!blob) {
-        logIfEnabled('用户取消了原生扫描，关闭弹层')
+        logModule('receipt', '用户取消了原生扫描，关闭弹层')
         onClose()
         return
       }
-      logIfEnabled(`原生扫描完成，blob.size=${blob.size}字节`)
+      logModule('receipt', `原生扫描完成，blob.size=${blob.size}字节`)
       await setResultFromBlob(blob)
     } catch (e) {
       // Web端(沙盒/浏览器预览)本来就没有原生扫描能力，插件会直接抛
       // "not supported on the web"——这不是异常情况，是预期内会走到的分支，
       // 兜底改用相册选图；真机上权限被拒绝/用户手动取消系统弹窗也会走到这里
       console.error('原生文档扫描失败', e)
-      logIfEnabled(`scanDocumentNative()抛错: ${errText(e)}`, 'error')
+      logModule('receipt', `scanDocumentNative()抛错: ${errText(e)}`, 'error')
       setErrorMsg(errText(e))
       setStage('error')
     }
   }
 
   async function handlePickGallery() {
-    logIfEnabled('用户选择从相册选取')
+    logModule('receipt', '用户选择从相册选取')
     try {
       const blob = await pickFromGallery()
       if (!blob) {
-        logIfEnabled('用户取消了相册选图，关闭弹层')
+        logModule('receipt', '用户取消了相册选图，关闭弹层')
         onClose()
         return
       }
       await setResultFromBlob(blob)
     } catch (e) {
       console.error('相册选图失败', e)
-      logIfEnabled(`pickFromGallery()抛错: ${errText(e)}`, 'error')
+      logModule('receipt', `pickFromGallery()抛错: ${errText(e)}`, 'error')
       setErrorMsg(errText(e))
       setStage('error')
     }

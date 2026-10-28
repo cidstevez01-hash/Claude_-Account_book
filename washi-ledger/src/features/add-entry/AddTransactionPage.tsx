@@ -26,7 +26,7 @@ import { consumeAddEntryOrigin } from '../../lib/addEntryOrigin'
 import { clearDetailSheetReturnMemory, updateDetailSheetReturnMemoryEntryId } from '../../lib/detailSheetReturnMemory'
 import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import { addToOutbox, flushOutbox, removeFromOutbox } from '../../lib/entryOutbox'
-import { logIfEnabled } from '../../lib/appLog'
+import { logModule } from '../../lib/appLog'
 import type { Entry, EntryType } from '../../types'
 
 /** 扫描小票识别出的店名+购入明细拼成备注默认值——店名单独一行，商品列表每行前面
@@ -328,16 +328,16 @@ export function AddTransactionPage() {
         const current = parseFloat(amount) || 0
         if (fields.amount != null) {
           const sum = current + fields.amount
-          logIfEnabled(`小票金额叠加: 当前金额栏=${current}, 本张识别=${fields.amount}, 叠加后=${sum}`)
+          logModule('receipt', `小票金额叠加: 当前金额栏=${current}, 本张识别=${fields.amount}, 叠加后=${sum}`)
           setAmount(String(sum))
         } else {
-          logIfEnabled(`小票金额叠加: 本张未识别到金额，金额栏保持${current}`)
+          logModule('receipt', `小票金额叠加: 本张未识别到金额，金额栏保持${current}`)
         }
         // 备注：每张小票的店名+明细都追加到已有备注后面，两张之间空一行，不再只在备注为空时写入
         const formatted = formatReceiptNote(fields)
         if (formatted) {
           setNote((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${formatted}` : formatted))
-          logIfEnabled(`小票备注追加: ${formatted.split('\n').length}行`)
+          logModule('receipt', `小票备注追加: ${formatted.split('\n').length}行`)
         }
       }
       return true

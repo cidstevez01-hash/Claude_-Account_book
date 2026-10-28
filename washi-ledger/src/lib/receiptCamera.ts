@@ -1,6 +1,6 @@
 import { DocumentScanner, ResponseType, ScanDocumentResponseStatus } from '@capgo/capacitor-document-scanner'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
-import { logIfEnabled } from './appLog'
+import { logModule } from './appLog'
 
 /** R-32三期：拍照页面改成调用系统原生文档扫描能力(iOS VisionKit/Android ML Kit)。
  * 排查确认OpenCV.js这条路径本身在这台设备的Worker环境里，运行时初始化(不是加载
@@ -14,17 +14,17 @@ import { logIfEnabled } from './appLog'
  * "Document scanning is not supported on the web."——不是bug，是插件本身的
  * 设计，调用方要兜底改用相册选图，这也是沙盒/桌面浏览器开发调试时唯一能走通的路径 */
 export async function scanDocumentNative(): Promise<Blob | null> {
-  logIfEnabled('调用DocumentScanner.scanDocument()')
+  logModule('receipt', '调用DocumentScanner.scanDocument()')
   const result = await DocumentScanner.scanDocument({
     responseType: ResponseType.Base64,
     letUserAdjustCrop: true,
     maxNumDocuments: 1,
   })
   if (result.status !== ScanDocumentResponseStatus.Success || !result.scannedImages?.length) {
-    logIfEnabled('DocumentScanner返回取消/无结果')
+    logModule('receipt', 'DocumentScanner返回取消/无结果')
     return null
   }
-  logIfEnabled(`DocumentScanner扫描成功，图片base64长度=${result.scannedImages[0].length}字符`)
+  logModule('receipt', `DocumentScanner扫描成功，图片base64长度=${result.scannedImages[0].length}字符`)
   const res = await fetch(`data:image/jpeg;base64,${result.scannedImages[0]}`)
   return await res.blob()
 }
@@ -34,19 +34,19 @@ export async function scanDocumentNative(): Promise<Blob | null> {
  * 原生相册，Capacitor会自动降级成<input type="file" accept="image/*">这个网页
  * 兼容实现，行为等价。 */
 export async function pickFromGallery(): Promise<Blob | null> {
-  logIfEnabled('调用Camera.getPhoto()从相册选图')
+  logModule('receipt', '调用Camera.getPhoto()从相册选图')
   const photo = await Camera.getPhoto({
     resultType: CameraResultType.DataUrl,
     source: CameraSource.Photos,
     quality: 85,
   })
   if (!photo.dataUrl) {
-    logIfEnabled('Camera.getPhoto()返回无dataUrl(用户取消选图)')
+    logModule('receipt', 'Camera.getPhoto()返回无dataUrl(用户取消选图)')
     return null
   }
-  logIfEnabled(`相册选图返回dataUrl，长度=${photo.dataUrl.length}字符，开始转Blob`)
+  logModule('receipt', `相册选图返回dataUrl，长度=${photo.dataUrl.length}字符，开始转Blob`)
   const res = await fetch(photo.dataUrl)
   const blob = await res.blob()
-  logIfEnabled(`dataUrl转Blob完成，blob.size=${blob.size}字节`)
+  logModule('receipt', `dataUrl转Blob完成，blob.size=${blob.size}字节`)
   return blob
 }

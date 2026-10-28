@@ -1,5 +1,5 @@
 import { Ocr, type TextDetection } from '@capacitor-community/image-to-text'
-import { logIfEnabled } from './appLog'
+import { logModule } from './appLog'
 
 /** 扫描小票后自动填金额/备注——免费方案，用iOS Vision框架(通过
  * @capacitor-community/image-to-text，纯本地识别不联网不花钱)。跟Claude视觉API
@@ -185,7 +185,7 @@ function pickTotal(rows: Row[], totalRowIdx: number): number | null {
       bestCount = c
     }
   }
-  logIfEnabled(`合計判定: 合計行=${rowValue}(出现${counts.get(rowValue) ?? 0}次), 选=${best}(出现${bestCount}次)`)
+  logModule('receipt', `合計判定: 合計行=${rowValue}(出现${counts.get(rowValue) ?? 0}次), 选=${best}(出现${bestCount}次)`)
   return best
 }
 
@@ -216,19 +216,19 @@ export function extractReceiptFields(rows: Row[]): RecognizedReceiptFields {
  * 用户正常保存这条记录) */
 export async function recognizeReceiptFields(imageDataUrl: string): Promise<RecognizedReceiptFields> {
   try {
-    logIfEnabled('调用Ocr.detectText()识别小票文字')
+    logModule('receipt', '调用Ocr.detectText()识别小票文字')
     const { textDetections } = await Ocr.detectText({ base64: imageDataUrl })
-    logIfEnabled(`Ocr.detectText()识别出${textDetections.length}个文本块`)
+    logModule('receipt', `Ocr.detectText()识别出${textDetections.length}个文本块`)
     const rows = groupIntoRows(textDetections)
-    logIfEnabled(`OCR原始行(${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
+    logModule('receipt', `OCR原始行(${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
     const totalIdx = findTotalRowIndex(rows)
     const fields = extractReceiptFields(rows)
-    logIfEnabled(
+    logModule('receipt',
       `OCR解析: 合計行=${totalIdx >= 0 ? `#${totalIdx} "${rows[totalIdx].text}"` : '未找到'}, 金额=${fields.amount}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
     )
     return fields
   } catch (e) {
-    logIfEnabled(`Ocr.detectText()失败(web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
+    logModule('receipt', `Ocr.detectText()失败(web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
     return { amount: null, storeName: null, items: [] }
   }
 }

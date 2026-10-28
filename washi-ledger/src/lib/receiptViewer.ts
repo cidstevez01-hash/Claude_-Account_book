@@ -1,5 +1,5 @@
 import { FileViewer } from '@capacitor/file-viewer'
-import { logIfEnabled } from './appLog'
+import { logModule } from './appLog'
 
 /** R-32续：レシート凭证预览——之前用<iframe>内嵌PDF+自绘HTML弹层，真机反馈内容撑爆
  * 没有标题栏/圆角/遮罩，改过一次iframe定位(position:absolute+inset:0)仍然复现，
@@ -16,11 +16,11 @@ import { logIfEnabled } from './appLog'
  * 的调用惯例，不新造一套模式 */
 export async function openReceiptDocumentNative(url: string): Promise<boolean> {
   try {
-    logIfEnabled(`调用FileViewer.openDocumentFromUrl() url=${url}`)
+    logModule('receipt', `调用FileViewer.openDocumentFromUrl() url=${url}`)
     await FileViewer.openDocumentFromUrl({ url })
     return true
   } catch (e) {
-    logIfEnabled(`FileViewer.openDocumentFromUrl()失败(web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
+    logModule('receipt', `FileViewer.openDocumentFromUrl()失败(web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
     return false
   }
 }

@@ -19,7 +19,7 @@ import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { summarizeRange, categoryBreakdownRange, TAG_MATCHED_COLOR, TAG_OTHER_COLOR } from '../../data/summary'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry, insertGeneratedEntriesIgnoringDuplicates } from '../../data/catalog'
-import { logIfEnabled } from '../../lib/appLog'
+import { logModule } from '../../lib/appLog'
 import { logRecurringCheck, logRecurringEntryGenerated } from '../../lib/recurringGenerationLog'
 import { computeRecurringEntriesToGenerate } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
@@ -179,7 +179,7 @@ export function DashboardPage() {
       })
       .catch((e) => {
         console.error('固定收支规则自动生成记录失败', e)
-        logIfEnabled(`[首页补生成] 写入失败：${e instanceof Error ? e.message : String(e)}`, 'error')
+        logModule('recurring', `[首页补生成] 写入失败：${e instanceof Error ? e.message : String(e)}`, 'error')
       })
   }, [user, recurringRules, entries, categories, jpHolidays, reload])
 
