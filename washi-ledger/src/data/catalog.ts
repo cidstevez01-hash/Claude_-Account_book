@@ -312,16 +312,20 @@ export async function hasEntryInCloud(id: string): Promise<boolean> {
 
 /** 固定收支规则自动生成的记录写入云端：id已存在就忽略(ON CONFLICT DO NOTHING)，不覆盖
  * 已有行。不能用pushEntriesBulkUpsert——那个是merge upsert，本机缓存过期时会用生成值
- * 覆盖云端已有的那笔(可能已经被用户改过日期或金额) */
-export async function insertGeneratedEntriesIgnoringDuplicates(entries: Entry[], userId: string): Promise<void> {
-  if (entries.length === 0) return
-  const { error } = await supabase
+ * 覆盖云端已有的那笔(可能已经被用户改过日期或金额)。
+ * 返回值是这次真正插入的记录id：带select时PostgREST只返回实际插入的行，被忽略的不会出现，
+ * 调用方据此区分"这次生成了"和"云端本来就有"，日志不会误报 */
+export async function insertGeneratedEntriesIgnoringDuplicates(entries: Entry[], userId: string): Promise<Set<string>> {
+  if (entries.length === 0) return new Set()
+  const { data, error } = await supabase
     .from('entries')
     .upsert(
       entries.map((e) => entryToDbRow(e, userId)),
       { onConflict: 'id', ignoreDuplicates: true },
     )
+    .select('id')
   if (error) throw error
+  return new Set((data ?? []).map((row) => row.id as string))
 }
 
 /** 自定义细分/标签的新增/改名/删除——逻辑照抄旧仓库index.html的addCustomSub/

@@ -18,7 +18,7 @@ import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { useSettings } from '../../hooks/useSettings'
 import { payLabel } from '../../lib/catalogLabel'
 import { logModule } from '../../lib/appLog'
-import { logRecurringEntryGenerated } from '../../lib/recurringGenerationLog'
+import { logRecurringEntryGenerated, logRecurringEntrySkipped } from '../../lib/recurringGenerationLog'
 import { buildCurrentMonthEntry } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
@@ -85,9 +85,13 @@ export function RecurringRuleFormPage() {
     const exists = await hasEntryInCloud(entry.id)
     logModule('recurring', `[本月补生成] 云端已存在=${exists}`)
     if (exists) return
-    await insertGeneratedEntriesIgnoringDuplicates([entry], userId)
-    logModule('recurring', '[本月补生成] 已写入云端')
-    logRecurringEntryGenerated(entry, '保存规则时补本月')
+    const inserted = await insertGeneratedEntriesIgnoringDuplicates([entry], userId)
+    if (inserted.has(entry.id)) {
+      logModule('recurring', '[本月补生成] 已写入云端')
+      logRecurringEntryGenerated(entry, '保存规则时补本月')
+    } else {
+      logRecurringEntrySkipped(entry.id, '保存规则时补本月')
+    }
   }
 
   async function handleSave() {

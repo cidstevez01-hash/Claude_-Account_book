@@ -20,7 +20,7 @@ import { summarizeRange, categoryBreakdownRange, TAG_MATCHED_COLOR, TAG_OTHER_CO
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry, insertGeneratedEntriesIgnoringDuplicates } from '../../data/catalog'
 import { logModule } from '../../lib/appLog'
-import { logRecurringCheck, logRecurringEntryGenerated } from '../../lib/recurringGenerationLog'
+import { logRecurringCheck, logRecurringEntryGenerated, logRecurringEntrySkipped } from '../../lib/recurringGenerationLog'
 import { computeRecurringEntriesToGenerate } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
@@ -173,8 +173,11 @@ export function DashboardPage() {
     if (toCreate.length === 0) return
     recurringGenDoneRef.current = true
     insertGeneratedEntriesIgnoringDuplicates(toCreate, user.id)
-      .then(() => {
-        toCreate.forEach((e) => logRecurringEntryGenerated(e, '首页补生成'))
+      .then((insertedIds) => {
+        toCreate.forEach((e) => {
+          if (insertedIds.has(e.id)) logRecurringEntryGenerated(e, '首页补生成')
+          else logRecurringEntrySkipped(e.id, '首页补生成')
+        })
         return reload()
       })
       .catch((e) => {

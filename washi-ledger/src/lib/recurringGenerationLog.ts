@@ -16,7 +16,7 @@ export function logRecurringCheck(source: string, rulesCount: number, pendingCou
   logModule('recurring', '生成检查', 'info', { 来源: source, 规则数: rulesCount, 待生成: pendingCount })
 }
 
-/** 每一笔新生成的记录记一条(写入云端成功之后调用) */
+/** 每一笔真正插入云端的新记录记一条(只对返回的插入id调用，见catalog.ts的说明) */
 export function logRecurringEntryGenerated(entry: Entry, source: string): void {
   logModule('recurring', '生成记录', 'info', {
     来源: source,
@@ -29,4 +29,9 @@ export function logRecurringEntryGenerated(entry: Entry, source: string): void {
     备注: entry.note,
     规则: entry.recurringId,
   })
+}
+
+/** 云端已经有这一笔(写入被忽略，没有真正插入)，不算这次生成 */
+export function logRecurringEntrySkipped(entryId: string, source: string): void {
+  logModule('recurring', '已存在，跳过', 'info', { 来源: source, id: entryId })
 }
