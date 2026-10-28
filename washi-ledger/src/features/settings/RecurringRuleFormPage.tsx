@@ -18,6 +18,7 @@ import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { useSettings } from '../../hooks/useSettings'
 import { payLabel } from '../../lib/catalogLabel'
 import { logIfEnabled } from '../../lib/appLog'
+import { logRecurringEntryGenerated } from '../../lib/recurringGenerationLog'
 import { buildCurrentMonthEntry } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
@@ -86,6 +87,7 @@ export function RecurringRuleFormPage() {
     if (exists) return
     await insertGeneratedEntriesIgnoringDuplicates([entry], userId)
     logIfEnabled('[本月补生成] 已写入云端')
+    logRecurringEntryGenerated(entry, '保存规则时补本月')
   }
 
   async function handleSave() {

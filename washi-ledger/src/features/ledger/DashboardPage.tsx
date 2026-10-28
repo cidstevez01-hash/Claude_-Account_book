@@ -20,6 +20,7 @@ import { summarizeRange, categoryBreakdownRange, TAG_MATCHED_COLOR, TAG_OTHER_CO
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry, insertGeneratedEntriesIgnoringDuplicates } from '../../data/catalog'
 import { logIfEnabled } from '../../lib/appLog'
+import { logRecurringCheck, logRecurringEntryGenerated } from '../../lib/recurringGenerationLog'
 import { computeRecurringEntriesToGenerate } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
@@ -168,12 +169,12 @@ export function DashboardPage() {
   useEffect(() => {
     if (!user || recurringGenDoneRef.current) return
     const toCreate = computeRecurringEntriesToGenerate(recurringRules, entries, categories, jpHolidays)
+    if (recurringRules.length > 0) logRecurringCheck('首页', recurringRules.length, toCreate.length)
     if (toCreate.length === 0) return
-    logIfEnabled(`[首页补生成] 待写入 ${toCreate.length} 条：${toCreate.map((e) => e.id).join(', ')}`)
     recurringGenDoneRef.current = true
     insertGeneratedEntriesIgnoringDuplicates(toCreate, user.id)
       .then(() => {
-        logIfEnabled('[首页补生成] 已写入云端')
+        toCreate.forEach((e) => logRecurringEntryGenerated(e, '首页补生成'))
         return reload()
       })
       .catch((e) => {
