@@ -10,6 +10,8 @@ import { formatCurrency } from '../../data/currencyDisplay'
 import { catLabel, subLabel, payLabel } from '../../lib/catalogLabel'
 import { formatDateFull } from '../../lib/date'
 import { computeNextOccurrence } from '../../lib/recurringGeneration'
+import { loadCachedEntries } from '../../lib/entriesCache'
+import { todayStr } from '../../lib/date'
 import { useI18n } from '../../lib/i18n'
 
 /** R-44：固定收支规则列表——设置页"固定收支"入口进来。旧App RECURRING_RULES/
@@ -26,6 +28,8 @@ export function RecurringRulesPage() {
 
   const categories = [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])]
   const paymentMethods = catalog?.paymentMethods ?? []
+  // "次回予定"只用于显示：本机缓存里已有的记录id，判断某个月是否已经生成过
+  const generatedIds = new Set(loadCachedEntries().map((e) => e.id))
 
   return (
     <AppLayout
@@ -55,7 +59,7 @@ export function RecurringRulesPage() {
             const cat = categories.find((c) => c.code === rule.catCode)
             const sub = cat?.subs.find((s) => s.code === rule.subCode)
             const pm = paymentMethods.find((p) => p.code === rule.paymentMethod)
-            const nextDate = computeNextOccurrence(rule, jpHolidays)
+            const nextDate = computeNextOccurrence(rule, jpHolidays, todayStr(), (id) => generatedIds.has(id))
             return (
               <button
                 key={rule.id}

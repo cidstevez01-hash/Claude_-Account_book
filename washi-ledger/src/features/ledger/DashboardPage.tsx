@@ -18,7 +18,7 @@ import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { summarizeRange, categoryBreakdownRange, TAG_MATCHED_COLOR, TAG_OTHER_COLOR } from '../../data/summary'
 import { toDisplayEntries } from '../../data/currencyDisplay'
-import { deleteEntry, pushEntriesBulkUpsert } from '../../data/catalog'
+import { deleteEntry, insertGeneratedEntriesIgnoringDuplicates } from '../../data/catalog'
 import { computeRecurringEntriesToGenerate } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
@@ -169,7 +169,7 @@ export function DashboardPage() {
     const toCreate = computeRecurringEntriesToGenerate(recurringRules, entries, categories, jpHolidays)
     if (toCreate.length === 0) return
     recurringGenDoneRef.current = true
-    pushEntriesBulkUpsert(toCreate, user.id)
+    insertGeneratedEntriesIgnoringDuplicates(toCreate, user.id)
       .then(() => reload())
       .catch((e) => console.error('固定收支规则自动生成记录失败', e))
   }, [user, recurringRules, entries, categories, jpHolidays, reload])

@@ -302,6 +302,28 @@ export async function pushEntriesBulkUpsert(entries: Entry[], userId: string) {
   await apiClient.post('/entries/upsert-bulk', { entries: entries.map((e) => entryToDbRow(e, userId)) })
 }
 
+/** 按id查云端entries表里这一条是否存在，直接查表、不经过本机缓存，也不过滤deleted_at：
+ * 已经软删除的记录也算"已经生成过"，不能再生成一次，否则用户删掉的那笔会被建回来 */
+export async function hasEntryInCloud(id: string): Promise<boolean> {
+  const { data, error } = await supabase.from('entries').select('id').eq('id', id).maybeSingle()
+  if (error) throw error
+  return data !== null
+}
+
+/** 固定收支规则自动生成的记录写入云端：id已存在就忽略(ON CONFLICT DO NOTHING)，不覆盖
+ * 已有行。不能用pushEntriesBulkUpsert——那个是merge upsert，本机缓存过期时会用生成值
+ * 覆盖云端已有的那笔(可能已经被用户改过日期或金额) */
+export async function insertGeneratedEntriesIgnoringDuplicates(entries: Entry[], userId: string): Promise<void> {
+  if (entries.length === 0) return
+  const { error } = await supabase
+    .from('entries')
+    .upsert(
+      entries.map((e) => entryToDbRow(e, userId)),
+      { onConflict: 'id', ignoreDuplicates: true },
+    )
+  if (error) throw error
+}
+
 /** 自定义细分/标签的新增/改名/删除——逻辑照抄旧仓库index.html的addCustomSub/
  * updateCustomSub/deleteCustomSub(细分)和addCustomTag/updateCustomTag/deleteCustomTag
  * (标签)。预设的(is_preset=true)不允许改/删，这几个函数只处理is_preset=false的自定义项，

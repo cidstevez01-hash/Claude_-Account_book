@@ -12,9 +12,12 @@ import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useRecurringRules } from '../../hooks/useRecurringRules'
 import { upsertRecurringRule, deleteRecurringRule } from '../../data/recurringRules'
+import { hasEntryInCloud, insertGeneratedEntriesIgnoringDuplicates } from '../../data/catalog'
 import { symbolFor } from '../../data/currencyDisplay'
+import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { useSettings } from '../../hooks/useSettings'
 import { payLabel } from '../../lib/catalogLabel'
+import { buildCurrentMonthEntry } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
 import type { EntryType, RecurringRule } from '../../types'
@@ -29,6 +32,7 @@ export function RecurringRuleFormPage() {
   const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
   const { rules, removeLocal } = useRecurringRules(user?.id ?? null)
   const { settings } = useSettings()
+  const jpHolidays = useJpHolidays()
   const [searchParams] = useSearchParams()
   const editId = searchParams.get('editId')
   const sourceRule = editId ? (rules.find((r) => r.id === editId) ?? null) : null
@@ -63,6 +67,16 @@ export function RecurringRuleFormPage() {
     navigate(-1)
   }
 
+  // 保存按月规则后：先查云端这个月的记录是否已经生成过。没有就按新规则立即生成本月这一笔
+  // (日期可能是本月已经过去的日子，按新规则照常生成)；已经有(包括已软删除的)就不动它，
+  // 新规则从下个月生效。查的是云端而不是本机缓存，免得缓存过期时重复生成
+  async function ensureCurrentMonthEntry(rule: RecurringRule, userId: string) {
+    const entry = buildCurrentMonthEntry(rule, categories, jpHolidays)
+    if (!entry) return
+    if (await hasEntryInCloud(entry.id)) return
+    await insertGeneratedEntriesIgnoringDuplicates([entry], userId)
+  }
+
   async function handleSave() {
     if (!user || !catCode || savingRef.current) return
     const amt = parseFloat(amount)
@@ -89,6 +103,7 @@ export function RecurringRuleFormPage() {
     }
     try {
       await upsertRecurringRule(rule, user.id)
+      await ensureCurrentMonthEntry(rule, user.id)
       navigate(-1)
     } catch (e) {
       console.error('固定收支规则保存失败', e)

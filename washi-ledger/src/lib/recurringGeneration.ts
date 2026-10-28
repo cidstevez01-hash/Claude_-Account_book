@@ -33,20 +33,59 @@ function lastDayOfMonthStr(year: number, month1to12: number): string {
   return formatDateYMD(new Date(year, month1to12, 0))
 }
 
-/** 规则列表页用——"下次预计生成日期"展示，纯预览用途，不做判重/不受已生成记录
- * 影响，方便用户核对规则配置是不是自己想要的效果 */
+/** 按固定收支规则算出"本月"这一笔记录(只处理按月规则，间隔规则返回null)。id是
+ * `recur_${规则id}_${YYYY-MM}`，同一条规则同一个月只有一个id。保存规则时和首页/定时
+ * 生成时共用这一个函数，保证两边算出来的id和日期完全一致；规则引用的分类不存在时返回null */
+export function buildCurrentMonthEntry(
+  rule: RecurringRule,
+  categories: Category[],
+  holidays: Record<string, string>,
+  today: string = todayStr(),
+): Entry | null {
+  if (rule.ruleKind !== 'dayOfMonth') return null
+  if (!categories.some((c) => c.code === rule.catCode)) return null
+  const [y, m] = today.split('-').map(Number)
+  const periodKey = `${y}-${String(m).padStart(2, '0')}`
+  let targetDate =
+    rule.dayOfMonth === 'last'
+      ? lastDayOfMonthStr(y, m)
+      : `${periodKey}-${String(rule.dayOfMonth).padStart(2, '0')}`
+  if (rule.bizDayAdjust) targetDate = adjustToBizDay(targetDate, rule.bizDayAdjust, holidays)
+  return {
+    id: `recur_${rule.id}_${periodKey}`,
+    type: rule.type,
+    amount: rule.amount,
+    currency: rule.currency,
+    catCode: rule.catCode,
+    subCode: rule.subCode,
+    paymentMethod: rule.paymentMethod,
+    tagCode: rule.tagCode,
+    note: rule.note,
+    points: null,
+    date: targetDate,
+    recurringId: rule.id,
+    createdAt: Date.now(),
+    receiptPaths: [],
+  }
+}
+
+/** 规则列表页用——"下次预计生成日期"展示。按月规则会跳过本月已经生成过的那笔
+ * (isGenerated传入记录id的判断，列表页用本机缓存判断)，这样列表显示的日期跟之后真正
+ * 会生成的一致，不会出现"显示10/27但10月不会再扣"的情况 */
 export function computeNextOccurrence(
   rule: RecurringRule,
   holidays: Record<string, string> = {},
   today: string = todayStr(),
+  isGenerated: (id: string) => boolean = () => false,
 ): string | null {
   if (rule.ruleKind === 'dayOfMonth') {
     let [y, m] = today.split('-').map(Number)
     for (let i = 0; i < 2; i++) {
-      // 最多往后看2个月：这个月该发生的日期如果已经过了，看下个月
+      // 最多往后看2个月：这个月该发生的日期如果已经过了、或者这个月已经生成过，看下个月
       let targetDate = rule.dayOfMonth === 'last' ? lastDayOfMonthStr(y, m) : `${y}-${String(m).padStart(2, '0')}-${String(rule.dayOfMonth).padStart(2, '0')}`
       if (rule.bizDayAdjust) targetDate = adjustToBizDay(targetDate, rule.bizDayAdjust, holidays)
-      if (targetDate >= today) return targetDate
+      const periodId = `recur_${rule.id}_${y}-${String(m).padStart(2, '0')}`
+      if (targetDate >= today && !isGenerated(periodId)) return targetDate
       m += 1
       if (m > 12) {
         m = 1
@@ -72,7 +111,6 @@ export function computeRecurringEntriesToGenerate(
   today: string = todayStr(),
 ): Entry[] {
   const existingIds = new Set(existingEntries.map((e) => e.id))
-  const [todayY, todayM] = today.split('-').map(Number)
   const toCreate: Entry[] = []
 
   for (const rule of rules) {
@@ -81,32 +119,8 @@ export function computeRecurringEntriesToGenerate(
     if (!catObj) continue // 分类数据没加载好/分类已被删，跳过，下次再补
 
     if (rule.ruleKind === 'dayOfMonth') {
-      let targetDate =
-        rule.dayOfMonth === 'last'
-          ? lastDayOfMonthStr(todayY, todayM)
-          : `${todayY}-${String(todayM).padStart(2, '0')}-${String(rule.dayOfMonth).padStart(2, '0')}`
-      if (rule.bizDayAdjust) targetDate = adjustToBizDay(targetDate, rule.bizDayAdjust, holidays)
-
-      const periodKey = `${todayY}-${String(todayM).padStart(2, '0')}`
-      const id = `recur_${rule.id}_${periodKey}`
-      if (existingIds.has(id)) continue
-
-      toCreate.push({
-        id,
-        type: rule.type,
-        amount: rule.amount,
-        currency: rule.currency,
-        catCode: rule.catCode,
-        subCode: rule.subCode,
-        paymentMethod: rule.paymentMethod,
-        tagCode: rule.tagCode,
-        note: rule.note,
-        points: null,
-        date: targetDate,
-        recurringId: rule.id,
-        createdAt: Date.now(),
-        receiptPaths: [],
-      })
+      const entry = buildCurrentMonthEntry(rule, categories, holidays, today)
+      if (entry && !existingIds.has(entry.id)) toCreate.push(entry)
     } else {
       // intervalDays：从anchorDate起每隔intervalDays天补一笔，补到今天为止，
       // 不补anchorDate之前的——照抄ensureBiweeklyRecurringEntries()的while循环
