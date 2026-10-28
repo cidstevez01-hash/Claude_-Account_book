@@ -161,19 +161,19 @@ export function SettingsPage() {
           </div>
         </SettingsRow>
 
-        {/* R-32排查真机卡住问题新加——纯开发调试用途，不是普通用户需要的功能，
-            暂时先放在设置页最后一行(不专门做隐藏手势，等这次问题查完/以后有需要
-            再收起来)。加完后发现这行图标一直没传effect="ring"，"夏 · 花火"主题下
-            没有光晕效果，跟着せ替え/language/currency这几行不统一——用fontTools
-            从字体里补提取了bug_report的形状数据(iconGlyphs.ts)后补上。B-75续：
-            fireflies也补上了，见下面统一说明 */}
-        <SettingsRow icon="bug_report" effect="ring" fireflies label={t('debugLogRowLabel')} onClick={() => navigate('/settings/debug-log')}>
-          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-        </SettingsRow>
-
         {/* R-44：固定收支规则入口——旧App RECURRING_RULES/RECURRING_BIWEEKLY_RULES
             写死在代码里，这里改成前台可增删改查的独立页面 */}
         <SettingsRow icon="event_repeat" effect="ring" fireflies label={t('recurringRulesRowLabel')} onClick={() => navigate('/settings/recurring-rules')}>
+          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+        </SettingsRow>
+
+        {/* R-32排查真机卡住问题新加——纯开发调试用途，不是普通用户需要的功能。
+            一直固定放在设置页最后一行，之后新增的设置项都放在它上面(不专门做隐藏手势，
+            等这次问题查完/以后有需要再收起来)。加完后发现这行图标一直没传effect="ring"，
+            "夏 · 花火"主题下没有光晕效果，跟着せ替え/language/currency这几行不统一——用fontTools
+            从字体里补提取了bug_report的形状数据(iconGlyphs.ts)后补上。B-75续：
+            fireflies也补上了，见下面统一说明 */}
+        <SettingsRow icon="bug_report" effect="ring" fireflies label={t('debugLogRowLabel')} onClick={() => navigate('/settings/debug-log')}>
           <span className="material-symbols-outlined text-[18px]">chevron_right</span>
         </SettingsRow>
 

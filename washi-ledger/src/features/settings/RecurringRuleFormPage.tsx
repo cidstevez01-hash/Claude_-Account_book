@@ -17,6 +17,7 @@ import { symbolFor } from '../../data/currencyDisplay'
 import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { useSettings } from '../../hooks/useSettings'
 import { payLabel } from '../../lib/catalogLabel'
+import { logIfEnabled } from '../../lib/appLog'
 import { buildCurrentMonthEntry } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
@@ -72,9 +73,19 @@ export function RecurringRuleFormPage() {
   // 新规则从下个月生效。查的是云端而不是本机缓存，免得缓存过期时重复生成
   async function ensureCurrentMonthEntry(rule: RecurringRule, userId: string) {
     const entry = buildCurrentMonthEntry(rule, categories, jpHolidays)
-    if (!entry) return
-    if (await hasEntryInCloud(entry.id)) return
+    if (!entry) {
+      logIfEnabled(
+        `[本月补生成] 跳过：生成函数返回空 ruleKind=${rule.ruleKind} cat=${rule.catCode} 分类已加载=${categories.some((c) => c.code === rule.catCode)}`,
+        'warn',
+      )
+      return
+    }
+    logIfEnabled(`[本月补生成] 本月应有 id=${entry.id} 日期=${entry.date}`)
+    const exists = await hasEntryInCloud(entry.id)
+    logIfEnabled(`[本月补生成] 云端已存在=${exists}`)
+    if (exists) return
     await insertGeneratedEntriesIgnoringDuplicates([entry], userId)
+    logIfEnabled('[本月补生成] 已写入云端')
   }
 
   async function handleSave() {
@@ -101,12 +112,17 @@ export function RecurringRuleFormPage() {
       intervalDays: ruleKind === 'intervalDays' ? parseInt(intervalDays, 10) || 1 : null,
       enabled,
     }
+    logIfEnabled(
+      `[规则保存] 开始 id=${rule.id} kind=${rule.ruleKind} day=${rule.dayOfMonth} adjust=${rule.bizDayAdjust} cat=${rule.catCode} 分类数=${categories.length} 节假日数=${Object.keys(jpHolidays).length}`,
+    )
     try {
       await upsertRecurringRule(rule, user.id)
+      logIfEnabled('[规则保存] 云端规则已更新')
       await ensureCurrentMonthEntry(rule, user.id)
       navigate(-1)
     } catch (e) {
       console.error('固定收支规则保存失败', e)
+      logIfEnabled(`[规则保存] 失败：${e instanceof Error ? e.message : String(e)}`, 'error')
       setSaveFailed(true)
     } finally {
       savingRef.current = false

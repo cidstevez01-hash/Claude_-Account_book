@@ -19,6 +19,7 @@ import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { summarizeRange, categoryBreakdownRange, TAG_MATCHED_COLOR, TAG_OTHER_COLOR } from '../../data/summary'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { deleteEntry, insertGeneratedEntriesIgnoringDuplicates } from '../../data/catalog'
+import { logIfEnabled } from '../../lib/appLog'
 import { computeRecurringEntriesToGenerate } from '../../lib/recurringGeneration'
 import { useI18n } from '../../lib/i18n'
 import { catLabel } from '../../lib/catalogLabel'
@@ -168,10 +169,17 @@ export function DashboardPage() {
     if (!user || recurringGenDoneRef.current) return
     const toCreate = computeRecurringEntriesToGenerate(recurringRules, entries, categories, jpHolidays)
     if (toCreate.length === 0) return
+    logIfEnabled(`[首页补生成] 待写入 ${toCreate.length} 条：${toCreate.map((e) => e.id).join(', ')}`)
     recurringGenDoneRef.current = true
     insertGeneratedEntriesIgnoringDuplicates(toCreate, user.id)
-      .then(() => reload())
-      .catch((e) => console.error('固定收支规则自动生成记录失败', e))
+      .then(() => {
+        logIfEnabled('[首页补生成] 已写入云端')
+        return reload()
+      })
+      .catch((e) => {
+        console.error('固定收支规则自动生成记录失败', e)
+        logIfEnabled(`[首页补生成] 写入失败：${e instanceof Error ? e.message : String(e)}`, 'error')
+      })
   }, [user, recurringRules, entries, categories, jpHolidays, reload])
 
   // 每条记录按settings.currency统一换算后再参与后面的求和/占比计算(照旧App
