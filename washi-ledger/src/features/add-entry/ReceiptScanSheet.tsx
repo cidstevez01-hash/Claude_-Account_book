@@ -20,13 +20,15 @@ interface ReceiptScanSheetProps {
 }
 
 const OCR_WAIT_MS = 5000
-const EMPTY_FIELDS: RecognizedReceiptFields = { amount: null, storeName: null, items: [] }
+function emptyFields(receiptId: string): RecognizedReceiptFields {
+  return { receiptId, ocrRows: [], amount: null, storeName: null, items: [] }
+}
 
 // OCR识别慢或卡住时不能让保存一直转圈——超时就按空结果保存，金额/备注留给用户手填
-function waitForFields(pending: Promise<RecognizedReceiptFields> | null): Promise<RecognizedReceiptFields> {
-  if (!pending) return Promise.resolve(EMPTY_FIELDS)
+function waitForFields(pending: Promise<RecognizedReceiptFields> | null, receiptId: string): Promise<RecognizedReceiptFields> {
+  if (!pending) return Promise.resolve(emptyFields(receiptId))
   return new Promise((resolve) => {
-    const timer = window.setTimeout(() => resolve(EMPTY_FIELDS), OCR_WAIT_MS)
+    const timer = window.setTimeout(() => resolve(emptyFields(receiptId)), OCR_WAIT_MS)
     pending.then(
       (fields) => {
         window.clearTimeout(timer)
@@ -34,10 +36,15 @@ function waitForFields(pending: Promise<RecognizedReceiptFields> | null): Promis
       },
       () => {
         window.clearTimeout(timer)
-        resolve(EMPTY_FIELDS)
+        resolve(emptyFields(receiptId))
       },
     )
   })
+}
+
+function createReceiptId(): string {
+  return globalThis.crypto?.randomUUID?.()
+    ?? `receipt-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 }
 
 /** R-32：レシート扫描确认弹层——照Stitch设计稿(用户已确认)做：原生扫描(系统全屏
@@ -53,6 +60,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const resultCanvasRef = useRef<HTMLCanvasElement | null>(null)
+  const receiptIdRef = useRef<string | null>(null)
   // R-XO：进入review态就在后台起一次OCR识别(不挡用户看预览图/点确认)，用户点
   // "存为PDF"时才去等这个promise的结果——大多数情况下用户看几眼预览图确认的这段
   // 时间，识别早就跑完了，真等到的时候也就是极快的一下
@@ -68,6 +76,8 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   }
 
   async function setResultFromBlob(blob: Blob) {
+    const receiptId = createReceiptId()
+    receiptIdRef.current = receiptId
     const imgEl = await blobToImage(blob)
     const canvas = document.createElement('canvas')
     canvas.width = imgEl.naturalWidth
@@ -77,7 +87,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
     setPreviewUrl(dataUrl)
     setStage('review')
-    recognizeResultRef.current = recognizeReceiptFields(dataUrl)
+    recognizeResultRef.current = recognizeReceiptFields(dataUrl, receiptId)
   }
 
   async function startScan() {
@@ -127,6 +137,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     setPreviewUrl(null)
     resultCanvasRef.current = null
     recognizeResultRef.current = null
+    receiptIdRef.current = null
     startScan()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
@@ -140,7 +151,8 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     setSaveFailed(false)
     try {
       const pdf = buildReceiptPdf(resultCanvasRef.current, { entryDate })
-      const fields = await waitForFields(recognizeResultRef.current)
+      const receiptId = receiptIdRef.current ?? createReceiptId()
+      const fields = await waitForFields(recognizeResultRef.current, receiptId)
       const ok = await onConfirm(pdf, fields)
       if (!ok) setSaveFailed(true)
     } finally {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
+import { useAuth } from './useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
@@ -16,6 +17,7 @@ type Mode = 'signup' | 'verify'
  * 不是注册完直接算完成 */
 export function SignUpPage() {
   const { t } = useI18n()
+  const { isAnonymous } = useAuth()
   const navigate = useAppNavigate()
   const [mode, setMode] = useState<Mode>('signup')
   const [email, setEmail] = useState('')
@@ -24,6 +26,7 @@ export function SignUpPage() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [linkingAnonymous, setLinkingAnonymous] = useState(false)
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
@@ -38,6 +41,25 @@ export function SignUpPage() {
     setLoading(true)
     setError('')
     try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) throw sessionError
+
+      // 把当前匿名用户升级为正式账号，保留同一个 Supabase userId，账目和规则仍归原用户。
+      // Supabase 项目需要开启 Authentication 的 Manual Linking。
+      if (sessionData.session?.user.is_anonymous) {
+        const { data, error: updateError } = await supabase.auth.updateUser({ email: email.trim() })
+        if (updateError) throw updateError
+        setLinkingAnonymous(true)
+        if (data.user.email_confirmed_at) {
+          const { error: passwordError } = await supabase.auth.updateUser({ password })
+          if (passwordError) throw passwordError
+          navigate('/account')
+          return
+        }
+        setMode('verify')
+        return
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({ email: email.trim(), password })
       if (signUpError) throw signUpError
       if (data.session) {
@@ -65,9 +87,13 @@ export function SignUpPage() {
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token: code.trim(),
-        type: 'signup',
+        type: linkingAnonymous ? 'email_change' : 'signup',
       })
       if (verifyError) throw verifyError
+      if (linkingAnonymous) {
+        const { error: passwordError } = await supabase.auth.updateUser({ password })
+        if (passwordError) throw passwordError
+      }
       navigate('/account')
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
@@ -99,6 +125,10 @@ export function SignUpPage() {
           {mode === 'signup' ? t('signUpTagline') : t('verifyTagline')}
         </p>
       </div>
+
+      {mode === 'signup' && isAnonymous && (
+        <p className="text-body-sm text-on-surface-variant mb-md text-center">{t('guestAccountUpgradeHint')}</p>
+      )}
 
       {mode === 'signup' ? (
         <form onSubmit={handleSignUp} className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md flex flex-col gap-md">
@@ -147,7 +177,7 @@ export function SignUpPage() {
         <form onSubmit={handleVerify} className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md flex flex-col gap-md">
           <p className="text-body-md text-on-surface-variant">
             {t('verifyEmailSentPrefix')} {email}
-            {t('verifyEmailSentSuffix')}
+            {linkingAnonymous ? t('verifyGuestAccountSuffix') : t('verifyEmailSentSuffix')}
           </p>
           <input
             type="text"

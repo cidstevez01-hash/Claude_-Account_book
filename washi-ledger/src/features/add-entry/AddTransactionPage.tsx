@@ -73,6 +73,10 @@ export function AddTransactionPage() {
 
   const [type, setType] = useState<EntryType>(() => initialSourceEntry?.type ?? 'expense')
   const [amount, setAmount] = useState(() => (initialSourceEntry ? String(initialSourceEntry.amount) : ''))
+  // 按小票ID保存每张小票独立识别到的合计；最终金额从这些小票重算，避免重复确认造成重复累加。
+  const receiptAmountsByIdRef = useRef<Map<string, number>>(new Map())
+  // 用户触碰金额栏后重置自动汇总组；有手填内容时后续扫描不覆盖手填值。
+  const amountWasManuallyEditedRef = useRef(false)
   const [catCode, setCatCode] = useState<string | null>(() => initialSourceEntry?.catCode ?? null)
   const [subCode, setSubCode] = useState<string | null>(() => initialSourceEntry?.subCode ?? null)
   const [payCode, setPayCode] = useState<string | null>(() => initialSourceEntry?.paymentMethod ?? null)
@@ -141,6 +145,8 @@ export function AddTransactionPage() {
     if (!src) return
     setSourceEntry(src)
     setType(src.type)
+    receiptAmountsByIdRef.current.clear()
+    amountWasManuallyEditedRef.current = false
     setAmount(String(src.amount))
     setCatCode(src.catCode)
     setSubCode(src.subCode)
@@ -220,6 +226,9 @@ export function AddTransactionPage() {
 
   function touchAmount(v: string) {
     pointsArmed.current = true
+    receiptAmountsByIdRef.current.clear()
+    const hasManualValue = v.trim().length > 0
+    amountWasManuallyEditedRef.current = hasManualValue
     setAmount(v)
   }
   function touchPayCode(code: string) {
@@ -321,23 +330,25 @@ export function AddTransactionPage() {
       setReceiptPaths((prev) => [...prev, path])
       setScanSheetOpen(false)
       if (mode !== 'edit') {
-        // R-46：多张小票依次扫描，金额要叠加而不是只取第一张——之前"金额栏为空
-        // 才填"这个判断，扫完第一张之后金额栏有值了，后面几张的识别结果全部被
-        // 忽略。改成每次都把这张的识别金额加进当前金额(第一张时当前值是空/0，
-        // 加出来效果跟原来"直接填"一样，不改变单张小票时的行为)
-        const current = parseFloat(amount) || 0
         if (fields.amount != null) {
-          const sum = current + fields.amount
-          logModule('receipt', `小票金额叠加: 当前金额栏=${current}, 本张识别=${fields.amount}, 叠加后=${sum}`)
-          setAmount(String(sum))
+          if (!amountWasManuallyEditedRef.current) {
+            // 每张已确认小票按ID保存；同一ID再次确认会覆盖原值，不会重复累加。
+            receiptAmountsByIdRef.current.set(fields.receiptId, fields.amount)
+            const sum = Array.from(receiptAmountsByIdRef.current.values()).reduce((total, value) => total + value, 0)
+            logModule('receipt', `小票金额汇总: receiptId=${fields.receiptId}, 本张合計=${fields.amount}, 小票数=${receiptAmountsByIdRef.current.size}, 汇总=${sum}`)
+            setAmount(String(sum))
+          } else {
+            // 保留用户已有/手动调整的金额；后续扫描也不会把它误认为上一张小票的金额。
+            logModule('receipt', `检测到手填金额，保留手填值=${amount}；忽略自动汇总 receiptId=${fields.receiptId}, 合計=${fields.amount}`)
+          }
         } else {
-          logModule('receipt', `小票金额叠加: 本张未识别到金额，金额栏保持${current}`)
+          logModule('receipt', `本张小票未识别到合計金额，金额栏保持不变 receiptId=${fields.receiptId}`)
         }
         // 备注：每张小票的店名+明细都追加到已有备注后面，两张之间空一行，不再只在备注为空时写入
         const formatted = formatReceiptNote(fields)
         if (formatted) {
           setNote((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${formatted}` : formatted))
-          logModule('receipt', `小票备注追加: ${formatted.split('\n').length}行`)
+          logModule('receipt', `小票备注追加: receiptId=${fields.receiptId}, ${formatted.split('\n').length}行`)
         }
       }
       return true

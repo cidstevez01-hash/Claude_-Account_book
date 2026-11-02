@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
+import { useAuth } from './useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../lib/i18n'
 import { RouteFade } from '../../design-system/components/RouteFade'
@@ -10,6 +11,7 @@ import { RouteFade } from '../../design-system/components/RouteFade'
  * cloudSigninForm提交处理：supabase.auth.signInWithPassword */
 export function SignInPage() {
   const { t } = useI18n()
+  const { isAnonymous } = useAuth()
   const navigate = useAppNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -48,6 +50,10 @@ export function SignInPage() {
         </div>
         <h1 className="font-serif text-headline-lg text-primary">PigBang</h1>
       </div>
+
+      {isAnonymous && (
+        <p className="text-body-sm text-on-surface-variant mb-md text-center">{t('guestSignInWarning')}</p>
+      )}
 
       <form onSubmit={handleSubmit} className="bg-surface-container-lowest border-[1.5px] border-dashed border-outline-variant rounded-xl p-md flex flex-col gap-md">
         <div className="flex flex-col gap-1">

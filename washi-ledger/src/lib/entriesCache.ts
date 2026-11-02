@@ -1,23 +1,50 @@
 import type { Entry } from '../types'
+import { getLegacyCacheOwner } from './legacyCacheOwner'
 
-const CACHE_KEY = 'washi_ledger_entries_cache_v1'
+const LEGACY_CACHE_KEY = 'washi_ledger_entries_cache_v1'
+const LEGACY_OWNER_KEY = 'washi_ledger_entries_legacy_owner_v1'
 
-/** 记账记录的本地缓存——照旧仓库index.html的LocalStore/ledger_entries真实逻辑：
- * 有缓存优先读缓存(先出内容，不用等云端请求)，退出登录时不清空(见useEntries.ts)，
- * 只有真正拉到新数据时才覆盖。 */
-export function loadCachedEntries(): Entry[] {
+function cacheKey(userId: string): string {
+  return `washi_ledger_entries_cache_v2:${encodeURIComponent(userId)}`
+}
+
+function parseEntries(raw: string | null): Entry[] {
+  if (!raw) return []
   try {
-    const raw = localStorage.getItem(CACHE_KEY)
-    return raw ? (JSON.parse(raw) as Entry[]) : []
+    return JSON.parse(raw) as Entry[]
   } catch (e) {
     console.error('读取本地记账缓存失败', e)
     return []
   }
 }
 
-export function saveCachedEntries(entries: Entry[]): void {
+/** 记账记录本地缓存，按Supabase userId分开保存；只有能确认旧缓存归属时才迁移，
+ * 归属不明的数据保留在旧键中，不自动交给当前登录账号。 */
+export function loadCachedEntries(userId: string | null): Entry[] {
+  if (!userId) return []
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(entries))
+    const key = cacheKey(userId)
+    const scoped = localStorage.getItem(key)
+    if (scoped != null) return parseEntries(scoped)
+
+    // 旧版缓存只在能从持久 owner 标记或App启动时捕获的旧账号确认归属时迁移。
+    // 没有归属信息就隔离保留，不能把它自动分给第一个登录账号。
+    const legacy = localStorage.getItem(LEGACY_CACHE_KEY)
+    if (!legacy) return []
+    const owner = getLegacyCacheOwner(LEGACY_OWNER_KEY)
+    if (!owner || owner !== userId) return []
+    localStorage.setItem(key, legacy)
+    return parseEntries(legacy)
+  } catch (e) {
+    console.error('读取本地记账缓存失败', e)
+    return []
+  }
+}
+
+export function saveCachedEntries(userId: string | null, entries: Entry[]): void {
+  if (!userId) return
+  try {
+    localStorage.setItem(cacheKey(userId), JSON.stringify(entries))
   } catch (e) {
     console.error('写入本地记账缓存失败', e)
   }

@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { fetchUserSettings, upsertUserSettings } from '../data/settings'
 import { loadCachedSettings, saveCachedSettings, loadLastSyncedUserId, saveLastSyncedUserId } from '../lib/localSettings'
+import { tagLegacyCachesForUser } from '../lib/legacyCacheOwner'
 import { useAuth } from '../features/auth/useAuth'
 import type { UserSettings } from '../types'
 
 interface SettingsContextValue {
   settings: UserSettings
   update: (patch: Partial<UserSettings>) => void
+  userId: string | null
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null)
@@ -47,6 +49,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     prevUserIdRef.current = userId
 
     if (!userId) return // 退出登录：保留当前设置(内存+缓存)不变
+    // 在更新last-synced标记前，先把未隔离的旧缓存归给切换前账号；若归属未知则不迁移。
+    tagLegacyCachesForUser(wasUserId)
     saveLastSyncedUserId(userId)
     // 同一账号的普通重渲染，或者App冷启动后session被supabase-js自动恢复回同一个
     // 账号——本地缓存已经是这个账号最新的真实设置(含刚切换、还没来得及推上云端的
@@ -81,7 +85,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     [user]
   )
 
-  return <SettingsContext.Provider value={{ settings, update }}>{children}</SettingsContext.Provider>
+  return <SettingsContext.Provider value={{ settings, update, userId: user?.id ?? null }}>{children}</SettingsContext.Provider>
 }
 
 export function useSettings() {

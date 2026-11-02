@@ -91,7 +91,7 @@ create or replace function public.generate_recurring_entries()
 returns void
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
 declare
   rule record;
@@ -143,6 +143,11 @@ begin
   end loop;
 end;
 $$;
+
+-- B-87：函数在 exposed schema 中且 SECURITY DEFINER，收紧默认 PUBLIC 执行权限；
+-- pg_cron 任务由 postgres 执行，保留 postgres 的调用权限。
+revoke execute on function public.generate_recurring_entries() from public, anon, authenticated;
+grant execute on function public.generate_recurring_entries() to postgres;
 
 
 -- ============================================================

@@ -29,7 +29,7 @@ export function RecurringRulesPage() {
   const categories = [...(catalog?.expenseCategories ?? []), ...(catalog?.incomeCategories ?? [])]
   const paymentMethods = catalog?.paymentMethods ?? []
   // "次回予定"只用于显示：本机缓存里已有的记录id，判断某个月是否已经生成过
-  const generatedIds = new Set(loadCachedEntries().map((e) => e.id))
+  const generatedIds = new Set(loadCachedEntries(user?.id ?? null).map((e) => e.id))
 
   return (
     <AppLayout

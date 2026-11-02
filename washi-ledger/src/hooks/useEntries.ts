@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { App } from '@capacitor/app'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { fetchEntries, pushEntriesBulkUpsert, subscribeEntriesRealtime } from '../data/catalog'
@@ -9,11 +9,11 @@ import type { Entry } from '../types'
 /** 记账记录数据层——照旧仓库index.html的真实缓存/同步逻辑搬，不是简单的"登录了就查库、
  * 没登录就清空"：
  * - 有本地缓存优先用缓存展示(初始state直接读缓存，不用等云端请求)，没缓存才是空列表
- * - 退出登录不清空当前数据(entries/缓存都保留原样，照旧App的cloudSignOutBtn真实
- *   处理——只清cloudUser、停实时订阅，从没碰过entries)，退出后应该还能正常看到之前的账目
+ * - 退出登录不删除原账号缓存；当前界面按当前userId读取对应缓存，切换账号不会展示
+ *   或回推其他账号的数据
  * - 只要挂载时有userId(含App冷启动时恢复已有会话、含单纯切页面重新mount这个hook)都
  *   做一次真实同步：远端拉到的数据按id跟本机合并(见mergeRemote)，不是直接整个覆盖；
- *   云端是空的就把本地现有缓存(可能是退出登录期间攒下的)推上去当种子数据
+ *   云端是空的就把当前账号缓存推上去当种子数据
  * - App重新回到前台时补一次同步(照旧App resyncCloudOnResume)，不是定时轮询，只在
  *   真的可能有新数据的时机(回到前台)才请求，省流量也更及时
  * - 常驻一条entries表的Realtime订阅(照旧App startCloudRealtime)：同一账号在别处(旧App/
@@ -23,15 +23,24 @@ import type { Entry } from '../types'
  *   的情况。回前台时除了补拉一次，也重启一次这条订阅——iOS后台太久WebSocket可能被系统冻结，
  *   不指望它自己重连。 */
 export function useEntries(userId: string | null) {
-  const [entries, setEntries] = useState<Entry[]>(() => loadCachedEntries())
+  const [entries, setEntries] = useState<Entry[]>(() => loadCachedEntries(userId))
   const [loading, setLoading] = useState(false)
   const realtimeChannelRef = useRef<RealtimeChannel | null>(null)
   // reload/挂载同步的effect依赖数组里都没有entries(避免每次entries变化就重新拉)，
   // 所以不能直接闭包读entries——用ref拿实时值，规避拿到旧闭包快照
   const entriesRef = useRef(entries)
+  const activeUserIdRef = useRef(userId)
   useEffect(() => {
     entriesRef.current = entries
   }, [entries])
+
+  useLayoutEffect(() => {
+    if (activeUserIdRef.current === userId) return
+    activeUserIdRef.current = userId
+    const next = loadCachedEntries(userId)
+    entriesRef.current = next
+    setEntries(next)
+  }, [userId])
 
   // 远端拉到账目后不能直接setEntries(remote)整个覆盖本机——本机在离线/登录失效期间
   // 可能已经攒了远端还没有的新记录(真实事故：旧App index.html的B-02，一模一样的坑，
@@ -41,11 +50,12 @@ export function useEntries(userId: string | null) {
   // 都要走这一个函数，不能各写各的覆盖逻辑
   const mergeRemote = useCallback(
     (remote: Entry[]) => {
+      if (activeUserIdRef.current !== userId) return
       const remoteIds = new Set(remote.map((e) => e.id))
       const localOnly = entriesRef.current.filter((e) => !remoteIds.has(e.id))
       const merged = remote.concat(localOnly)
       setEntries(merged)
-      saveCachedEntries(merged)
+      saveCachedEntries(userId, merged)
       if (localOnly.length && userId) {
         pushEntriesBulkUpsert(localOnly, userId).catch((e) => console.error('本机独有记录回推云端失败', e))
       }
@@ -68,12 +78,13 @@ export function useEntries(userId: string | null) {
   // 反手又把刚删掉的记录推回云端，等于删除白做了(2026-08-23 delete回归测试时
   // 发现的真实bug，不是猜的)
   const removeLocal = useCallback((id: string) => {
+    if (activeUserIdRef.current !== userId) return
     setEntries((prev) => {
       const next = prev.filter((e) => e.id !== id)
-      saveCachedEntries(next)
+      saveCachedEntries(userId, next)
       return next
     })
-  }, [])
+  }, [userId])
 
   const stopRealtime = useCallback(() => {
     if (realtimeChannelRef.current) {
@@ -86,6 +97,7 @@ export function useEntries(userId: string | null) {
     if (!userId) return
     stopRealtime()
     realtimeChannelRef.current = subscribeEntriesRealtime(userId, (event) => {
+      if (activeUserIdRef.current !== userId) return
       setEntries((prev) => {
         const next =
           event.type === 'delete'
@@ -93,7 +105,7 @@ export function useEntries(userId: string | null) {
             : prev.some((e) => e.id === event.entry.id)
               ? prev.map((e) => (e.id === event.entry.id ? event.entry : e))
               : [...prev, event.entry]
-        saveCachedEntries(next)
+        saveCachedEntries(userId, next)
         return next
       })
     })
@@ -109,7 +121,7 @@ export function useEntries(userId: string | null) {
   }, [userId, startRealtime, stopRealtime])
 
   useEffect(() => {
-    if (!userId) return // 退出登录：保留当前entries(内存+缓存)不变，不清空、不请求
+    if (!userId) return // 未认证时不请求；切换时由上面的账号切换effect装载对应缓存
 
     // 每次挂载(含"从未登录切到已登录"、以及单纯换页面重新mount这个hook)都真实拉一次——
     // 之前这里用一个ref记"上一次的userId"来只在"真的刚登录"时才拉，但DashboardPage/
@@ -120,14 +132,17 @@ export function useEntries(userId: string | null) {
     setLoading(true)
     fetchEntries(userId)
       .then(async (remote) => {
+        if (activeUserIdRef.current !== userId) return
         if (remote.length > 0) {
           mergeRemote(remote)
         } else {
-          const local = loadCachedEntries()
+          const local = loadCachedEntries(userId)
           if (local.length > 0) {
+            if (activeUserIdRef.current !== userId) return
             await pushEntriesBulkUpsert(local, userId)
+            if (activeUserIdRef.current !== userId) return
             setEntries(local)
-            saveCachedEntries(local)
+            saveCachedEntries(userId, local)
           }
         }
       })

@@ -18,9 +18,9 @@ export function hasEverSignedIn(): boolean {
 /** 镜像旧仓库index.html里的cloudUser全局状态，但多了一层匿名兜底：完全没有session
  * (含从没登录过、含真实账户主动退出登录之后)时自动匿名登录(supabase.auth.signInAnonymously)，
  * 保证user.id永远存在，记账/设置等数据层(useEntries.ts/useSettings.tsx)不用等"真的登录"
- * 才写数据库，未登录状态下的记录也会落库，只是没有关联真实账户。真实登录/注册后，
- * 匿名session期间攒的本机独有记录会通过useEntries.ts里的mergeRemote合并逻辑自动带过去
- * (跟B-02修复同一套机制，不用另外写迁移代码)。
+ * 才写数据库，未登录状态下的记录也会落库，只是没有关联真实账户。用匿名账号注册时通过
+ * updateUser保留同一个userId，因此缓存和云端数据继续归属该账号；登录到另一个已有账号
+ * 则按userId切换隔离数据，不自动合并游客缓存，避免误传到其他账号。
  *
  * 依赖Supabase项目开启"Anonymous Sign-ins"(Authentication设置里的开关)，这是我们这边
  * 代码改不了、需要用户自己去Supabase后台开一次的前置条件——如果没开，signInAnonymously()

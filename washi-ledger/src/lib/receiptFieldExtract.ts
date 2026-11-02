@@ -17,6 +17,10 @@ import { logModule } from './appLog'
  * 这里全程按"Y值越大越靠上"处理，不要凭直觉套反了方向 */
 
 export interface RecognizedReceiptFields {
+  /** 一次确认的小票扫描唯一ID；用于把OCR行与该张小票的合计绑定 */
+  receiptId: string
+  /** 仅属于此张小票的OCR行，禁止跨扫描混合后再找合计 */
+  ocrRows: string[]
   amount: number | null
   storeName: string | null
   items: string[]
@@ -157,41 +161,20 @@ function parseAmountFromRow(text: string): number | null {
   return Number.isFinite(n) && n > 0 ? n : null
 }
 
-function parseYenToken(token: string): number | null {
-  const n = Number(token.replace(/[¥￥円,]/g, ''))
-  return Number.isFinite(n) && n >= 10 ? n : null
-}
-
-/** 实付合计在小票上会重复出现(合計行、内税/税込行、支付行)，而税额、单价、找零通常只出现一两次，
- * 所以不依赖"支払"等标签文字(支付方式、行位置都不固定)，统计整张小票上每个金额出现的次数。
- * 合計行读出的值只作为基准：只在比它大的、重复出现的金额里挑，这样税额(一定比合计小)不会被选中；
- * 合计行读错成税额时，正确的合计会因为出现次数更多而被选中 */
+/** 只使用已判定的总计行金额。整张小票上的其他重复数字可能是商品码、流水号或税额，
+ * 不能用“出现次数”或“数值更大”覆盖明确标注的合計；总计行无法解析时留空让用户确认。 */
 function pickTotal(rows: Row[], totalRowIdx: number): number | null {
-  const rowValue = totalRowIdx >= 0 ? parseAmountFromRow(rows[totalRowIdx].text) : null
-  if (rowValue == null) return null
-  const counts = new Map<number, number>()
-  for (const r of rows) {
-    for (const m of r.text.matchAll(NUMBER_RE)) {
-      const n = parseYenToken(m[0])
-      if (n != null) counts.set(n, (counts.get(n) ?? 0) + 1)
-    }
-  }
-  let best = rowValue
-  let bestCount = counts.get(rowValue) ?? 0
-  for (const [n, c] of counts) {
-    if (n < rowValue || c < 2) continue
-    if (c > bestCount || (c === bestCount && n > best)) {
-      best = n
-      bestCount = c
-    }
-  }
-  logModule('receipt', `合計判定: 合計行=${rowValue}(出现${counts.get(rowValue) ?? 0}次), 选=${best}(出现${bestCount}次)`)
-  return best
+  if (totalRowIdx < 0) return null
+  const row = rows[totalRowIdx].text
+  const amount = parseAmountFromRow(row)
+  logModule('receipt', `合計判定: 使用总计行="${row}", 金额=${amount ?? '未解析'}`)
+  return amount
 }
 
 /** 从识别出的文本行里拆金额/店名/购入明细——见文件头注释的整体思路 */
-export function extractReceiptFields(rows: Row[]): RecognizedReceiptFields {
-  if (rows.length === 0) return { amount: null, storeName: null, items: [] }
+export function extractReceiptFields(rows: Row[], receiptId: string): RecognizedReceiptFields {
+  const ocrRows = rows.map((row) => row.text)
+  if (rows.length === 0) return { receiptId, ocrRows, amount: null, storeName: null, items: [] }
 
   const totalRowIdx = findTotalRowIndex(rows)
   const amount = pickTotal(rows, totalRowIdx)
@@ -208,27 +191,27 @@ export function extractReceiptFields(rows: Row[]): RecognizedReceiptFields {
     .filter((t) => t.length > 0 && !isMetadataRow(t))
   if (totalRowIdx < 0) items = items.slice(0, MAX_FALLBACK_ITEMS)
 
-  return { amount, storeName, items }
+  return { receiptId, ocrRows, amount, storeName, items }
 }
 
 /** web端(沙盒/浏览器预览)没有这个原生能力，插件会抛错——调用方要兜底，返回
  * 全空结果而不是抛错中断整个扫描确认流程(自动填表单是锦上添花，失败不能挡住
  * 用户正常保存这条记录) */
-export async function recognizeReceiptFields(imageDataUrl: string): Promise<RecognizedReceiptFields> {
+export async function recognizeReceiptFields(imageDataUrl: string, receiptId: string): Promise<RecognizedReceiptFields> {
   try {
     logModule('receipt', '调用Ocr.detectText()识别小票文字')
     const { textDetections } = await Ocr.detectText({ base64: imageDataUrl })
     logModule('receipt', `Ocr.detectText()识别出${textDetections.length}个文本块`)
     const rows = groupIntoRows(textDetections)
-    logModule('receipt', `OCR原始行(${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
+    logModule('receipt', `OCR原始行 receiptId=${receiptId} (${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
     const totalIdx = findTotalRowIndex(rows)
-    const fields = extractReceiptFields(rows)
+    const fields = extractReceiptFields(rows, receiptId)
     logModule('receipt',
-      `OCR解析: 合計行=${totalIdx >= 0 ? `#${totalIdx} "${rows[totalIdx].text}"` : '未找到'}, 金额=${fields.amount}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
+      `OCR解析 receiptId=${receiptId}: 合計行=${totalIdx >= 0 ? `#${totalIdx} "${rows[totalIdx].text}"` : '未找到'}, 金额=${fields.amount}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
     )
     return fields
   } catch (e) {
-    logModule('receipt', `Ocr.detectText()失败(web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
-    return { amount: null, storeName: null, items: [] }
+    logModule('receipt', `OCR失败 receiptId=${receiptId} (web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
+    return { receiptId, ocrRows: [], amount: null, storeName: null, items: [] }
   }
 }

@@ -56,20 +56,10 @@ const MODULE_BADGE: Record<LogModule, string> = {
   other: 'bg-surface-container text-on-surface-variant',
 }
 
-function Chip({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`shrink-0 px-3 py-1 rounded-full border text-[12px] font-sans whitespace-nowrap transition-colors ${
-        active
-          ? 'border-primary bg-primary-fixed text-primary font-semibold'
-          : 'border-outline-variant bg-surface-container text-on-surface-variant'
-      }`}
-    >
-      {label}
-    </button>
-  )
+const LEVEL_ACCENT: Record<LogLevel, string> = {
+  info: 'border-l-outline-variant',
+  warn: 'border-l-tertiary',
+  error: 'border-l-primary',
 }
 
 function Toggle({ on, label, onToggle }: { on: boolean; label: string; onToggle: () => void }) {
@@ -160,6 +150,15 @@ export function DebugLogPage() {
     return out
   }, [filtered])
 
+  const hasActiveFilters = moduleFilter !== 'all' || levelFilter !== 'all' || timeFilter !== 'all' || query.trim() !== ''
+
+  function resetFilters() {
+    setModuleFilter('all')
+    setLevelFilter('all')
+    setTimeFilter('all')
+    setQuery('')
+  }
+
   function handleToggleEnabled() {
     const next = !enabled
     setEnabled(next)
@@ -230,163 +229,238 @@ export function DebugLogPage() {
     <>
       <AppLayout title={t('debugLogTitle')} leftButton="back">
         <div className="px-md pt-md pb-lg flex flex-col gap-md">
-          {/* 总开关 + 计数 */}
-          <div className="w-full flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest border-b-2 border-outline-variant">
-            <div className="flex flex-col gap-0.5">
-              <div className="flex items-center gap-1.5">
-                <span className={`w-2 h-2 rounded-full ${enabled ? 'bg-secondary animate-pulse' : 'bg-outline-variant'}`} />
-                <span className="text-body-lg text-on-surface">
-                  {enabled ? t('debugLogActiveLabel') : t('debugLogPausedLabel')}
-                </span>
-              </div>
-              <span className="text-xs text-on-surface-variant pl-3.5">
-                {t('debugLogCountLabel').replace('{n}', String(entries.length))}
+          <section className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-sm">
+            <div className="flex items-start gap-3 min-w-0">
+              <span className={`material-symbols-outlined shrink-0 mt-0.5 ${enabled ? 'text-secondary' : 'text-on-surface-variant'}`}>
+                {enabled ? 'sensors' : 'sensors_off'}
               </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${enabled ? 'bg-secondary animate-pulse' : 'bg-outline-variant'}`} />
+                  <h2 className="text-body-lg font-semibold text-on-surface">
+                    {enabled ? t('debugLogActiveLabel') : t('debugLogPausedLabel')}
+                  </h2>
+                </div>
+                <p className="mt-1 text-xs text-on-surface-variant">
+                  {t('debugLogCountLabel').replace('{n}', String(entries.length))}
+                </p>
+              </div>
             </div>
             <Toggle on={enabled} label={t('debugLogEnableLabel')} onToggle={handleToggleEnabled} />
-          </div>
+          </section>
 
-          {/* 模块开关：关掉某个模块后它不再记录，已经存下的日志保留 */}
-          <div className="grid grid-cols-3 gap-2">
-            {LOG_MODULES.map((m) => (
-              <div
-                key={m}
-                className="flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant"
-              >
-                <span className="text-[12px] text-on-surface truncate">{moduleNames[m]}</span>
-                <Toggle
-                  on={switches[m]}
-                  label={t('debugLogModuleSwitchAria').replace('{m}', moduleNames[m])}
-                  onToggle={() => handleToggleModule(m)}
-                />
+          <details className="group rounded-2xl bg-surface-container-lowest border border-outline-variant overflow-hidden">
+            <summary className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-3 p-4 cursor-pointer">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="material-symbols-outlined text-on-surface-variant">settings_suggest</span>
+                <div>
+                  <h2 className="text-body-md font-semibold text-on-surface">{t('debugLogCaptureSettings')}</h2>
+                  <p className="mt-0.5 text-xs text-on-surface-variant">{t('debugLogCaptureSettingsHint')}</p>
+                </div>
               </div>
-            ))}
-          </div>
-
-          {/* 模块筛选 */}
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            <Chip
-              active={moduleFilter === 'all'}
-              label={`${t('debugLogModuleAll')} ${entries.length}`}
-              onClick={() => setModuleFilter('all')}
-            />
-            {LOG_MODULES.map((m) => (
-              <Chip
-                key={m}
-                active={moduleFilter === m}
-                label={`${moduleNames[m]} ${counts[m]}`}
-                onClick={() => setModuleFilter(m)}
-              />
-            ))}
-          </div>
-
-          {/* 级别筛选 */}
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            {LEVEL_KEYS.map((k) => (
-              <Chip key={k} active={levelFilter === k} label={levelLabels[k]} onClick={() => setLevelFilter(k)} />
-            ))}
-          </div>
-
-          {/* 时间筛选 */}
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            {timeFilters.map((f) => (
-              <Chip key={f.key} active={timeFilter === f.key} label={f.label} onClick={() => setTimeFilter(f.key)} />
-            ))}
-          </div>
-
-          {/* 搜索：匹配内容和字段 */}
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t('debugLogSearchPlaceholder')}
-            className="w-full px-3 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-[13px] font-sans text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary"
-          />
-
-          {/* 操作按钮：复制/下载/刷新/清空(清空只作用于当前模块筛选) */}
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-outline-variant bg-surface-container text-on-surface text-[13px] font-sans active:bg-surface-container-high transition-colors"
-            >
-              <span className="material-symbols-outlined text-[16px]">content_copy</span>
-              {t('debugLogCopyLabel')}
-            </button>
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-outline-variant bg-surface-container text-on-surface text-[13px] font-sans active:bg-surface-container-high transition-colors"
-            >
-              <span className="material-symbols-outlined text-[16px]">download</span>
-              {t('debugLogDownloadLabel')}
-            </button>
-            <button
-              type="button"
-              aria-label={t('debugLogRefreshAria')}
-              onClick={refresh}
-              className="w-10 flex items-center justify-center rounded-lg border border-outline-variant bg-surface-container text-on-surface-variant active:bg-surface-container-high transition-colors"
-            >
-              <span className="material-symbols-outlined text-[18px]">refresh</span>
-            </button>
-            <button
-              type="button"
-              aria-label={t('debugLogClearLabel')}
-              onClick={() => setClearOpen(true)}
-              className="w-10 flex items-center justify-center rounded-lg border border-outline-variant bg-surface-container text-primary active:bg-surface-container-high transition-colors"
-            >
-              <span className="material-symbols-outlined text-[18px]">delete_sweep</span>
-            </button>
-          </div>
-
-          {copyToast && <div className="text-center text-xs text-primary">{t('debugLogCopiedToast')}</div>}
-
-          {/* 日志列表：按天分组，最新在上；每条第一行是时间/模块/级别，然后是内容，结构化字段显示成小标签 */}
-          {groups.length === 0 ? (
-            <p className="text-center text-body-md text-on-surface-variant py-lg">{t('debugLogEmptyHint')}</p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {groups.map((g) => (
-                <section key={g.day}>
-                  <div className="flex items-center justify-between px-1 pb-1 text-[12px] font-semibold text-on-surface-variant">
-                    <span>{g.day}</span>
-                    <span>{t('debugLogGroupCount').replace('{n}', String(g.items.length))}</span>
-                  </div>
-                  <div className="flex flex-col rounded-lg border border-outline-variant overflow-hidden bg-surface-container-lowest">
-                    {g.items.map((e, i) => (
-                      <div
-                        key={`${e.time}-${i}`}
-                        className={`px-3 py-2 ${i > 0 ? 'border-t border-dashed border-outline-variant/60' : ''}`}
-                      >
-                        <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
-                          <span className="text-on-surface-variant">{formatTime(e.time)}</span>
-                          <span className={`px-1.5 rounded font-semibold ${MODULE_BADGE[e.module]}`}>
-                            {moduleNames[e.module]}
-                          </span>
-                          <span className={`px-1 rounded font-semibold uppercase ${LEVEL_BADGE[e.level]}`}>
-                            {e.level}
-                          </span>
-                        </div>
-                        <div className="mt-1 text-[13px] leading-snug text-on-surface break-all">{e.message}</div>
-                        {e.ctx && Object.keys(e.ctx).length > 0 && (
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {Object.entries(e.ctx).map(([k, v]) => (
-                              <span
-                                key={k}
-                                className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant break-all"
-                              >
-                                <span className="text-on-surface">{k}</span>={v == null ? '-' : String(v)}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </section>
+              <span className="material-symbols-outlined text-on-surface-variant transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <div className="px-3 pb-3 flex flex-col gap-2">
+              {LOG_MODULES.map((m) => (
+                <div key={m} className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-surface-container">
+                  <span className="text-body-sm text-on-surface">{moduleNames[m]}</span>
+                  <Toggle
+                    on={switches[m]}
+                    label={t('debugLogModuleSwitchAria').replace('{m}', moduleNames[m])}
+                    onToggle={() => handleToggleModule(m)}
+                  />
+                </div>
               ))}
             </div>
-          )}
+          </details>
+
+          <section className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-primary">filter_list</span>
+              <h2 className="text-body-lg font-semibold text-on-surface">{t('debugLogFilterSection')}</h2>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="debug-log-module-filter" className="text-sm font-semibold text-on-surface">
+                  {t('debugLogModuleFilterLabel')}
+                </label>
+                <select
+                  id="debug-log-module-filter"
+                  value={moduleFilter}
+                  onChange={(e) => setModuleFilter(e.target.value as ModuleKey)}
+                  className="w-full min-h-11 px-3 rounded-xl border border-outline-variant bg-surface text-body-sm text-on-surface focus:outline-none focus:border-primary"
+                >
+                  <option value="all">{`${t('debugLogModuleAll')} (${entries.length})`}</option>
+                  {LOG_MODULES.map((m) => (
+                    <option key={m} value={m}>{`${moduleNames[m]} (${counts[m]})`}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <label htmlFor="debug-log-level-filter" className="text-sm font-semibold text-on-surface">
+                    {t('debugLogLevelFilterLabel')}
+                  </label>
+                  <select
+                    id="debug-log-level-filter"
+                    value={levelFilter}
+                    onChange={(e) => setLevelFilter(e.target.value as LevelKey)}
+                    className="w-full min-h-11 px-2.5 rounded-xl border border-outline-variant bg-surface text-body-sm text-on-surface focus:outline-none focus:border-primary"
+                  >
+                    {LEVEL_KEYS.map((key) => <option key={key} value={key}>{levelLabels[key]}</option>)}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <label htmlFor="debug-log-time-filter" className="text-sm font-semibold text-on-surface">
+                    {t('debugLogTimeFilterLabel')}
+                  </label>
+                  <select
+                    id="debug-log-time-filter"
+                    value={timeFilter}
+                    onChange={(e) => setTimeFilter(e.target.value as TimeKey)}
+                    className="w-full min-h-11 px-2.5 rounded-xl border border-outline-variant bg-surface text-body-sm text-on-surface focus:outline-none focus:border-primary"
+                  >
+                    {timeFilters.map((filter) => <option key={filter.key} value={filter.key}>{filter.label}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="debug-log-search" className="text-sm font-semibold text-on-surface">
+                  {t('debugLogKeywordLabel')}
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+                  <input
+                    id="debug-log-search"
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={t('debugLogSearchPlaceholder')}
+                    className="w-full min-h-11 pl-10 pr-3 rounded-xl border border-outline-variant bg-surface text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="self-start min-h-9 px-3 rounded-full text-sm font-semibold text-primary bg-primary-fixed active:opacity-80"
+                >
+                  {t('debugLogResetFilters')}
+                </button>
+              )}
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <div className="flex items-end justify-between gap-2 px-1">
+              <div>
+                <h2 className="text-body-lg font-semibold text-on-surface">
+                  {t('debugLogResultCount').replace('{n}', String(filtered.length))}
+                </h2>
+                <p className="mt-0.5 text-xs text-on-surface-variant">
+                  {t('debugLogCountLabel').replace('{n}', String(entries.length))}
+                </p>
+              </div>
+              {copyToast && <span className="text-xs font-semibold text-primary">{t('debugLogCopiedToast')}</span>}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={handleCopy}
+                disabled={filtered.length === 0}
+                className="min-h-11 flex items-center justify-center gap-2 rounded-xl bg-primary text-on-primary text-sm font-semibold disabled:opacity-40 active:opacity-80"
+              >
+                <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                {t('debugLogCopyLabel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                disabled={filtered.length === 0}
+                className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface-container text-on-surface text-sm font-semibold disabled:opacity-40 active:bg-surface-container-high"
+              >
+                <span className="material-symbols-outlined text-[18px]">download</span>
+                {t('debugLogDownloadLabel')}
+              </button>
+              <button
+                type="button"
+                onClick={refresh}
+                className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface-container text-on-surface text-sm font-semibold active:bg-surface-container-high"
+              >
+                <span className="material-symbols-outlined text-[18px]">refresh</span>
+                {t('debugLogRefreshAria')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setClearOpen(true)}
+                disabled={entries.length === 0}
+                className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary-fixed text-primary text-sm font-semibold disabled:opacity-40 active:opacity-80"
+              >
+                <span className="material-symbols-outlined text-[18px]">delete_sweep</span>
+                {t('debugLogClearLabel')}
+              </button>
+            </div>
+
+            {groups.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-10 px-4 rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest text-center">
+                <span className="material-symbols-outlined text-3xl text-outline-variant">
+                  {entries.length === 0 ? 'notes' : 'search_off'}
+                </span>
+                <p className="text-body-md text-on-surface-variant">
+                  {entries.length === 0 ? t('debugLogEmptyHint') : t('debugLogNoMatches')}
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-5">
+                {groups.map((group) => (
+                  <section key={group.day} className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 px-1">
+                      <span className="text-sm font-semibold text-on-surface">{group.day}</span>
+                      <span className="flex-1 h-px bg-outline-variant/70" />
+                      <span className="text-xs text-on-surface-variant">
+                        {t('debugLogGroupCount').replace('{n}', String(group.items.length))}
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {group.items.map((entry, index) => (
+                        <article
+                          key={`${entry.time}-${index}`}
+                          className={`p-3 rounded-xl border border-outline-variant border-l-4 ${LEVEL_ACCENT[entry.level]} bg-surface-container-lowest shadow-sm`}
+                        >
+                          <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
+                            <time className="text-on-surface-variant">{formatTime(entry.time)}</time>
+                            <span className={`px-2 py-0.5 rounded-full font-semibold ${MODULE_BADGE[entry.module]}`}>
+                              {moduleNames[entry.module]}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded-full font-semibold ${LEVEL_BADGE[entry.level]}`}>
+                              {levelLabels[entry.level]}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-sm leading-relaxed text-on-surface break-all whitespace-pre-wrap">{entry.message}</p>
+                          {entry.ctx && Object.keys(entry.ctx).length > 0 && (
+                            <div className="mt-2 flex flex-col gap-1 pt-2 border-t border-dashed border-outline-variant/70">
+                              {Object.entries(entry.ctx).map(([key, value]) => (
+                                <div key={key} className="grid grid-cols-[auto_1fr] gap-x-2 font-mono text-[11px] leading-relaxed break-all">
+                                  <span className="font-semibold text-on-surface">{key}</span>
+                                  <span className="text-on-surface-variant">{value == null ? '-' : String(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </AppLayout>
 

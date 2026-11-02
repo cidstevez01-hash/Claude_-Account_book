@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { App } from '@capacitor/app'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { fetchRecurringRules, pushRulesBulkUpsert, subscribeRecurringRulesRealtime } from '../data/recurringRules'
@@ -11,26 +11,36 @@ import type { RecurringRule } from '../types'
  * Entry换成RecurringRule，同步逻辑本身不做改动（连注释里的历史坑一并保留，
  * 这套架构已经踩过的坑没理由在这里重踩一遍）：
  * - 有本地缓存优先用缓存展示，没缓存才是空列表
- * - 退出登录不清空当前数据
+ * - 退出登录不删除账号缓存；不同 userId 只读取各自的规则缓存
  * - 挂载时有userId都做一次真实同步：远端拉到的数据按id跟本机合并，不是直接覆盖
  * - App重新回到前台时补一次同步+重启Realtime订阅
  * - 常驻一条recurring_rules表的Realtime订阅 */
 export function useRecurringRules(userId: string | null) {
-  const [rules, setRules] = useState<RecurringRule[]>(() => loadCachedRecurringRules())
+  const [rules, setRules] = useState<RecurringRule[]>(() => loadCachedRecurringRules(userId))
   const [loading, setLoading] = useState(false)
   const realtimeChannelRef = useRef<RealtimeChannel | null>(null)
   const rulesRef = useRef(rules)
+  const activeUserIdRef = useRef(userId)
   useEffect(() => {
     rulesRef.current = rules
   }, [rules])
 
+  useLayoutEffect(() => {
+    if (activeUserIdRef.current === userId) return
+    activeUserIdRef.current = userId
+    const next = loadCachedRecurringRules(userId)
+    rulesRef.current = next
+    setRules(next)
+  }, [userId])
+
   const mergeRemote = useCallback(
     (remote: RecurringRule[]) => {
+      if (activeUserIdRef.current !== userId) return
       const remoteIds = new Set(remote.map((r) => r.id))
       const localOnly = rulesRef.current.filter((r) => !remoteIds.has(r.id))
       const merged = remote.concat(localOnly)
       setRules(merged)
-      saveCachedRecurringRules(merged)
+      saveCachedRecurringRules(userId, merged)
       if (localOnly.length && userId) {
         pushRulesBulkUpsert(localOnly, userId).catch((e) => console.error('本机独有规则回推云端失败', e))
       }
@@ -51,12 +61,13 @@ export function useRecurringRules(userId: string | null) {
   // useEntries.ts的removeLocal一样，不然mergeRemote会把"删除后不在最新远端列表
   // 里"误判成"本机独有、还没同步的新规则"，反手又把刚删掉的规则推回云端
   const removeLocal = useCallback((id: string) => {
+    if (activeUserIdRef.current !== userId) return
     setRules((prev) => {
       const next = prev.filter((r) => r.id !== id)
-      saveCachedRecurringRules(next)
+      saveCachedRecurringRules(userId, next)
       return next
     })
-  }, [])
+  }, [userId])
 
   const stopRealtime = useCallback(() => {
     if (realtimeChannelRef.current) {
@@ -69,6 +80,7 @@ export function useRecurringRules(userId: string | null) {
     if (!userId) return
     stopRealtime()
     realtimeChannelRef.current = subscribeRecurringRulesRealtime(userId, (event) => {
+      if (activeUserIdRef.current !== userId) return
       setRules((prev) => {
         const next =
           event.type === 'delete'
@@ -76,7 +88,7 @@ export function useRecurringRules(userId: string | null) {
             : prev.some((r) => r.id === event.rule.id)
               ? prev.map((r) => (r.id === event.rule.id ? event.rule : r))
               : [...prev, event.rule]
-        saveCachedRecurringRules(next)
+        saveCachedRecurringRules(userId, next)
         return next
       })
     })
@@ -97,14 +109,17 @@ export function useRecurringRules(userId: string | null) {
     setLoading(true)
     fetchRecurringRules(userId)
       .then(async (remote) => {
+        if (activeUserIdRef.current !== userId) return
         if (remote.length > 0) {
           mergeRemote(remote)
         } else {
-          const local = loadCachedRecurringRules()
+          const local = loadCachedRecurringRules(userId)
           if (local.length > 0) {
+            if (activeUserIdRef.current !== userId) return
             await pushRulesBulkUpsert(local, userId)
+            if (activeUserIdRef.current !== userId) return
             setRules(local)
-            saveCachedRecurringRules(local)
+            saveCachedRecurringRules(userId, local)
           }
         }
       })

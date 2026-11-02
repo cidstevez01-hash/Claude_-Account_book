@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { fetchCatalog, type Catalog } from '../data/catalog'
 import { loadCachedCatalog, saveCachedCatalog } from '../lib/catalogCache'
+import { useSettings } from './useSettings'
 
 interface CatalogContextValue {
   catalog: Catalog | null
@@ -23,28 +24,38 @@ const CatalogContext = createContext<CatalogContextValue | null>(null)
  * 都会在后台发一次真实请求刷新最新数据(网络请求的loading态只在完全没有缓存、真的
  * 要靠这次请求才有数据可看时才会是true，否则安静地在后台替换，不打断已经在看的内容) */
 export function CatalogProvider({ children }: { children: ReactNode }) {
-  const [catalog, setCatalog] = useState<Catalog | null>(() => loadCachedCatalog())
-  const [loading, setLoading] = useState(() => !loadCachedCatalog())
+  const { userId } = useSettings()
+  const [catalog, setCatalog] = useState<Catalog | null>(() => loadCachedCatalog(userId))
+  const [loading, setLoading] = useState(() => !loadCachedCatalog(userId))
   const [error, setError] = useState<unknown>(null)
+  const activeUserIdRef = useRef(userId)
+  activeUserIdRef.current = userId
 
   const reload = useCallback(() => {
-    setLoading((prev) => prev || !loadCachedCatalog())
+    if (!userId) {
+      setCatalog(null)
+      setLoading(false)
+      return Promise.resolve()
+    }
+    setLoading((prev) => prev || !loadCachedCatalog(userId))
     return fetchCatalog()
       .then((data) => {
+        if (activeUserIdRef.current !== userId) return
         setCatalog(data)
-        saveCachedCatalog(data)
+        saveCachedCatalog(userId, data)
       })
       .catch((e) => {
         console.error('拉取分类/支付方式目录数据失败', e)
         setError(e)
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [userId])
 
-  useEffect(() => {
-    reload()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  useLayoutEffect(() => {
+    setCatalog(loadCachedCatalog(userId))
+    if (userId) reload()
+    else setLoading(false)
+  }, [userId, reload])
 
   return <CatalogContext.Provider value={{ catalog, loading, error, reload }}>{children}</CatalogContext.Provider>
 }
