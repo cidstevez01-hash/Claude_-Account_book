@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import pointCoinIcon from '../../assets/icons/point-coin.png'
+import pointCoinIcon from '../../icons/assets/point-coin.png'
 import { useSettings } from '../../hooks/useSettings'
 
 /** 現金图标——Material Symbols真实"payments"字形的SVG path，不是自己画的近似图形

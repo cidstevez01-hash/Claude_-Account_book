@@ -100,7 +100,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
             </div>
           ) : (
             <div className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-2xl text-primary">menu_book</span>
+              <ThemeIcon className="material-symbols-outlined text-2xl text-primary" icon="menu_book" />
             </div>
           )}
           <div className="min-w-0">

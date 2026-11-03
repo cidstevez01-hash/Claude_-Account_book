@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useLayoutEffect, useState } from 'react'
 import { useDraggableFab } from '../../hooks/useDraggableFab'
 import { useKeyboardInset } from '../../hooks/useKeyboardInset'
@@ -191,7 +192,7 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
               }}
               aria-hidden="true"
             />
-            <span className="material-symbols-outlined text-2xl relative">{action.icon}</span>
+            <ThemeIcon className="material-symbols-outlined text-2xl relative" icon={action.icon} />
           </button>
         ))}
 
@@ -213,16 +214,14 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
           boxShadow: 'var(--shadow-main-fab, 0 4px 0 var(--color-primary-container))',
         }}
       >
-        <span
+        <ThemeIcon
           className="material-symbols-outlined text-3xl"
           style={{
             display: 'inline-block',
             transform: expanded ? 'rotate(45deg)' : undefined,
             transition: 'transform 0.2s ease',
           }}
-        >
-          {icon}
-        </span>
+         icon={icon} />
       </button>
     </>
   )

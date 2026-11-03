@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppLayout } from '../../design-system/components/AppLayout'
@@ -41,7 +42,7 @@ export function AccountPage() {
     return (
       <AppLayout title={t('accountTitle')} leftButton="back">
         <div className="flex flex-col items-center gap-md px-md py-xl text-center">
-          <span className="material-symbols-outlined text-5xl text-outline">account_circle</span>
+          <ThemeIcon className="material-symbols-outlined text-5xl text-outline" icon="account_circle" />
           <p className="text-body-lg text-on-surface-variant">{t('accountSignInHint')}</p>
           <div className="flex gap-sm w-full max-w-[280px]">
             <Link
@@ -84,7 +85,7 @@ export function AccountPage() {
             aria-label={t('changeAvatarAria')}
             className="absolute -right-0.5 bottom-0 w-[26px] h-[26px] rounded-full bg-primary border-2 border-surface flex items-center justify-center active:scale-90 transition-transform"
           >
-            <span className="material-symbols-outlined text-[13px] text-on-primary">edit</span>
+            <ThemeIcon className="material-symbols-outlined text-[13px] text-on-primary" icon="edit" />
           </Link>
         </div>
         <h2 className="text-body-md text-on-surface-variant">{user!.email}</h2>
@@ -96,7 +97,7 @@ export function AccountPage() {
           onClick={() => setConfirmSignOut(true)}
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-primary/40 text-primary text-body-md active:opacity-60 transition-opacity"
         >
-          <span className="material-symbols-outlined text-[18px]">logout</span>
+          <ThemeIcon className="material-symbols-outlined text-[18px]" icon="logout" />
           {t('signOutBtn')}
         </button>
       </div>

@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
@@ -46,7 +47,7 @@ export function SignInPage() {
       <RouteFade className="flex flex-col">
       <div className="flex flex-col items-center mb-lg">
         <div className="w-16 h-16 rounded-full border-2 border-primary flex items-center justify-center mb-3">
-          <span className="material-symbols-outlined text-3xl text-primary">menu_book</span>
+          <ThemeIcon className="material-symbols-outlined text-3xl text-primary" icon="menu_book" />
         </div>
         <h1 className="font-serif text-headline-lg text-primary">PigBang</h1>
       </div>
@@ -59,7 +60,7 @@ export function SignInPage() {
         <div className="flex flex-col gap-1">
           <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('emailLabel')}</label>
           <div className="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary py-1">
-            <span className="material-symbols-outlined text-outline text-[18px]">mail</span>
+            <ThemeIcon className="material-symbols-outlined text-outline text-[18px]" icon="mail" />
             <input
               type="email"
               value={email}
@@ -73,7 +74,7 @@ export function SignInPage() {
         <div className="flex flex-col gap-1">
           <label className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('passwordLabel')}</label>
           <div className="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary py-1">
-            <span className="material-symbols-outlined text-outline text-[18px]">lock</span>
+            <ThemeIcon className="material-symbols-outlined text-outline text-[18px]" icon="lock" />
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -82,7 +83,7 @@ export function SignInPage() {
               className="flex-1 bg-transparent border-none outline-none text-body-lg text-on-surface focus:ring-0"
             />
             <button type="button" onClick={() => setShowPassword((v) => !v)} className="text-outline">
-              <span className="material-symbols-outlined text-[18px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
+              <ThemeIcon className="material-symbols-outlined text-[18px]" icon={showPassword ? 'visibility_off' : 'visibility'} />
             </button>
           </div>
         </div>

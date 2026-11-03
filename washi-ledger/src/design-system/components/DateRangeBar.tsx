@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useState } from 'react'
 import { formatDateRangeLabel } from '../../lib/date'
 import { RangeCalendarPicker } from './RangeCalendarPicker'
@@ -37,7 +38,7 @@ export function DateRangeBar({ startDate, endDate, onChange }: DateRangeBarProps
         className="flex items-center w-full bg-surface-container-low rounded-lg p-3 border-[1.5px] border-dashed border-outline-variant"
       >
         <div className="flex-1 min-w-0 flex items-center justify-center gap-1.5">
-          <span className="material-symbols-outlined text-on-surface-variant text-[18px] shrink-0">calendar_today</span>
+          <ThemeIcon className="material-symbols-outlined text-on-surface-variant text-[18px] shrink-0" icon="calendar_today" />
           <span className="truncate font-serif text-body-lg text-on-surface">{startLabel}</span>
         </div>
         <span className="shrink-0 px-1 font-serif text-body-lg text-on-surface-variant">~</span>

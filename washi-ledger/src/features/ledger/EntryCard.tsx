@@ -113,15 +113,13 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
             className="w-[38px] h-[38px] rounded-full flex items-center justify-center mr-3 shrink-0"
             style={{ background: category ? tintColor(category.color, 0.85) : 'var(--color-surface-container-highest)' }}
           >
-            <span
+            <ThemeIcon
               className="material-symbols-outlined text-xl"
               style={{
                 color: category ? category.color : 'var(--color-on-surface-variant)',
                 fontVariationSettings: "'FILL' 1",
               }}
-            >
-              {category?.icon || (isIncome ? 'payments' : 'category')}
-            </span>
+             icon={category?.icon || (isIncome ? 'payments' : 'category')} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-sans text-body-lg font-medium text-on-surface truncate">{title}</p>
@@ -223,7 +221,7 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
                 onClick={() => setReceiptPickerOpen(false)}
                 className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
               >
-                <span className="material-symbols-outlined">close</span>
+                <ThemeIcon className="material-symbols-outlined" icon="close" />
               </button>
             </header>
             <div
@@ -256,7 +254,7 @@ export function EntryCard({ entry, category, paymentMethod, onOpenDetail, id, hi
                       {t('entryDetailReceiptLabel')} {i + 1}
                     </span>
                   </div>
-                  <span className="material-symbols-outlined text-[18px] text-on-surface-variant">chevron_right</span>
+                  <ThemeIcon className="material-symbols-outlined text-[18px] text-on-surface-variant" icon="chevron_right" />
                 </button>
               ))}
             </div>

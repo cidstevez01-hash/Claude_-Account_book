@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useMemo, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
@@ -231,9 +232,7 @@ export function DebugLogPage() {
         <div className="px-md pt-md pb-lg flex flex-col gap-md">
           <section className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-sm">
             <div className="flex items-start gap-3 min-w-0">
-              <span className={`material-symbols-outlined shrink-0 mt-0.5 ${enabled ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                {enabled ? 'sensors' : 'sensors_off'}
-              </span>
+              <ThemeIcon className={`material-symbols-outlined shrink-0 mt-0.5 ${enabled ? 'text-secondary' : 'text-on-surface-variant'}`} icon={enabled ? 'sensors' : 'sensors_off'} />
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${enabled ? 'bg-secondary animate-pulse' : 'bg-outline-variant'}`} />
@@ -252,13 +251,13 @@ export function DebugLogPage() {
           <details className="group rounded-2xl bg-surface-container-lowest border border-outline-variant overflow-hidden">
             <summary className="list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-3 p-4 cursor-pointer">
               <div className="flex items-center gap-3 min-w-0">
-                <span className="material-symbols-outlined text-on-surface-variant">settings_suggest</span>
+                <ThemeIcon className="material-symbols-outlined text-on-surface-variant" icon="settings_suggest" />
                 <div>
                   <h2 className="text-body-md font-semibold text-on-surface">{t('debugLogCaptureSettings')}</h2>
                   <p className="mt-0.5 text-xs text-on-surface-variant">{t('debugLogCaptureSettingsHint')}</p>
                 </div>
               </div>
-              <span className="material-symbols-outlined text-on-surface-variant transition-transform group-open:rotate-180">expand_more</span>
+              <ThemeIcon className="material-symbols-outlined text-on-surface-variant transition-transform group-open:rotate-180" icon="expand_more" />
             </summary>
             <div className="px-3 pb-3 flex flex-col gap-2">
               {LOG_MODULES.map((m) => (
@@ -276,7 +275,7 @@ export function DebugLogPage() {
 
           <section className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-primary">filter_list</span>
+              <ThemeIcon className="material-symbols-outlined text-primary" icon="filter_list" />
               <h2 className="text-body-lg font-semibold text-on-surface">{t('debugLogFilterSection')}</h2>
             </div>
 
@@ -332,7 +331,7 @@ export function DebugLogPage() {
                   {t('debugLogKeywordLabel')}
                 </label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+                  <ThemeIcon className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" icon="search" />
                   <input
                     id="debug-log-search"
                     type="search"
@@ -376,7 +375,7 @@ export function DebugLogPage() {
                 disabled={filtered.length === 0}
                 className="min-h-11 flex items-center justify-center gap-2 rounded-xl bg-primary text-on-primary text-sm font-semibold disabled:opacity-40 active:opacity-80"
               >
-                <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                <ThemeIcon className="material-symbols-outlined text-[18px]" icon="content_copy" />
                 {t('debugLogCopyLabel')}
               </button>
               <button
@@ -385,7 +384,7 @@ export function DebugLogPage() {
                 disabled={filtered.length === 0}
                 className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface-container text-on-surface text-sm font-semibold disabled:opacity-40 active:bg-surface-container-high"
               >
-                <span className="material-symbols-outlined text-[18px]">download</span>
+                <ThemeIcon className="material-symbols-outlined text-[18px]" icon="download" />
                 {t('debugLogDownloadLabel')}
               </button>
               <button
@@ -393,7 +392,7 @@ export function DebugLogPage() {
                 onClick={refresh}
                 className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface-container text-on-surface text-sm font-semibold active:bg-surface-container-high"
               >
-                <span className="material-symbols-outlined text-[18px]">refresh</span>
+                <ThemeIcon className="material-symbols-outlined text-[18px]" icon="refresh" />
                 {t('debugLogRefreshAria')}
               </button>
               <button
@@ -402,16 +401,14 @@ export function DebugLogPage() {
                 disabled={entries.length === 0}
                 className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary-fixed text-primary text-sm font-semibold disabled:opacity-40 active:opacity-80"
               >
-                <span className="material-symbols-outlined text-[18px]">delete_sweep</span>
+                <ThemeIcon className="material-symbols-outlined text-[18px]" icon="delete_sweep" />
                 {t('debugLogClearLabel')}
               </button>
             </div>
 
             {groups.length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-10 px-4 rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest text-center">
-                <span className="material-symbols-outlined text-3xl text-outline-variant">
-                  {entries.length === 0 ? 'notes' : 'search_off'}
-                </span>
+                <ThemeIcon className="material-symbols-outlined text-3xl text-outline-variant" icon={entries.length === 0 ? 'notes' : 'search_off'} />
                 <p className="text-body-md text-on-surface-variant">
                   {entries.length === 0 ? t('debugLogEmptyHint') : t('debugLogNoMatches')}
                 </p>

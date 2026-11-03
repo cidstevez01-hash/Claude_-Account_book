@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useI18n } from '../../lib/i18n'
 
 interface ConfirmDialogProps {
@@ -46,9 +47,7 @@ export function ConfirmDialog({
             tone === 'error' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-primary'
           }`}
         >
-          <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-            {icon}
-          </span>
+          <ThemeIcon className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }} icon={icon} />
         </div>
         <h2 className="font-serif text-headline-md text-on-surface mb-1 text-center">{title}</h2>
         <p className="text-body-md text-on-surface-variant text-center mb-lg">{message}</p>

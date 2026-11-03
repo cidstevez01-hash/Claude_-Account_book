@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { CashPointToggle } from '../../design-system/components/CashPointToggle'
@@ -351,9 +352,7 @@ export function CalendarPage() {
                 className="rounded-lg px-sm py-2 border-[1.5px] border-dashed flex items-center gap-2"
                 style={{ borderColor: 'var(--color-holiday)', background: 'color-mix(in srgb, var(--color-holiday) 10%, transparent)' }}
               >
-                <span className="material-symbols-outlined text-[18px]" style={{ color: 'var(--color-holiday)' }}>
-                  event
-                </span>
+                <ThemeIcon className="material-symbols-outlined text-[18px]" style={{ color: 'var(--color-holiday)' }} icon="event" />
                 <span className="text-body-md" style={{ color: 'var(--color-holiday)' }}>
                   {t('calendarHolidayLabel')}：{selectedHolidayName}
                 </span>
@@ -445,7 +444,7 @@ export function CalendarPage() {
               </div>
             ) : (
               <div className="text-center py-10 text-on-surface-variant">
-                <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">event_busy</span>
+                <ThemeIcon className="material-symbols-outlined text-4xl mb-2 block opacity-40" icon="event_busy" />
                 <p className="text-body-md">{t('noRecordsThisDay')}</p>
               </div>
             )}

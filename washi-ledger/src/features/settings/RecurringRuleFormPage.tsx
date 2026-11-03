@@ -409,7 +409,7 @@ export function RecurringRuleFormPage() {
                 onClick={() => setPendingDelete(true)}
                 className="flex-1 h-[58px] flex items-center justify-center gap-1.5 rounded-xl border-2 border-error text-error text-body-lg font-sans active:scale-95 transition-transform"
               >
-                <span className="material-symbols-outlined text-[20px]">delete</span>
+                <ThemeIcon className="material-symbols-outlined text-[20px]" icon="delete" />
                 {t('deleteLabel')}
               </button>
             )}
@@ -420,7 +420,7 @@ export function RecurringRuleFormPage() {
               className="flex-1 h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >
-              <span className="material-symbols-outlined">how_to_reg</span>
+              <ThemeIcon className="material-symbols-outlined" icon="how_to_reg" />
               {t('recurringRuleSaveLabel')}
             </button>
           </div>

@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { useAppNavigate } from '../../hooks/useAppNavigate'
@@ -218,9 +219,7 @@ export function HistoryPage() {
     >
       <section className="flex flex-col gap-sm px-md pt-md">
         <div className="relative w-full">
-          <span className="material-symbols-outlined text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-outline">
-            search
-          </span>
+          <ThemeIcon className="material-symbols-outlined text-[16px] absolute left-3 top-1/2 -translate-y-1/2 text-outline" icon="search" />
           <input
             type="text"
             value={search}
@@ -269,7 +268,7 @@ export function HistoryPage() {
             onClick={() => navigate('/calendar')}
             className="ml-auto shrink-0 w-9 h-9 rounded-full flex items-center justify-center border-[1.5px] border-dashed border-outline-variant text-on-surface-variant active:scale-90 transition-transform"
           >
-            <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+            <ThemeIcon className="material-symbols-outlined text-[18px]" icon="calendar_month" />
           </button>
         </div>
       </section>

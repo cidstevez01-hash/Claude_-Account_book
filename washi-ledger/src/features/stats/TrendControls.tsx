@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useI18n } from '../../lib/i18n'
 
 interface TrendControlsProps {
@@ -40,7 +41,7 @@ export function TrendControls({ dim, onDimChange, periodLabel, onPrev, onNext, d
           disabled={disablePrev}
           className="text-on-surface-variant disabled:opacity-30"
         >
-          <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+          <ThemeIcon className="material-symbols-outlined text-[20px]" icon="chevron_left" />
         </button>
         <span className="text-body-md text-on-surface-variant min-w-[72px] text-center">{periodLabel}</span>
         <button
@@ -50,7 +51,7 @@ export function TrendControls({ dim, onDimChange, periodLabel, onPrev, onNext, d
           disabled={disableNext}
           className="text-on-surface-variant disabled:opacity-30"
         >
-          <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+          <ThemeIcon className="material-symbols-outlined text-[20px]" icon="chevron_right" />
         </button>
       </div>
     </div>

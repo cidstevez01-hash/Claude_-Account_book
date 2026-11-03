@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { Link } from 'react-router-dom'
 import { hasEverSignedIn, useAuth } from '../../features/auth/useAuth'
 import { useI18n } from '../../lib/i18n'
@@ -20,7 +21,7 @@ export function CloudDisconnectBanner() {
         to="/account"
         className="flex items-center gap-2 rounded-full bg-tertiary-fixed border border-tertiary/30 px-3 py-2 text-body-md text-on-tertiary-fixed shadow-sm active:opacity-80 transition-opacity"
       >
-        <span className="material-symbols-outlined text-[18px] shrink-0">cloud_off</span>
+        <ThemeIcon className="material-symbols-outlined text-[18px] shrink-0" icon="cloud_off" />
         <span className="flex-1 truncate">{t('cloudDisconnectBannerText')}</span>
         <span className="shrink-0 font-bold underline underline-offset-2">{t('cloudReconnectBtn')}</span>
       </Link>

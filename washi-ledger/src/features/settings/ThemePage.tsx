@@ -115,9 +115,7 @@ export function ThemePage() {
                     active ? 'bg-primary text-on-primary' : 'bg-transparent border border-outline-variant text-transparent'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    check
-                  </span>
+                  <ThemeIcon className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }} icon="check" />
                 </div>
               </button>
             )

@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { ScrollLegendList } from '../../design-system/components/ScrollLegendList'
 import { useI18n } from '../../lib/i18n'
 import type { TrendBucket, TrendLegendItem } from '../../data/summary'
@@ -41,7 +42,7 @@ export function TrendLegend({
               {selectedBucket.total.toLocaleString()}
             </span>
             <button type="button" onClick={onClosePoint} aria-label={t('closeAria')} className="text-on-surface-variant">
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <ThemeIcon className="material-symbols-outlined text-[18px]" icon="close" />
             </button>
           </div>
         </div>

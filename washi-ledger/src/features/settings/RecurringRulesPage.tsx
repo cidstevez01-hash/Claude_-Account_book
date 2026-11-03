@@ -50,7 +50,7 @@ export function RecurringRulesPage() {
         <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
       ) : rules.length === 0 ? (
         <div className="text-center py-16 px-md text-on-surface-variant">
-          <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">event_repeat</span>
+          <ThemeIcon className="material-symbols-outlined text-4xl mb-2 block opacity-40" icon="event_repeat" />
           <p className="text-body-md">{t('recurringRuleEmptyState')}</p>
         </div>
       ) : (
@@ -73,12 +73,10 @@ export function RecurringRulesPage() {
                   className="w-10 h-10 rounded-full flex items-center justify-center mr-3 shrink-0"
                   style={{ background: cat ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-highest)' }}
                 >
-                  <span
+                  <ThemeIcon
                     className="material-symbols-outlined text-xl"
                     style={{ color: cat ? cat.color : 'var(--color-on-surface-variant)', fontVariationSettings: "'FILL' 1" }}
-                  >
-                    {cat?.icon ?? 'category'}
-                  </span>
+                   icon={cat?.icon ?? 'category'} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-sans text-body-lg font-medium text-on-surface truncate">

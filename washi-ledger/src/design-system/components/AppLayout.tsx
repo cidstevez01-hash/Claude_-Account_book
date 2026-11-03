@@ -154,7 +154,7 @@ export function AppLayout({
             className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]"
             onClick={() => navigate('/')}
           >
-            <span className="material-symbols-outlined papercut-text-shadow">home</span>
+            <ThemeIcon className="material-symbols-outlined papercut-text-shadow" icon="home" />
           </button>
         ) : (
           // R-18：返回上一页(不是固定跳仪表盘)——这几个子页面是从抽屉哪个主页面点进来的
@@ -259,16 +259,14 @@ export function AppLayout({
                 ))}
               </span>
             ) : (
-              <span
+              <ThemeIcon
                 className="material-symbols-outlined text-primary"
                 style={{
                   fontSize: 24,
                   opacity: Math.min(1, pullDistance / threshold),
                   transform: `rotate(${Math.min(1, pullDistance / threshold) * 180}deg)`,
                 }}
-              >
-                arrow_downward
-              </span>
+               icon="arrow_downward" />
             )}
           </div>
         )}

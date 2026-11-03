@@ -1,10 +1,11 @@
+import { ThemeIcon } from '../../icons/Icon'
 import type { ReactElement } from 'react'
-import amazonLogo from '../../assets/payment-brands/amazon.svg'
-import rakutenLogo from '../../assets/payment-brands/rakuten.svg'
-import merpayLogo from '../../assets/payment-brands/pm-merpay.png'
-import paidyLogo from '../../assets/payment-brands/pm-paidy.png'
-import suicaLogo from '../../assets/payment-brands/pm-suica.png'
-import paypayLogo from '../../assets/payment-brands/pm-paypay.png'
+import amazonLogo from '../../icons/brands/amazon.svg'
+import rakutenLogo from '../../icons/brands/rakuten.svg'
+import merpayLogo from '../../icons/brands/pm-merpay.png'
+import paidyLogo from '../../icons/brands/pm-paidy.png'
+import suicaLogo from '../../icons/brands/pm-suica.png'
+import paypayLogo from '../../icons/brands/pm-paypay.png'
 import { mapGenericPaymentMethodIcon } from '../../lib/iconMap'
 import { useI18n } from '../../lib/i18n'
 import { payLabel } from '../../lib/catalogLabel'
@@ -92,11 +93,9 @@ export function PaymentMethodIcon({ method, size = 20 }: PaymentMethodIconProps)
   }
   const genericIcon = mapGenericPaymentMethodIcon(method.icon)
   return (
-    <span
+    <ThemeIcon
       className="material-symbols-outlined shrink-0 text-on-surface-variant"
       style={{ fontSize: size }}
-    >
-      {genericIcon ?? 'account_balance_wallet'}
-    </span>
+     icon={genericIcon ?? 'account_balance_wallet'} />
   )
 }

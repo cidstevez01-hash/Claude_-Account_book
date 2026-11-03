@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useI18n } from '../../lib/i18n'
 import type { MonthSummary } from '../../data/summary'
 import { formatCurrency, symbolFor } from '../../data/currencyDisplay'
@@ -39,7 +40,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
       <div className="flex items-center justify-between border-t-[1.5px] border-dashed border-outline-variant pt-sm">
         <div className="flex-1 text-center">
           <p className="font-sans text-label-caps text-secondary mb-1 flex items-center justify-center gap-1">
-            <span className="material-symbols-outlined text-sm">arrow_downward</span>
+            <ThemeIcon className="material-symbols-outlined text-sm" icon="arrow_downward" />
             {t('rangeIncome')}
           </p>
           <p className="font-serif text-stat-figure font-semibold text-income">{formatCurrency(summary.income, currency)}</p>
@@ -47,7 +48,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
         <div className="w-[1.5px] h-10 bg-outline-variant" />
         <div className="flex-1 text-center">
           <p className="font-sans text-label-caps text-primary mb-1 flex items-center justify-center gap-1">
-            <span className="material-symbols-outlined text-sm">arrow_upward</span>
+            <ThemeIcon className="material-symbols-outlined text-sm" icon="arrow_upward" />
             {t('rangeExpense')}
           </p>
           <p className="font-serif text-stat-figure font-semibold text-expense">{formatCurrency(summary.expense, currency)}</p>

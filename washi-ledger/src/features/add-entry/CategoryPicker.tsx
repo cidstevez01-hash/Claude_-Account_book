@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { buildNewSubcategory, insertCustomSubcategory, updateCustomSubcategory, deleteCustomSubcategory } from '../../data/catalog'
 import { tintColor } from '../../lib/color'
@@ -185,12 +186,10 @@ export function CategoryPicker({
                 className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{ background: tintColor(cat.color, 0.85) }}
               >
-                <span
+                <ThemeIcon
                   className="material-symbols-outlined text-[17px]"
                   style={{ color: cat.color, fontVariationSettings: "'FILL' 1" }}
-                >
-                  {cat.icon}
-                </span>
+                 icon={cat.icon} />
               </span>
               <span
                 className="text-[11px] font-sans truncate w-full"
@@ -237,7 +236,7 @@ export function CategoryPicker({
                     onClick={confirmEdit}
                     className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
                   >
-                    <span className="material-symbols-outlined text-[13px]">check</span>
+                    <ThemeIcon className="material-symbols-outlined text-[13px]" icon="check" />
                   </button>
                 </span>
               )
@@ -279,7 +278,7 @@ export function CategoryPicker({
                       onClick={() => startEdit(sub.id, subLabel(sub, lang))}
                       className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-on-surface whitespace-nowrap w-full"
                     >
-                      <span className="material-symbols-outlined text-[14px]">edit</span>
+                      <ThemeIcon className="material-symbols-outlined text-[14px]" icon="edit" />
                       {t('editLabel')}
                     </button>
                     <button
@@ -287,7 +286,7 @@ export function CategoryPicker({
                       onClick={() => handleDelete(sub.id, sub.code)}
                       className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-primary whitespace-nowrap w-full"
                     >
-                      <span className="material-symbols-outlined text-[14px]">delete</span>
+                      <ThemeIcon className="material-symbols-outlined text-[14px]" icon="delete" />
                       {t('deleteLabel')}
                     </button>
                   </div>
@@ -316,7 +315,7 @@ export function CategoryPicker({
                 onClick={confirmEdit}
                 className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
               >
-                <span className="material-symbols-outlined text-[13px]">check</span>
+                <ThemeIcon className="material-symbols-outlined text-[13px]" icon="check" />
               </button>
             </span>
           ) : (

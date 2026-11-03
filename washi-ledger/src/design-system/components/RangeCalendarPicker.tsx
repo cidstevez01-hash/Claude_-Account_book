@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 
@@ -214,7 +215,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
             {page === 'year' ? t('rangePickerYearTitle') : page === 'month' ? t('rangePickerMonthTitle') : t('rangePickerTitle')}
           </h2>
           <button type="button" aria-label={t('closeAria')} onClick={handleCancel} className="text-on-surface-variant">
-            <span className="material-symbols-outlined">close</span>
+            <ThemeIcon className="material-symbols-outlined" icon="close" />
           </button>
         </div>
         <div className="border-t border-dashed border-outline-variant mb-3" />
@@ -385,13 +386,13 @@ function YearPage({
     <>
       <div className="flex items-center justify-center gap-2 mb-2">
         <button type="button" onClick={onPrevDecade} className="text-on-surface-variant">
-          <span className="material-symbols-outlined">chevron_left</span>
+          <ThemeIcon className="material-symbols-outlined" icon="chevron_left" />
         </button>
         <span className="font-serif text-body-lg text-on-surface min-w-[110px] text-center">
           {decadeStart} - {decadeStart + 9}
         </span>
         <button type="button" onClick={onNextDecade} className="text-on-surface-variant">
-          <span className="material-symbols-outlined">chevron_right</span>
+          <ThemeIcon className="material-symbols-outlined" icon="chevron_right" />
         </button>
       </div>
       {/* 格子线拿掉了，不再是border-collapse那种整块网格，单元格之间靠gap留白+
@@ -449,7 +450,7 @@ function MonthPage({
     <>
       <div className="flex items-center justify-center gap-2 mb-2">
         <button type="button" onClick={onPrevYear} className="text-on-surface-variant">
-          <span className="material-symbols-outlined">chevron_left</span>
+          <ThemeIcon className="material-symbols-outlined" icon="chevron_left" />
         </button>
         <button
           type="button"
@@ -459,7 +460,7 @@ function MonthPage({
           {year}年
         </button>
         <button type="button" onClick={onNextYear} className="text-on-surface-variant">
-          <span className="material-symbols-outlined">chevron_right</span>
+          <ThemeIcon className="material-symbols-outlined" icon="chevron_right" />
         </button>
       </div>
       {/* 格子线拿掉了，理由同YearPage */}

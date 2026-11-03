@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDayPinned, matchesEntrySearch } from '../../data/summary'
@@ -108,7 +109,7 @@ export function RecentEntriesList({
   if (entries.length === 0) {
     return (
       <div className="text-center py-16 px-md text-on-surface-variant">
-        <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">receipt_long</span>
+        <ThemeIcon className="material-symbols-outlined text-4xl mb-2 block opacity-40" icon="receipt_long" />
         <p className="text-body-md">{t('emptyLine1')}</p>
         <p className="text-body-md">{t('emptyLine2')}</p>
       </div>
@@ -146,7 +147,7 @@ export function RecentEntriesList({
             onClick={() => setSearchExpanded(true)}
             className="w-[30px] h-[30px] shrink-0 flex items-center justify-center text-outline"
           >
-            <span className="material-symbols-outlined text-[14px]">search</span>
+            <ThemeIcon className="material-symbols-outlined text-[14px]" icon="search" />
           </button>
           <input
             type="text"

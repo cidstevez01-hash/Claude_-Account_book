@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useI18n } from '../../lib/i18n'
 
 interface ReceiptPreviewSheetProps {
@@ -32,7 +33,7 @@ export function ReceiptPreviewSheet({ open, url, onClose }: ReceiptPreviewSheetP
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center text-on-surface-variant"
           >
-            <span className="material-symbols-outlined">close</span>
+            <ThemeIcon className="material-symbols-outlined" icon="close" />
           </button>
         </header>
 
@@ -70,7 +71,7 @@ export function ReceiptPreviewSheet({ open, url, onClose }: ReceiptPreviewSheetP
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-1.5 text-body-md text-on-surface-variant py-1"
             >
-              <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+              <ThemeIcon className="material-symbols-outlined text-[18px]" icon="open_in_new" />
               {t('receiptOpenExternalLabel')}
             </a>
           </div>

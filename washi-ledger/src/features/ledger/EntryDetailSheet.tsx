@@ -161,15 +161,13 @@ export function EntryDetailSheet({ open, entry, category, paymentMethod, tag, on
               className="w-14 h-14 rounded-full flex items-center justify-center"
               style={{ background: category ? tintColor(category.color, 0.85) : 'var(--color-surface-container-highest)' }}
             >
-              <span
+              <ThemeIcon
                 className="material-symbols-outlined text-[28px]"
                 style={{
                   color: category ? category.color : 'var(--color-on-surface-variant)',
                   fontVariationSettings: "'FILL' 1",
                 }}
-              >
-                {category?.icon || (isIncome ? 'payments' : 'category')}
-              </span>
+               icon={category?.icon || (isIncome ? 'payments' : 'category')} />
             </div>
             <p className="font-serif text-headline-sm text-on-surface">{title}</p>
             <p
