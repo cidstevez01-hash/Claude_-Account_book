@@ -33,6 +33,7 @@ jobs:
       - name: 算版本号(PigBang package.json语义版本号 + Actions运行号当build号)
         run: |
           echo "APP_VERSION=$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
+          echo "APP_MARKETING_VERSION=$(node -p "require('./package.json').version.split('-')[0]")" >> "$GITHUB_ENV"
           echo "APP_BUILD_NUMBER=${{ github.run_number }}" >> "$GITHUB_ENV"
 
       - name: 安装依赖 + 构建网页产物(washi-ledger/dist)
@@ -57,7 +58,7 @@ jobs:
           /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" "$PLIST" || true
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$PLIST"
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${APP_VERSION}" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${APP_MARKETING_VERSION}" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${APP_BUILD_NUMBER}" "$PLIST"
           # R-32：@capacitor/camera在iOS上如果Info.plist缺这三个Usage Description，
           # 原生CameraPlugin.checkUsageDescriptions()会在调用最开始就直接reject，
