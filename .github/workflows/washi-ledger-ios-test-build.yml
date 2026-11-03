@@ -1,4 +1,4 @@
-name: Washi Ledger iOS 测试包(未签名 .ipa)
+name: PigBang iOS 测试包(未签名 .ipa)
 
 # 手动触发,跟ios-test-build.yml同一套习惯：不跟着每次push自动跑(iOS编译在macOS
 # runner上跑得慢、还按10倍分钟数扣费)，只有真的要出一个新安装包测试的时候才手动点。
