@@ -46,7 +46,7 @@ git checkout <对应提交> -- index.html
 
 ## PigBang 重写版
 
-PigBang 重写版使用独立版本线，与上方旧版单文件 PigBang（`v1.0.0`~`v2.1.2`）分别记录。重写版曾以内部名称 Washi Ledger 开发，历史开发行保留原记录；产品名称现统一为 PigBang。开发阶段版本格式为`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`，正式发布后使用`vMAJOR.MINOR.PATCH`。版本写入`washi-ledger/package.json`，IPA 工作流读取该字段；目录名和现有 iOS Bundle ID 暂时保留，确保现有测试安装身份不变。开发历史见`DEVLOG.md`，架构与设计决策见`HANDOFF-washi-ledger-rewrite.md`。
+PigBang 重写版使用独立版本线，与上方旧版单文件 PigBang（`v1.0.0`~`v2.1.2`）分别记录。重写版曾以内部名称 Washi Ledger 开发，历史开发行保留原记录；产品名称现统一为 PigBang。测试版以`origin/main`的语义版本为基础，格式为`MAJOR.MINOR.PATCH-YYYYMMDD-dev.N`（如`1.0.0-20261103-dev.1`）；日期按日本时间，当天每次推送递增 N，新一天从 1 开始。建立`1.0.0`基线前的历史版本使用`0.0.0-`前缀。版本写入`washi-ledger/package.json`，IPA 文件和 App 内显示完整测试版本；iOS 的原生短版本取数字基础版本，构建号取 Actions 运行号。目录名和现有 iOS Bundle ID 暂时保留，确保现有测试安装身份不变。开发历史见`DEVLOG.md`，架构与设计决策见`HANDOFF-washi-ledger-rewrite.md`。
 
 （曾经在2026-08-18当天短暂把这个字段写成过`0.1.0`这种"干净"格式，是记错了规则——开发分支不该用这种格式，已改回`dev.N`格式。）
 
@@ -162,11 +162,14 @@ PigBang 重写版使用独立版本线，与上方旧版单文件 PigBang（`v1.
 | 20261028-dev.4 | 2026-10-28 | **诊断日志改版：按模块分类 + 结构化字段**。①每条日志带模块：固定收支(recurring)、小票(receipt)、其他(other)；旧版本留下的日志没有模块，读取时归到其他。②生成记录改成结构化字段(来源、生成时间、id、日期、金额、分类、支付、备注、规则)，日志页显示成小标签，复制时拼成 key=value。③日志页：模块筛选(带计数)、级别筛选、搜索、时间筛选、按天分组；每个模块有开关，关掉后该模块不再记录；清空只清当前模块(有确认框)。复制/下载的内容与当前筛选一致。④小票相关约三十处日志调用改成模块写入。`tsc -b`、oxlint 通过；Playwright 验证 6 项(设置页顺序、保存/首页生成记录字段、模块计数和筛选、按模块清空、模块开关) | washi-ledger-ui-fixes |
 | 20261028-dev.5 | 2026-10-28 | **修复固定收支"生成记录"误报**。写入改为带 `select('id')`，PostgREST 只返回真正插入的行；只对真正插入的记录记"生成记录"，云端已经存在(被忽略)的记一条"已存在，跳过"。保存规则和首页补生成两条路径都改了。`tsc -b`、oxlint 通过；Playwright 验证 4 项(保存/首页 × 插入成功/云端已存在)全部通过，原有 T1 到 T6 无回归 | washi-ledger-ui-fixes |
 
+| 1.0.0-20261103-dev.1 | 2026-11-03 | 基于 main 的 v1.0.0 基线生成测试版，包含账号缓存隔离、小票合计识别、固定收支 RPC 权限及日志页重设计；完整测试号用于 App 和 IPA 文件，原生短版本为 1.0.0；仅运行测试 IPA 工作流。 | pigbang_20261031 |
+
 ## 命名规则
 
 - 正式版本：`vMAJOR.MINOR.PATCH`（语义化版本），只是主分支上一次`release: vX.Y.Z`提交里写的版本号，不再额外拉同名分支（`v1.0.0`~`v2.0.4`是旧规则留下的快照分支，之后不会再新增）。
-- 开发分支（主分支以外，日常迭代用）：`accountbook-YYYYMMDD`，年月日命名，例如 `accountbook-20260731`；同一天需要另开一个的话加 `-2`/`-3` 后缀，例如 `accountbook-20260810-2`。这是从 2026-07-31 起最早定下、一直沿用的规则。
+- 旧App开发分支：`accountbook-YYYYMMDD`，年月日命名，例如 `accountbook-20260731`；同一天需要另开一个的话加 `-2`/`-3` 后缀，例如 `accountbook-20260810-2`。
+  - PigBang 重写版测试分支使用`pigbang_YYYYMMDD`，当前测试分支为`pigbang_20261031`；分支日期与后续测试版本日期分别记录。
   - 2026-08-13～2026-08-14 之间的几个分支（`YYYYMMDD-dev.N` 格式，不带 `accountbook-` 前缀）是中途误改的命名，已经改回来，不再沿用。
 - **核心原则(两条线都适用)：开发分支上还没合并/发布的版本，一律不用干净的`vMAJOR.MINOR.PATCH`格式**，那个格式专属于"已经合并/正式发布"的版本；开发中的版本号长相是`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`(日期+当天第几次)，跟正式版本号一眼就能分清谁是谁。
   - 旧App(`accountbook-YYYYMMDD`分支)：这两个值是`index.html`里的`DEV_BUILD_DATE`/`DEV_BUILD`两个JS常量。
-  - washi-ledger(`washi-ledger-rewrite`分支)：这条线还没有`accountbook-YYYYMMDD`那样按天开新分支的习惯，长期在同一个`washi-ledger-rewrite`分支上开发，所以版本号只把`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`这串写进`washi-ledger/package.json`的`version`字段（用semver prerelease语法`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`承载）——同一天再推一次，`DEV_BUILD`在当前值上+1；换了新的一天，`DEV_BUILD_DATE`改成当天、`DEV_BUILD`重置成1。等这条分支真正合并/发布，才跳到干净的`vMAJOR.MINOR.PATCH`。
+  - PigBang 重写版：读取远端`main`中`washi-ledger/package.json`的数字基础版本，测试分支使用`{main版本}-{YYYYMMDD}-dev.{N}`。同一天再推一次 N 加 1，新一天重置为 1；`1.0.0-20261103-dev.1`中的`1.0.0`跟随 main，日期和次数沿用既有规则。旧的`0.0.0-日期-dev.N`只用于建立 main 基线之前的历史开发记录。测试工作流仅生成未签名 IPA artifact；用户明确要求时由 Codex 触发。
