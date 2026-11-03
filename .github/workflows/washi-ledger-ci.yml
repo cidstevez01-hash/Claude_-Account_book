@@ -4,9 +4,13 @@ on:
   push:
     paths:
       - 'washi-ledger/**'
+      - '.github/workflows/washi-ledger-ci.yml'
+      - '.github/workflows/washi-ledger-ios-test-build.yml'
   pull_request:
     paths:
       - 'washi-ledger/**'
+      - '.github/workflows/washi-ledger-ci.yml'
+      - '.github/workflows/washi-ledger-ios-test-build.yml'
 
 jobs:
   build:

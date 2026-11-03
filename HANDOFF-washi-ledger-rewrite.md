@@ -76,9 +76,9 @@ washi-ledger/
 
 ## 版本号/分支/CI
 
-- 版本号：`washi-ledger/package.json`的`version`字段，还没合并/正式发布过，所以沿用"开发分支不用干净`vX.Y.Z`"的规则，格式是`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`(semver prerelease语法承载`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`)，当前`0.0.0-20260818-dev.1`，等真正合并/发布才跳到干净`vMAJOR.MINOR.PATCH`。记录见`VERSIONS.md`「Washi Ledger重写」一节
-- 分支：`washi-ledger-rewrite`，已推送到远程，对`claude/upload-project-github-ww338s`开了PR #1
-- CI：`.github/workflows/washi-ledger-ci.yml`(push/PR改到`washi-ledger/**`时自动typecheck+build)、`.github/workflows/washi-ledger-ios-test-build.yml`(手动触发，出未签名ipa，appId跟旧App的原生打包互不冲突)
+- 版本号：main 的 PigBang 基础版本为`1.0.0`；测试版本写入`washi-ledger/package.json`，规则为`{origin/main版本}-{YYYYMMDD}-dev.{N}`。同一天每次推送 N 加 1，新一天从 1 开始；日期按日本时间。当前测试版为`1.0.0-20261103-dev.1`，记录见`VERSIONS.md`「PigBang 重写版」一节。
+- 分支：main 保存基线，当前测试分支为`pigbang_20261031`；历史`washi-ledger-rewrite`分支名只作追溯。
+- CI：`.github/workflows/washi-ledger-ci.yml`(push/PR改到`washi-ledger/**`时自动typecheck+build)、`.github/workflows/washi-ledger-ios-test-build.yml`(workflow_dispatch，出未签名 IPA；用户明确要求时可由 Codex 触发)。完整测试版本用于 App 显示和 IPA 文件名，原生短版本取数字基础版本，构建号取 Actions 运行号。
 - 每次改动的详细记录见`DEVLOG.md`里`washi-ledger-rewrite`分支那几行（跟`accountbook-YYYYMMDD`那条主线分开记录，见`DEVLOG.md`顶部的说明）
 
 ## 关于旧仓库/旧分支
