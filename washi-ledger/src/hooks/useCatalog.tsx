@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { fetchCatalog, type Catalog } from '../data/catalog'
 import { loadCachedCatalog, saveCachedCatalog } from '../lib/catalogCache'
 import { useSettings } from './useSettings'

@@ -44,15 +44,15 @@ git checkout <对应提交> -- index.html
 | 20260816-dev.9 | 2026-08-16 | 气泡缓动曲线再调——上一版矫枉过正变成瞬移感，换成标准CSS ease，位移在时间窗口内均匀推进 | accountbook-20260816 |
 | 20260816-dev.10 | 2026-08-16 | 修两个真机闹钟响铃原生bug(自定义铃声失败连累内置蜂鸣音兜底一起哑掉、点通知因15秒轮询窄窗口而"看运气"生效)；讨论后决定后台音频保活方案模拟不出真正可靠的持续响铃，加`ALARM_FEATURE_ENABLED`开关整体暂时封存——三个头部入口隐藏、原生调度/监听整体停用，代码保留 | accountbook-20260816(合并自accountbook-20260816-2) |
 
-## Washi Ledger重写
+## PigBang 重写版
 
-独立版本号体系，跟上面`accountbook-YYYYMMDD`那条线（`v1.0.0`~`v2.1.2`）是两回事，但**沿用同一套"开发分支不用干净语义化版本号"的命名规则**（见下面「命名规则」一节）：`washi-ledger-rewrite`分支还没合并/正式发布过，现在处于开发阶段，版本号格式是`{DEV_BUILD_DATE}-dev.{DEV_BUILD}`，记在`washi-ledger/package.json`的`version`字段里(用semver的prerelease写法`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`承载，保证仍是合法semver)。等这条分支真正合并/发布，才会跳到干净的`vMAJOR.MINOR.PATCH`并记进「正式版本」表。详细开发过程见`DEVLOG.md`里`washi-ledger-rewrite`分支那几行，架构背景/设计决策见`HANDOFF-washi-ledger-rewrite.md`。
+PigBang 重写版使用独立版本线，与上方旧版单文件 PigBang（`v1.0.0`~`v2.1.2`）分别记录。重写版曾以内部名称 Washi Ledger 开发，历史开发行保留原记录；产品名称现统一为 PigBang。开发阶段版本格式为`0.0.0-{DEV_BUILD_DATE}-dev.{DEV_BUILD}`，正式发布后使用`vMAJOR.MINOR.PATCH`。版本写入`washi-ledger/package.json`，IPA 工作流读取该字段；目录名和现有 iOS Bundle ID 暂时保留，确保现有测试安装身份不变。开发历史见`DEVLOG.md`，架构与设计决策见`HANDOFF-washi-ledger-rewrite.md`。
 
 （曾经在2026-08-18当天短暂把这个字段写成过`0.1.0`这种"干净"格式，是记错了规则——开发分支不该用这种格式，已改回`dev.N`格式。）
 
 ### 正式版本
 
-还没有——这条线目前还没合并/正式发布过，等真正合并时再在这里加第一行记录。
+首个正式版本将在合入`main`时登记，版本号为`v1.0.0`。
 
 ### 开发版本
 
