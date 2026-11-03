@@ -1,4 +1,4 @@
-name: Washi Ledger CI
+name: PigBang CI
 
 on:
   push:
