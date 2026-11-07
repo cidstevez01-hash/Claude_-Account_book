@@ -1,6 +1,8 @@
-import { createContext, useCallback, useContext, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { App } from '@capacitor/app'
 import { fetchCatalog, type Catalog } from '../data/catalog'
 import { loadCachedCatalog, saveCachedCatalog } from '../lib/catalogCache'
+import { logModule } from '../lib/appLog'
 import { useSettings } from './useSettings'
 
 interface CatalogContextValue {
@@ -24,38 +26,100 @@ const CatalogContext = createContext<CatalogContextValue | null>(null)
  * 都会在后台发一次真实请求刷新最新数据(网络请求的loading态只在完全没有缓存、真的
  * 要靠这次请求才有数据可看时才会是true，否则安静地在后台替换，不打断已经在看的内容) */
 export function CatalogProvider({ children }: { children: ReactNode }) {
-  const { userId } = useSettings()
+  const { userId, authLoading } = useSettings()
   const [catalog, setCatalog] = useState<Catalog | null>(() => loadCachedCatalog(userId))
-  const [loading, setLoading] = useState(() => !loadCachedCatalog(userId))
+  const [loading, setLoading] = useState(() => authLoading || !loadCachedCatalog(userId))
   const [error, setError] = useState<unknown>(null)
   const activeUserIdRef = useRef(userId)
   activeUserIdRef.current = userId
+  const authLoadingRef = useRef(authLoading)
+  authLoadingRef.current = authLoading
+  const requestIdRef = useRef(0)
+  const inFlightRef = useRef<{ userId: string; promise: Promise<void> } | null>(null)
+  const retryCountRef = useRef(0)
 
   const reload = useCallback(() => {
+    // 认证尚在恢复时，null 不是“没有账号”；不要提前清缓存或显示分类请求失败。
+    if (authLoading || activeUserIdRef.current !== userId) return Promise.resolve()
     if (!userId) {
       setCatalog(null)
+      setError(null)
       setLoading(false)
       return Promise.resolve()
     }
-    setLoading((prev) => prev || !loadCachedCatalog(userId))
-    return fetchCatalog()
+    if (inFlightRef.current?.userId === userId) return inFlightRef.current.promise
+    const requestId = ++requestIdRef.current
+    const isCurrent = () => requestIdRef.current === requestId
+      && activeUserIdRef.current === userId && !authLoadingRef.current
+    setError(null)
+    setLoading(!loadCachedCatalog(userId))
+    const promise = fetchCatalog()
       .then((data) => {
-        if (activeUserIdRef.current !== userId) return
+        if (!isCurrent()) return
         setCatalog(data)
         saveCachedCatalog(userId, data)
+        setError(null)
+        retryCountRef.current = 0
       })
       .catch((e) => {
+        if (!isCurrent()) return
         console.error('拉取分类/支付方式目录数据失败', e)
+        logModule('other', '分类目录加载失败', 'error', {
+          message: String((e as { message?: unknown } | null)?.message ?? e),
+          cached: !!loadCachedCatalog(userId),
+        })
         setError(e)
       })
-      .finally(() => setLoading(false))
-  }, [userId])
+      .finally(() => {
+        if (!isCurrent()) return
+        inFlightRef.current = null
+        setLoading(false)
+      })
+    inFlightRef.current = { userId, promise }
+    return promise
+  }, [userId, authLoading])
 
   useLayoutEffect(() => {
-    setCatalog(loadCachedCatalog(userId))
-    if (userId) reload()
-    else setLoading(false)
-  }, [userId, reload])
+    const cached = loadCachedCatalog(userId)
+    setCatalog(cached)
+    setError(null)
+    retryCountRef.current = 0
+    setLoading(authLoading || (!!userId && !cached))
+    if (!authLoading && userId) void reload()
+    return () => {
+      // 旧账号请求的成功、失败和 finally 都不能改变新账号的状态。
+      requestIdRef.current += 1
+      inFlightRef.current = null
+    }
+  }, [userId, authLoading, reload])
+
+  useEffect(() => {
+    if (!error || authLoading || !userId || retryCountRef.current >= 2) return
+    const delay = [1000, 3000][retryCountRef.current++]
+    const timer = setTimeout(() => { void reload() }, delay)
+    return () => clearTimeout(timer)
+  }, [error, authLoading, userId, reload])
+
+  useEffect(() => {
+    const recover = () => {
+      retryCountRef.current = 0
+      void reload()
+    }
+    window.addEventListener('online', recover)
+    let handle: { remove: () => void } | undefined
+    let cancelled = false
+    void App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) recover()
+    }).then((listener) => {
+      if (cancelled) listener.remove()
+      else handle = listener
+    })
+    return () => {
+      cancelled = true
+      handle?.remove()
+      window.removeEventListener('online', recover)
+    }
+  }, [reload])
 
   return <CatalogContext.Provider value={{ catalog, loading, error, reload }}>{children}</CatalogContext.Provider>
 }
