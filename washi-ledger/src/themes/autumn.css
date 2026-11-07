@@ -49,7 +49,7 @@
 }
 [data-theme='autumn'] .app-shell {
   isolation: isolate;
-  background: linear-gradient(#faf6eeb3,#faf6eeb3), url('../assets/themes/autumn/paper.webp') center / 512px;
+  background: linear-gradient(#faf6ee66,#faf6ee66), url('../assets/themes/autumn/paper.webp') center / 512px;
   background-color: #faf6ee;
 }
 [data-theme='autumn'] .app-shell::before,
@@ -58,17 +58,30 @@
   background-repeat: no-repeat; background-size: contain;
 }
 [data-theme='autumn'] .app-shell::before {
-  width: 190px; height: 190px; right: -18px;
-  top: env(safe-area-inset-top, 0px); opacity: .44;
+  width: clamp(260px,74vw,330px); height: clamp(260px,74vw,330px); right: -32px;
+  /* Only interactive header content is inset; decoration reaches the screen edge. */
+  top: -18px; opacity: .68;
   background-image: url('../assets/themes/autumn/foliage.webp');
 }
 [data-theme='autumn'] .app-shell::after {
-  width: 125px; height: 150px; left: -25px; bottom: 0; opacity: .5;
+  width: 210px; height: 235px; left: -62px; bottom: 26px; opacity: .62;
   background-image: url('../assets/themes/autumn/corner.webp');
 }
 [data-theme='autumn'] .paper-grid-bg { background-image: none; }
 [data-theme='autumn'] .app-shell header { background-color: transparent; border-bottom-color: transparent; }
-[data-theme='autumn'] .app-shell:has(input)::before { width: 145px; height: 145px; opacity: .32; }
+[data-theme='autumn'] .autumn-scattered-leaves {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+}
+[data-theme='autumn'] .autumn-scattered-leaf {
+  position: absolute; width: var(--leaf-size); height: var(--leaf-size);
+  background: url('../assets/themes/autumn/leaf.webp') center / contain no-repeat;
+  transform: rotate(var(--leaf-angle)); opacity: var(--leaf-alpha);
+}
+[data-theme='autumn'] .autumn-scattered-leaf:nth-child(1) { left: -8px; top: 31%; --leaf-size: 48px; --leaf-angle: -27deg; --leaf-alpha: .46; }
+[data-theme='autumn'] .autumn-scattered-leaf:nth-child(2) { right: -10px; top: 47%; --leaf-size: 66px; --leaf-angle: 26deg; --leaf-alpha: .43; }
+[data-theme='autumn'] .autumn-scattered-leaf:nth-child(3) { left: 25%; top: 68%; --leaf-size: 46px; --leaf-angle: 67deg; --leaf-alpha: .35; }
+[data-theme='autumn'] .autumn-scattered-leaf:nth-child(4) { right: 14px; bottom: 8%; --leaf-size: 38px; --leaf-angle: -10deg; --leaf-alpha: .42; }
+[data-theme='autumn'] .autumn-scattered-leaf:nth-child(5) { left: -4px; top: 18%; --leaf-size: 29px; --leaf-angle: 42deg; --leaf-alpha: .38; }
 [data-theme='autumn'] [data-app-header] a[href='/account'] {
   position: relative; border: 1px solid #dfac6b88; background: #fffaf3cc;
   margin-right: 0;
@@ -79,8 +92,15 @@
 }
 [data-theme='autumn'] .papercut-text-shadow { text-shadow: none; }
 [data-theme='autumn'] :is(.ledger-card,.entry-card,.rate-card) {
-  background: #fffffff2; border: 1px solid #dcb38c70; border-radius: 20px;
+  border: 1px solid #dcb38c70; border-radius: 20px;
   box-shadow: 0 4px 9px #74401d13;
+}
+/* Include graph panels as well as ledger cards; keep text fully opaque. */
+[data-theme='autumn'] :is(.ledger-card,.entry-card,.rate-card,.autumn-summary-tile,.autumn-recent-empty,main section.bg-surface-container-lowest) {
+  background: color-mix(in srgb,var(--color-surface-container-lowest) 55%,transparent) !important;
+}
+[data-theme='autumn'] [data-date-range-bar] {
+  background: color-mix(in srgb,var(--color-surface-container-low) 65%,transparent);
 }
 [data-theme='autumn'] .autumn-balance { border-color: #d8543f88; overflow: hidden; }
 [data-theme='autumn'] .autumn-balance::after {
@@ -98,7 +118,7 @@
   transform: rotate(180deg); opacity: .32; z-index: -1; pointer-events: none;
 }
 [data-theme='autumn'] .autumn-bottom-nav {
-  background: #fffaf3ed; border: 1px solid #d9985b70;
+  background: #fffaf3cc; border: 1px solid #d9985b70;
   box-shadow: 0 4px 14px #925b2b24, inset 0 1px #ffffff;
 }
 [data-theme='autumn'] .tab-bubble { background: #f5d6ba55; border-color: #db936466; }

@@ -1,0 +1,33 @@
+/* Preview-only overrides. Not imported by the application. */
+[data-theme='autumn'] .app-shell {
+  background-image: linear-gradient(#faf6ee66,#faf6ee66),var(--preview-paper);
+}
+[data-theme='autumn'] .app-shell::before,
+[data-theme='autumn'] .app-shell:has(input)::before {
+  width: clamp(260px,74vw,330px); height: clamp(260px,74vw,330px);
+  top: -18px; right: -32px; opacity: .68;
+}
+[data-theme='autumn'] .app-shell::after {
+  width: 210px; height: 235px; left: -62px; bottom: 26px; opacity: .62;
+}
+[data-theme='autumn'] .preview-autumn-leaves {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+}
+[data-theme='autumn'] .preview-autumn-leaf {
+  position: absolute; width: var(--leaf-size); height: var(--leaf-size);
+  background: var(--preview-leaf) center / contain no-repeat;
+  transform: rotate(var(--leaf-angle)); opacity: var(--leaf-alpha);
+}
+[data-theme='autumn'] .preview-autumn-leaf:nth-child(1) { left: -8px; top: 31%; --leaf-size: 48px; --leaf-angle: -27deg; --leaf-alpha: .46; }
+[data-theme='autumn'] .preview-autumn-leaf:nth-child(2) { right: -10px; top: 47%; --leaf-size: 66px; --leaf-angle: 26deg; --leaf-alpha: .43; }
+[data-theme='autumn'] .preview-autumn-leaf:nth-child(3) { left: 25%; top: 68%; --leaf-size: 46px; --leaf-angle: 67deg; --leaf-alpha: .35; }
+[data-theme='autumn'] .preview-autumn-leaf:nth-child(4) { right: 14px; bottom: 8%; --leaf-size: 38px; --leaf-angle: -10deg; --leaf-alpha: .42; }
+[data-theme='autumn'] .preview-autumn-leaf:nth-child(5) { left: -4px; top: 18%; --leaf-size: 29px; --leaf-angle: 42deg; --leaf-alpha: .38; }
+[data-theme='autumn'] [data-preview-autumn-card] {
+  background: color-mix(in srgb,var(--color-surface-container-lowest) 55%,transparent) !important;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+[data-theme='autumn'] [data-preview-date-surface] {
+  background: color-mix(in srgb,var(--color-surface-container-low) 65%,transparent) !important;
+}
+[data-theme='autumn'] .autumn-bottom-nav { background: #fffaf3cc; }

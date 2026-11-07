@@ -3,6 +3,7 @@ import { useAppNavigate } from '../../hooks/useAppNavigate'
 import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { RouteFade } from '../../design-system/components/RouteFade'
+import { AutumnLeaves } from '../../design-system/components/AutumnLeaves'
 import type { ThemeSkin } from '../../types'
 
 /** 主题选择——独立整屏子页面，照design-assets-v2/_25的Bento卡片布局做。_25设计稿画了
@@ -52,6 +53,7 @@ export function ThemePage() {
           否则真机上能看出两段拼接的接缝(参照AppLayout.tsx同一个修复)
           B-XX：路由切换入场渐显(见AppLayout.tsx的RouteFade说明)——这页是独立整屏
           子页面不走AppLayout，之前一直没有这个效果，切进/退出这页都是硬切 */}
+      <AutumnLeaves />
       <RouteFade className="flex flex-col flex-1 min-h-0">
       <div
         style={

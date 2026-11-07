@@ -1,0 +1,121 @@
+{
+  "mode": "Production bundle rendered in isolated browser, preview CSS injected only. All external requests blocked. Synthetic local entries only. 59px safe area and status bar simulated; not a native iPhone screenshot.",
+  "rows": [
+    {
+      "width": 320,
+      "before": {
+        "width": "145px",
+        "top": "59px",
+        "opacity": "0.32",
+        "cards": [
+          "rgba(255, 255, 255, 0.95)",
+          "rgb(255, 255, 255)",
+          "rgba(0, 0, 0, 0)"
+        ]
+      },
+      "after": {
+        "width": "260px",
+        "top": "-18px",
+        "opacity": "0.68",
+        "overflow": false,
+        "leafCount": 5,
+        "cards": [
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)"
+        ],
+        "header": 59
+      }
+    },
+    {
+      "width": 390,
+      "before": {
+        "width": "145px",
+        "top": "59px",
+        "opacity": "0.32",
+        "cards": [
+          "rgba(255, 255, 255, 0.95)",
+          "rgb(255, 255, 255)",
+          "rgba(0, 0, 0, 0)"
+        ]
+      },
+      "after": {
+        "width": "288.594px",
+        "top": "-18px",
+        "opacity": "0.68",
+        "overflow": false,
+        "leafCount": 5,
+        "cards": [
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)"
+        ],
+        "header": 59
+      }
+    },
+    {
+      "width": 430,
+      "before": {
+        "width": "145px",
+        "top": "59px",
+        "opacity": "0.32",
+        "cards": [
+          "rgba(255, 255, 255, 0.95)",
+          "rgb(255, 255, 255)",
+          "rgba(0, 0, 0, 0)"
+        ]
+      },
+      "after": {
+        "width": "318.188px",
+        "top": "-18px",
+        "opacity": "0.68",
+        "overflow": false,
+        "leafCount": 5,
+        "cards": [
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)"
+        ],
+        "header": 59
+      }
+    },
+    {
+      "width": 768,
+      "before": {
+        "width": "145px",
+        "top": "59px",
+        "opacity": "0.32",
+        "cards": [
+          "rgba(255, 255, 255, 0.95)",
+          "rgb(255, 255, 255)",
+          "rgba(0, 0, 0, 0)"
+        ]
+      },
+      "after": {
+        "width": "330px",
+        "top": "-18px",
+        "opacity": "0.68",
+        "overflow": false,
+        "leafCount": 5,
+        "cards": [
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)",
+          "color(srgb 1 1 1 / 0.55)"
+        ],
+        "header": 59
+      }
+    }
+  ]
+}

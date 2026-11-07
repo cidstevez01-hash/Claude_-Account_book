@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { RouteFade } from '../../design-system/components/RouteFade'
+import { AutumnLeaves } from '../../design-system/components/AutumnLeaves'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { ConfirmDialog } from '../../design-system/components/ConfirmDialog'
 import { CategoryPicker } from '../add-entry/CategoryPicker'
@@ -156,6 +157,7 @@ export function RecurringRuleFormPage() {
       className="app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
+      <AutumnLeaves />
       <RouteFade className="flex flex-col flex-1 min-h-0">
         <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
           <button

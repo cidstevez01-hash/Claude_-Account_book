@@ -1,0 +1,698 @@
+{
+  "mode": "Production CSS and components; no layout injection except simulated 59px OS safe inset. All external requests blocked. Synthetic local records only; no native-device validation.",
+  "rows": [
+    {
+      "width": "260px",
+      "route": "/",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/history",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/stats",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/add",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/rate",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/settings",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/theme",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/signin",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "260px",
+      "route": "/register",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "260px",
+      "route": "/settings/recurring-rules/form",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "260px",
+      "route": "/calendar",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/history",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/stats",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/add",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/rate",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/settings",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/theme",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/signin",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "288.594px",
+      "route": "/register",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "288.594px",
+      "route": "/settings/recurring-rules/form",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "288.594px",
+      "route": "/calendar",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "existingTheme": "default",
+      "theme": "default",
+      "leaves": 0,
+      "branch": "none",
+      "primary": "#d1665a"
+    },
+    {
+      "existingTheme": "nostalgia",
+      "theme": "nostalgia",
+      "leaves": 0,
+      "branch": "none",
+      "primary": "#ff9459"
+    },
+    {
+      "existingTheme": "summer",
+      "theme": "summer",
+      "leaves": 0,
+      "branch": "none",
+      "primary": "#e85d4a"
+    },
+    {
+      "width": "318.188px",
+      "route": "/",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/history",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/stats",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/add",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/rate",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/settings",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/theme",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/signin",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "318.188px",
+      "route": "/register",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "318.188px",
+      "route": "/settings/recurring-rules/form",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "318.188px",
+      "route": "/calendar",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/history",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [
+        "color(srgb 1 0.984314 0.960784 / 0.65)"
+      ],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/stats",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/add",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/rate",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/settings",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/theme",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/signin",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "330px",
+      "route": "/register",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": []
+    },
+    {
+      "width": "330px",
+      "route": "/settings/recurring-rules/form",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [],
+      "date": [],
+      "header": 59
+    },
+    {
+      "width": "330px",
+      "route": "/calendar",
+      "shell": true,
+      "theme": "autumn",
+      "top": "-18px",
+      "leafCount": 5,
+      "leafPointer": "none",
+      "overflow": false,
+      "cards": [
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)",
+        "color(srgb 1 1 1 / 0.55)"
+      ],
+      "date": [],
+      "header": 59
+    }
+  ]
+}

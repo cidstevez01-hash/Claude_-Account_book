@@ -1,6 +1,16 @@
 {
   "adoptedDesign": "design-assets/themes/pigbang-autumn-maple/history/20261107-05/pigbang-tanfu-home-high.png",
   "runtimePath": "washi-ledger/src/assets/themes/autumn",
+  "adoptedLayoutReview": "design-assets/themes/pigbang-autumn-maple/history/20261107-07/",
+  "layout": {
+    "foliageWidth": "clamp(260px,74vw,330px)",
+    "foliageTop": "-18px",
+    "scatteredLeaves": 5,
+    "cardOpacity": 0.55,
+    "dateBarOpacity": 0.65,
+    "navigationOpacity": 0.8,
+    "interactiveSafeArea": "unchanged"
+  },
   "assets": [
     {
       "file": "paper.webp",

@@ -2,6 +2,7 @@ import { useState, type CSSProperties, type ReactNode, type RefObject } from 're
 import { Link } from 'react-router-dom'
 import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { BottomNav } from './BottomNav'
+import { AutumnLeaves } from './AutumnLeaves'
 import { NavDrawer } from './NavDrawer'
 import { RateShortcutFab } from './RateShortcutFab'
 import { RouteFade } from './RouteFade'
@@ -99,6 +100,7 @@ export function AppLayout({
         isSummer ? 'bg-transparent' : 'bg-surface'
       }`}
     >
+      <AutumnLeaves />
       {/* B-08：paper-grid-bg之前贴在这个根容器上，顶部安全区(header上方那一小条，
           没有header遮住)会透出方格纹理，跟正下方header的纯色bg-surface不一致，看起来
           像缺了一块。改成只贴在真正的内容滚动区(main)上，根容器/header都保持纯色，

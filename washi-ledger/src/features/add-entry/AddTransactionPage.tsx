@@ -8,6 +8,7 @@ import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
 import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { RouteFade } from '../../design-system/components/RouteFade'
+import { AutumnLeaves } from '../../design-system/components/AutumnLeaves'
 import { useAuth } from '../auth/useAuth'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
@@ -399,6 +400,7 @@ export function AddTransactionPage() {
       className="app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
+      <AutumnLeaves />
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
           上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致
           B-XX：路由切换入场渐显(见AppLayout.tsx的RouteFade说明)——这页是独立整屏

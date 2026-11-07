@@ -33,6 +33,7 @@ export function DateRangeBar({ startDate, endDate, onChange }: DateRangeBarProps
   return (
     <>
       <button
+        data-date-range-bar
         type="button"
         onClick={() => setOpen(true)}
         className="flex items-center w-full bg-surface-container-low rounded-lg p-3 border-[1.5px] border-dashed border-outline-variant"
