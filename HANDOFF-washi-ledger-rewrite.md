@@ -76,7 +76,7 @@ washi-ledger/
 
 ## 版本号/分支/CI
 
-- 版本号：main 的 PigBang 基础版本为`1.0.0`；测试版本写入`washi-ledger/package.json`，规则为`{origin/main版本}-{YYYYMMDD}-dev.{N}`。同一天每次推送 N 加 1，新一天从 1 开始；日期按日本时间。当前测试版为`1.0.0-20261107-dev.1`，记录见`VERSIONS.md`「PigBang 重写版」一节。
+- 版本号：main 的 PigBang 基础版本为`1.0.0`；测试版本写入`washi-ledger/package.json`，规则为`{origin/main版本}-{YYYYMMDD}-dev.{N}`。同一天每次推送 N 加 1，新一天从 1 开始；日期按日本时间。当前测试版为`1.0.0-20261107-dev.2`，记录见`VERSIONS.md`「PigBang 重写版」一节。该版本新增「红叶 · 丹枫金秋」独立主题，原Image2素材及设计历史保留在`design-assets/themes/pigbang-autumn-maple/`，运行图层来源见`final/manifest.json`。
 - 分支：main 保存基线，当前测试分支为`pigbang_20261031`；历史`washi-ledger-rewrite`分支名只作追溯。
 - CI：`.github/workflows/washi-ledger-ci.yml`(push/PR改到`washi-ledger/**`时自动typecheck+build)、`.github/workflows/washi-ledger-ios-test-build.yml`(workflow_dispatch，出未签名 IPA；用户明确要求时可由 Codex 触发)。完整测试版本用于 App 显示和 IPA 文件名，原生短版本取数字基础版本，构建号取 Actions 运行号。
 - 每次改动的详细记录见`DEVLOG.md`里`washi-ledger-rewrite`分支那几行（跟`accountbook-YYYYMMDD`那条主线分开记录，见`DEVLOG.md`顶部的说明）
