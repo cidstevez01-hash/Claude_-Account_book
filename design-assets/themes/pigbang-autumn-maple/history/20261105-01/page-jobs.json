@@ -1,0 +1,12 @@
+{
+  "id": "drawer",
+  "name": "抽屉菜单",
+  "layout": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261105-01\\drawer-layout.png",
+  "reference": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-02\\pigbang-lineart-two-petioles.png",
+  "prompt": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261105-01\\prompt.txt",
+  "output": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261105-01\\pigbang-maple-drawer-low.png",
+  "model": "gpt-image-2",
+  "quality": "low",
+  "size": "768x1664",
+  "status": "已生成，待确认"
+}

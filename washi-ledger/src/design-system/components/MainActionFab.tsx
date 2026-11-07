@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useLayoutEffect, useState } from 'react'
 import { useDraggableFab } from '../../hooks/useDraggableFab'
 import { useKeyboardInset } from '../../hooks/useKeyboardInset'
@@ -58,7 +59,7 @@ interface SubLayout {
 
 export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) {
   const { settings } = useSettings()
-  const isSummer = settings.themeSkin === 'summer'
+  const isSummer = settings.themeSkin === 'summer' || settings.themeSkin === 'autumn'
   const keyboardOpen = useKeyboardInset() > 0
   const [expanded, setExpanded] = useState(false)
   const [subLayout, setSubLayout] = useState<SubLayout | null>(null)
@@ -191,7 +192,7 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
               }}
               aria-hidden="true"
             />
-            <span className="material-symbols-outlined text-2xl relative">{action.icon}</span>
+            <ThemeIcon className="material-symbols-outlined text-2xl relative" icon={action.icon} />
           </button>
         ))}
 
@@ -201,7 +202,7 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
         aria-label={ariaLabel}
         onClick={handleClick}
         {...bind}
-        className="stamp-shadow fixed z-[55] flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-fab-icon active:scale-90"
+        className="autumn-main-fab stamp-shadow fixed z-[55] flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-fab-icon active:scale-90"
         style={{
           right: rightCss,
           bottom: bottomCss,
@@ -213,16 +214,14 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
           boxShadow: 'var(--shadow-main-fab, 0 4px 0 var(--color-primary-container))',
         }}
       >
-        <span
+        <ThemeIcon
           className="material-symbols-outlined text-3xl"
           style={{
             display: 'inline-block',
             transform: expanded ? 'rotate(45deg)' : undefined,
             transition: 'transform 0.2s ease',
           }}
-        >
-          {icon}
-        </span>
+         icon={icon} />
       </button>
     </>
   )

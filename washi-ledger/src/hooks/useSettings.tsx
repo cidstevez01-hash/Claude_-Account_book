@@ -9,6 +9,7 @@ interface SettingsContextValue {
   settings: UserSettings
   update: (patch: Partial<UserSettings>) => void
   userId: string | null
+  authLoading: boolean
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null)
@@ -85,7 +86,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     [user]
   )
 
-  return <SettingsContext.Provider value={{ settings, update, userId: user?.id ?? null }}>{children}</SettingsContext.Provider>
+  return <SettingsContext.Provider value={{ settings, update, userId: user?.id ?? null, authLoading }}>{children}</SettingsContext.Provider>
 }
 
 export function useSettings() {

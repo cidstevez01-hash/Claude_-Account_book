@@ -1,0 +1,1749 @@
+{
+  "scope": "washi-ledger/src 静态代码盘点；不查询云端，不含旧 index.html；不声称映射候选均在使用。",
+  "icons": [
+    {
+      "icon": "account_balance",
+      "label": "银行",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/rate/RatePage.tsx",
+          "line": 454,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 34,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "account_balance_wallet",
+      "label": "钱包",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/transactions/PaymentMethodIcon.tsx",
+          "line": 95,
+          "kind": "条件/动态字体图标"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 32,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "account_circle",
+      "label": "账户头像",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/account/AccountPage.tsx",
+          "line": 44,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "add",
+      "label": "添加",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/add-entry/TagPicker.tsx",
+          "line": 263,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/history/HistoryPage.tsx",
+          "line": 210,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/features/history/HistoryPage.tsx",
+          "line": 213,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/DashboardPage.tsx",
+          "line": 267,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/DashboardPage.tsx",
+          "line": 270,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/RecurringRulesPage.tsx",
+          "line": 45,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/StatsPage.tsx",
+          "line": 279,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/StatsPage.tsx",
+          "line": 282,
+          "kind": "统一注册表引用"
+        }
+      ]
+    },
+    {
+      "icon": "alarm",
+      "label": "闹钟",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 43,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "apartment",
+      "label": "楼房",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 37,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "arrow_back",
+      "label": "返回",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/AppLayout.tsx",
+          "line": 169,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/AddTransactionPage.tsx",
+          "line": 411,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/auth/SignUpPage.tsx",
+          "line": 117,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/RecurringRuleFormPage.tsx",
+          "line": 167,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/ThemePage.tsx",
+          "line": 77,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "arrow_downward",
+      "label": "支出方向",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/AppLayout.tsx",
+          "line": 262,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/BalanceCard.tsx",
+          "line": 42,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "arrow_upward",
+      "label": "收入方向",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/ledger/BalanceCard.tsx",
+          "line": 50,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "bar_chart",
+      "label": "统计",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/BottomNav.tsx",
+          "line": 23,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 40,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "book",
+      "label": "记账本",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/BottomNav.tsx",
+          "line": 230,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/design-system/components/BottomNav.tsx",
+          "line": 232,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "bug_report",
+      "label": "诊断日志",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 176,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "calendar_month",
+      "label": "日历",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/NavDrawer.tsx",
+          "line": 37,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/features/history/HistoryPage.tsx",
+          "line": 272,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "calendar_today",
+      "label": "日期选择",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/DateRangeBar.tsx",
+          "line": 40,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "category",
+      "label": "分类默认",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/ledger/EntryCard.tsx",
+          "line": 116,
+          "kind": "条件/动态字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryDetailSheet.tsx",
+          "line": 164,
+          "kind": "条件/动态字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/RecurringRulesPage.tsx",
+          "line": 76,
+          "kind": "条件/动态字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "celebration",
+      "label": "庆祝",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 26,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "check",
+      "label": "勾选",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/account/ChangeAvatarPage.tsx",
+          "line": 58,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/CategoryPicker.tsx",
+          "line": 240,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/CategoryPicker.tsx",
+          "line": 319,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/TagPicker.tsx",
+          "line": 159,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/TagPicker.tsx",
+          "line": 253,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/ThemePage.tsx",
+          "line": 118,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "checkroom",
+      "label": "服饰",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 15,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "chevron_left",
+      "label": "上一项",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/RangeCalendarPicker.tsx",
+          "line": 388,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/design-system/components/RangeCalendarPicker.tsx",
+          "line": 452,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/MonthNavBar.tsx",
+          "line": 26,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/TrendControls.tsx",
+          "line": 43,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "chevron_right",
+      "label": "下一项",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/RangeCalendarPicker.tsx",
+          "line": 394,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/design-system/components/RangeCalendarPicker.tsx",
+          "line": 462,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryCard.tsx",
+          "line": 259,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 160,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 167,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 177,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/MonthNavBar.tsx",
+          "line": 36,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/TrendControls.tsx",
+          "line": 53,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "close",
+      "label": "关闭",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/RangeCalendarPicker.tsx",
+          "line": 217,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx",
+          "line": 171,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/CategoryDetailSheet.tsx",
+          "line": 170,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryCard.tsx",
+          "line": 226,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryDetailSheet.tsx",
+          "line": 147,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/ReceiptPreviewSheet.tsx",
+          "line": 35,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/CategoryDetailSheet.tsx",
+          "line": 160,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/TrendLegend.tsx",
+          "line": 44,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "cloud_off",
+      "label": "云断连",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/CatalogLoadState.tsx",
+          "line": 26,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/design-system/components/CloudDisconnectBanner.tsx",
+          "line": 23,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "content_copy",
+      "label": "复制",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/ledger/EntryDetailSheet.tsx",
+          "line": 129,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 379,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "credit_card",
+      "label": "信用卡",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 38,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "currency_exchange",
+      "label": "汇率",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/NavDrawer.tsx",
+          "line": 36,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/design-system/components/RateShortcutFab.tsx",
+          "line": 102,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/design-system/components/RateShortcutFab.tsx",
+          "line": 104,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/history/HistoryPage.tsx",
+          "line": 214,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/DashboardPage.tsx",
+          "line": 271,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/stats/StatsPage.tsx",
+          "line": 283,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 41,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "delete",
+      "label": "删除",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/ConfirmDialog.tsx",
+          "line": 28,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/AddTransactionPage.tsx",
+          "line": 482,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/CategoryPicker.tsx",
+          "line": 290,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/TagPicker.tsx",
+          "line": 209,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryDetailSheet.tsx",
+          "line": 121,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/RecurringRuleFormPage.tsx",
+          "line": 412,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "delete_sweep",
+      "label": "批量清除",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 405,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "description",
+      "label": "文档",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 24,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "directions_bus",
+      "label": "公交",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 13,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "directions_car",
+      "label": "汽车",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 12,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "download",
+      "label": "下载",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 388,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "edit",
+      "label": "编辑",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/account/AccountPage.tsx",
+          "line": 87,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/CategoryPicker.tsx",
+          "line": 282,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/TagPicker.tsx",
+          "line": 201,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryDetailSheet.tsx",
+          "line": 137,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "error",
+      "label": "错误",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx",
+          "line": 188,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "event",
+      "label": "事件",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/calendar/CalendarPage.tsx",
+          "line": 354,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "event_busy",
+      "label": "无日程",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/calendar/CalendarPage.tsx",
+          "line": 448,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "event_repeat",
+      "label": "周期记账",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/RecurringRulesPage.tsx",
+          "line": 53,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 166,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "expand_more",
+      "label": "展开",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 261,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 92,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "filter_list",
+      "label": "筛选",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 279,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "grid_view",
+      "label": "仪表盘注册值（底栏实际为book）",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/BottomNav.tsx",
+          "line": 21,
+          "kind": "统一注册表引用"
+        }
+      ]
+    },
+    {
+      "icon": "help",
+      "label": "帮助",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 27,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "history",
+      "label": "明细/历史",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/BottomNav.tsx",
+          "line": 22,
+          "kind": "统一注册表引用"
+        }
+      ]
+    },
+    {
+      "icon": "home",
+      "label": "首页",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/AppLayout.tsx",
+          "line": 157,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 14,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "how_to_reg",
+      "label": "注册",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/add-entry/AddTransactionPage.tsx",
+          "line": 687,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/RecurringRuleFormPage.tsx",
+          "line": 423,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "image",
+      "label": "图片",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/account/ChangeAvatarPage.tsx",
+          "line": 78,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "info",
+      "label": "关于/提示",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/NavDrawer.tsx",
+          "line": 39,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx",
+          "line": 228,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "inventory_2",
+      "label": "物品",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 19,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "language",
+      "label": "语言",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 125,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "lightbulb",
+      "label": "灯泡",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 21,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "lock",
+      "label": "密码锁",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/auth/SignInPage.tsx",
+          "line": 76,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "logout",
+      "label": "退出登录",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/account/AccountPage.tsx",
+          "line": 99,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/account/AccountPage.tsx",
+          "line": 110,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "mail",
+      "label": "邮件",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/auth/SignInPage.tsx",
+          "line": 62,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 25,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "medical_services",
+      "label": "医疗",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 20,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "menu",
+      "label": "菜单",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/AppLayout.tsx",
+          "line": 148,
+          "kind": "统一注册表引用"
+        }
+      ]
+    },
+    {
+      "icon": "menu_book",
+      "label": "翻开书本",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/NavDrawer.tsx",
+          "line": 103,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/auth/SignInPage.tsx",
+          "line": 49,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 36,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "notes",
+      "label": "空记录",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 412,
+          "kind": "条件/动态字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "open_in_new",
+      "label": "外部打开",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/ledger/ReceiptPreviewSheet.tsx",
+          "line": 73,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "paid",
+      "label": "硬币",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 39,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "palette",
+      "label": "主题",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 147,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "payments",
+      "label": "现金/货币",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/ledger/EntryCard.tsx",
+          "line": 116,
+          "kind": "条件/动态字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryDetailSheet.tsx",
+          "line": 164,
+          "kind": "条件/动态字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/rate/RatePage.tsx",
+          "line": 395,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/SettingsPage.tsx",
+          "line": 138,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "person",
+      "label": "账户",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/AppLayout.tsx",
+          "line": 213,
+          "kind": "统一注册表引用"
+        }
+      ]
+    },
+    {
+      "icon": "photo_camera",
+      "label": "拍照扫描",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/add-entry/AddTransactionPage.tsx",
+          "line": 492,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/AddTransactionPage.tsx",
+          "line": 502,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx",
+          "line": 223,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "picture_as_pdf",
+      "label": "PDF",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx",
+          "line": 252,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "progress_activity",
+      "label": "加载",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/CatalogLoadState.tsx",
+          "line": 19,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "receipt_long",
+      "label": "账单/明细",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/history/HistoryEntryList.tsx",
+          "line": 69,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryCard.tsx",
+          "line": 203,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/EntryCard.tsx",
+          "line": 252,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/RecentEntriesList.tsx",
+          "line": 111,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 35,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "redeem",
+      "label": "礼物",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 16,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "refresh",
+      "label": "刷新",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 396,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "restart_alt",
+      "label": "重置",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/rate/RatePage.tsx",
+          "line": 416,
+          "kind": "图标属性/配置"
+        }
+      ]
+    },
+    {
+      "icon": "restaurant",
+      "label": "餐饮",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 11,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "school",
+      "label": "教育",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 22,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "search",
+      "label": "搜索",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/history/HistoryPage.tsx",
+          "line": 221,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/ledger/RecentEntriesList.tsx",
+          "line": 149,
+          "kind": "字体图标"
+        },
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 335,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "search_off",
+      "label": "无搜索结果",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 412,
+          "kind": "条件/动态字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "sell",
+      "label": "标签",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/ledger/DashboardPage.tsx",
+          "line": 244,
+          "kind": "图标属性/配置"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 30,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "sensors",
+      "label": "诊断开启",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 234,
+          "kind": "条件/动态字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "sensors_off",
+      "label": "诊断关闭",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 234,
+          "kind": "条件/动态字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "settings",
+      "label": "设置",
+      "group": "界面/操作",
+      "theme_svg": true,
+      "locations": [
+        {
+          "file": "washi-ledger/src/design-system/components/NavDrawer.tsx",
+          "line": 38,
+          "kind": "统一注册表引用"
+        },
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 42,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "settings_suggest",
+      "label": "规则设置",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+          "line": 255,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "shield",
+      "label": "保障",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 28,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "shopping_basket",
+      "label": "购物",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 18,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "sports_esports",
+      "label": "游戏",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 23,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "star",
+      "label": "星标",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 29,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "stars",
+      "label": "积分星星",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/add-entry/AddTransactionPage.tsx",
+          "line": 616,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "swap_vert",
+      "label": "交换方向",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/rate/RatePage.tsx",
+          "line": 437,
+          "kind": "字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "trending_up",
+      "label": "趋势",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 31,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "visibility",
+      "label": "显示密码",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/auth/SignInPage.tsx",
+          "line": 85,
+          "kind": "条件/动态字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "visibility_off",
+      "label": "隐藏密码",
+      "group": "界面/操作",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/features/auth/SignInPage.tsx",
+          "line": 85,
+          "kind": "条件/动态字体图标"
+        }
+      ]
+    },
+    {
+      "icon": "wifi",
+      "label": "网络",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 33,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    },
+    {
+      "icon": "work",
+      "label": "工作",
+      "group": "分类映射",
+      "theme_svg": false,
+      "locations": [
+        {
+          "file": "washi-ledger/src/lib/iconMap.ts",
+          "line": 17,
+          "kind": "分类映射候选（非当前云端使用证明）"
+        }
+      ]
+    }
+  ],
+  "registry": {
+    "dashboard": "grid_view",
+    "history": "history",
+    "stats": "bar_chart",
+    "addTransaction": "add",
+    "settings": "settings",
+    "rate": "currency_exchange",
+    "calendar": "calendar_month",
+    "account": "person",
+    "about": "info",
+    "menu": "menu"
+  },
+  "category_map": {
+    "bowl": "restaurant",
+    "car": "directions_car",
+    "bus": "directions_bus",
+    "house": "home",
+    "shirt": "checkroom",
+    "gift": "redeem",
+    "briefcase": "work",
+    "basket": "shopping_basket",
+    "box": "inventory_2",
+    "cross": "medical_services",
+    "bulb": "lightbulb",
+    "cap": "school",
+    "controller": "sports_esports",
+    "doc": "description",
+    "envelope": "mail",
+    "party": "celebration",
+    "question": "help",
+    "shield": "shield",
+    "star": "star",
+    "tag": "sell",
+    "trend": "trending_up",
+    "wallet": "account_balance_wallet",
+    "wifi": "wifi",
+    "bank": "account_balance",
+    "bill": "receipt_long",
+    "book": "menu_book",
+    "building": "apartment",
+    "card": "credit_card",
+    "coin": "paid",
+    "chart": "bar_chart",
+    "exchange": "currency_exchange",
+    "gear": "settings",
+    "alarm": "alarm"
+  },
+  "dynamic_expressions": [
+    {
+      "file": "washi-ledger/src/design-system/components/ConfirmDialog.tsx",
+      "line": 49,
+      "expression": "{icon}"
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/MainActionFab.tsx",
+      "line": 194,
+      "expression": "{action.icon}"
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/MainActionFab.tsx",
+      "line": 216,
+      "expression": "{icon}"
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/ThemeIcon.tsx",
+      "line": 55,
+      "expression": "{icon}"
+    },
+    {
+      "file": "washi-ledger/src/features/add-entry/CategoryPicker.tsx",
+      "line": 188,
+      "expression": "{cat.icon}"
+    },
+    {
+      "file": "washi-ledger/src/features/auth/SignInPage.tsx",
+      "line": 85,
+      "expression": "{showPassword ? 'visibility_off' : 'visibility'}"
+    },
+    {
+      "file": "washi-ledger/src/features/ledger/CategoryDetailSheet.tsx",
+      "line": 164,
+      "expression": "{snap.header.icon}"
+    },
+    {
+      "file": "washi-ledger/src/features/ledger/EntryCard.tsx",
+      "line": 116,
+      "expression": "{category?.icon || (isIncome ? 'payments' : 'category')}"
+    },
+    {
+      "file": "washi-ledger/src/features/ledger/EntryDetailSheet.tsx",
+      "line": 164,
+      "expression": "{category?.icon || (isIncome ? 'payments' : 'category')}"
+    },
+    {
+      "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+      "line": 234,
+      "expression": "{enabled ? 'sensors' : 'sensors_off'}"
+    },
+    {
+      "file": "washi-ledger/src/features/settings/DebugLogPage.tsx",
+      "line": 412,
+      "expression": "{entries.length === 0 ? 'notes' : 'search_off'}"
+    },
+    {
+      "file": "washi-ledger/src/features/settings/RecurringRulesPage.tsx",
+      "line": 76,
+      "expression": "{cat?.icon ?? 'category'}"
+    },
+    {
+      "file": "washi-ledger/src/features/stats/CategoryDetailSheet.tsx",
+      "line": 154,
+      "expression": "{snap.header.icon}"
+    },
+    {
+      "file": "washi-ledger/src/features/transactions/PaymentMethodIcon.tsx",
+      "line": 95,
+      "expression": "{genericIcon ?? 'account_balance_wallet'}"
+    }
+  ],
+  "inline_svg_sites": [
+    {
+      "file": "washi-ledger/src/design-system/components/AppIcon.tsx",
+      "line": 41
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/CashPointToggle.tsx",
+      "line": 108
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/DonutRing.tsx",
+      "line": 16
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/FireworksBackground.tsx",
+      "line": 512
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/TrendBarChart.tsx",
+      "line": 47
+    },
+    {
+      "file": "washi-ledger/src/features/ledger/BalanceCard.tsx",
+      "line": 30
+    },
+    {
+      "file": "washi-ledger/src/features/rate/RatePage.tsx",
+      "line": 557
+    },
+    {
+      "file": "washi-ledger/src/features/rate/RatePage.tsx",
+      "line": 573
+    },
+    {
+      "file": "washi-ledger/src/features/transactions/PaymentMethodIcon.tsx",
+      "line": 88
+    }
+  ],
+  "image_sites": [
+    {
+      "file": "washi-ledger/src/design-system/components/AppLayout.tsx",
+      "line": 208
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/CashPointToggle.tsx",
+      "line": 112
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/NavDrawer.tsx",
+      "line": 98
+    },
+    {
+      "file": "washi-ledger/src/design-system/components/ThemeIcon.tsx",
+      "line": 52
+    },
+    {
+      "file": "washi-ledger/src/features/about/AboutPage.tsx",
+      "line": 17
+    },
+    {
+      "file": "washi-ledger/src/features/account/AccountPage.tsx",
+      "line": 79
+    },
+    {
+      "file": "washi-ledger/src/features/account/ChangeAvatarPage.tsx",
+      "line": 31
+    },
+    {
+      "file": "washi-ledger/src/features/account/ChangeAvatarPage.tsx",
+      "line": 54
+    },
+    {
+      "file": "washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx",
+      "line": 216
+    },
+    {
+      "file": "washi-ledger/src/features/transactions/PaymentMethodIcon.tsx",
+      "line": 77
+    }
+  ],
+  "brands": [
+    "Amazon",
+    "Rakuten",
+    "Merpay",
+    "Paidy",
+    "Suica",
+    "PayPay"
+  ],
+  "special_assets": [
+    "src/assets/icons/point-coin.png",
+    "CashPointToggle 内联现金 SVG",
+    "PaymentMethodIcon 三个多色现金/信用卡/银行 SVG"
+  ],
+  "notes": [
+    "引用点数量不是按钮实例数：配置、展示图标、复用组件均单独记录。",
+    "ThemeIcon 只有显式 effect 且存在 ICON_GLYPHS 时使用夏主题 SVG；裸 span 不会自动切换新图形。",
+    "SVG 扫描包含图表，img 扫描包含头像、收据；已单独列为需人工审查，不能全部视为按钮。",
+    "当前分类/细分类由数据库动态决定；清单为代码支持范围，未读取真实云端目录。"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "source": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261103-06\\pigbang-lineart-two-leaves-final.png",
+  "method": "reflection of existing lower-right lobe onto lower-left; upper half-plane excluded",
+  "regions": [
+    {
+      "name": "watermark",
+      "left": 742,
+      "top": 487,
+      "width": 86,
+      "height": 41,
+      "axis": [
+        826,
+        498,
+        835,
+        393
+      ],
+      "maxSourceY": 528
+    },
+    {
+      "name": "bottom-left",
+      "left": 0,
+      "top": 1380,
+      "width": 51,
+      "height": 54,
+      "axis": [
+        49,
+        1393,
+        65,
+        1323
+      ],
+      "maxSourceY": 1439
+    }
+  ],
+  "changedPixels": 3562,
+  "outsideChanges": 0,
+  "newApiCalls": 0
+}

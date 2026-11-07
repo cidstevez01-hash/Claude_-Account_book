@@ -1,0 +1,39 @@
+{
+  "source": "20261103-05",
+  "method": "pixel reflection about each leaf main vein; bilinear resampling",
+  "apiCandidateQuality": "low",
+  "regions": [
+    {
+      "left": 744,
+      "top": 416,
+      "width": 84,
+      "height": 83,
+      "axis": [
+        826,
+        498,
+        835,
+        393
+      ],
+      "side": -1,
+      "minDistance": 18,
+      "maxSourceX": 920
+    },
+    {
+      "left": 49,
+      "top": 1330,
+      "width": 80,
+      "height": 64,
+      "axis": [
+        49,
+        1393,
+        65,
+        1323
+      ],
+      "side": 1,
+      "minDistance": 18,
+      "minSourceX": 0
+    }
+  ],
+  "changedPixels": 8318,
+  "outsideDifferences": 0
+}

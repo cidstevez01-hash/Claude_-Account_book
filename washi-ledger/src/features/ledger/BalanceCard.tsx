@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useI18n } from '../../lib/i18n'
 import type { MonthSummary } from '../../data/summary'
 import { formatCurrency, symbolFor } from '../../data/currencyDisplay'
@@ -10,7 +11,7 @@ interface BalanceCardProps {
 export function BalanceCard({ summary, currency }: BalanceCardProps) {
   const { t } = useI18n()
   return (
-    <section className="ledger-card relative bg-surface-container-lowest rounded-xl p-md mx-md mt-sm mb-lg">
+    <section className="autumn-balance ledger-card relative bg-surface-container-lowest rounded-xl p-md mx-md mt-sm mb-lg">
       {/* B-33：和纸胶带装饰角——换成真实斜纹纹理(.washi-tape-texture，见index.css)，
           不再是纯色块；尺寸放大到w-11 h-5更接近旧App56x20的观感比例，位置(-top-1.5
           right-5)/旋转角度(4deg)保持不动 */}
@@ -39,7 +40,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
       <div className="flex items-center justify-between border-t-[1.5px] border-dashed border-outline-variant pt-sm">
         <div className="flex-1 text-center">
           <p className="font-sans text-label-caps text-secondary mb-1 flex items-center justify-center gap-1">
-            <span className="material-symbols-outlined text-sm">arrow_downward</span>
+            <ThemeIcon className="material-symbols-outlined text-sm" icon="arrow_downward" />
             {t('rangeIncome')}
           </p>
           <p className="font-serif text-stat-figure font-semibold text-income">{formatCurrency(summary.income, currency)}</p>
@@ -47,7 +48,7 @@ export function BalanceCard({ summary, currency }: BalanceCardProps) {
         <div className="w-[1.5px] h-10 bg-outline-variant" />
         <div className="flex-1 text-center">
           <p className="font-sans text-label-caps text-primary mb-1 flex items-center justify-center gap-1">
-            <span className="material-symbols-outlined text-sm">arrow_upward</span>
+            <ThemeIcon className="material-symbols-outlined text-sm" icon="arrow_upward" />
             {t('rangeExpense')}
           </p>
           <p className="font-serif text-stat-figure font-semibold text-expense">{formatCurrency(summary.expense, currency)}</p>

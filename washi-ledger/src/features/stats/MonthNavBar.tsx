@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useI18n } from '../../lib/i18n'
 
 interface MonthNavBarProps {
@@ -23,7 +24,7 @@ export function MonthNavBar({ monthLabel, onPrevMonth, onNextMonth, disablePrev,
         disabled={disablePrev}
         className="text-on-surface-variant disabled:opacity-30"
       >
-        <span className="material-symbols-outlined">chevron_left</span>
+        <ThemeIcon className="material-symbols-outlined" icon="chevron_left" />
       </button>
       <span className="font-serif text-body-lg text-on-surface">{monthLabel}</span>
       <button
@@ -33,7 +34,7 @@ export function MonthNavBar({ monthLabel, onPrevMonth, onNextMonth, disablePrev,
         disabled={disableNext}
         className="text-on-surface-variant disabled:opacity-30"
       >
-        <span className="material-symbols-outlined">chevron_right</span>
+        <ThemeIcon className="material-symbols-outlined" icon="chevron_right" />
       </button>
     </div>
   )

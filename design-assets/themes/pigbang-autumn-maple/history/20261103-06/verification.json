@@ -1,0 +1,31 @@
+{
+  "model": "gpt-image-2",
+  "quality": "low",
+  "regions": [
+    {
+      "left": 744,
+      "top": 431,
+      "width": 75,
+      "height": 69
+    },
+    {
+      "left": 839,
+      "top": 422,
+      "width": 81,
+      "height": 78
+    },
+    {
+      "left": 0,
+      "top": 1330,
+      "width": 44,
+      "height": 65
+    },
+    {
+      "left": 57,
+      "top": 1330,
+      "width": 50,
+      "height": 65
+    }
+  ],
+  "outsideDifferences": 0
+}

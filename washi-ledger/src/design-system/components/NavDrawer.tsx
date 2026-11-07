@@ -47,7 +47,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
   // 显示(loading期间user还是null，没有邮箱可显示)，保持原样只看真实signedIn
   const showAvatar = signedIn || (loading && hasEverSignedIn())
   const { settings } = useSettings()
-  const isSummer = settings.themeSkin === 'summer'
+  const isSummer = settings.themeSkin === 'summer' || settings.themeSkin === 'autumn'
   const { t } = useI18n()
   const location = useLocation()
   const navigate = useAppNavigate()
@@ -81,7 +81,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
         onClick={onClose}
       />
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-[78%] max-w-[320px] bg-surface
+        className={`autumn-drawer fixed top-0 left-0 bottom-0 z-50 w-[78%] max-w-[320px] bg-surface
                     border-r-[1.5px] border-dashed border-outline-variant shadow-xl
                     flex flex-col overflow-y-auto overflow-x-hidden transition-transform duration-300 ease-out
                     ${open ? 'translate-x-0' : '-translate-x-full'}`}
@@ -92,7 +92,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
             // 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态。
             // B-XX：光晕贴着照片外沿，同AppLayout头部头像的处理，不能放进
             // overflow-hidden的圆形照片容器内部
-            <div className="relative shrink-0 w-11 h-11">
+            <div className="relative shrink-0 w-11 h-11" style={{ '--icon-size': '44px' } as import('react').CSSProperties}>
               {isSummer && <span className="icon-ring-glow" aria-hidden="true" />}
               <div className="relative z-[1] w-11 h-11 rounded-full overflow-hidden">
                 <img src={avatar.src} alt="" className="w-full h-full object-cover" />
@@ -100,7 +100,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
             </div>
           ) : (
             <div className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-2xl text-primary">menu_book</span>
+              <ThemeIcon className="material-symbols-outlined text-2xl text-primary" icon="menu_book" />
             </div>
           )}
           <div className="min-w-0">

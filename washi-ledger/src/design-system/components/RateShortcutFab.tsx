@@ -29,7 +29,7 @@ const DEFAULT_BOTTOM_CSS = 'calc(6rem + 102px)'
 export function RateShortcutFab() {
   const { t } = useI18n()
   const { settings } = useSettings()
-  const isSummer = settings.themeSkin === 'summer'
+  const isSummer = settings.themeSkin === 'summer' || settings.themeSkin === 'autumn'
   const navigate = useAppNavigate()
   const keyboardOpen = useKeyboardInset() > 0
 

@@ -1,0 +1,11 @@
+{
+  "individual_images": 121,
+  "missing": 0,
+  "wrong_sizes": 0,
+  "blank_icons": 0,
+  "transparent_icons": 90,
+  "new_image_api_calls": 0,
+  "production_method": "已确认参考稿拆分、现有图标造型重配色、按代码结构绘制页面样式预览",
+  "integration": "未接入App",
+  "page_format": "16路由+7弹层+2内嵌选择器，共25张"
+}

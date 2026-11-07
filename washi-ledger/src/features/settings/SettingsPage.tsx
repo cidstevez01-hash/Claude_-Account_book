@@ -89,7 +89,7 @@ function SelectRow({
           统一；select这个透明交互层继续用absolute inset-0盖住整块可点区域 */}
       <div className="relative flex items-center gap-1">
         <span className="text-body-md text-on-surface-variant">{selectedLabel}</span>
-        <span className="material-symbols-outlined text-[16px] pointer-events-none">expand_more</span>
+        <ThemeIcon className="material-symbols-outlined text-[16px] pointer-events-none" icon="expand_more" />
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -155,16 +155,18 @@ export function SettingsPage() {
                 ? t('themeNostalgiaName')
                 : settings.themeSkin === 'summer'
                   ? t('themeSummerName')
-                  : t('themeDefaultName')}
+                  : settings.themeSkin === 'autumn'
+                    ? t('themeAutumnName')
+                    : t('themeDefaultName')}
             </span>
-            <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            <ThemeIcon className="material-symbols-outlined text-[18px]" icon="chevron_right" />
           </div>
         </SettingsRow>
 
         {/* R-44：固定收支规则入口——旧App RECURRING_RULES/RECURRING_BIWEEKLY_RULES
             写死在代码里，这里改成前台可增删改查的独立页面 */}
         <SettingsRow icon="event_repeat" effect="ring" fireflies label={t('recurringRulesRowLabel')} onClick={() => navigate('/settings/recurring-rules')}>
-          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+          <ThemeIcon className="material-symbols-outlined text-[18px]" icon="chevron_right" />
         </SettingsRow>
 
         {/* R-32排查真机卡住问题新加——纯开发调试用途，不是普通用户需要的功能。
@@ -174,7 +176,7 @@ export function SettingsPage() {
             从字体里补提取了bug_report的形状数据(iconGlyphs.ts)后补上。B-75续：
             fireflies也补上了，见下面统一说明 */}
         <SettingsRow icon="bug_report" effect="ring" fireflies label={t('debugLogRowLabel')} onClick={() => navigate('/settings/debug-log')}>
-          <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+          <ThemeIcon className="material-symbols-outlined text-[18px]" icon="chevron_right" />
         </SettingsRow>
 
       </div>

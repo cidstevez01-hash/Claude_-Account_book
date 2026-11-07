@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDay } from '../../data/summary'
@@ -66,7 +67,7 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
   if (entries.length === 0) {
     return (
       <div className="text-center py-16 px-md text-on-surface-variant">
-        <span className="material-symbols-outlined text-4xl mb-2 block opacity-40">receipt_long</span>
+        <ThemeIcon className="material-symbols-outlined text-4xl mb-2 block opacity-40" icon="receipt_long" />
         <p className="text-body-md">{t('historyNoResults')}</p>
       </div>
     )

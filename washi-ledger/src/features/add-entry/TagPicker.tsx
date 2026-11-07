@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { buildNewTag, insertCustomTag, updateCustomTag, deleteCustomTag } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
@@ -156,7 +157,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
                 onClick={confirmEdit}
                 className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
               >
-                <span className="material-symbols-outlined text-[13px]">check</span>
+                <ThemeIcon className="material-symbols-outlined text-[13px]" icon="check" />
               </button>
             </span>
           )
@@ -198,7 +199,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
                     onClick={() => startEdit(tag.id, tagLabel(tag, lang))}
                     className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-on-surface whitespace-nowrap w-full"
                   >
-                    <span className="material-symbols-outlined text-[14px]">edit</span>
+                    <ThemeIcon className="material-symbols-outlined text-[14px]" icon="edit" />
                     {t('editLabel')}
                   </button>
                   <button
@@ -206,7 +207,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
                     onClick={() => handleDelete(tag.id, tag.code)}
                     className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-primary whitespace-nowrap w-full"
                   >
-                    <span className="material-symbols-outlined text-[14px]">delete</span>
+                    <ThemeIcon className="material-symbols-outlined text-[14px]" icon="delete" />
                     {t('deleteLabel')}
                   </button>
                 </div>
@@ -250,7 +251,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
             onClick={confirmEdit}
             className="w-[22px] h-[22px] rounded-full border border-outline-variant bg-secondary text-on-secondary flex items-center justify-center shrink-0 active:scale-[0.88] active:opacity-70 transition-transform"
           >
-            <span className="material-symbols-outlined text-[13px]">check</span>
+            <ThemeIcon className="material-symbols-outlined text-[13px]" icon="check" />
           </button>
         </span>
       ) : (
@@ -260,7 +261,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
             onClick={startAdd}
             className="py-1.5 px-2.5 rounded-lg border border-dashed border-primary text-primary text-tab-label font-sans flex items-center gap-1"
           >
-            <span className="material-symbols-outlined text-[14px]">add</span>
+            <ThemeIcon className="material-symbols-outlined text-[14px]" icon="add" />
             {t('tagsLabel')}
           </button>
         )

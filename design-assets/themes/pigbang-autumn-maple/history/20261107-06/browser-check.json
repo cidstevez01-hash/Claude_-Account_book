@@ -1,0 +1,635 @@
+{
+  "data": "isolated empty test session; external services blocked; no real account or ledger data",
+  "rows": [
+    {
+      "width": 320,
+      "route": "/",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.357563018798828,
+          "right": 39.64243698120117,
+          "width": 23.284873962402344
+        },
+        {
+          "left": 257.80450439453125,
+          "right": 310.19549560546875,
+          "width": 52.3909912109375
+        },
+        {
+          "left": 68.87330627441406,
+          "right": 92.43919372558594,
+          "width": 23.565887451171875
+        }
+      ],
+      "shell": true,
+      "body": "PigBang\narrow_downward\ncalendar_today\n2026年11月1日\n~\n2026年11月30日\n\n累计结余\n\nJP¥\n0.00\n\narrow_downward\n累计收入\n\nJP¥0\n\narrow_upward\n累计支出\n\nJP¥0\n\n支出\n收入\n分类\n\n这个月还没有记录\n\nreceipt_long\n\n这本账还是空的\n\n点右下角记下第一笔吧\n\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 320,
+      "route": "/history",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.29109764099121,
+          "right": 39.708900451660156,
+          "width": 23.417802810668945
+        },
+        {
+          "left": 257.65496826171875,
+          "right": 310.34503173828125,
+          "width": 52.6900634765625
+        },
+        {
+          "left": 147.55860900878906,
+          "right": 172.44139099121094,
+          "width": 24.882781982421875
+        }
+      ],
+      "shell": true,
+      "body": "出入金\narrow_downward\nsearch\n全部\n支出\n收入\ncalendar_month\ncalendar_today\n2026年11月1日\n~\n2026年11月30日\nreceipt_long\n\n没有符合条件的记录\n\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 320,
+      "route": "/stats",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.299888610839844,
+          "right": 39.700111389160156,
+          "width": 23.400222778320312
+        },
+        {
+          "left": 257.67474365234375,
+          "right": 310.32525634765625,
+          "width": 52.6505126953125
+        },
+        {
+          "left": 226.72926330566406,
+          "right": 251.92698669433594,
+          "width": 25.197723388671875
+        }
+      ],
+      "shell": true,
+      "body": "统计\narrow_downward\n收支\n积分\nchevron_left\n2026年11月\nchevron_right\n\n本月收入\n\nJP¥0\n\n本月支出\n\nJP¥0\n\n收支趋势\n支出\n收入\n按日\n按月\nchevron_left\n2026年11月\nchevron_right\n0\n0\n1\n1\n1\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 320,
+      "route": "/add",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.2840576171875,
+          "right": 39.7159423828125,
+          "width": 23.431884765625
+        }
+      ],
+      "shell": true,
+      "body": "记一笔\n支出\n收入\nphoto_camera\n扫描小票\nJP¥\n分类\n细分\n支付方式\n日期\n标签\nadd\n标签\n获得积分\nstars\n备注\nhow_to_reg\n保存"
+    },
+    {
+      "width": 320,
+      "route": "/calendar",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.286455154418945,
+          "right": 39.71354675292969,
+          "width": 23.427091598510742
+        },
+        {
+          "left": 256.1345520019531,
+          "right": 299.0841979980469,
+          "width": 42.94964599609375
+        }
+      ],
+      "shell": true,
+      "body": "日历\narrow_downward\nchevron_left\n2026年11月\nchevron_right\n日\n一\n二\n三\n四\n五\n六\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n\n点击上方日历格子可切换查看当日明细\n\n今天\n0笔明细\n\n支出\n\nJP¥0\n\n收入\n\nJP¥0\n\n当日明细\n支出\n收入\nevent_busy\n\n这天还没有记录"
+    },
+    {
+      "width": 320,
+      "route": "/rate",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.331953048706055,
+          "right": 39.66804504394531,
+          "width": 23.336091995239258
+        },
+        {
+          "left": 262.24896240234375,
+          "right": 279.75103759765625,
+          "width": 17.5020751953125
+        }
+      ],
+      "shell": true,
+      "body": "汇率换算\narrow_downward\npayments\nJPY · 日元\nCNY · 人民币\nUSD · 美元\nEUR · 欧元\nGBP · 英镑\nHKD · 港币\nKRW · 韩元\nAUD · 澳元\nCAD · 加元\nSGD · 新加坡元\nTHB · 泰铢\nswap_vert\nJPY · 日元\nCNY · 人民币\nUSD · 美元\nEUR · 欧元\nGBP · 英镑\nHKD · 港币\nKRW · 韩元\nAUD · 澳元\nCAD · 加元\nSGD · 新加坡元\nTHB · 泰铢\naccount_balance\n尚未获取汇率\n\nFailed to fetch\n\nJPY/CNY 走势\n近1周\n近"
+    },
+    {
+      "width": 320,
+      "route": "/settings",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.288833618164062,
+          "right": 39.71116638183594,
+          "width": 23.422332763671875
+        },
+        {
+          "left": 20.673946380615234,
+          "right": 75.3260498046875,
+          "width": 54.652103424072266
+        },
+        {
+          "left": 20.673946380615234,
+          "right": 75.3260498046875,
+          "width": 54.652103424072266
+        },
+        {
+          "left": 20.673946380615234,
+          "right": 75.3260498046875,
+          "width": 54.652103424072266
+        },
+        {
+          "left": 20.673946380615234,
+          "right": 75.3260498046875,
+          "width": 54.652103424072266
+        },
+        {
+          "left": 20.673946380615234,
+          "right": 75.3260498046875,
+          "width": 54.652103424072266
+        }
+      ],
+      "shell": true,
+      "body": "设置\n语言\n中文\nexpand_more\n中文\n日本語\n货币\n日元 (JPY)\nexpand_more\n日元 (JPY)\n人民币 (CNY)\n美元 (USD)\n欧元 (EUR)\n英镑 (GBP)\n港币 (HKD)\n韩元 (KRW)\n澳元 (AUD)\n加元 (CAD)\n新加坡元 (SGD)\n泰铢 (THB)\n主题\nPigBang\nchevron_right\n固定收支\nchevron_right\n诊断日志\nchevron_right"
+    },
+    {
+      "width": 320,
+      "route": "/theme",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.28402328491211,
+          "right": 39.71597671508789,
+          "width": 23.43195343017578
+        }
+      ],
+      "shell": true,
+      "body": "主题\nPigBang\ncheck\n怀旧\ncheck\n夏 · 花火\ncheck\n红叶 · 丹枫金秋\ncheck"
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.313846588134766,
+          "right": 39.686153411865234,
+          "width": 23.37230682373047
+        },
+        {
+          "left": 327.7061462402344,
+          "right": 380.2938537597656,
+          "width": 52.58770751953125
+        },
+        {
+          "left": 82.17027282714844,
+          "right": 107.14222717285156,
+          "width": 24.971954345703125
+        }
+      ],
+      "shell": true,
+      "body": "PigBang\narrow_downward\ncalendar_today\n2026年11月1日\n~\n2026年11月30日\n\n累计结余\n\nJP¥\n0.00\n\narrow_downward\n累计收入\n\nJP¥0\n\narrow_upward\n累计支出\n\nJP¥0\n\n支出\n收入\n分类\n\n这个月还没有记录\n\nreceipt_long\n\n这本账还是空的\n\n点右下角记下第一笔吧\n\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 390,
+      "route": "/history",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.304046630859375,
+          "right": 39.695953369140625,
+          "width": 23.39190673828125
+        },
+        {
+          "left": 327.6841125488281,
+          "right": 380.3158874511719,
+          "width": 52.63177490234375
+        },
+        {
+          "left": 182.42196655273438,
+          "right": 207.57803344726562,
+          "width": 25.15606689453125
+        }
+      ],
+      "shell": true,
+      "body": "出入金\narrow_downward\nsearch\n全部\n支出\n收入\ncalendar_month\ncalendar_today\n2026年11月1日\n~\n2026年11月30日\nreceipt_long\n\n没有符合条件的记录\n\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 390,
+      "route": "/stats",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.281543731689453,
+          "right": 39.71845626831055,
+          "width": 23.436912536621094
+        },
+        {
+          "left": 327.63348388671875,
+          "right": 380.36651611328125,
+          "width": 52.7330322265625
+        },
+        {
+          "left": 283.1423034667969,
+          "right": 307.5139465332031,
+          "width": 24.37164306640625
+        }
+      ],
+      "shell": true,
+      "body": "统计\narrow_downward\n收支\n积分\nchevron_left\n2026年11月\nchevron_right\n\n本月收入\n\nJP¥0\n\n本月支出\n\nJP¥0\n\n收支趋势\n支出\n收入\n按日\n按月\nchevron_left\n2026年11月\nchevron_right\n0\n0\n1\n1\n1\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 390,
+      "route": "/add",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.28876495361328,
+          "right": 39.71123504638672,
+          "width": 23.422470092773438
+        }
+      ],
+      "shell": true,
+      "body": "记一笔\n支出\n收入\nphoto_camera\n扫描小票\nJP¥\n分类\n细分\n支付方式\n日期\n标签\nadd\n标签\n获得积分\nstars\n备注\nhow_to_reg\n保存"
+    },
+    {
+      "width": 390,
+      "route": "/calendar",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.286418914794922,
+          "right": 39.71358108520508,
+          "width": 23.427162170410156
+        },
+        {
+          "left": 326.13446044921875,
+          "right": 369.08428955078125,
+          "width": 42.9498291015625
+        }
+      ],
+      "shell": true,
+      "body": "日历\narrow_downward\nchevron_left\n2026年11月\nchevron_right\n日\n一\n二\n三\n四\n五\n六\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n\n点击上方日历格子可切换查看当日明细\n\n今天\n0笔明细\n\n支出\n\nJP¥0\n\n收入\n\nJP¥0\n\n当日明细\n支出\n收入\nevent_busy\n\n这天还没有记录"
+    },
+    {
+      "width": 390,
+      "route": "/rate",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.299928665161133,
+          "right": 39.7000732421875,
+          "width": 23.400144577026367
+        },
+        {
+          "left": 332.2249450683594,
+          "right": 349.7750549316406,
+          "width": 17.55010986328125
+        }
+      ],
+      "shell": true,
+      "body": "汇率换算\narrow_downward\npayments\nJPY · 日元\nCNY · 人民币\nUSD · 美元\nEUR · 欧元\nGBP · 英镑\nHKD · 港币\nKRW · 韩元\nAUD · 澳元\nCAD · 加元\nSGD · 新加坡元\nTHB · 泰铢\nswap_vert\nJPY · 日元\nCNY · 人民币\nUSD · 美元\nEUR · 欧元\nGBP · 英镑\nHKD · 港币\nKRW · 韩元\nAUD · 澳元\nCAD · 加元\nSGD · 新加坡元\nTHB · 泰铢\naccount_balance\n尚未获取汇率\n\nFailed to fetch\n\nJPY/CNY 走势\n近1周\n近"
+    },
+    {
+      "width": 390,
+      "route": "/settings",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.28399658203125,
+          "right": 39.71600341796875,
+          "width": 23.4320068359375
+        },
+        {
+          "left": 20.662660598754883,
+          "right": 75.33734321594238,
+          "width": 54.6746826171875
+        },
+        {
+          "left": 20.662660598754883,
+          "right": 75.33734321594238,
+          "width": 54.6746826171875
+        },
+        {
+          "left": 20.662660598754883,
+          "right": 75.33734321594238,
+          "width": 54.6746826171875
+        },
+        {
+          "left": 20.662660598754883,
+          "right": 75.33734321594238,
+          "width": 54.6746826171875
+        },
+        {
+          "left": 20.662660598754883,
+          "right": 75.33734321594238,
+          "width": 54.6746826171875
+        }
+      ],
+      "shell": true,
+      "body": "设置\n语言\n中文\nexpand_more\n中文\n日本語\n货币\n日元 (JPY)\nexpand_more\n日元 (JPY)\n人民币 (CNY)\n美元 (USD)\n欧元 (EUR)\n英镑 (GBP)\n港币 (HKD)\n韩元 (KRW)\n澳元 (AUD)\n加元 (CAD)\n新加坡元 (SGD)\n泰铢 (THB)\n主题\nPigBang\nchevron_right\n固定收支\nchevron_right\n诊断日志\nchevron_right"
+    },
+    {
+      "width": 390,
+      "route": "/theme",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 16.284055709838867,
+          "right": 39.7159423828125,
+          "width": 23.431886672973633
+        }
+      ],
+      "shell": true,
+      "body": "主题\nPigBang\ncheck\n怀旧\ncheck\n夏 · 花火\ncheck\n红叶 · 丹枫金秋\ncheck"
+    },
+    {
+      "test": "nostalgia reload",
+      "theme": "nostalgia"
+    },
+    {
+      "test": "reduced motion",
+      "animation": "none"
+    },
+    {
+      "test": "existing theme",
+      "theme": "default",
+      "primary": "#d1665a",
+      "autumnDecor": "none"
+    },
+    {
+      "test": "existing theme",
+      "theme": "nostalgia",
+      "primary": "#ff9459",
+      "autumnDecor": "none"
+    },
+    {
+      "test": "existing theme",
+      "theme": "summer",
+      "primary": "#e85d4a",
+      "autumnDecor": "none"
+    },
+    {
+      "width": 768,
+      "route": "/",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.30812072753906,
+          "right": 183.69187927246094,
+          "width": 23.383758544921875
+        },
+        {
+          "left": 561.6932373046875,
+          "right": 614.3067626953125,
+          "width": 52.613525390625
+        },
+        {
+          "left": 255.68601989746094,
+          "right": 278.9702453613281,
+          "width": 23.284225463867188
+        }
+      ],
+      "shell": true,
+      "body": "PigBang\narrow_downward\ncalendar_today\n2026年11月1日\n~\n2026年11月30日\n\n累计结余\n\nJP¥\n0.00\n\narrow_downward\n累计收入\n\nJP¥0\n\narrow_upward\n累计支出\n\nJP¥0\n\n支出\n收入\n分类\n\n这个月还没有记录\n\nreceipt_long\n\n这本账还是空的\n\n点右下角记下第一笔吧\n\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 768,
+      "route": "/history",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.3061065673828,
+          "right": 183.6938934326172,
+          "width": 23.387786865234375
+        },
+        {
+          "left": 561.688720703125,
+          "right": 614.311279296875,
+          "width": 52.62255859375
+        },
+        {
+          "left": 372.2075500488281,
+          "right": 395.7611999511719,
+          "width": 23.55364990234375
+        }
+      ],
+      "shell": true,
+      "body": "出入金\narrow_downward\nsearch\n全部\n支出\n收入\ncalendar_month\ncalendar_today\n2026年11月1日\n~\n2026年11月30日\nreceipt_long\n\n没有符合条件的记录\n\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 768,
+      "route": "/stats",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.30203247070312,
+          "right": 183.69796752929688,
+          "width": 23.39593505859375
+        },
+        {
+          "left": 561.6795654296875,
+          "right": 614.3204345703125,
+          "width": 52.640869140625
+        },
+        {
+          "left": 488.43731689453125,
+          "right": 512.8751831054688,
+          "width": 24.4378662109375
+        }
+      ],
+      "shell": true,
+      "body": "统计\narrow_downward\n收支\n积分\nchevron_left\n2026年11月\nchevron_right\n\n本月收入\n\nJP¥0\n\n本月支出\n\nJP¥0\n\n收支趋势\n支出\n收入\n按日\n按月\nchevron_left\n2026年11月\nchevron_right\n0\n0\n1\n1\n1\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\nadd\n概览\n出入金\n统计\nmenu_book\n\nPigBang\n\n未登录\n\n汇率换算\n日历\n设置\n关于"
+    },
+    {
+      "width": 768,
+      "route": "/add",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.28402709960938,
+          "right": 183.71597290039062,
+          "width": 23.43194580078125
+        }
+      ],
+      "shell": true,
+      "body": "记一笔\n支出\n收入\nphoto_camera\n扫描小票\nJP¥\n分类\n细分\n支付方式\n日期\n标签\nadd\n标签\n获得积分\nstars\n备注\nhow_to_reg\n保存"
+    },
+    {
+      "width": 768,
+      "route": "/calendar",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.28648376464844,
+          "right": 183.71351623535156,
+          "width": 23.427032470703125
+        },
+        {
+          "left": 560.1345825195312,
+          "right": 603.0841674804688,
+          "width": 42.9495849609375
+        }
+      ],
+      "shell": true,
+      "body": "日历\narrow_downward\nchevron_left\n2026年11月\nchevron_right\n日\n一\n二\n三\n四\n五\n六\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n\n点击上方日历格子可切换查看当日明细\n\n今天\n0笔明细\n\n支出\n\nJP¥0\n\n收入\n\nJP¥0\n\n当日明细\n支出\n收入\nevent_busy\n\n这天还没有记录"
+    },
+    {
+      "width": 768,
+      "route": "/rate",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.31199645996094,
+          "right": 183.68800354003906,
+          "width": 23.376007080078125
+        },
+        {
+          "left": 566.2340087890625,
+          "right": 583.7659912109375,
+          "width": 17.531982421875
+        }
+      ],
+      "shell": true,
+      "body": "汇率换算\narrow_downward\npayments\nJPY · 日元\nCNY · 人民币\nUSD · 美元\nEUR · 欧元\nGBP · 英镑\nHKD · 港币\nKRW · 韩元\nAUD · 澳元\nCAD · 加元\nSGD · 新加坡元\nTHB · 泰铢\nswap_vert\nJPY · 日元\nCNY · 人民币\nUSD · 美元\nEUR · 欧元\nGBP · 英镑\nHKD · 港币\nKRW · 韩元\nAUD · 澳元\nCAD · 加元\nSGD · 新加坡元\nTHB · 泰铢\naccount_balance\n尚未获取汇率\n\nFailed to fetch\n\nJPY/CNY 走势\n近1周\n近"
+    },
+    {
+      "width": 768,
+      "route": "/settings",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.28875732421875,
+          "right": 183.71124267578125,
+          "width": 23.4224853515625
+        },
+        {
+          "left": 164.67376708984375,
+          "right": 219.32623291015625,
+          "width": 54.6524658203125
+        },
+        {
+          "left": 164.67376708984375,
+          "right": 219.32623291015625,
+          "width": 54.6524658203125
+        },
+        {
+          "left": 164.67376708984375,
+          "right": 219.32623291015625,
+          "width": 54.6524658203125
+        },
+        {
+          "left": 164.67376708984375,
+          "right": 219.32623291015625,
+          "width": 54.6524658203125
+        },
+        {
+          "left": 164.67376708984375,
+          "right": 219.32623291015625,
+          "width": 54.6524658203125
+        }
+      ],
+      "shell": true,
+      "body": "设置\n语言\n中文\nexpand_more\n中文\n日本語\n货币\n日元 (JPY)\nexpand_more\n日元 (JPY)\n人民币 (CNY)\n美元 (USD)\n欧元 (EUR)\n英镑 (GBP)\n港币 (HKD)\n韩元 (KRW)\n澳元 (AUD)\n加元 (CAD)\n新加坡元 (SGD)\n泰铢 (THB)\n主题\nPigBang\nchevron_right\n固定收支\nchevron_right\n诊断日志\nchevron_right"
+    },
+    {
+      "width": 768,
+      "route": "/theme",
+      "theme": "autumn",
+      "overflow": false,
+      "broken": 0,
+      "primary": "#c62818",
+      "glows": [
+        {
+          "left": 160.2840118408203,
+          "right": 183.71597290039062,
+          "width": 23.431961059570312
+        }
+      ],
+      "shell": true,
+      "body": "主题\nPigBang\ncheck\n怀旧\ncheck\n夏 · 花火\ncheck\n红叶 · 丹枫金秋\ncheck"
+    }
+  ],
+  "errors": []
+}

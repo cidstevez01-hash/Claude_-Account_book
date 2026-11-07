@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { pickFromGallery, scanDocumentNative } from '../../lib/receiptCamera'
@@ -168,7 +169,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
         <header className="flex items-center justify-between px-md h-16 border-b-[1.5px] border-dashed border-outline-variant shrink-0">
           <h2 className="font-serif text-headline-md text-on-surface">{t('receiptScanTitle')}</h2>
           <button type="button" aria-label={t('closeAria')} onClick={onClose} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
-            <span className="material-symbols-outlined">close</span>
+            <ThemeIcon className="material-symbols-outlined" icon="close" />
           </button>
         </header>
 
@@ -185,7 +186,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
           {stage === 'error' && (
             <div className="flex flex-col items-center gap-md py-12 px-md text-center">
-              <span className="material-symbols-outlined text-4xl text-primary">error</span>
+              <ThemeIcon className="material-symbols-outlined text-4xl text-primary" icon="error" />
               <p className="text-body-md text-on-surface">{t('receiptFailedError')}</p>
               {errorMsg && <p className="text-xs text-primary break-all">⚠ {errorMsg}</p>}
               <div className="flex items-center gap-2 mt-sm">
@@ -220,12 +221,12 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                   onClick={startScan}
                   className="absolute right-2 bottom-2 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-sm border border-outline-variant flex items-center justify-center text-primary shadow-sm active:scale-90 transition-transform"
                 >
-                  <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                  <ThemeIcon className="material-symbols-outlined text-[18px]" icon="photo_camera" />
                 </button>
               </div>
 
               <div className="flex items-start gap-2 p-3 rounded-xl bg-surface-container border border-outline-variant/50">
-                <span className="material-symbols-outlined text-primary text-[18px] shrink-0">info</span>
+                <ThemeIcon className="material-symbols-outlined text-primary text-[18px] shrink-0" icon="info" />
                 <p className="text-xs text-on-surface-variant">{t('receiptPrivacyNote')}</p>
               </div>
             </>
@@ -249,7 +250,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                   ))}
                 </span>
               ) : (
-                <span className="material-symbols-outlined">picture_as_pdf</span>
+                <ThemeIcon className="material-symbols-outlined" icon="picture_as_pdf" />
               )}
               {t('receiptSaveAsPdf')}
             </button>

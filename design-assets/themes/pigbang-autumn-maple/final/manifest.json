@@ -1,0 +1,31 @@
+{
+  "adoptedDesign": "design-assets/themes/pigbang-autumn-maple/history/20261107-05/pigbang-tanfu-home-high.png",
+  "runtimePath": "washi-ledger/src/assets/themes/autumn",
+  "assets": [
+    {
+      "file": "paper.webp",
+      "source": "design-assets\\themes\\pigbang-autumn-maple\\history\\20261105-02\\layers\\L-01-paper.png",
+      "sourceSha256": "c8f318ed38dc31ceda1f58956dffbed094a237f38d4e1571fc3a264016c309e0",
+      "bytes": 6784
+    },
+    {
+      "file": "foliage.webp",
+      "source": "design-assets\\themes\\pigbang-autumn-maple\\history\\20261106-01\\maple-foliage-low.png",
+      "sourceSha256": "78bbb6a0fa2da44823d1a32f3890a985551f22101d6e2dae48fe5cc97f220bd4",
+      "bytes": 81006
+    },
+    {
+      "file": "corner.webp",
+      "source": "design-assets\\themes\\pigbang-autumn-maple\\history\\20261105-02\\layers\\L-03-corner.png",
+      "sourceSha256": "351e47beb6fc04fb06a431e6ffeed086ab31f2fde01b7cef517df7d9f9284004",
+      "bytes": 15364
+    },
+    {
+      "file": "leaf.webp",
+      "source": "design-assets\\themes\\pigbang-autumn-maple\\history\\20261105-02\\layers\\L-04-leaf.png",
+      "sourceSha256": "c9152f0e2bfb3adcaa2fba0a1a4872b07fe508f8043f2d77d9c2df999517a885",
+      "bytes": 21346
+    }
+  ],
+  "note": "Original images unchanged. Foliage line-color separation removes ivory for transparent runtime overlay; other layers resized/compressed. Watermark reuses leaf."
+}

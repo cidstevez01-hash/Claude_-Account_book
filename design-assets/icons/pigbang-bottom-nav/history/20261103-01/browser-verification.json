@@ -1,0 +1,1568 @@
+[
+  {
+    "theme": "default",
+    "width": 320,
+    "page": "/",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 42,
+      "width": 79.328125
+    },
+    "active": {
+      "left": 41,
+      "width": 79.328125
+    }
+  },
+  {
+    "theme": "default",
+    "width": 320,
+    "page": "/history",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 121.328125,
+      "width": 79.34375
+    },
+    "active": {
+      "left": 120.328125,
+      "width": 79.34375
+    }
+  },
+  {
+    "theme": "default",
+    "width": 320,
+    "page": "/stats",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 200.671875,
+      "width": 79.328125
+    },
+    "active": {
+      "left": 199.671875,
+      "width": 79.328125
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 320,
+    "page": "/",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 42,
+      "width": 79.328125
+    },
+    "active": {
+      "left": 41,
+      "width": 79.328125
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 320,
+    "page": "/history",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 121.328125,
+      "width": 79.34375
+    },
+    "active": {
+      "left": 120.328125,
+      "width": 79.34375
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 320,
+    "page": "/stats",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 200.671875,
+      "width": 79.328125
+    },
+    "active": {
+      "left": 199.671875,
+      "width": 79.328125
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 320,
+    "page": "/",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 69.1865463256836,
+          "right": 92.1259536743164
+        },
+        "animationDelay": "-0.757s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": true,
+        "glowBox": {
+          "left": 148.53028869628906,
+          "right": 171.46969604492188
+        },
+        "animationDelay": "-0.757s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 227.85841369628906,
+          "right": 250.79782104492188
+        },
+        "animationDelay": "-0.757s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 42,
+      "width": 79.328125
+    },
+    "active": {
+      "left": 41,
+      "width": 79.328125
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 320,
+    "page": "/history",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 68.5838623046875,
+          "right": 92.7286376953125
+        },
+        "animationDelay": "-1.149s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": true,
+        "glowBox": {
+          "left": 147.9276123046875,
+          "right": 172.0723876953125
+        },
+        "animationDelay": "-1.149s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 227.2557373046875,
+          "right": 251.4005126953125
+        },
+        "animationDelay": "-1.149s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 121.328125,
+      "width": 79.34375
+    },
+    "active": {
+      "left": 120.328125,
+      "width": 79.34375
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 320,
+    "page": "/stats",
+    "nav": {
+      "left": 16,
+      "right": 304
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 68.65625,
+        "right": 92.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 68.26593017578125,
+          "right": 93.04656982421875
+        },
+        "animationDelay": "-1.717s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 148,
+        "right": 172,
+        "glow": true,
+        "glowBox": {
+          "left": 147.60968017578125,
+          "right": 172.39031982421875
+        },
+        "animationDelay": "-1.717s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 227.328125,
+        "right": 251.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 226.93780517578125,
+          "right": 251.71844482421875
+        },
+        "animationDelay": "-1.717s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 200.671875,
+      "width": 79.328125
+    },
+    "active": {
+      "left": 199.671875,
+      "width": 79.328125
+    }
+  },
+  {
+    "theme": "default",
+    "width": 390,
+    "page": "/",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 45.5,
+      "width": 100.328125
+    },
+    "active": {
+      "left": 44.5,
+      "width": 100.328125
+    }
+  },
+  {
+    "theme": "default",
+    "width": 390,
+    "page": "/history",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 145.828125,
+      "width": 100.34375
+    },
+    "active": {
+      "left": 144.828125,
+      "width": 100.34375
+    }
+  },
+  {
+    "theme": "default",
+    "width": 390,
+    "page": "/stats",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 246.171875,
+      "width": 100.328125
+    },
+    "active": {
+      "left": 245.171875,
+      "width": 100.328125
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 390,
+    "page": "/",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 45.5,
+      "width": 100.328125
+    },
+    "active": {
+      "left": 44.5,
+      "width": 100.328125
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 390,
+    "page": "/history",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 145.828125,
+      "width": 100.34375
+    },
+    "active": {
+      "left": 144.828125,
+      "width": 100.34375
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 390,
+    "page": "/stats",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 246.171875,
+      "width": 100.328125
+    },
+    "active": {
+      "left": 245.171875,
+      "width": 100.328125
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 390,
+    "page": "/",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 82.22965240478516,
+          "right": 107.08284759521484
+        },
+        "animationDelay": "-2.112s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": true,
+        "glowBox": {
+          "left": 182.57339477539062,
+          "right": 207.42660522460938
+        },
+        "animationDelay": "-2.112s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 282.9015197753906,
+          "right": 307.7547302246094
+        },
+        "animationDelay": "-2.112s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 45.5,
+      "width": 100.328125
+    },
+    "active": {
+      "left": 44.5,
+      "width": 100.328125
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 390,
+    "page": "/history",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 82.18963623046875,
+          "right": 107.12286376953125
+        },
+        "animationDelay": "-2.479s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": true,
+        "glowBox": {
+          "left": 182.53338623046875,
+          "right": 207.46661376953125
+        },
+        "animationDelay": "-2.479s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 282.86151123046875,
+          "right": 307.79473876953125
+        },
+        "animationDelay": "-2.479s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 145.828125,
+      "width": 100.34375
+    },
+    "active": {
+      "left": 144.828125,
+      "width": 100.34375
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 390,
+    "page": "/stats",
+    "nav": {
+      "left": 19.5,
+      "right": 370.5
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 82.65625,
+        "right": 106.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 82.35374450683594,
+          "right": 106.95875549316406
+        },
+        "animationDelay": "-3.033s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 183,
+        "right": 207,
+        "glow": true,
+        "glowBox": {
+          "left": 182.69749450683594,
+          "right": 207.30250549316406
+        },
+        "animationDelay": "-3.033s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 283.328125,
+        "right": 307.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 283.0256042480469,
+          "right": 307.6306457519531
+        },
+        "animationDelay": "-3.033s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 246.171875,
+      "width": 100.328125
+    },
+    "active": {
+      "left": 245.171875,
+      "width": 100.328125
+    }
+  },
+  {
+    "theme": "default",
+    "width": 768,
+    "page": "/",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 210,
+      "width": 116.65625
+    },
+    "active": {
+      "left": 209,
+      "width": 116.65625
+    }
+  },
+  {
+    "theme": "default",
+    "width": 768,
+    "page": "/history",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 326.65625,
+      "width": 116.671875
+    },
+    "active": {
+      "left": 325.65625,
+      "width": 116.671875
+    }
+  },
+  {
+    "theme": "default",
+    "width": 768,
+    "page": "/stats",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 443.328125,
+      "width": 116.671875
+    },
+    "active": {
+      "left": 442.328125,
+      "width": 116.671875
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 768,
+    "page": "/",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 210,
+      "width": 116.65625
+    },
+    "active": {
+      "left": 209,
+      "width": 116.65625
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 768,
+    "page": "/history",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 326.65625,
+      "width": 116.671875
+    },
+    "active": {
+      "left": 325.65625,
+      "width": 116.671875
+    }
+  },
+  {
+    "theme": "nostalgia",
+    "width": 768,
+    "page": "/stats",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": false,
+        "glowBox": null,
+        "animationDelay": null,
+        "gradients": 0
+      }
+    ],
+    "bubble": {
+      "left": 443.328125,
+      "width": 116.671875
+    },
+    "active": {
+      "left": 442.328125,
+      "width": 116.671875
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 768,
+    "page": "/",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 254.89291381835938,
+          "right": 279.7633361816406
+        },
+        "animationDelay": "-2.887s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": true,
+        "glowBox": {
+          "left": 371.5491638183594,
+          "right": 396.4195861816406
+        },
+        "animationDelay": "-2.887s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 488.2210388183594,
+          "right": 513.0914306640625
+        },
+        "animationDelay": "-2.887s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 210,
+      "width": 116.65625
+    },
+    "active": {
+      "left": 209,
+      "width": 116.65625
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 768,
+    "page": "/history",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 255.2121124267578,
+          "right": 279.44415283203125
+        },
+        "animationDelay": "-3.324s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": true,
+        "glowBox": {
+          "left": 371.86834716796875,
+          "right": 396.10040283203125
+        },
+        "animationDelay": "-3.324s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 488.54022216796875,
+          "right": 512.7722778320312
+        },
+        "animationDelay": "-3.324s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 326.65625,
+      "width": 116.671875
+    },
+    "active": {
+      "left": 325.65625,
+      "width": 116.671875
+    }
+  },
+  {
+    "theme": "summer",
+    "width": 768,
+    "page": "/stats",
+    "nav": {
+      "left": 184,
+      "right": 584
+    },
+    "icons": [
+      {
+        "icon": "book",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 255.328125,
+        "right": 279.328125,
+        "glow": true,
+        "glowBox": {
+          "left": 255.6312255859375,
+          "right": 279.0250244140625
+        },
+        "animationDelay": "-3.878s",
+        "gradients": 1
+      },
+      {
+        "icon": "history",
+        "active": "false",
+        "width": 24,
+        "height": 24,
+        "left": 371.984375,
+        "right": 395.984375,
+        "glow": true,
+        "glowBox": {
+          "left": 372.2874755859375,
+          "right": 395.6812744140625
+        },
+        "animationDelay": "-3.878s",
+        "gradients": 1
+      },
+      {
+        "icon": "bar_chart",
+        "active": "true",
+        "width": 24,
+        "height": 24,
+        "left": 488.65625,
+        "right": 512.65625,
+        "glow": true,
+        "glowBox": {
+          "left": 488.9593505859375,
+          "right": 512.3531494140625
+        },
+        "animationDelay": "-3.878s",
+        "gradients": 1
+      }
+    ],
+    "bubble": {
+      "left": 443.328125,
+      "width": 116.671875
+    },
+    "active": {
+      "left": 442.328125,
+      "width": 116.671875
+    }
+  }
+]

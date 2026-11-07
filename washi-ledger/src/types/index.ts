@@ -112,7 +112,7 @@ export type Lang = 'zh' | 'ja'
 // 新增'summer'("夏 · 花火")——旧仓库index.html的data-skin="summerB"移植：深藏青底配
 // 朱红/金黄/翡翠绿，卡片/图标发光描边，外加canvas实时烟花+星空动态背景(见
 // FireworksBackground.tsx)，是当前唯一带动态背景的主题
-export type ThemeSkin = 'default' | 'nostalgia' | 'summer'
+export type ThemeSkin = 'default' | 'nostalgia' | 'summer' | 'autumn'
 
 export interface UserSettings {
   lang: Lang

@@ -1,4 +1,5 @@
 import type { UserSettings } from '../types'
+import { normalizeThemeSkin } from './themeSkin'
 
 const CACHE_KEY = 'washi_ledger_settings_cache_v1'
 
@@ -17,7 +18,7 @@ export function loadCachedSettings(): UserSettings {
       lang: parsed.lang === 'zh' ? 'zh' : parsed.lang === 'ja' ? 'ja' : DEFAULT_SETTINGS.lang,
       currency: parsed.currency ?? DEFAULT_SETTINGS.currency,
       themeSkin:
-        parsed.themeSkin === 'nostalgia' ? 'nostalgia' : parsed.themeSkin === 'summer' ? 'summer' : 'default',
+        normalizeThemeSkin(parsed.themeSkin),
     }
   } catch (e) {
     console.error('读取本地设置缓存失败', e)

@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useState } from 'react'
 import { AppLayout } from '../../design-system/components/AppLayout'
 import { useAppNavigate } from '../../hooks/useAppNavigate'
@@ -55,9 +56,7 @@ export function ChangeAvatarPage() {
                     </div>
                     {active && (
                       <div className="absolute -right-0.5 -bottom-0.5 w-[18px] h-[18px] rounded-full bg-primary border-2 border-surface flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[10px] text-on-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
-                          check
-                        </span>
+                        <ThemeIcon className="material-symbols-outlined text-[10px] text-on-primary" style={{ fontVariationSettings: "'FILL' 1" }} icon="check" />
                       </div>
                     )}
                   </div>
@@ -75,7 +74,7 @@ export function ChangeAvatarPage() {
           disabled
           className="w-full h-12 flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-outline-variant text-on-surface-variant opacity-50"
         >
-          <span className="material-symbols-outlined text-[18px]">image</span>
+          <ThemeIcon className="material-symbols-outlined text-[18px]" icon="image" />
           {t('chooseFromAlbumBtn')}
           <span className="text-label-caps">({t('chooseFromAlbumComingSoon')})</span>
         </button>

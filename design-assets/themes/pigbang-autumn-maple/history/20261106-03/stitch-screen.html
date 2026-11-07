@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PigBang 记账 - 秋枫手账</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-washi: #FFF4E3;
+      --copper-text: #704426;
+      --copper-hairline: rgba(112, 68, 38, 0.16);
+      --copper-hairline-bright: rgba(112, 68, 38, 0.28);
+      --cinnabar-active: #B94C31;
+      --amber-gold: #C99B50;
+      --jade-income: #4F8061;
+      --card-bg: rgba(255, 249, 240, 0.78);
+      --card-inner: rgba(255, 253, 250, 0.65);
+    }
+
+    body {
+      background-color: #EFE2CF;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--copper-text);
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .font-serif-sc {
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .font-brand {
+      font-family: 'Cinzel', 'Noto Serif SC', serif;
+      letter-spacing: 0.08em;
+    }
+
+    /* Washi Paper texture with subtle natural paper fibers and grain */
+    .washi-container {
+      background-color: var(--bg-washi);
+      background-image: 
+        radial-gradient(ellipse at 15% 20%, rgba(201, 155, 80, 0.07) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 75%, rgba(185, 76, 49, 0.05) 0%, transparent 50%),
+        repeating-linear-gradient(45deg, rgba(112, 68, 38, 0.015) 0px, rgba(112, 68, 38, 0.015) 1px, transparent 1px, transparent 18px),
+        repeating-linear-gradient(-35deg, rgba(201, 155, 80, 0.018) 0px, rgba(201, 155, 80, 0.018) 1.5px, transparent 1.5px, transparent 24px);
+    }
+
+    /* Subtle hairline & tactile elevation */
+    .washi-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--copper-hairline);
+      box-shadow: 0 4px 18px -2px rgba(112, 68, 38, 0.06), 0 1px 3px rgba(112, 68, 38, 0.04);
+    }
+
+    .washi-card-hover {
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease;
+    }
+    .washi-card-hover:active {
+      transform: scale(0.985);
+    }
+
+    /* Interactive press scale */
+    .press-feedback {
+      transition: transform 100ms ease;
+    }
+    .press-feedback:active {
+      transform: scale(0.96);
+    }
+
+    /* Breathing Glow Animations */
+    @keyframes navHaloBreathe {
+      0%, 100% {
+        box-shadow: 0 0 14px 2px rgba(185, 76, 49, 0.18), inset 0 0 8px 1px rgba(201, 155, 80, 0.14);
+      }
+      50% {
+        box-shadow: 0 0 22px 5px rgba(185, 76, 49, 0.32), inset 0 0 12px 2px rgba(201, 155, 80, 0.25);
+      }
+    }
+
+    @keyframes ringHaloPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 2px rgba(201, 155, 80, 0.25), 0 4px 14px rgba(112, 68, 38, 0.12);
+      }
+      50% {
+        box-shadow: 0 0 0 3.5px rgba(185, 76, 49, 0.38), 0 6px 20px rgba(185, 76, 49, 0.22);
+      }
+    }
+
+    @keyframes fabGlowPulse {
+      0%, 100% {
+        box-shadow: 0 8px 24px -2px rgba(185, 76, 49, 0.38), 0 0 0 3px rgba(201, 155, 80, 0.25);
+      }
+      50% {
+        box-shadow: 0 10px 28px -1px rgba(185, 76, 49, 0.52), 0 0 0 4.5px rgba(185, 76, 49, 0.4);
+      }
+    }
+
+    .nav-active-pill {
+      animation: navHaloBreathe 6.5s ease-in-out infinite;
+    }
+
+    .avatar-halo {
+      animation: ringHaloPulse 8s ease-in-out infinite;
+    }
+
+    .fab-button {
+      animation: fabGlowPulse 6.5s ease-in-out infinite;
+    }
+
+    /* Bare icon silhouette glow without synthetic disc background */
+    .icon-silhouette-glow {
+      filter: drop-shadow(0 1px 3px rgba(112, 68, 38, 0.18));
+      transition: filter 0.18s ease;
+    }
+    .icon-silhouette-glow:active {
+      filter: drop-shadow(0 0 5px rgba(185, 76, 49, 0.5));
+    }
+
+    /* Accessibility respect */
+    @media (prefers-reduced-motion: reduce) {
+      .nav-active-pill,
+      .avatar-halo,
+      .fab-button {
+        animation: none !important;
+      }
+      .press-feedback:active,
+      .washi-card-hover:active {
+        transform: none !important;
+      }
+    }
+
+    /* Hide scrollbars but keep swipeable */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="p-0 sm:py-6">
+  <!-- Mobile 390px Shell -->
+  <main class="w-[390px] h-[844px] max-h-[844px] washi-container relative overflow-hidden flex flex-col justify-between select-none shadow-2xl sm:rounded-[40px] border border-[#d8c3a5]">
+
+    <!-- Background Outline Foliage Layer: Thin copper unfilled outline foliage strictly at upper-right and small lower-left edges with front/back cluster occlusion -->
+    <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      <!-- Upper-Right Autumn Maple Clustered Outline Foliage -->
+      <svg class="absolute -top-3 -right-4 w-[215px] h-[215px] text-[#704426]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Hidden/Faint connector twig -->
+        <path d="M190 10 Q160 30 135 60 T105 105" stroke="#704426" stroke-opacity="0.14" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M145 48 Q125 52 110 40" stroke="#704426" stroke-opacity="0.12" stroke-width="0.9" stroke-linecap="round"/>
+        <path d="M125 72 Q105 85 92 82" stroke="#704426" stroke-opacity="0.12" stroke-width="0.9" stroke-linecap="round"/>
+        
+        <!-- Back layer leaf 1 (softer copper stroke for depth/occlusion) -->
+        <g stroke="#704426" stroke-opacity="0.18" stroke-width="0.85" stroke-linejoin="round" transform="translate(108, 14) rotate(22) scale(0.65)">
+          <path d="M50 85 C48 70 32 64 25 52 C32 50 38 42 35 30 C45 35 50 32 50 15 C52 32 57 35 67 30 C64 42 70 50 77 52 C70 64 54 70 52 85 Z"/>
+          <path d="M50 85 L50 25 M50 62 L32 46 M50 62 L68 46 M50 45 L38 35 M50 45 L62 35" stroke-opacity="0.13" stroke-width="0.6"/>
+        </g>
+
+        <!-- Back layer leaf 2 -->
+        <g stroke="#C99B50" stroke-opacity="0.22" stroke-width="0.9" stroke-linejoin="round" transform="translate(68, 62) rotate(-35) scale(0.58)">
+          <path d="M50 85 C48 70 32 64 25 52 C32 50 38 42 35 30 C45 35 50 32 50 15 C52 32 57 35 67 30 C64 42 70 50 77 52 C70 64 54 70 52 85 Z"/>
+          <path d="M50 85 L50 26 M50 60 L33 46 M50 60 L67 46" stroke-opacity="0.16" stroke-width="0.6"/>
+        </g>
+
+        <!-- Front prominent clustered leaf (crisp thin copper hairline outline, pure unfilled) -->
+        <g stroke="#704426" stroke-opacity="0.32" stroke-width="1.15" stroke-linejoin="round" transform="translate(120, 48) rotate(12) scale(0.82)">
+          <path d="M50 90 C47 72 28 65 20 50 C29 48 36 38 32 24 C44 30 50 27 50 8 C52 27 58 30 70 24 C66 38 73 48 82 50 C74 65 55 72 52 90 Z"/>
+          <!-- Delicately etched venation -->
+          <path d="M50 90 L50 20 M50 66 L27 45 M50 66 L73 45 M50 46 L35 32 M50 46 L65 32" stroke-opacity="0.22" stroke-width="0.75"/>
+        </g>
+
+        <!-- Small clustered accent leaf -->
+        <g stroke="#B94C31" stroke-opacity="0.28" stroke-width="1" stroke-linejoin="round" transform="translate(150, 110) rotate(42) scale(0.52)">
+          <path d="M50 85 C48 70 32 64 25 52 C32 50 38 42 35 30 C45 35 50 32 50 15 C52 32 57 35 67 30 C64 42 70 50 77 52 C70 64 54 70 52 85 Z"/>
+          <path d="M50 85 L50 24 M50 60 L32 46 M50 60 L68 46" stroke-opacity="0.18" stroke-width="0.6"/>
+        </g>
+      </svg>
+
+      <!-- Small Lower-Left Corner Foliage (Clustered outline, keeping center completely blank and legible) -->
+      <svg class="absolute -bottom-4 -left-4 w-[145px] h-[145px] text-[#704426]" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 140 Q40 120 70 95" stroke="#704426" stroke-opacity="0.14" stroke-width="1.1" stroke-linecap="round"/>
+        <!-- Back leaf -->
+        <g stroke="#C99B50" stroke-opacity="0.22" stroke-width="0.85" stroke-linejoin="round" transform="translate(15, 60) rotate(70) scale(0.55)">
+          <path d="M50 85 C48 70 32 64 25 52 C32 50 38 42 35 30 C45 35 50 32 50 15 C52 32 57 35 67 30 C64 42 70 50 77 52 C70 64 54 70 52 85 Z"/>
+          <path d="M50 85 L50 26 M50 60 L33 46 M50 60 L67 46" stroke-opacity="0.15" stroke-width="0.6"/>
+        </g>
+        <!-- Front leaf -->
+        <g stroke="#704426" stroke-opacity="0.28" stroke-width="1.05" stroke-linejoin="round" transform="translate(42, 68) rotate(35) scale(0.68)">
+          <path d="M50 90 C47 72 28 65 20 50 C29 48 36 38 32 24 C44 30 50 27 50 8 C52 27 58 30 70 24 C66 38 73 48 82 50 C74 65 55 72 52 90 Z"/>
+          <path d="M50 90 L50 20 M50 66 L27 45 M50 66 L73 45 M50 46 L35 32 M50 46 L65 32" stroke-opacity="0.2" stroke-width="0.7"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- MAIN SCROLLABLE CONTENT -->
+    <div class="relative z-10 flex-1 overflow-y-auto no-scrollbar pt-3 px-5 pb-24">
+      
+      <!-- Top Bar: Menu Icon Left / PigBang Brand Center / Account Avatar Right -->
+      <header class="flex items-center justify-between pt-1 pb-3">
+        <!-- Menu Icon: Bare icon with silhouette-following subtle glow, no artificial circle disc -->
+        <button class="press-feedback p-1 -ml-1 text-[#704426] icon-silhouette-glow focus:outline-none" aria-label="菜单">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
+            <line x1="4" y1="7" x2="20" y2="7"></line>
+            <line x1="4" y1="12" x2="16" y2="12"></line>
+            <line x1="4" y1="17" x2="20" y2="17"></line>
+          </svg>
+        </button>
+
+        <!-- Brand Center: PigBang with refined serif typography and vermilion seal accent -->
+        <div class="flex items-center gap-1.5">
+          <span class="font-brand text-[20px] font-bold text-[#704426] tracking-wider">PigBang</span>
+          <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-medium font-serif-sc text-[#B94C31] bg-[#B94C31]/10 rounded border border-[#B94C31]/25">
+            秋枫账本
+          </span>
+        </div>
+
+        <!-- Account Avatar Right: Outside circle glow at actual container boundary, no double halos -->
+        <button class="press-feedback relative focus:outline-none" aria-label="个人账户">
+          <div class="w-8 h-8 rounded-full border border-[#C99B50]/60 p-[1.5px] bg-[#FFF9F0] avatar-halo flex items-center justify-center overflow-hidden">
+            <!-- Stylized PigBang Avatar Seal -->
+            <svg class="w-full h-full text-[#704426]" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="16" fill="#FCEBD6"/>
+              <!-- Piglet minimalist ear and silhouette mark -->
+              <ellipse cx="16" cy="17" rx="7.5" ry="6.5" fill="#E8B594" stroke="#704426" stroke-width="1.1"/>
+              <ellipse cx="11.5" cy="11.5" rx="2.5" ry="3.5" transform="rotate(-25 11.5 11.5)" fill="#D98E6C" stroke="#704426" stroke-width="0.9"/>
+              <ellipse cx="20.5" cy="11.5" rx="2.5" ry="3.5" transform="rotate(25 20.5 11.5)" fill="#D98E6C" stroke="#704426" stroke-width="0.9"/>
+              <ellipse cx="16" cy="18" rx="3.2" ry="2.2" fill="#FAF1E6" stroke="#704426" stroke-width="0.9"/>
+              <circle cx="14.8" cy="18" r="0.6" fill="#704426"/>
+              <circle cx="17.2" cy="18" r="0.6" fill="#704426"/>
+              <circle cx="13" cy="15.5" r="0.85" fill="#704426"/>
+              <circle cx="19" cy="15.5" r="0.85" fill="#704426"/>
+            </svg>
+          </div>
+        </button>
+      </header>
+
+      <!-- Month-Range Selector (Authentic washi capsule with copper hairline border) -->
+      <div class="flex items-center justify-between mt-1 mb-3.5">
+        <button class="press-feedback inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full washi-card border border-[var(--copper-hairline-bright)] text-[#704426] text-[13px] font-medium shadow-sm">
+          <span class="font-serif-sc font-semibold">2024年 10月</span>
+          <span class="text-[10px] text-[#704426]/60">秋季归档</span>
+          <svg class="w-3.5 h-3.5 text-[#B94C31]" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+
+        <div class="text-[11px] text-[#704426]/60 font-serif-sc tracking-wide flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#C99B50]"></span>
+          <span>账期：10.01 - 10.31</span>
+        </div>
+      </div>
+
+      <!-- MAIN BALANCE CARD: 本月结余 ¥ — with 收入 ¥ — 支出 ¥ — 积分 — -->
+      <section class="washi-card rounded-2xl p-4.5 mb-3.5 relative overflow-hidden border border-[#704426]/20 bg-gradient-to-br from-[#FFF9F0]/90 to-[#F9EEDD]/80">
+        <!-- Corner watermark flourish in warm washi texture -->
+        <div class="absolute -right-4 -bottom-4 text-[#C99B50]/10 pointer-events-none">
+          <svg width="88" height="88" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 90 C47 72 28 65 20 50 C29 48 36 38 32 24 C44 30 50 27 50 8 C52 27 58 30 70 24 C66 38 73 48 82 50 C74 65 55 72 52 90 Z"/>
+          </svg>
+        </div>
+
+        <div class="relative z-10">
+          <div class="flex items-center justify-between text-[12px] text-[#704426]/75 font-serif-sc mb-1">
+            <span>本月结余</span>
+            <span class="inline-flex items-center gap-1 text-[11px] text-[#C99B50] font-medium bg-[#C99B50]/10 px-2 py-0.5 rounded-full border border-[#C99B50]/20">
+              <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              待记账统计
+            </span>
+          </div>
+
+          <!-- Main Balance Amount Display: ¥ — strictly preserving unpopulated dash placeholder -->
+          <div class="flex items-baseline gap-1 my-1">
+            <span class="font-serif-sc text-[22px] font-bold text-[#704426]/80">¥</span>
+            <span class="font-serif-sc text-[36px] font-bold text-[#704426] tracking-tight leading-none">—</span>
+          </div>
+
+          <div class="h-[1px] bg-gradient-to-r from-transparent via-[#704426]/15 to-transparent my-3.5"></div>
+
+          <!-- Sub-metrics Grid: 收入 ¥ — | 支出 ¥ — | 积分 — -->
+          <div class="grid grid-cols-3 divide-x divide-[#704426]/12">
+            <!-- 收入 ¥ — (Jade Green #4F8061) -->
+            <div class="pr-2">
+              <div class="flex items-center gap-1 text-[11px] text-[#4F8061] font-medium mb-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#4F8061]"></span>
+                <span>收入</span>
+              </div>
+              <div class="font-serif-sc text-[16px] font-semibold text-[#4F8061] flex items-baseline gap-0.5">
+                <span class="text-[12px]">¥</span>
+                <span>—</span>
+              </div>
+            </div>
+
+            <!-- 支出 ¥ — (Maple Cinnabar #B94C31 active accent) -->
+            <div class="px-2.5">
+              <div class="flex items-center gap-1 text-[11px] text-[#B94C31] font-medium mb-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#B94C31]"></span>
+                <span>支出</span>
+              </div>
+              <div class="font-serif-sc text-[16px] font-semibold text-[#B94C31] flex items-baseline gap-0.5">
+                <span class="text-[12px]">¥</span>
+                <span>—</span>
+              </div>
+            </div>
+
+            <!-- 积分 — (Amber Gold #C99B50) -->
+            <div class="pl-2.5">
+              <div class="flex items-center gap-1 text-[11px] text-[#C99B50] font-medium mb-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#C99B50]"></span>
+                <span>积分</span>
+              </div>
+              <div class="font-serif-sc text-[16px] font-semibold text-[#C99B50]">
+                <span>—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 分类统计 DONUT EMPTY STATE CARD -->
+      <section class="washi-card rounded-2xl p-4 mb-3.5 border border-[#704426]/18">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1 h-3.5 rounded-full bg-[#B94C31]"></span>
+            <h2 class="font-serif-sc font-bold text-[14px] text-[#704426]">分类统计</h2>
+          </div>
+          <span class="text-[11px] text-[#704426]/50 font-serif-sc">本期暂无支出</span>
+        </div>
+
+        <div class="flex flex-col items-center justify-center py-4 px-2">
+          <!-- Donut Empty State with Refined Concentric Washi Hairline Track & Empty State Glyph -->
+          <div class="relative w-[138px] h-[138px] flex items-center justify-center">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+              <!-- Background subtle track -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(112, 68, 38, 0.08)" stroke-width="7"/>
+              <!-- Dashed elegant maple/washi empty ring -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#C99B50" stroke-opacity="0.32" stroke-width="6.5" stroke-dasharray="3 4" stroke-linecap="round"/>
+              <!-- Inner delicate copper hairline guide -->
+              <circle cx="60" cy="60" r="39" fill="none" stroke="rgba(112, 68, 38, 0.14)" stroke-width="0.75"/>
+              <circle cx="60" cy="60" r="53" fill="none" stroke="rgba(112, 68, 38, 0.12)" stroke-width="0.75"/>
+            </svg>
+
+            <!-- Center Donut Label: Warm and precise empty state -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span class="text-[10px] text-[#704426]/60 font-serif-sc">无支出分类</span>
+              <span class="font-serif-sc text-[15px] font-bold text-[#704426]/75 mt-0.5">0.0%</span>
+            </div>
+          </div>
+
+          <!-- Empty Legend Indicators -->
+          <div class="flex items-center justify-center gap-4 mt-2 text-[11px] text-[#704426]/65 font-serif-sc">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full border border-[#C99B50]/60 bg-[#C99B50]/20"></span>
+              <span>餐饮未入</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full border border-[#B94C31]/60 bg-[#B94C31]/20"></span>
+              <span>日常暂空</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full border border-[#4F8061]/60 bg-[#4F8061]/20"></span>
+              <span>结余待记</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 最近记录 WITH SEARCH AND EMPTY RECORDS -->
+      <section class="washi-card rounded-2xl p-4 border border-[#704426]/18">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1 h-3.5 rounded-full bg-[#C99B50]"></span>
+            <h2 class="font-serif-sc font-bold text-[14px] text-[#704426]">最近记录</h2>
+          </div>
+          <span class="text-[11px] text-[#704426]/50">共 0 笔</span>
+        </div>
+
+        <!-- Search Bar: Warm cream card, copper hairline border, icon silhouette glow -->
+        <div class="relative flex items-center mb-4">
+          <div class="absolute left-3 text-[#704426]/50 pointer-events-none icon-silhouette-glow">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input 
+            type="text" 
+            readonly 
+            placeholder="搜索账单、商户或备注..." 
+            class="w-full bg-[#FFFBF4]/80 text-[#704426] placeholder-[#704426]/40 text-[12px] pl-9 pr-3 py-2 rounded-xl border border-[#704426]/20 focus:outline-none cursor-default"
+          />
+        </div>
+
+        <!-- Empty Records View: Strictly preserving no fake merchants or fabricated account data -->
+        <div class="flex flex-col items-center justify-center py-6 px-4 rounded-xl border border-dashed border-[#704426]/20 bg-[#FFFDF8]/50 text-center">
+          <!-- Stylized Maple Leaf Book Mark empty illustration (pure unfilled/delicate lines) -->
+          <div class="w-12 h-12 rounded-full bg-[#C99B50]/10 border border-[#C99B50]/25 flex items-center justify-center mb-2.5 text-[#B94C31]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Miniature ledger outline -->
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+              <path d="M6 2v20"></path>
+              <!-- Small bookmark leaf drop -->
+              <path d="M12 2v7l2.5-1.5L17 9V2" stroke="#B94C31" fill="rgba(185, 76, 49, 0.15)"></path>
+            </svg>
+          </div>
+          <p class="font-serif-sc text-[13px] font-semibold text-[#704426]/80">本月尚无收支账目</p>
+          <p class="text-[11px] text-[#704426]/55 mt-1 leading-relaxed">
+            轻触右下方悬浮「+」按钮<br>开启秋日第一笔温暖手账
+          </p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- FLOATING ELEMENTS AREA -->
+
+    <!-- Floating Circular + Button:
+         Preserves layout position, Outside circle glow at actual container boundary, No double halos, High contrast active color -->
+    <div class="absolute right-5 bottom-20 z-30">
+      <button class="press-feedback fab-button w-13 h-13 w-[52px] h-[52px] rounded-full bg-gradient-to-br from-[#C95438] via-[#B94C31] to-[#993A22] text-[#FFF7EC] flex items-center justify-center border border-[#FFE1B5]/40 focus:outline-none" aria-label="记一笔">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Bottom Floating Capsule Navigation:
+         Contains EXACTLY 概览 / 明细 / 统计 tabs.
+         Purposeful icon redesign:
+         - 概览: small book with spine and tiny bookmark
+         - 明细: circular return-arrow clock for history
+         - 统计: three clear vertical bars for stats
+         Selected icon gets cinnabar/copper-to-gold, inactive copper brown.
+         Selected tab gets gentle nav halo breathing 6.5s. -->
+    <nav class="absolute left-1/2 -translate-x-1/2 bottom-4 z-20 w-[326px] h-[58px] rounded-full washi-card border border-[var(--copper-hairline-bright)] bg-[#FFFDF8]/92 backdrop-blur-md px-2 py-1.5 flex items-center justify-between shadow-[0_8px_24px_-4px_rgba(112,68,38,0.14)]" aria-label="底栏导航">
+
+      <!-- 1. 概览 (Active Selected Tab) -->
+      <button class="press-feedback nav-active-pill flex-1 h-[44px] rounded-full bg-gradient-to-r from-[#B94C31] to-[#C99B50] text-[#FFF9F2] flex items-center justify-center gap-1.5 px-3 border border-[#FFF0D4]/30 focus:outline-none">
+        <!-- Small book with visible spine and tiny bookmark ribbon -->
+        <svg class="w-[18px] h-[18px] text-[#FFF7ED] filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+          <!-- Book spine stitch line -->
+          <line x1="7" y1="2" x2="7" y2="22" stroke-width="1.8"></line>
+          <!-- Tiny hanging bookmark ribbon -->
+          <path d="M12 2v6.5l2-1.2 2 1.2V2" fill="#FFE0B2" stroke="#FFF7ED" stroke-width="1.2"></path>
+        </svg>
+        <span class="text-[12.5px] font-serif-sc font-bold tracking-wide">概览</span>
+      </button>
+
+      <!-- 2. 明细 (Inactive Tab) -->
+      <button class="press-feedback flex-1 h-[44px] rounded-full text-[#704426] hover:text-[#B94C31] flex items-center justify-center gap-1.5 px-3 focus:outline-none transition-colors">
+        <!-- Circular return-arrow clock for history -->
+        <svg class="w-[18px] h-[18px] text-[#704426] icon-silhouette-glow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Circular clock body with return arrow arc -->
+          <path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"></path>
+          <!-- Arrow head -->
+          <polyline points="3 3 3 8 8 8"></polyline>
+          <!-- Clock hands -->
+          <polyline points="12 7 12 12 15 14"></polyline>
+        </svg>
+        <span class="text-[12.5px] font-serif-sc font-medium opacity-85">明细</span>
+      </button>
+
+      <!-- 3. 统计 (Inactive Tab) -->
+      <button class="press-feedback flex-1 h-[44px] rounded-full text-[#704426] hover:text-[#B94C31] flex items-center justify-center gap-1.5 px-3 focus:outline-none transition-colors">
+        <!-- Three clear distinct vertical bars for stats -->
+        <svg class="w-[18px] h-[18px] text-[#704426] icon-silhouette-glow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- 3 clear vertical bars of stepped heights -->
+          <rect x="4" y="13" width="3.5" height="7" rx="1"></rect>
+          <rect x="10.25" y="6" width="3.5" height="14" rx="1"></rect>
+          <rect x="16.5" y="10" width="3.5" height="10" rx="1"></rect>
+          <!-- Base axis line -->
+          <line x1="2.5" y1="20" x2="21.5" y2="20" stroke-linecap="round"></line>
+        </svg>
+        <span class="text-[12.5px] font-serif-sc font-medium opacity-85">统计</span>
+      </button>
+
+    </nav>
+
+  </main>
+</body>
+</html>

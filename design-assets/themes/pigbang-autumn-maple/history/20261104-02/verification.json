@@ -1,0 +1,29 @@
+{
+  "source": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-01\\pigbang-lineart-lower-lobes-symmetric.png",
+  "leaves": [
+    {
+      "name": "watermark",
+      "x": 826,
+      "y": 498,
+      "angle": 4.9,
+      "length": 49,
+      "color": "#cd9b62",
+      "width": 0.9,
+      "opacity": 0.72
+    },
+    {
+      "name": "bottom-left",
+      "x": 49,
+      "y": 1393,
+      "angle": 12.88,
+      "length": 40,
+      "color": "#b17733",
+      "width": 1.05,
+      "opacity": 0.88
+    }
+  ],
+  "changedPixels": 1720,
+  "outsideChanges": 0,
+  "newApiCalls": 0,
+  "method": "local prong cleanup and one continuous petiole per leaf"
+}

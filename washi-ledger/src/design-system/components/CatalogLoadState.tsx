@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useI18n } from '../../lib/i18n'
 
 interface CatalogLoadStateProps {
@@ -16,14 +17,14 @@ export function CatalogLoadState({ loading, onRetry }: CatalogLoadStateProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <span className="material-symbols-outlined animate-spin text-3xl text-outline">progress_activity</span>
+        <ThemeIcon className="material-symbols-outlined animate-spin text-3xl text-outline" icon="progress_activity" />
       </div>
     )
   }
 
   return (
     <div className="flex flex-col items-center gap-sm py-24 px-md text-center">
-      <span className="material-symbols-outlined text-3xl text-outline">cloud_off</span>
+      <ThemeIcon className="material-symbols-outlined text-3xl text-outline" icon="cloud_off" />
       <p className="text-body-md text-on-surface-variant">{t('catalogLoadErrorHint')}</p>
       <button
         type="button"

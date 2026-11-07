@@ -1,0 +1,26 @@
+{
+  "model": "gpt-image-2",
+  "quality": "high",
+  "generation_requests": 2,
+  "icons_visually_checked": 11,
+  "states": 3,
+  "app_integrated": false,
+  "files": [
+    {
+      "name": "home-high.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "bytes": 1481189
+    },
+    {
+      "name": "icons-states-high.png",
+      "size": [
+        1536,
+        2048
+      ],
+      "bytes": 2174692
+    }
+  ]
+}

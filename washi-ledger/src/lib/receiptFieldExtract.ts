@@ -1,13 +1,14 @@
 import { Ocr, type TextDetection } from '@capacitor-community/image-to-text'
 import { logModule } from './appLog'
+import { selectReceiptTotal, type ReceiptTextRow } from './receiptTotal'
 
 /** 扫描小票后自动填金额/备注——免费方案，用iOS Vision框架(通过
  * @capacitor-community/image-to-text，纯本地识别不联网不花钱)。跟Claude视觉API
  * 那种"直接看懂这是金额/店名/商品"完全不是一回事：这个插件只负责把图片里的文字
  * 识别出来(每条文本自带四角坐标)，金额/店名/购入明细这三项要靠这个文件自己写规则
  * 从这堆文本框里按版面结构拆出来，不是关键词瞎猜——按Y坐标把文本框聚类成"行"，
- * 行内再按X坐标还原从左到右的阅读顺序，店名取最上面一行，金额找含"合計/小計/
- * お会計"字样那一行里的数字，中间几行当购入明细。这套规则式解析在排版工整的
+ * 行内再按X坐标还原从左到右的阅读顺序，店名取最上面一行，金额只取明确的
+ * "合計/お会計/Total"标签之后的金额，中间几行当购入明细。这套规则式解析在排版工整的
  * 小票上效果还行，遇到花哨排版/手写小票会出错——这只是自动填表单默认值，
  * 用户确认页面还能改，不是直接存进去不让改
  *
@@ -24,31 +25,6 @@ export interface RecognizedReceiptFields {
   amount: number | null
   storeName: string | null
   items: string[]
-}
-
-// 按优先级找金额行，不是按"从上到下第一个匹配到关键词的行"——日式小票真实顺序
-// 通常是"小計"(税前)先出现、"合計"(税后)在它下面，如果不分优先级直接找第一个
-// 匹配的关键词，会先撞上"小計"就停，拿到税前金额而不是税后合計(真机实测复现过
-// 这个bug：138的"小計"被当成了金额，正确的应该是加了消费税之后的"合計")。
-// "合計"最优先，找不到再依次退而求其次，"小計"放最后垫底
-const TOTAL_KEYWORD_PRIORITY = ['合計', 'お会計', '御会計', 'total', '小計']
-// 数字块：允许千分位逗号/日元符号/円字，取一行里最后出现的一段数字当金额
-// (日式小票惯例是"合計"标签在左、金额在右，同一行内金额通常是最后一段数字)
-const NUMBER_RE = /[¥￥]?[\d,]{2,}[円]?/g
-
-// B-76：同一张小票上"割引前合計"(折扣前小计)和"合計"(折扣后实付总额)可能同时
-// 出现，而且前者的字面本身就包含"合計"这个子串——用findIndex从上往下找第一个
-// 匹配，排版通常是"割引前合計"先列、折扣后的真实"合計"排在它下面，会先撞上
-// "割引前合計"拿到折扣前的金额，读错。改成findLastIndex从下往上找最后一个
-// 匹配——小票上真正要付的那个"合計"/"お会計"永远是整张票最靠下的汇总行(付款方式/
-// 找零说明还在它下面，但那些行不含"合計"字样不会误撞)，不需要额外写"排除割引"
-// 这类特判规则，天然就会跳过排在上面的"割引前合計"
-function findTotalRowIndex(rows: Row[]): number {
-  for (const kw of TOTAL_KEYWORD_PRIORITY) {
-    const idx = rows.findLastIndex((r) => r.text.toLowerCase().includes(kw.toLowerCase()))
-    if (idx >= 0) return idx
-  }
-  return -1
 }
 
 // 店名/金额行之间夹的不只是"找不到合計时的兜底"这一种情况——真机实测过一张小票
@@ -106,7 +82,7 @@ const CJK_RE = /[぀-ヿ一-鿿･-ﾟ]/
  * 店名会变成分店名，是错的。用"第一行有没有日文字符"来区分这两种真实场景——
  * 第一行是纯英文/数字/符号(没有任何日文字符)、且第二行确实有日文字符时，才认为
  * 第一行是"店名之外的招牌英文名"，改取第二行 */
-function pickStoreNameIndex(rows: Row[]): number {
+function pickStoreNameIndex(rows: ReceiptTextRow[]): number {
   if (rows.length > 1 && !CJK_RE.test(rows[0].text) && CJK_RE.test(rows[1].text)) {
     return 1
   }
@@ -126,21 +102,17 @@ function boxHeight(box: TextDetection): number {
   return Math.abs(box.topLeft[1] - box.bottomLeft[1]) || 0.02
 }
 
-interface Row {
-  y: number
-  text: string
-}
-
 /** 按Y坐标把文本框聚类成行——同一行内的框Y中心差距应该在半个字高以内，
  * 不是简单按Y值相等分组(OCR识别出来的坐标不会真的完全对齐) */
-function groupIntoRows(boxes: TextDetection[]): Row[] {
+function groupIntoRows(boxes: TextDetection[]): ReceiptTextRow[] {
   // Y值越大越靠上，降序排列就是从上到下的阅读顺序
   const sorted = [...boxes].sort((a, b) => yCenter(b) - yCenter(a))
   const clusters: { ySum: number; boxes: TextDetection[] }[] = []
   for (const box of sorted) {
     const last = clusters[clusters.length - 1]
     const lastY = last ? last.ySum / last.boxes.length : null
-    if (last && lastY != null && Math.abs(yCenter(box) - lastY) < boxHeight(box) * 0.6) {
+    const sharedHeight = last ? Math.min(boxHeight(box), ...last.boxes.map(boxHeight)) : boxHeight(box)
+    if (last && lastY != null && Math.abs(yCenter(box) - lastY) < sharedHeight * 0.6) {
       last.boxes.push(box)
       last.ySum += yCenter(box)
     } else {
@@ -149,35 +121,33 @@ function groupIntoRows(boxes: TextDetection[]): Row[] {
   }
   return clusters.map((c) => {
     const orderedBoxes = [...c.boxes].sort((a, b) => xCenter(a) - xCenter(b))
-    return { y: c.ySum / c.boxes.length, text: orderedBoxes.map((b) => b.text).join(' ').trim() }
+    return {
+      y: c.ySum / c.boxes.length,
+      text: orderedBoxes.map((b) => b.text).join(' ').trim(),
+      blocks: orderedBoxes.map((box) => ({
+        text: box.text,
+        left: Math.min(box.topLeft[0], box.bottomLeft[0]),
+        right: Math.max(box.topRight[0], box.bottomRight[0]),
+        top: Math.max(box.topLeft[1], box.topRight[1]),
+        bottom: Math.min(box.bottomLeft[1], box.bottomRight[1]),
+      })),
+    }
   })
 }
 
-function parseAmountFromRow(text: string): number | null {
-  const matches = text.match(NUMBER_RE)
-  if (!matches || matches.length === 0) return null
-  const last = matches[matches.length - 1].replace(/[¥￥円,]/g, '')
-  const n = Number(last)
-  return Number.isFinite(n) && n > 0 ? n : null
-}
-
-/** 只使用已判定的总计行金额。整张小票上的其他重复数字可能是商品码、流水号或税额，
- * 不能用“出现次数”或“数值更大”覆盖明确标注的合計；总计行无法解析时留空让用户确认。 */
-function pickTotal(rows: Row[], totalRowIdx: number): number | null {
-  if (totalRowIdx < 0) return null
-  const row = rows[totalRowIdx].text
-  const amount = parseAmountFromRow(row)
-  logModule('receipt', `合計判定: 使用总计行="${row}", 金额=${amount ?? '未解析'}`)
-  return amount
-}
-
 /** 从识别出的文本行里拆金额/店名/购入明细——见文件头注释的整体思路 */
-export function extractReceiptFields(rows: Row[], receiptId: string): RecognizedReceiptFields {
+export function extractReceiptFields(rows: ReceiptTextRow[], receiptId: string): RecognizedReceiptFields {
   const ocrRows = rows.map((row) => row.text)
   if (rows.length === 0) return { receiptId, ocrRows, amount: null, storeName: null, items: [] }
 
-  const totalRowIdx = findTotalRowIndex(rows)
-  const amount = pickTotal(rows, totalRowIdx)
+  const total = selectReceiptTotal(rows)
+  const totalRowIdx = total.rowIndex
+  const amount = total.amount
+  logModule('receipt', `合計判定 receiptId=${receiptId}: 金额=${amount ?? '未确认'}, 原因=${total.reason}`, 'info', {
+    row: totalRowIdx,
+    candidates: JSON.stringify(total.candidates),
+    rejectedRows: JSON.stringify(total.rejectedRows),
+  })
 
   const storeNameIdx = pickStoreNameIndex(rows)
   const storeName = rows[storeNameIdx]?.text || null
@@ -204,10 +174,9 @@ export async function recognizeReceiptFields(imageDataUrl: string, receiptId: st
     logModule('receipt', `Ocr.detectText()识别出${textDetections.length}个文本块`)
     const rows = groupIntoRows(textDetections)
     logModule('receipt', `OCR原始行 receiptId=${receiptId} (${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
-    const totalIdx = findTotalRowIndex(rows)
     const fields = extractReceiptFields(rows, receiptId)
     logModule('receipt',
-      `OCR解析 receiptId=${receiptId}: 合計行=${totalIdx >= 0 ? `#${totalIdx} "${rows[totalIdx].text}"` : '未找到'}, 金额=${fields.amount}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
+      `OCR解析 receiptId=${receiptId}: 金额=${fields.amount}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
     )
     return fields
   } catch (e) {

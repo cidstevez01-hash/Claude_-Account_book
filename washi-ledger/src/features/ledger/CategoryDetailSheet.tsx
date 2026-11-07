@@ -1,3 +1,4 @@
+import { ThemeIcon } from '../../icons/Icon'
 import { useEffect, useRef, useState } from 'react'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
@@ -161,13 +162,11 @@ export function CategoryDetailSheet({
       >
         <header className="flex items-center justify-between px-md h-16 border-b-[1.5px] border-dashed border-outline-variant shrink-0">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined" style={{ color: snap.header.color }}>
-              {snap.header.icon}
-            </span>
+            <ThemeIcon className="material-symbols-outlined" style={{ color: snap.header.color }} icon={snap.header.icon} />
             <h2 className="font-serif text-headline-md text-on-surface">{snap.header.label}</h2>
           </div>
           <button type="button" aria-label={t('closeAria')} onClick={onClose} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
-            <span className="material-symbols-outlined">close</span>
+            <ThemeIcon className="material-symbols-outlined" icon="close" />
           </button>
         </header>
 

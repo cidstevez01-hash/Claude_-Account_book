@@ -3,20 +3,14 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useAppNavigate, viewTransitionLinkClick } from '../../hooks/useAppNavigate'
 import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import { useI18n } from '../../lib/i18n'
-import { useSettings } from '../../hooks/useSettings'
 import { APP_ICONS } from '../../lib/appIcons'
 import { ThemeIcon } from './ThemeIcon'
-import { AppIcon } from './AppIcon'
-import { BareIconEffect } from './IconEffects'
 
 // 悬浮胶囊样式——DESIGN.md原文"A floating capsule with a backdrop-filter"。
 // 3个tab：仪表盘/明细/统计，设置+汇率不在这里，放左侧抽屉导航(见NavDrawer)。
 // 这条规则来自washi_ledger_markdown.md"交互逻辑提醒"一节，详见HANDOFF文档。
-// B-XX：不再用旧App专属插画图标(-fw资源)。仪表盘换成新画的书本图标(全主题通用，
-// 见lib/iconGlyphs.ts的book——Material Symbols没有合适的"账本"图标，Stitch单独画的，
-// 不是从字体提取的)；明细/统计沿用默认主题的history/bar_chart图标形状，"夏 · 花火"
-// 下三个tab统一套裸图标发光效果(见ThemeIcon.tsx的effect='bare')，不再跟active状态
-// 挂钩——选中态改由.tab-bubble的珊瑚红滑动指示条单独表达
+// R-52: navigation semantics, artwork and theme palettes are registered in src/icons/.
+// All three themes share the approved sample silhouettes; summer retains bare glow.
 const items = [
   { to: '/', icon: APP_ICONS.dashboard, labelKey: 'tabDashboard' as const },
   { to: '/history', icon: APP_ICONS.history, labelKey: 'tabHistory' as const },
@@ -51,8 +45,6 @@ let coldStartFontFixApplied = false
  * 按钮当下的真实渲染宽度，而不是硬编码常量——不然气泡宽度会跟tab本身对不上 */
 export function BottomNav() {
   const { t } = useI18n()
-  const { settings } = useSettings()
-  const isSummer = settings.themeSkin === 'summer'
   // B-48：这个组件每次切tab都会整个销毁重建(见上面lastActiveTab的说明)，图标呼吸
   // 发光动画(icon-glow-breathe，5.5s一个周期，见index.css)不传delay时新挂载的实例
   // 永远从0%关键帧重新开始，看起来像"跳"一下。用挂载时算一次的Date.now()%5500当
@@ -190,7 +182,7 @@ export function BottomNav() {
   return (
     <nav
       ref={navRef}
-      className="bottom-nav-shell fixed inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
+      className="autumn-bottom-nav bottom-nav-shell fixed inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
                  flex items-center px-lg py-xs
                  bg-surface/80 backdrop-blur-md border border-white/20 rounded-full shadow-lg"
       style={{
@@ -225,21 +217,14 @@ export function BottomNav() {
         >
           {({ isActive }) => (
             <>
-              {item.to === '/' ? (
-                isSummer ? (
-                  <BareIconEffect icon="book" size={24} className="w-6 h-6" glowDelayMs={glowDelayMs} />
-                ) : (
-                  <AppIcon icon="book" size={24} fill="currentColor" className="w-6 h-6" />
-                )
-              ) : (
-                <ThemeIcon
-                  icon={item.icon}
-                  effect="bare"
-                  className="w-6 h-6"
-                  style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
-                  glowDelayMs={glowDelayMs}
-                />
-              )}
+              <ThemeIcon
+                icon={item.icon}
+                variant="navigation"
+                active={isActive}
+                size={24}
+                className="w-6 h-6"
+                glowDelayMs={glowDelayMs}
+              />
               <span className="text-tab-label font-sans font-normal">{t(item.labelKey)}</span>
             </>
           )}

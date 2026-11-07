@@ -396,7 +396,7 @@ export function AddTransactionPage() {
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
+      className="app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
@@ -479,7 +479,7 @@ export function AddTransactionPage() {
                       disabled={receiptBusy}
                       className="w-7 h-7 shrink-0 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
                     >
-                      <span className="material-symbols-outlined text-[16px]">delete</span>
+                      <ThemeIcon className="material-symbols-outlined text-[16px]" icon="delete" />
                     </button>
                   </div>
                 ))}
@@ -489,7 +489,7 @@ export function AddTransactionPage() {
                   disabled={receiptBusy}
                   className="flex items-center justify-center gap-1.5 py-1.5 text-on-surface-variant text-body-md active:bg-surface-container transition-colors disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined text-[16px]">photo_camera</span>
+                  <ThemeIcon className="material-symbols-outlined text-[16px]" icon="photo_camera" />
                   {t('receiptScanMore')}
                 </button>
               </div>
@@ -499,7 +499,7 @@ export function AddTransactionPage() {
                 onClick={() => setScanSheetOpen(true)}
                 className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant text-on-surface-variant text-body-md active:bg-surface-container transition-colors"
               >
-                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                <ThemeIcon className="material-symbols-outlined text-[18px]" icon="photo_camera" />
                 {t('receiptScanEntry')}
               </button>
             )}
@@ -613,12 +613,10 @@ export function AddTransactionPage() {
                 {t('pointsLabel')}
               </h2>
               <div className="flex items-center border-b border-outline-variant pb-2">
-                <span
+                <ThemeIcon
                   className="material-symbols-outlined text-tertiary mr-2 text-[20px]"
                   style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  stars
-                </span>
+                 icon="stars" />
                 <input
                   type="number"
                   inputMode="numeric"
@@ -684,7 +682,7 @@ export function AddTransactionPage() {
               ))}
             </span>
           ) : (
-            <span className="material-symbols-outlined">how_to_reg</span>
+            <ThemeIcon className="material-symbols-outlined" icon="how_to_reg" />
           )}
           {t('saveEntry')}
         </button>

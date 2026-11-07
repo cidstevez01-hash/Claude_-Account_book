@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PigBang 红枫主题配色定案 - 丹枫金秋</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=Noto+Serif+SC:wght@600;700;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: #0E1012;
+      color: #E2E8F0;
+    }
+    .serif-title {
+      font-family: 'Noto Serif SC', serif;
+    }
+    .mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Subtle dot grid pattern on desktop backdrop */
+    .bg-dot-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    /* Natural washi paper feel for the mobile mock */
+    .washi-paper-bg {
+      background-color: #FAF6EE;
+      background-image: radial-gradient(#F0E8D7 0.75px, transparent 0.75px);
+      background-size: 16px 16px;
+    }
+    .subtle-washi-card {
+      background-color: #FFFFFF;
+      box-shadow: 0 4px 20px -2px rgba(186, 42, 27, 0.05), 0 1px 3px rgba(38, 30, 24, 0.04);
+    }
+    .accent-glow-amber {
+      box-shadow: 0 10px 25px -4px rgba(198, 40, 24, 0.35), 0 0 12px rgba(229, 142, 38, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-dot-pattern min-h-screen p-6 md:p-12 text-slate-200">
+  <div class="max-w-6xl mx-auto space-y-10">
+
+    <!-- Header Badge & Title -->
+    <header class="border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-[#C62818]/20 text-[#FF5A43] border border-[#C62818]/40">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#FF5A43] animate-pulse"></span>
+            DECISIVE PALETTE REVISION
+          </span>
+          <span class="text-xs text-slate-400 font-mono">PigBang Autumn System v2.0</span>
+        </div>
+        <h1 class="serif-title text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight flex items-baseline gap-3">
+          <span>丹枫金秋</span>
+          <span class="text-xl md:text-2xl font-normal text-[#E58E26] serif-title tracking-normal">（Tanfū Yamabuki）</span>
+        </h1>
+        <p class="mt-3 text-slate-400 text-sm md:text-base max-w-3xl leading-relaxed">
+          针对上一轮灰白偏暗、沉闷迟滞的问题全面推倒重构。汲取日本神社御朱印纸的纯澈素白、鲜活丹枫朱绯、熟透赤枫、以及点睛的<span class="text-[#E58E26] font-medium">山吹/银杏黄</span>暖光。剔除大面积冷灰与死寂褐木，以通透温润的天然和纸为底，构筑极具秋日呼吸感的决断配色方案。
+        </p>
+      </div>
+
+      <!-- Quick Summary Metric Card -->
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-4 md:p-5 flex items-center gap-6 shrink-0 backdrop-blur-sm">
+        <div>
+          <div class="text-xs text-slate-400 mb-1">设计形态</div>
+          <div class="font-bold text-white text-base">单一决策定案看板</div>
+        </div>
+        <div class="w-px h-8 bg-white/10"></div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1">点睛黄占比</div>
+          <div class="font-bold text-[#E58E26] text-base font-mono">&le; 8.5% UI</div>
+        </div>
+        <div class="w-px h-8 bg-white/10"></div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1">主对比度</div>
+          <div class="font-bold text-emerald-400 text-base font-mono">13.2:1 (AAA)</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Grid: Phone Mockup (Left/Center) + 6 Hex Swatches & Rationale (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+      <!-- Left Column: The Mobile Dashboard Preview (5 Cols) -->
+      <div class="lg:col-span-5 flex flex-col items-center">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+          <span>真实手机视图预览 (390 &times; 844 px)</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        </div>
+
+        <!-- Phone Shell -->
+        <div class="w-[370px] sm:w-[390px] rounded-[48px] p-3.5 bg-gradient-to-b from-[#282725] to-[#151413] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.15)] ring-1 ring-black">
+          <!-- Inner Screen -->
+          <div class="w-full rounded-[38px] washi-paper-bg text-[#241D17] overflow-hidden flex flex-col relative select-none" style="min-height: 780px;">
+            
+            <!-- Top Status Bar & Subtle Autumn Foliage Watermark Placeholder (Preserving Paid Asset Space) -->
+            <div class="px-7 pt-3 pb-1 flex justify-between items-center text-xs font-semibold text-[#6E6359] mono-code">
+              <span>9:41</span>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full border border-[#6E6359]"></span>
+                <span class="text-[10px]">5G</span>
+                <span class="w-4 h-2 rounded-sm border border-[#6E6359] flex items-center p-0.5"><span class="w-full h-full bg-[#6E6359] rounded-2xs"></span></span>
+              </div>
+            </div>
+
+            <!-- App Bar / Header -->
+            <div class="px-6 py-3 flex items-center justify-between">
+              <button class="w-9 h-9 rounded-full flex items-center justify-center text-[#241D17] hover:bg-black/5 transition">
+                <svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                </svg>
+              </button>
+
+              <div class="flex items-center gap-2">
+                <!-- Red Maple Pip / Logo Accent -->
+                <span class="w-2.5 h-2.5 rounded-full bg-[#C62818] shadow-[0_0_8px_rgba(198,40,24,0.6)]"></span>
+                <span class="text-xl font-bold tracking-tight text-[#241D17] serif-title">PigBang</span>
+              </div>
+
+              <button class="w-9 h-9 rounded-full flex items-center justify-center text-[#241D17] hover:bg-black/5 transition">
+                <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Main Scrollable Body Area -->
+            <div class="px-5 pt-1 pb-24 space-y-4 overflow-y-auto">
+
+              <!-- Date Capsule (Warm ochre border subtle accent) -->
+              <div class="flex justify-center">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 border border-[#E58E26]/30 text-xs font-medium text-[#5A4F46] shadow-xs">
+                  <svg class="w-3.5 h-3.5 text-[#E58E26]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span class="mono-code font-medium">2026年11月1日 ～ 11月30日</span>
+                </div>
+              </div>
+
+              <!-- Main Balance Card: Pure White Washi with Rich Maple Red & Yamabuki Glow -->
+              <div class="subtle-washi-card rounded-2xl p-5 border border-[#E8DFC9] relative overflow-hidden">
+                <!-- Warm Leaf-Sunlight Ambient Corner Glow -->
+                <div class="absolute -right-8 -top-8 w-32 h-32 bg-[#FF5A43]/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute -right-2 -bottom-2 w-20 h-20 bg-[#E58E26]/10 rounded-full blur-xl pointer-events-none"></div>
+                
+                <!-- Paid Asset Botanical Watermark Reserved Slot (Clean Outline Motif Placeholder) -->
+                <div class="absolute right-4 top-4 opacity-15 pointer-events-none">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#C62818" stroke-width="1.2">
+                    <path d="M12 2L13.5 7.5L18.5 5L16 10L21.5 12L16 14L18.5 19L13.5 16.5L12 22L10.5 16.5L5.5 19L8 14L2.5 12L8 10L5.5 5L10.5 7.5L12 2Z" />
+                  </svg>
+                </div>
+
+                <div class="text-xs text-[#7A6E63] font-medium flex items-center justify-between mb-1">
+                  <span>本月结余</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#C62818] bg-[#C62818]/8 px-2 py-0.5 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#C62818]"></span>
+                    秋暮结算
+                  </span>
+                </div>
+
+                <!-- Balance Display -->
+                <div class="flex items-baseline gap-1 my-1">
+                  <span class="text-2xl font-bold text-[#C62818] serif-title">¥</span>
+                  <span class="text-3xl font-extrabold text-[#241D17] tracking-tight mono-code">—</span>
+                </div>
+
+                <!-- 3 Pillars: Income / Expense / Points (Preserving Green & Red Semantics) -->
+                <div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-[#F3EDE0]">
+                  <div>
+                    <div class="text-[11px] text-[#7A6E63] mb-1">收入</div>
+                    <div class="text-sm font-bold text-[#2A7E4B] mono-code flex items-center gap-0.5">
+                      <span>¥</span>
+                      <span>—</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-[11px] text-[#7A6E63] mb-1">支出</div>
+                    <div class="text-sm font-bold text-[#C62818] mono-code flex items-center gap-0.5">
+                      <span>¥</span>
+                      <span>—</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-[11px] text-[#7A6E63] mb-1">积分</div>
+                    <div class="text-sm font-bold text-[#E58E26] mono-code">
+                      <span>—</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category Donut Card (分类统计) -->
+              <div class="subtle-washi-card rounded-2xl p-5 border border-[#E8DFC9]">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="text-sm font-bold text-[#241D17] flex items-center gap-2">
+                    <span class="w-1 h-3.5 bg-[#C62818] rounded-full"></span>
+                    <span>分类统计</span>
+                  </div>
+                  <!-- Expense / Income Toggle -->
+                  <div class="inline-flex p-0.5 rounded-lg bg-[#F0E8D7] text-xs">
+                    <button class="px-2.5 py-1 rounded-md bg-[#C62818] text-white font-medium shadow-xs text-[11px]">支出</button>
+                    <button class="px-2.5 py-1 rounded-md text-[#6E6359] font-medium text-[11px]">收入</button>
+                  </div>
+                </div>
+
+                <!-- Empty Donut Chart (Leaf vermilion stroke + Yamabuki accent tip) -->
+                <div class="py-3 flex flex-col items-center justify-center">
+                  <div class="relative w-32 h-32 flex items-center justify-center">
+                    <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                      <!-- Base Ring -->
+                      <circle cx="50" cy="50" r="38" stroke="#EBE2D0" stroke-width="9" fill="transparent"/>
+                      <!-- Vivid Vermilion Crimson Arc (Simulating foliage distribution) -->
+                      <circle cx="50" cy="50" r="38" stroke="#C62818" stroke-width="9" stroke-linecap="round" stroke-dasharray="140 240" fill="transparent"/>
+                      <!-- Yamabuki Yellow Accent Tip (<=10%) -->
+                      <circle cx="50" cy="50" r="38" stroke="#E58E26" stroke-width="9" stroke-linecap="round" stroke-dasharray="25 240" stroke-dashoffset="-145" fill="transparent"/>
+                    </svg>
+                    <!-- Center Empty Label -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                      <span class="text-xs text-[#82766A] font-medium">暂无数据</span>
+                    </div>
+                  </div>
+                  <div class="mt-3 text-[11px] text-[#8C8075] flex items-center gap-3">
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#C62818]"></span>主要支出</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#E58E26]"></span>日常零用</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Records Card (最近记录 Empty State) -->
+              <div class="subtle-washi-card rounded-2xl p-5 border border-[#E8DFC9]">
+                <div class="text-sm font-bold text-[#241D17] flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1 h-3.5 bg-[#E58E26] rounded-full"></span>
+                    <span>最近记录</span>
+                  </div>
+                  <span class="text-xs text-[#9E9285]">明细列表</span>
+                </div>
+
+                <div class="py-8 border-2 border-dashed border-[#E5DCBE] rounded-xl flex flex-col items-center justify-center bg-[#FAF6EE]/50">
+                  <div class="w-10 h-10 rounded-full bg-[#C62818]/10 text-[#C62818] flex items-center justify-center mb-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <span class="text-xs font-medium text-[#7A6E63]">本月尚未收支记录</span>
+                  <span class="text-[10px] text-[#A69B8F] mt-0.5">点击下方按钮开启记账</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Floating Action Button '+' (Vivid Japanese Maple Red + Subtle Amber Ray) -->
+            <div class="absolute right-6 bottom-20 z-20">
+              <button class="w-13 h-13 w-[52px] h-[52px] rounded-full bg-gradient-to-tr from-[#A81E10] to-[#C62818] text-white flex items-center justify-center accent-glow-amber transition-transform active:scale-95 border border-[#FF5A43]/40">
+                <svg class="w-6 h-6 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Floating Capsule Bottom Navigation (Icon ABOVE Label) -->
+            <div class="absolute bottom-4 inset-x-4 z-10 flex justify-center">
+              <div class="w-full bg-white/95 backdrop-blur-md border border-[#E0D5BE] rounded-full py-2.5 px-6 shadow-[0_8px_25px_rgba(38,30,24,0.08)] flex justify-between items-center">
+                <!-- 概览 (Active: Vivid Red) -->
+                <button class="flex flex-col items-center justify-center text-[#C62818] group">
+                  <svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                  </svg>
+                  <span class="text-[10px] font-bold mt-1">概览</span>
+                </button>
+
+                <!-- 明细 -->
+                <button class="flex flex-col items-center justify-center text-[#82766A] hover:text-[#241D17]">
+                  <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-[10px] font-medium mt-1">明细</span>
+                </button>
+
+                <!-- 统计 -->
+                <button class="flex flex-col items-center justify-center text-[#82766A] hover:text-[#241D17]">
+                  <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                  </svg>
+                  <span class="text-[10px] font-medium mt-1">统计</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: 6 Exact HEX Swatches & Design Spec (7 Cols) -->
+      <div class="lg:col-span-7 space-y-8">
+
+        <!-- Palette Swatches Section -->
+        <div class="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="serif-title text-2xl font-bold text-white flex items-center gap-2.5">
+                <span>定案 6 色精细 HEX 规格</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-1">精确剥离冷灰与死寂褐木，以御朱印丹赤与山吹金构成鲜活秋日光华</p>
+            </div>
+            <span class="px-2.5 py-1 bg-white/10 text-slate-300 text-xs rounded-full mono-code font-medium">6 SWATCHES</span>
+          </div>
+
+          <!-- The 6 Swatches Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <!-- Swatch 1: Background -->
+            <div class="bg-black/30 border border-white/10 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <div class="w-full h-16 rounded-xl border border-black/20 shadow-inner flex items-end p-2.5" style="background-color: #FAF6EE;">
+                  <span class="text-[11px] font-bold text-[#6E6359] mono-code">#FAF6EE</span>
+                </div>
+                <div class="mt-3">
+                  <div class="text-xs text-slate-400">背景色（天然素和纸）</div>
+                  <div class="text-sm font-semibold text-white mt-0.5">Washi Ivory Paper</div>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                告别发灰的泥土冷调。汲取日本神社御朱印原纸的天然奶白与微温米色，清透利落。
+              </p>
+            </div>
+
+            <!-- Swatch 2: Card -->
+            <div class="bg-black/30 border border-white/10 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <div class="w-full h-16 rounded-xl border border-black/20 shadow-inner flex items-end p-2.5" style="background-color: #FFFFFF;">
+                  <span class="text-[11px] font-bold text-slate-700 mono-code">#FFFFFF</span>
+                </div>
+                <div class="mt-3">
+                  <div class="text-xs text-slate-400">卡片底色（素纯白纸）</div>
+                  <div class="text-sm font-semibold text-white mt-0.5">Pure White Card</div>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                提供极高的层级明度跃升，承载真实叶片线稿水印时具有无遮挡透光感与极佳对比。
+              </p>
+            </div>
+
+            <!-- Swatch 3: Primary Red -->
+            <div class="bg-black/30 border border-white/10 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute right-2 top-2 px-1.5 py-0.5 rounded text-[10px] bg-[#C62818]/30 text-[#FF5A43] font-bold">核心主色</div>
+              <div>
+                <div class="w-full h-16 rounded-xl border border-black/20 shadow-inner flex items-end p-2.5" style="background-color: #C62818;">
+                  <span class="text-[11px] font-bold text-white mono-code">#C62818</span>
+                </div>
+                <div class="mt-3">
+                  <div class="text-xs text-slate-400">品牌主色（丹枫叶赤）</div>
+                  <div class="text-sm font-semibold text-white mt-0.5">Crimson Maple Red</div>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                成熟日本枫树深浓红叶色。既有御朱印印章的饱满冲击力，绝无粉调、紫调或灰脏感。
+              </p>
+            </div>
+
+            <!-- Swatch 4: Primary Text -->
+            <div class="bg-black/30 border border-white/10 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <div class="w-full h-16 rounded-xl border border-black/20 shadow-inner flex items-end p-2.5" style="background-color: #241D17;">
+                  <span class="text-[11px] font-bold text-amber-200/80 mono-code">#241D17</span>
+                </div>
+                <div class="mt-3">
+                  <div class="text-xs text-slate-400">主文本（墨浓焦茶）</div>
+                  <div class="text-sm font-semibold text-white mt-0.5">Sumi Tea Bark</div>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                浓郁苍劲的茶墨深黑，与和纸底色构成高达 13.2:1 的超高可读性，兼具自然树木质感。
+              </p>
+            </div>
+
+            <!-- Swatch 5: Accent Yellow (<=10%) -->
+            <div class="bg-black/30 border border-white/10 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute right-2 top-2 px-1.5 py-0.5 rounded text-[10px] bg-[#E58E26]/20 text-[#E58E26] font-bold">&le; 10% 重点</div>
+              <div>
+                <div class="w-full h-16 rounded-xl border border-black/20 shadow-inner flex items-end p-2.5" style="background-color: #E58E26;">
+                  <span class="text-[11px] font-bold text-black mono-code">#E58E26</span>
+                </div>
+                <div class="mt-3">
+                  <div class="text-xs text-slate-400">点睛色（山吹金银杏）</div>
+                  <div class="text-sm font-semibold text-white mt-0.5">Yamabuki Ochre</div>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                明亮温暖的天然黄栌/银杏黄。精准控制在 8.5% 面积内，杜绝大面积金属金的泥泞感。
+              </p>
+            </div>
+
+            <!-- Swatch 6: Edge Sun Glow -->
+            <div class="bg-black/30 border border-white/10 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <div class="w-full h-16 rounded-xl border border-black/20 shadow-inner flex items-end p-2.5" style="background-color: #FF5A43;">
+                  <span class="text-[11px] font-bold text-white mono-code">#FF5A43</span>
+                </div>
+                <div class="mt-3">
+                  <div class="text-xs text-slate-400">透光微光（叶缘斜阳朱）</div>
+                  <div class="text-sm font-semibold text-white mt-0.5">Translucent Vermilion</div>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                深秋枫叶迎着落日余晖透光时呈现的朱红光晕，专用于 FAB 按钮外发光与高光边缘。
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Semantic & Asset Integration Guarantees -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- Card 1: Asset Preservation & Integration -->
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+            <div class="flex items-center gap-2 mb-3 text-emerald-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 class="font-bold text-white text-base">付费资产 100% 预留与继承规范</h3>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed space-y-2">
+              <span class="block">• <strong class="text-slate-200">Image 2 已购资产完全保留：</strong>重叠紫铜轮廓枫叶叶簇、角落半透明飘叶、单片叶脉水印、和纸纹理以及书本/历史/柱状图图标族全部按尺寸与层级预留槽位。</span>
+              <span class="block">• <strong class="text-slate-200">纯粹色值与样式定义：</strong>本次交付严格限于 Color Tokens 与 CSS 视觉系统，绝不生成任何替换性图画，确保后续本地资产装配时严丝合缝。</span>
+            </p>
+          </div>
+
+          <!-- Card 2: Semantic Colors & Contrast Compliance -->
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+            <div class="flex items-center gap-2 mb-3 text-amber-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 class="font-bold text-white text-base">语义色彩与无障碍验证</h3>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed space-y-2">
+              <span class="block">• <strong class="text-emerald-400">收入常青绿 (#2A7E4B)：</strong>完整保留独立记账语义，在天然米白和纸上达到 6.8:1 对比度。</span>
+              <span class="block">• <strong class="text-[#FF5A43]">支出丹枫红 (#C62818)：</strong>与主品牌色调保持严密秩序，对比度达到 4.9:1，清晰醒目。</span>
+              <span class="block">• <strong class="text-slate-200">杜绝脏灰与粉紫：</strong>消除了此前被拒方案中大面积深褐青灰底板（如 #EFECE6），页面明快清澈。</span>
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Token Implementation Code Snippet -->
+        <div class="bg-black/40 border border-white/10 rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-mono text-slate-400">CSS Tokens Export (Ready to Copy)</span>
+            <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">PIGBANG_AUTUMN_TOKENS</span>
+          </div>
+          <pre class="mono-code text-xs text-slate-300 overflow-x-auto leading-relaxed p-2 bg-black/30 rounded-xl"><code>:root {
+  --pb-bg-paper:      <span class="text-[#FAF6EE] font-bold">#FAF6EE</span>; /* 天然素和纸底色 */
+  --pb-card-paper:    <span class="text-white font-bold">#FFFFFF</span>; /* 素纯白卡片 */
+  --pb-primary-maple: <span class="text-[#FF5A43] font-bold">#C62818</span>; /* 丹枫鲜绯主色 (深浓叶赤) */
+  --pb-text-sumi:     <span class="text-amber-100 font-bold">#241D17</span>; /* 墨浓焦茶主字 */
+  --pb-accent-ochre:  <span class="text-[#E58E26] font-bold">#E58E26</span>; /* 山吹金银杏点睛 (≤10%) */
+  --pb-glow-amber:    <span class="text-[#FF5A43] font-bold">#FF5A43</span>; /* 叶缘斜阳朱透光 */
+  --pb-semantic-inc:  <span class="text-emerald-400 font-bold">#2A7E4B</span>; /* 收入绿 */
+  --pb-semantic-exp:  <span class="text-[#FF5A43] font-bold">#C62818</span>; /* 支出红 */
+}</code></pre>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,2374 @@
+{
+  "count": 229,
+  "files": [
+    {
+      "path": "20261103-01/pigbang-maple-home-low.png",
+      "bytes": 1702239,
+      "sha256": "10a03397f357b37151d55be17f11364d7595dfbee4561bcdc5aeb88e4021db60",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-02/pigbang-maple-home-corrected-low.png",
+      "bytes": 1664694,
+      "sha256": "d9808eae0db66164cce983b1080486af4425b7d8809d08631e4705d6e82c8cdf",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-02/references/japanese-maple-real.jpg",
+      "bytes": 47897,
+      "sha256": "4770bac07f4c19a931d6f7beb365f1840971931fa52753fcfd1e981598ff49c8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        900,
+        720
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-02/references/ncsu-acer-palmatum.jpg",
+      "bytes": 266233,
+      "sha256": "7ba41ea0565dc9823b1f956d25d21745efb527dd39aaadf3f1059d9465bb3735",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        682,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-03/pigbang-maple-home-user-refs-low.png",
+      "bytes": 1670188,
+      "sha256": "d69a3dbf07961b8366b859035acfeb9ab415dfc796edbc0293cb2f3cc7d4896f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-03/references/user-leaf-detail.png",
+      "bytes": 288027,
+      "sha256": "50b1c0babdbc16ecc4f7c898c6764fead8d68132bfac948489162f6880467c4a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        462,
+        505
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-03/references/user-scene.png",
+      "bytes": 237324,
+      "sha256": "a009ff01db2e9d014e8cb15942e6726dd514909b094f4766eb183fe03bba7520",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        474,
+        439
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-04/cleanup-mask.png",
+      "bytes": 15867,
+      "sha256": "cdcb4fc3944ae713414d1cec83b362e8298c7ee57949f5d652825a84e50c9bd5",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-04/leaf-decoration-layer.svg",
+      "bytes": 32896,
+      "sha256": "2376f04705f6dcd33050eec96d7b4885d2b1d3554b0696d5d435a517e1babd0e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261103-04/maple-template-preview.png",
+      "bytes": 50332,
+      "sha256": "fc94b2b5cdd07be18b768d73b1484875f07b39aae6e06455ea343c9da23a0115",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        600,
+        660
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-04/maple-template.svg",
+      "bytes": 1508,
+      "sha256": "16896d03a52f534c8f559595d6f92a30a20772a6ea162d7c9d7732637f7f076f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261103-04/pigbang-maple-clean-base-low.png",
+      "bytes": 1537205,
+      "sha256": "2d483765e77bd302fc437219886cc7926f815c7ec7913f322fc43b54bdcd8ac0",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-04/pigbang-maple-home-unified-leaf-low.png",
+      "bytes": 1578083,
+      "sha256": "6fb42f312cc6d836a3648ae2f05a564bcb3b906de37d65d6b137be9b0edcff08",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-05/pigbang-maple-home-lineart-low.png",
+      "bytes": 1690732,
+      "sha256": "607270863a9438d6f75121b0a20371f884ab456a5c3eb35514cd54e349d83961",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-06/bottom-left-detail.png",
+      "bytes": 202954,
+      "sha256": "71e8f4194f06dbbdfae1c4c21aecb0509a582e18f4855e3ee52c3a6d93bcd6d9",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        360,
+        435
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/bottom-left-final.png",
+      "bytes": 212542,
+      "sha256": "97b002caaa3ac111b666e1db63f2ad1a152ce86d01b1c7620d06c9b17ce983ea",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        390,
+        435
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/bottom-left-mirrored.png",
+      "bytes": 214447,
+      "sha256": "e3e1bb2779633f6d270c69fd3c8f41caa7469ee09fd2f35fa7f1a160e3ffeac1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        360,
+        435
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/lobe-edit-mask.png",
+      "bytes": 10779,
+      "sha256": "e56bdedf7dadb78fda64031190525f12471d4b0f8b6f0f2cc175a4560093064b",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/pigbang-lineart-local-edit-low.png",
+      "bytes": 1659415,
+      "sha256": "0c9e31160c7106522f7bcded9fcee3a3f185487cc5858d420af12133d02b254e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261103-06/pigbang-lineart-two-leaves-final.png",
+      "bytes": 1908166,
+      "sha256": "7e95d81a886684431bd7db500312a045db0002b730b4c3b474ccbf79c75cf735",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/pigbang-lineart-two-leaves-low.png",
+      "bytes": 1911096,
+      "sha256": "abf9fbc634e14fa277ab9a79e83ecc261b2bf2d3a4b3c656ec786a4c92c047c6",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/pigbang-lineart-two-leaves-mirrored.png",
+      "bytes": 1911240,
+      "sha256": "6dff590392a50eda156a50d6aac4f9c8caced036e417d538943029883b1470dd",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/symmetric-lobes-layer.svg",
+      "bytes": 868,
+      "sha256": "09719fa90a2c7aa74ff6518fd3fb4333f969b528e65dc7ece5c024f946ffb251",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261103-06/watermark-detail.png",
+      "bytes": 286537,
+      "sha256": "a2df21d9017c0bea78dec8c9d1039466989c3006979c9928feedc2cdf4d5f396",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        597,
+        495
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/watermark-final.png",
+      "bytes": 273194,
+      "sha256": "4d0be95c342edba55c5f53bd86eac71c2b4d5e44d312c98ef22255822efb481f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        597,
+        495
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261103-06/watermark-mirrored.png",
+      "bytes": 274568,
+      "sha256": "a1dee957c4e7fd8ae7a6252f3f3e6e2317ae28ce7b6a092578cd32e2e02a4f17",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        597,
+        495
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-01/bottom-left-detail.png",
+      "bytes": 210667,
+      "sha256": "91cc8e3a8f5ce7113d642ccecf0ccdef7d3e38dfa644757ba4bbd1eafefd9fb0",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        390,
+        435
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-01/pigbang-lineart-lower-lobes-symmetric.png",
+      "bytes": 1908449,
+      "sha256": "ab50c431fbb18bd30b3ec242c024162e4c3aa494a593542c75ee413854a86b1c",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-01/watermark-detail.png",
+      "bytes": 277228,
+      "sha256": "9930bdc61b8fec75a78088536e3448b0cd90ec1078c5dc20d29d8597fbef88ec",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        597,
+        495
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-02/bottom-left-detail.png",
+      "bytes": 210494,
+      "sha256": "71ca5a5687b53597c192060cc962182d638bd352a1032be5e5d7e211b6db6347",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        390,
+        450
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-02/petioles.svg",
+      "bytes": 580,
+      "sha256": "ec8d9e2f17ef08b4c265de30fc49c85dd28b32fc93f4d8a1b701298e624fcf16",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-02/pigbang-lineart-two-petioles.png",
+      "bytes": 1906673,
+      "sha256": "f12509bb30094830a9def68e742802f820dc41e5410e55dd56445c49385fb7b8",
+      "role": "用户明确采用的线稿与叶梗基准版",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-02/watermark-detail.png",
+      "bytes": 285872,
+      "sha256": "0587dd563f090ac643d50d0069633f16b75c75f9da98cb3de2c214387f6932a1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        597,
+        525
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-03/bottom-left-detail.png",
+      "bytes": 141838,
+      "sha256": "9e46f5ebfa55122158a96fd61bed70156e6770fd8b1052ebf68703bdc393ff38",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        396,
+        435
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-03/continuous-leaf-contours.svg",
+      "bytes": 1339,
+      "sha256": "c3f5731bd75cf34076e0640e699e55d6f99e65a1e232e5dd03ba371e542218f8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-03/pigbang-lineart-contours-repaired.png",
+      "bytes": 1892740,
+      "sha256": "4a6b21916e00e738c043750d8b03ec504fcdac906ec93cba68545aa46f50ad66",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-03/watermark-detail.png",
+      "bytes": 226930,
+      "sha256": "2d7ab6045f183304af173933d5947fbe7ee6d56e1d4f46b9f03cd5e8deb1790c",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        597,
+        510
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/backgrounds/B-01-paper.png",
+      "bytes": 119244,
+      "sha256": "54efdf52442cbc57def75c65b022fdabca6bf3cde79b7e45108ba3fc4eca1fae",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/backgrounds/B-02-branch.png",
+      "bytes": 274818,
+      "sha256": "0dc09b85cf77fcd50bb644ecbb753954355b6a69ea06dd79ded0ab24ef4db2d0",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        768
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/backgrounds/B-03-corner.png",
+      "bytes": 135174,
+      "sha256": "3d740993402593b703fdcc7ea36a07a0248747fc7d530af8374ea0098f66e25e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        512,
+        640
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/backgrounds/B-04-falling.png",
+      "bytes": 40210,
+      "sha256": "5ceede9812f235761876e48a55fcc0041a87a9c567845e25e404b15338aed675",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/backgrounds/B-05-watermark.png",
+      "bytes": 85036,
+      "sha256": "6d4e317c5f4edd3add25b7042437056f3c9f69db7af48e9ddb8c79d4c901f32f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/backgrounds/B-06-tape.png",
+      "bytes": 16687,
+      "sha256": "a3611b80a7940a7cb89d1839a132eed70af21533f2300682934419f2f758b6bb",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        128
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-001-book.png",
+      "bytes": 10748,
+      "sha256": "74c2f0ad0e98fbf9ecd9e9c3d7c25dbdbf8407a15056fa1551423adf2ef09669",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-001-book.svg",
+      "bytes": 594,
+      "sha256": "347b247d9d860ab9eb7bb8035bd93be8a4b75e785f84dad5bb259b31bcf886a8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-002-history.png",
+      "bytes": 10810,
+      "sha256": "2bd57f0e08989d4512971d48326962cf59d49838e3ba9569d2b590c411fe791a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-002-history.svg",
+      "bytes": 541,
+      "sha256": "a10b6b60ac1c78a7dae661b723b3370589f8466a180060fad0618e838bf9de98",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-003-bar_chart.png",
+      "bytes": 4946,
+      "sha256": "0c6b3c09b69a842a7fc7c0ec222caedbcb6b901e47e0a6d40e98808448745f7c",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-003-bar_chart.svg",
+      "bytes": 442,
+      "sha256": "7a4190c0ce5b983aa2e15c681c54b8870f1910d4391f09cb9d332cffc621484c",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-004-add.png",
+      "bytes": 2312,
+      "sha256": "6343a73eed11c92def8df411c27914ddfe32bbbb0f4a9c863aaa6cf32ae895c0",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-004-add.svg",
+      "bytes": 353,
+      "sha256": "0b404f9ecc2d43c61ca3dcdb19a10efd96c270eefb9a442838a3a2be82629624",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-005-menu.png",
+      "bytes": 2429,
+      "sha256": "e31feabab27eb2f225ebaad0e067287cb7abd53d6a2a93e1d8db1a848d3fee24",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-005-menu.svg",
+      "bytes": 365,
+      "sha256": "50f9dcd9325ab1508664416d1aaea4a8e24b0ce36fa6d7a66689fbbe259fcb84",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-006-person.png",
+      "bytes": 6455,
+      "sha256": "f0c023091002efebfb7d76b8a34f9949820cbffefa2dd91d5fc9e4ae9704248d",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-006-person.svg",
+      "bytes": 1296,
+      "sha256": "57dde909e029704572d3686a65b5c559c6884a954dce654856991ce9bc6734cd",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-007-calendar_month.png",
+      "bytes": 7387,
+      "sha256": "c62b709f0e0cc7c6ef10b70bb292fc3808deea56007f8a866a86c1e798368f92",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-007-calendar_month.svg",
+      "bytes": 1734,
+      "sha256": "02ae45725120711da0e7a8ccd4a98b1d4ffa1bf9f95c9537ffd094bd980d919f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-008-currency_exchange.png",
+      "bytes": 12534,
+      "sha256": "ac8ac2a8fb757aba2161bcb7f9fe318baae43372470038fa9181dc261d085268",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-008-currency_exchange.svg",
+      "bytes": 1327,
+      "sha256": "c9e6e9e98124278a59df6205de918ed5c2f89c3ac5ab18eb2e06a6ffd5d7988b",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-009-settings.png",
+      "bytes": 11402,
+      "sha256": "c9ece0860126877b88d960a080123364c7c67f6e9c6abc6a1f34330c25b9d667",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-009-settings.svg",
+      "bytes": 1572,
+      "sha256": "7a4b9d7e6d02aac7cba8219899b8844140b2f8223cb16b01c641cd20bb11781a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-010-info.png",
+      "bytes": 10050,
+      "sha256": "c2c0633195367867ac04b4a4b449c2974b15c8a04cc950d59b50759a3de5dadf",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-010-info.svg",
+      "bytes": 1091,
+      "sha256": "85e97ff1935a239635e5bfe7cd2127a60aeaee024bb2245339f2e69a70d124b4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-011-arrow_back.png",
+      "bytes": 2800,
+      "sha256": "e6bc4673a9ee0a764ea785569d2be3457ae3b1da2e016f96c835f614df102bad",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-011-arrow_back.svg",
+      "bytes": 368,
+      "sha256": "0a2057089ad9d63d7865f8be22cfc11c2effa0f103a5a875cda83a8d4da8a6d2",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-012-close.png",
+      "bytes": 3724,
+      "sha256": "39b55924e1cb311a5961ce10d22afa367d11ccac1435e65ceffdeec2304c453a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-012-close.svg",
+      "bytes": 397,
+      "sha256": "86c6a186f2b283a3a796260b58cb8223526d9eafb95e2984ad048aa55e9b0c36",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-013-language.png",
+      "bytes": 11269,
+      "sha256": "eee6bd97164ad7bcd3f2fdf59b2d90bb3e61787365fb814def4969afef66a7f4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-013-language.svg",
+      "bytes": 1621,
+      "sha256": "3c145bb512a6f093e3c7130bcfa19066600d61c1aeabde8b7319f9e77a3b84d0",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-014-payments.png",
+      "bytes": 7116,
+      "sha256": "51722933f1bb4049f4905d8a07c2007f46e6cc70b4ea8ce81e1fff9563a1b252",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-014-payments.svg",
+      "bytes": 1047,
+      "sha256": "e8639c4001dc79e28a9992e0dcfe1089b1672f0a9c64c1b7fe64fce3df67791a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-015-palette.png",
+      "bytes": 11349,
+      "sha256": "52c124a492cc347b68a96bf6f9531cf90fe6e56778ec433e7f827bcd0456385f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-015-palette.svg",
+      "bytes": 1860,
+      "sha256": "f7d5bbe99af69940600948f86cf157adaedd3138352f8b6dede4d99c564e5a89",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-016-event_repeat.png",
+      "bytes": 7240,
+      "sha256": "02b98d6f306e62fae8e559b2ce41af204023e5d8727d205a67e240bf628b2c2d",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-016-event_repeat.svg",
+      "bytes": 1010,
+      "sha256": "213e44165e81ac72b013352b8a2cfe34ae31bafa7623d83c38dd475f8192b33b",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-017-bug_report.png",
+      "bytes": 7139,
+      "sha256": "5bd9dd2ce1ef817c8e3c14d6bd7614e1efdf37ddfb475102d17860692aeae1c4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-017-bug_report.svg",
+      "bytes": 1117,
+      "sha256": "37e9ad33245c1583b6046e6107d334ef028e925198ec3e33a2c002261a885336",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-018-account_balance.png",
+      "bytes": 11457,
+      "sha256": "8dfae617ee53a08d58640bf1437785b945ef35621a82873aa13ad57e7b0ae8ad",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-019-account_balance_wallet.png",
+      "bytes": 15402,
+      "sha256": "14a466f9c09d27127ac953c61f1446cc259a676695cf353b826aac41f1cc7af1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-020-account_circle.png",
+      "bytes": 15781,
+      "sha256": "b069d7a81d5afbc93bff923970284484e5e3a573648452f4477dc28765717165",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-021-alarm.png",
+      "bytes": 17149,
+      "sha256": "68a81841a1f39d3d2bbb4affd52e82ab04bfe2f4b9ddc28faca85601263cc92f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-022-apartment.png",
+      "bytes": 14138,
+      "sha256": "09314ba66041627e9d202e824a6b3cf98e75c6bfed9bd4467e9d8e8e8212c630",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-023-arrow_downward.png",
+      "bytes": 7467,
+      "sha256": "d9b590c2e501d39fd5dc28c0301d87b24883c9c58651f6e3f4159c9bde00c7a3",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-024-arrow_upward.png",
+      "bytes": 3415,
+      "sha256": "ca13ea2ea491c49b2bf71b4ad0c1a48f963ea82058f7f98441a17be373e8a8ae",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-025-calendar_today.png",
+      "bytes": 11199,
+      "sha256": "54d99dffb191cf8069bf9852d7bd387a286f067dd4e78a56838a5b1b2d73c263",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-026-category.png",
+      "bytes": 13212,
+      "sha256": "80a7af0c3d72010c7f5a40a5783fa80166cd007a9e0c5f0878bdadde8f62deca",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-027-celebration.png",
+      "bytes": 14822,
+      "sha256": "f854ec5afaef310a54371599b65b70ceb3aaa5dbf8ac48dd8ea770d386b47433",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-028-check.png",
+      "bytes": 6003,
+      "sha256": "f641b5efd232fe9ce3bcd05fbe8b30cb10c49f74ec54a16463de44f2f6b0e21b",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-029-checkroom.png",
+      "bytes": 9605,
+      "sha256": "ef1a87f31d68852289074459c9c12b062b2d55cf774683f40cb02975e4e94db3",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-030-chevron_left.png",
+      "bytes": 4956,
+      "sha256": "08d2046613fcb3c6e33be571007486322a3ebfdb6363de4b0b9823680a38676b",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-031-chevron_right.png",
+      "bytes": 4896,
+      "sha256": "2210904ec077b278f8a6adb440efaf2576156728ad5e52b614fbe088b0c76897",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-032-cloud_off.png",
+      "bytes": 16313,
+      "sha256": "366fe42459e2eb04f21ff8aa39ac0ba495c938936820f39a297562b7d1ced752",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-033-content_copy.png",
+      "bytes": 5401,
+      "sha256": "9398970477983742f0d8028867ab1476e18d8fd857d9e05a2a0bce0a3c5f16ab",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-033-content_copy.svg",
+      "bytes": 893,
+      "sha256": "78f87b6b2a1f3d4c7092ed62ab6fafcbdf5017044f607d1bd9d4c220d5996e2e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-034-credit_card.png",
+      "bytes": 12837,
+      "sha256": "4b630bed1367b28d35543b2ecd18485ac37d47a4797e257b0036b3b4a7c3fcc4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-035-delete.png",
+      "bytes": 5356,
+      "sha256": "d5b3e565310c3cd77959725f02d739f07778add002ce9e0fef36c826ec5f661e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-035-delete.svg",
+      "bytes": 645,
+      "sha256": "16587a00da22807d6f2161846dbb3a950327825f0c96487a8fdfb22b504d0192",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-036-delete_sweep.png",
+      "bytes": 10453,
+      "sha256": "12d715fa9b2eba2787e5ff9f66886e85adcd1a8d45dd7c8fe1d36df21c9b710e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-037-description.png",
+      "bytes": 14083,
+      "sha256": "758b5345eb51956a576362b105b8788ff24ada3d79126f1174cdbf1f06e6d5aa",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-038-directions_bus.png",
+      "bytes": 13917,
+      "sha256": "e3e2d715e8f5ccfc626bbfeab822b05f6c8fc8103bb720a7421604f64228eb49",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-039-directions_car.png",
+      "bytes": 13309,
+      "sha256": "0263a80492274e9d421d55f7a9888f06aba1bf6bb818a5ec845b58581486a839",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-040-download.png",
+      "bytes": 7847,
+      "sha256": "bb91a374931fc0b0a193fbd518fd584d0a70e86cf9cbb94f0f21acd9f31be7c9",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-041-edit.png",
+      "bytes": 4916,
+      "sha256": "61bba1ee19847e9649ee46c8e361ba20690d026793fa56f154f1290f41c176ed",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-041-edit.svg",
+      "bytes": 560,
+      "sha256": "32619766473fa106851d15da1f7bf84e11dd97dd319865d12edc7b386b413963",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-042-error.png",
+      "bytes": 16303,
+      "sha256": "ebc6c0c86ad55fb72c6679076b6e4060851d9b142fbc570fce7f653233cb14d6",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-043-event.png",
+      "bytes": 13019,
+      "sha256": "cfe1dbbd5df9eb6b5a251c996ad60ffa3379df73ca8cefec79f5128f6daa9ede",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-044-event_busy.png",
+      "bytes": 14510,
+      "sha256": "f68a50b5a102d600157229c0c2a4b65e25f230832f285b8b54ed7a52612c3292",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-045-expand_more.png",
+      "bytes": 4221,
+      "sha256": "82ff87c964ade1298688e75668a59194b6cefbafffd39c9d4c51f56acf653edf",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-046-filter_list.png",
+      "bytes": 5390,
+      "sha256": "6737c4d82ed3cfad9f35316c186868f140002f4f3745a3a496c8fcbf3503bda5",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-047-help.png",
+      "bytes": 17454,
+      "sha256": "ea3289ae3b413cfda97b716e655ad2f0daddd2055e67b420ab0db33c9e3fb341",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-048-home.png",
+      "bytes": 11284,
+      "sha256": "422ee122f6940b13c451765dde3248b97f3130befc97d11b9c6577ae2408579b",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-049-how_to_reg.png",
+      "bytes": 11014,
+      "sha256": "fc61679864e3ab0cd94a31c6335a28c1d0fbeb8cdf430a6b600bc89139820fa8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-050-image.png",
+      "bytes": 15190,
+      "sha256": "89d1a1dc53b6b6a62a4ac8fe32696052153b1d054f2b278e29333dcf71bd70d1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-051-inventory_2.png",
+      "bytes": 15276,
+      "sha256": "0ba3a757aca494951b2398e05d24f3af952c40bcb0882e32f36b4437826ff97e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-052-lightbulb.png",
+      "bytes": 12084,
+      "sha256": "5244e32f726ac290d113f47d2159545d250200675ff974ec68a99b31bd0e9558",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-053-lock.png",
+      "bytes": 15040,
+      "sha256": "488507df633c4c1f8ade25732628724013850decbcb84076b91e333f7ea0b6d1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-054-logout.png",
+      "bytes": 9362,
+      "sha256": "6fc73bb2b4e05d2fa2dd7f52c481cf984644f183296297df57aee9a407b7df3b",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-055-mail.png",
+      "bytes": 16621,
+      "sha256": "cafe047c7425f3fd3e5703ffa5354a5ccf80ff19c08809c314f832cd6fed5979",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-056-medical_services.png",
+      "bytes": 16166,
+      "sha256": "9dc7b19c1211b82cf8d2b8754170f649fd1b39eb92ce54b041195643c7029e7a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-057-menu_book.png",
+      "bytes": 17740,
+      "sha256": "f65424bf32856b5635ec3f0c0430c625150c824d906c0d4cb9a4f7d33ce7effa",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-058-notes.png",
+      "bytes": 6812,
+      "sha256": "3c1189ccd6f034ac30465fdcb048b5dcd4b4022b8fcc34b47f7b318b6930e11e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-059-open_in_new.png",
+      "bytes": 12007,
+      "sha256": "97068949d5b0597268f8bf51fa3f3bdb63317bede596057d7a2810dd226f113c",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-060-paid.png",
+      "bytes": 18393,
+      "sha256": "988945dd70eee7d018e27d30fc68889ac2e0e4c0184d9f7775fa91ebe6a1c305",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-061-photo_camera.png",
+      "bytes": 16847,
+      "sha256": "a3dc1e02afdc4c2db5d890b40dd28019f5b75811081454c68094ed441c072e4c",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-062-picture_as_pdf.png",
+      "bytes": 17749,
+      "sha256": "ab7a935b6090d79a0b72918e55d022cad7346d07d31149b05208b87beefc5b7a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-063-progress_activity.png",
+      "bytes": 10177,
+      "sha256": "3544dbaab69eb969ad623838407ed92845bbb96b3f3cf4ec1809dc447a1c30c8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-064-receipt_long.png",
+      "bytes": 6768,
+      "sha256": "d756061dcae9d222cf14054eaed72ade24722a14db0f77cd5df38247c5f3d69f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-064-receipt_long.svg",
+      "bytes": 1052,
+      "sha256": "5e5563a8d4dddc28b38c13a5ac42d5cfc9e515e54d028aa86a307c387cbce3b5",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-065-redeem.png",
+      "bytes": 16026,
+      "sha256": "4757878ee2d45586473b58ae40ca056d35e8d08f9841966e79fcf5a6dcc94cfd",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-066-refresh.png",
+      "bytes": 10656,
+      "sha256": "0a4d3f55c8d5ff5f0f8a2cedb167b7f1b55fe63d4a157c6cd55f7e0aa7ec711f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-067-restart_alt.png",
+      "bytes": 7161,
+      "sha256": "4bd86a0faa4c97ec2fc02b3fe95292755d2d33e211c1c09372fff027978aba49",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-067-restart_alt.svg",
+      "bytes": 674,
+      "sha256": "d7c95b9d0d2da9181d612837540f3c29749afa767ad95e7141d74224d60ea3c5",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-068-restaurant.png",
+      "bytes": 12230,
+      "sha256": "5e8fca13588163550ef4a6cc10f21a3c234cafcf95b062a522bd4c44aac5e438",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-069-school.png",
+      "bytes": 14459,
+      "sha256": "05c44c7828b0fc864dcbfe87be9a3bb963240930a901250d760006c718932c9a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-070-search.png",
+      "bytes": 9632,
+      "sha256": "c0d2d9bdd8efa715122efb520459788d30fd9648918ce411ba77921752c46241",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-071-search_off.png",
+      "bytes": 14103,
+      "sha256": "1cc0b0a56a727a6a84e8505f2d2fbc588ba0928d1a275d2db86a12ec9d26cac0",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-072-sell.png",
+      "bytes": 14884,
+      "sha256": "3319ce3c53bf2deaa72c6b3006ee2b1ed692f81ed4d9e6d72e9388149976ce14",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-073-sensors.png",
+      "bytes": 13395,
+      "sha256": "688cfbb5797f1ec42481e221daf6bb9d663fb0af0fc6da239fb5163d9a29ab0a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-074-sensors_off.png",
+      "bytes": 15472,
+      "sha256": "4bbf80d5725cfd60345bd0e0583fba1e009f1a9b50684035dff7bcda444bf257",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-075-settings_suggest.png",
+      "bytes": 15718,
+      "sha256": "95f498b4fdebed1c1314ff7591733849587e9e9427b65196d9cfc34676f6e84d",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-076-shield.png",
+      "bytes": 13992,
+      "sha256": "a888949eccff2677a8ffcabc3a45338f8862376e9382a77398730b1c0746370f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-077-shopping_basket.png",
+      "bytes": 15820,
+      "sha256": "c1693628f4b5cba5e7c00ee81b34cfe6c63233e46f6877a9205b7504d77766c8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-078-sports_esports.png",
+      "bytes": 14140,
+      "sha256": "8a5a8229dc2a8fd200d93dfc3c1da7e39a271a8e525f87fc2f9f859233ef9799",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-079-star.png",
+      "bytes": 11517,
+      "sha256": "c91daaf2653df5dbb19afb67cf8e2d8b8d2bbfd18a0f34c69a559ba7b5d233e1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-080-stars.png",
+      "bytes": 17073,
+      "sha256": "4fdb849a0324ac50480161a235c74c13d3536877a2d0fc1ba53c0f47db52f56e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-081-swap_vert.png",
+      "bytes": 8916,
+      "sha256": "d67f5900fff1ea2b9a3183f7fd69fdef0b0b0115265d6a3c1e8f64b23201e0e5",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-082-trending_up.png",
+      "bytes": 7591,
+      "sha256": "8b48a602d003ccff539afd8460b97cc105e6d7b7de8f3631e25e13c519229ef1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-083-visibility.png",
+      "bytes": 13508,
+      "sha256": "d2ce3457ad24d9cc8858a5383867e558c6e1a17c361602d38a212b272fd66798",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-084-visibility_off.png",
+      "bytes": 15602,
+      "sha256": "26455497a60486b72cc122d18e7bce0371d0d47de03a10bca498efd79528addd",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-085-wifi.png",
+      "bytes": 10702,
+      "sha256": "5de350ae725fbee079bc5eb274a30f03701cf38dfec5319f7d80d237c8ff70a6",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-086-work.png",
+      "bytes": 15437,
+      "sha256": "e5780a4c92e2a461363a93514ac197d103a0261e922a93cfaacf8a62ccb1d4a7",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-087-pm-cash.png",
+      "bytes": 3655,
+      "sha256": "4e8c59172bff973b3729ac04cefa9d4ea2451c2ca0828f78f97811f104a60a01",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-087-pm-cash.svg",
+      "bytes": 266,
+      "sha256": "3a31a1b7ba99c3a5e123165fae715be2379e0fc612aee4bd839ad6f2da303f86",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-088-pm-credit.png",
+      "bytes": 1799,
+      "sha256": "b9d013aeaa6396d0130dbf24f774655493e8d3553ee763db6bd302fc66e26cac",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-088-pm-credit.svg",
+      "bytes": 249,
+      "sha256": "1928524bdcec9c81974bb396328cd896a06bb0b1a2996fca0655a9540c2e2e7e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-089-pm-bank.png",
+      "bytes": 2373,
+      "sha256": "80d4470314018d85a401ba7515d60a10d5f7c4e9d0bdaaa63c3e1fab62fbac3e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/icons/I-089-pm-bank.svg",
+      "bytes": 340,
+      "sha256": "ea7829a17e77780cffc18a7525ddfcf2c68f65b7f2573f312b95d0bcdae3ef61",
+      "role": "历史图像/页面预览/参考，保留；不表示采用"
+    },
+    {
+      "path": "20261104-04/icons/I-090-point-coin.png",
+      "bytes": 89720,
+      "sha256": "d7cb0602bf3f46f7d1291b05e0f1eb9ef17d2c3ae98e0e73cc79b34cd5af5a81",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/pages/D-01-NavDrawer.png",
+      "bytes": 164967,
+      "sha256": "24fba7851528e6aff3b0b5f13eb02db38ad6ba7d70da48d468d1646aaf2eb2d6",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-02-EntryDetailSheet.png",
+      "bytes": 158925,
+      "sha256": "4ff1bf909dbcda522564b875cc1f9e269b7cb220ef26cc3c09945bdc51eab115",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-03-CategoryDetailSheet.png",
+      "bytes": 180412,
+      "sha256": "4f87ec2fdc539f81c7ebeb8cea769e78adab44d3e023554d6bda6f514daf8be1",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-04-ReceiptPreviewSheet.png",
+      "bytes": 167460,
+      "sha256": "86206bc5b0fd3137fecd73537b69775e98cf3c30e01abb01f22647c41656b505",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-05-ReceiptScanSheet.png",
+      "bytes": 149616,
+      "sha256": "27cad5157d55648a82c66b406900e6a86da7a21c988f31fba268794affb53057",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-06-RangeCalendarPicker.png",
+      "bytes": 215435,
+      "sha256": "e09a586751fe71c5c0c97ab2b46db6eedfbf6cbf75987909597153d90d343de3",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-07-CategoryPicker.png",
+      "bytes": 1059620,
+      "sha256": "200b001c7b501d540a332912d252ceb4d38b95a04cc0aea46b580fca1e1cf1cb",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-08-TagPicker.png",
+      "bytes": 1115509,
+      "sha256": "210198382fd1d4743925f9100b28a642cfe341b06bd09ecbc98f9b854f4a3b99",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/D-09-ConfirmDialog.png",
+      "bytes": 256111,
+      "sha256": "111209fbcc7a988f811fd6a0e95b73abcd2c90c65f36b54c2cf3e8208a2d9a6d",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-01-DashboardPage.png",
+      "bytes": 928735,
+      "sha256": "7c1a51e660691499771f63046e10cf85770ad6d45675e844acb56b2c2e048736",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-02-HistoryPage.png",
+      "bytes": 1067983,
+      "sha256": "8283843599fc8ccd99d97435f526636f46a3b7f156a74c968d851f889956a8c9",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-03-StatsPage.png",
+      "bytes": 956611,
+      "sha256": "f2545454667053845a81a6eaf10deb9c30cc7d3504879ff431d32ba7038ab201",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-04-AddTransactionPage.png",
+      "bytes": 807505,
+      "sha256": "6bde001e150203aa30ad5624f436dfb6bb8dedf1cb763fe54e9f9c08216b76cf",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-05-RatePage.png",
+      "bytes": 977629,
+      "sha256": "dd93e1201c83d9773b135c42db61c2b195280eee0f6a25a5a23b95f9bfe2359a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-06-SettingsPage.png",
+      "bytes": 1106897,
+      "sha256": "45e48c03e291fcf76322811ffd9b1385b478067642d281014c5bdb37bf8bf823",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-07-ThemePage.png",
+      "bytes": 1038164,
+      "sha256": "f9d1a5a36174a783b68972975dd8809a68e0fea5f9048d3595caa7f3c688471e",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-08-DebugLogPage.png",
+      "bytes": 890741,
+      "sha256": "223ac3f2abc248cb60c789a6506a32de4b7d17e0a0d1b4e127cc16f5b4bbfca4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-09-RecurringRulesPage.png",
+      "bytes": 1168125,
+      "sha256": "f227f601cd48707cdfbd9e256def0d319d33a5d42e44e631a0368cc3a9260394",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-10-RecurringRuleFormPage.png",
+      "bytes": 815571,
+      "sha256": "78a8481bbb746c9a16b784020e38b2fe6d67997ea1cc01858c42db45e9d638fb",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-11-AccountPage.png",
+      "bytes": 1071268,
+      "sha256": "ab4958e5abeca6657cd16b8e7c6777174ead72f9a6a2d485fafdbe6f28d4f94d",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-12-ChangeAvatarPage.png",
+      "bytes": 1155109,
+      "sha256": "51534d93e7365734817bc829b117cec1ebd685210d0a1a25f248b3732d063ce3",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-13-SignInPage.png",
+      "bytes": 1102175,
+      "sha256": "9de014a2a126aa4e4f47653b39a54463142346290f06701f218e15ca358696e7",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-14-SignUpPage.png",
+      "bytes": 1036465,
+      "sha256": "36aad2d551354a8b0bf3e4e7f15b05ab1c9e699c383a8117b775af60bcba13e4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-15-AboutPage.png",
+      "bytes": 1102712,
+      "sha256": "5baf3fe2aa42ad773bd35ad863043f26d55e610718aea7309bc6474bb41a8e8d",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/pages/P-16-CalendarPage.png",
+      "bytes": 970693,
+      "sha256": "5955a902c83f1ae8a74f3a2dc587dbdce61e3dc2a238211e99ef68d1f05b2e32",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-04/reference/approved-20261104-02.png",
+      "bytes": 1906673,
+      "sha256": "f12509bb30094830a9def68e742802f820dc41e5410e55dd56445c49385fb7b8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/review/90-icons-overview.png",
+      "bytes": 300556,
+      "sha256": "a429606dae877f1cce48940e6cbeaadcbfb5fd640c87596d7c52d28c04a8c686",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1200,
+        1044
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-04/review/page-examples.png",
+      "bytes": 616653,
+      "sha256": "7dfcdc1976d54be152d925e9811479fabcd43f9e261046bb4ecc655c65b619c7",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1230,
+        900
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-05/effects/effects-preview.png",
+      "bytes": 43045,
+      "sha256": "e54b5faf1ca9b92d557aad4b2b1c99cabc100b0875e66438852e9ff3c1eda736",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1100,
+        650
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-05/pages/S-01-history-low.png",
+      "bytes": 1372333,
+      "sha256": "9be1d73f3493ee0af6271123d8cbc14baa0f0e72021ce619bed6c8b10f6d96ab",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        768,
+        1664
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-05/pages/S-02-stats-low.png",
+      "bytes": 1320128,
+      "sha256": "6a77b979f8e2d4b4457ce3dab0c4283fac24fff7c2f1c384991e8c4cba7d4c56",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        768,
+        1664
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-05/pages/S-03-add-entry-low.png",
+      "bytes": 1205209,
+      "sha256": "2125b092aeb8c8099f44ad2c36fc75030779be92c56776ae57dea81f1519bb09",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        768,
+        1664
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-05/pages/S-04-calendar-low.png",
+      "bytes": 1150018,
+      "sha256": "c36de5d62d839e40900e9c3ba281c77c8c763f5dc223306cf6f9de8c4354b45f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        768,
+        1664
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-05/pages/S-05-rate-low.png",
+      "bytes": 1246763,
+      "sha256": "b2ec56bd71d24945c37ffe40d1e9414809ade55ff1f2bc42037ec7eb6e09b007",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        768,
+        1664
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-05/pages/S-06-settings-low.png",
+      "bytes": 1430902,
+      "sha256": "e81ad51cb61c741883e9b0d214e7ccae084297416e95fa70424ca99518d93d87",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        768,
+        1664
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261104-05/reference/approved-20261104-02.png",
+      "bytes": 1906673,
+      "sha256": "f12509bb30094830a9def68e742802f820dc41e5410e55dd56445c49385fb7b8",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261104-05/six-pages-overview.jpg",
+      "bytes": 57617,
+      "sha256": "e6bd2d314e6a81e0632ee164d1a59bd2eaa9438d4926353fb68f4acd90fd5b59",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1200,
+        465
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-01/drawer-layout.png",
+      "bytes": 150195,
+      "sha256": "70cc695837b7f480ce596979a4b0a09549320eb382783d51bf3aa61989b0cf6a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-01/pigbang-maple-drawer-low.png",
+      "bytes": 1304400,
+      "sha256": "2746d70769cdc56d172bd66ea779fd77bf3635bc2b6c370d4eff584abba3d259",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        768,
+        1664
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-02/layers/L-01-paper.png",
+      "bytes": 2001997,
+      "sha256": "c8f318ed38dc31ceda1f58956dffbed094a237f38d4e1571fc3a264016c309e0",
+      "role": "内置生成纸纹；可复用",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-02/layers/L-02-branch.png",
+      "bytes": 668315,
+      "sha256": "9273e86b979ec38049bb8de7855a337f71c38ed815fa16f268a0630b68470b44",
+      "role": "枝干造型已被指出不合适；只保留历史，不作为新稿造型依据",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261105-02/layers/L-03-corner-v1.png",
+      "bytes": 869319,
+      "sha256": "ccfbfb80073ec78587016e38d78fc08a37ed90ef383600f196ae5110787ab3eb",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261105-02/layers/L-03-corner.png",
+      "bytes": 871093,
+      "sha256": "351e47beb6fc04fb06a431e6ffeed086ab31f2fde01b7cef517df7d9f9284004",
+      "role": "内置生成透明左下叶装饰；可复用",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261105-02/layers/L-04-leaf.png",
+      "bytes": 521872,
+      "sha256": "c9152f0e2bfb3adcaa2fba0a1a4872b07fe508f8043f2d77d9c2df999517a885",
+      "role": "内置生成透明单叶；散落叶和水印共用",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261105-02/layers-preview-v1.png",
+      "bytes": 360732,
+      "sha256": "efdaed31874758946e96b5e3cc41745a9b0057a1b0816d424d6f1940ac7db7ac",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1240,
+        1169
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-02/layers-preview.png",
+      "bytes": 361080,
+      "sha256": "eb06ac39210cd93536ceeaab9923ac57d010985b1f56dbd2e7b842b683a2ce76",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1240,
+        1169
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-03/branch-comparison.png",
+      "bytes": 178420,
+      "sha256": "a36cc2122a20076b7d1f306533b9f55455f012a73daf00bba8b85ce373b2a076",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1160,
+        800
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-03/L-02-woody-branch.png",
+      "bytes": 643385,
+      "sha256": "0ca0d75be716061d4b7446497771b2dd5ecd0dd84e10e02a7a5ba366871f59f9",
+      "role": "枝干结构被否定；只保留历史",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261105-04/maple-structure-low.png",
+      "bytes": 1083249,
+      "sha256": "d3d4f4a162d621a52f9949ed418c49a6afd2ea629fcbf6373c780fa683d89721",
+      "role": "平面枝叶结构被否定；只保留历史",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261105-04/reference-tree.png",
+      "bytes": 5073059,
+      "sha256": "142be969a5fc756446a10f4865f63fa46679b7b10dcd65a6596bf61eab91b606",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1920,
+        1078
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-01/maple-foliage-low.png",
+      "bytes": 1276192,
+      "sha256": "78bbb6a0fa2da44823d1a32f3890a985551f22101d6e2dae48fe5cc97f220bd4",
+      "role": "Image2 low叶丛结构参考；继续用于合成，浅底非透明",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/eight-pages-overview.png",
+      "bytes": 547784,
+      "sha256": "d58b62d72d65594a7bbb81904ffee41795ed4339ffd8730eb1089805c58f6d02",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1060,
+        1130
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261106-02/layers/corner.png",
+      "bytes": 871093,
+      "sha256": "351e47beb6fc04fb06a431e6ffeed086ab31f2fde01b7cef517df7d9f9284004",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261106-02/layers/foliage.png",
+      "bytes": 1276192,
+      "sha256": "78bbb6a0fa2da44823d1a32f3890a985551f22101d6e2dae48fe5cc97f220bd4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/layers/leaf.png",
+      "bytes": 521872,
+      "sha256": "c9152f0e2bfb3adcaa2fba0a1a4872b07fe508f8043f2d77d9c2df999517a885",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261106-02/layers/paper.png",
+      "bytes": 2001997,
+      "sha256": "c8f318ed38dc31ceda1f58956dffbed094a237f38d4e1571fc3a264016c309e0",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/01.png",
+      "bytes": 529576,
+      "sha256": "4427821627204d173f4f0515275f00e165b3ce1e670793f16bdb3febc5286e54",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/02.png",
+      "bytes": 732131,
+      "sha256": "8f7f7b459fb50fa12c3efa37038672403db282721fc72fc055e085e36edd752a",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/03.png",
+      "bytes": 547597,
+      "sha256": "aa114fc80f7c165399b785699e5e6338322f308891b11456ddfeb3bd7684ffdc",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/04.png",
+      "bytes": 436491,
+      "sha256": "8369b0990a7da7c34d13a01dffdb5018c0520880718e09967d34b90257eddea7",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/05.png",
+      "bytes": 503349,
+      "sha256": "9497a901e01852575445b82990bc8cc8c8d64f1bd2a3d229a523cfdc8196a150",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/06.png",
+      "bytes": 570261,
+      "sha256": "b8227934c721f2698aaebe21d6cd2fb14ae1344d0266db1735361448674b165f",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/07.png",
+      "bytes": 741311,
+      "sha256": "69843ae4f270b7be41f47bbfae3bacedc9c07056fffb2e58d5f9a2ce15a23fc4",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-02/pages/08.png",
+      "bytes": 857117,
+      "sha256": "cc4bb43c7abe2c23e49f0ee22b7c1ad256a94fb20993f758efe9c647788f908d",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        780,
+        1688
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-03/comparison.png",
+      "bytes": 523128,
+      "sha256": "365457358bacf32078e39b422efd82dc153d86bac4f280fa6299659fcc069038",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        840,
+        890
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "20261106-03/pigbang-home-color-high.png",
+      "bytes": 2292735,
+      "sha256": "5fb1c47dfba6dab015bd773225feebaee43fcc3502f4d5e7f3fffb304e32b7b2",
+      "role": "Image2 high页面材质参考；保留",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261106-03/stitch-screen.png",
+      "bytes": 798455,
+      "sha256": "68efebccd31957ba11ef1b3795afb701b7f4700e7f0e1b16038096ded3545649",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        2560,
+        2048
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261107-01/home-high.png",
+      "bytes": 1481189,
+      "sha256": "63ca0bbc70d3bd4474b5e3979e62138b71147e20fabd43d6abf7dd60cd2fd39d",
+      "role": "Image2 high首页与光效参考；保留，配色可修订",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261107-01/icons-states-high.png",
+      "bytes": 2174692,
+      "sha256": "a3da4d483f47ea803504de095e03e730fb53f8fc78f725ed85ce58bf325b01bd",
+      "role": "Image2 high 11种图标三态设计；继续作为图标参考，尚未拆图",
+      "size": [
+        1536,
+        2048
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261107-02/preview.png",
+      "bytes": 231324,
+      "sha256": "5499399b1b936ca5a3ac0fd078cc19916d073ab2b01f6673f806cc5eb3d90b73",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        736,
+        1200
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "20261107-03/stitch-palettes.png",
+      "bytes": 1084700,
+      "sha256": "d2172814c9b907948fd1879020f1f1675a4865cb61c4e573c5d79c7c9562c3df",
+      "role": "历史图像/页面预览/参考，保留；不表示采用",
+      "size": [
+        2560,
+        3080
+      ],
+      "mode": "RGB"
+    }
+  ]
+}

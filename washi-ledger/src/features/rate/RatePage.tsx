@@ -392,7 +392,7 @@ export function RatePage() {
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container">
-                    <span className="material-symbols-outlined text-[18px]">payments</span>
+                    <ThemeIcon className="material-symbols-outlined text-[18px]" icon="payments" />
                   </div>
                   <select
                     value={fromCode}
@@ -434,7 +434,7 @@ export function RatePage() {
               className="stamp-shadow absolute left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-surface-container-lowest border-[1.5px] border-outline-variant flex items-center justify-center text-primary"
               style={{ boxShadow: '0 3px 0 var(--color-surface-variant)' }}
             >
-              <span className="material-symbols-outlined text-[24px]">swap_vert</span>
+              <ThemeIcon className="material-symbols-outlined text-[24px]" icon="swap_vert" />
             </button>
 
             <div className="flex flex-col gap-1 pt-2">
@@ -451,7 +451,7 @@ export function RatePage() {
                   ))}
                 </select>
                 <div className="w-8 h-8 rounded-full flex items-center justify-center bg-secondary-container text-on-secondary-container">
-                  <span className="material-symbols-outlined text-[18px]">account_balance</span>
+                  <ThemeIcon className="material-symbols-outlined text-[18px]" icon="account_balance" />
                 </div>
               </div>
               <input
