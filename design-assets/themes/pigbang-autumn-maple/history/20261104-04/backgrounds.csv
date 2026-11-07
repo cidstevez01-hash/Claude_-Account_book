@@ -1,0 +1,7 @@
+﻿id,name,actual_size,file,production,status
+B-01,和纸底纹,512×512,backgrounds/B-01-paper.png,依据确认稿色调制作可平铺底纹,已制作，待确认
+B-02,右上角线稿枝叶,1024×768,backgrounds/B-02-branch.png,从确认稿提取线条，透明底,已制作，待确认
+B-03,左下角线稿叶组,512×640,backgrounds/B-03-corner.png,从确认稿提取，保留当时叶形,已制作，待确认
+B-04,飘落小叶,256×256,backgrounds/B-04-falling.png,从确认稿提取，透明底,已制作，待确认
+B-05,卡片枫叶水印,512×512,backgrounds/B-05-watermark.png,从确认稿提取，透明底,已制作，待确认
+B-06,和纸胶带,256×128,backgrounds/B-06-tape.png,按确认稿制作透明胶带,已制作，待确认

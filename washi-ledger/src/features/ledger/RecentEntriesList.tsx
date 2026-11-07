@@ -108,7 +108,7 @@ export function RecentEntriesList({
   // 不显示标题/搜索框，这时候搜什么都没有意义
   if (entries.length === 0) {
     return (
-      <div className="text-center py-16 px-md text-on-surface-variant">
+      <div className="autumn-recent-empty text-center py-16 px-md text-on-surface-variant">
         <ThemeIcon className="material-symbols-outlined text-4xl mb-2 block opacity-40" icon="receipt_long" />
         <p className="text-body-md">{t('emptyLine1')}</p>
         <p className="text-body-md">{t('emptyLine2')}</p>

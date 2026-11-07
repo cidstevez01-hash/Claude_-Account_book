@@ -396,7 +396,7 @@ export function AddTransactionPage() {
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
+      className="app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header

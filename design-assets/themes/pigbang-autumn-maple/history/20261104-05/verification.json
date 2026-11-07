@@ -1,0 +1,11 @@
+{
+  "index.html": {
+    "images": 6,
+    "broken": 0
+  },
+  "effects/index.html": {
+    "images": 8,
+    "broken": 0
+  },
+  "pause": true
+}

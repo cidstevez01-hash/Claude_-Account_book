@@ -11,7 +11,7 @@ interface BalanceCardProps {
 export function BalanceCard({ summary, currency }: BalanceCardProps) {
   const { t } = useI18n()
   return (
-    <section className="ledger-card relative bg-surface-container-lowest rounded-xl p-md mx-md mt-sm mb-lg">
+    <section className="autumn-balance ledger-card relative bg-surface-container-lowest rounded-xl p-md mx-md mt-sm mb-lg">
       {/* B-33：和纸胶带装饰角——换成真实斜纹纹理(.washi-tape-texture，见index.css)，
           不再是纯色块；尺寸放大到w-11 h-5更接近旧App56x20的观感比例，位置(-top-1.5
           right-5)/旋转角度(4deg)保持不动 */}

@@ -91,10 +91,11 @@ export function AppLayout({
   // 分层关系一致
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer'
+  const hasIconGlow = isSummer || settings.themeSkin === 'autumn'
 
   return (
     <div
-      className={`fixed inset-0 mx-auto max-w-[480px] flex flex-col overflow-hidden ${
+      className={`app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col overflow-hidden ${
         isSummer ? 'bg-transparent' : 'bg-surface'
       }`}
     >
@@ -174,7 +175,7 @@ export function AppLayout({
             剪下来贴上去"的贴纸感，再叠一层3px 4px偏移、不带模糊的深色阴影(旧App用--ink
             15%左右透明度)做投影厚度——纯高斯模糊text-shadow做不出这种硬边剪纸质感 */}
         <h1 className="font-serif text-headline-lg font-extrabold text-app-title tracking-tight papercut-text-shadow">
-          {title}
+          {settings.themeSkin === 'autumn' && title === t('appTitle') ? 'PigBang' : title}
         </h1>
         {/* R-18：右上角在子页面不显示任何东西——用一个等宽的空div占位，让标题(左右各
             靠一个w-10按钮/占位)还能居中，不是直接不渲染导致标题偏向左边 */}
@@ -197,7 +198,7 @@ export function AppLayout({
                     40px——.icon-ring-glow的mask硬边界靠--icon-size算真实半径，
                     这里必须覆盖成28px，否则会沿用默认值40px，裁切点还是对着
                     20px算，比头像自己14px的真实半径多留出一圈空白 */}
-                {isSummer && (
+                {hasIconGlow && (
                   <span
                     className="icon-ring-glow"
                     aria-hidden="true"
@@ -211,7 +212,7 @@ export function AppLayout({
             ) : (
               <ThemeIcon
                 icon={APP_ICONS.account}
-                effect="bare"
+                effect={settings.themeSkin === 'autumn' ? 'ring' : 'bare'}
                 size={28}
                 className="material-symbols-outlined papercut-text-shadow w-7 h-7"
               />

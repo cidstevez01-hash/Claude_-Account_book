@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase'
 import { DEFAULT_SETTINGS } from '../lib/localSettings'
 import type { UserSettings } from '../types'
+import { normalizeThemeSkin } from '../lib/themeSkin'
 
 interface UserSettingsRow {
   user_id: string
@@ -17,7 +18,7 @@ export async function fetchUserSettings(userId: string): Promise<UserSettings | 
   return {
     lang: row.lang === 'zh' ? 'zh' : row.lang === 'ja' ? 'ja' : DEFAULT_SETTINGS.lang,
     currency: row.currency ?? DEFAULT_SETTINGS.currency,
-    themeSkin: row.theme_skin === 'nostalgia' ? 'nostalgia' : row.theme_skin === 'summer' ? 'summer' : 'default',
+    themeSkin: normalizeThemeSkin(row.theme_skin),
   }
 }
 

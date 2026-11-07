@@ -1,0 +1,134 @@
+/* 丹枫金秋 — adopted Image 2 design 20261107-05; other skins are unaffected. */
+:root[data-theme='autumn'] {
+  --color-surface: #faf6ee;
+  --color-background: #faf6ee;
+  --color-surface-bright: #fffdf9;
+  --color-surface-dim: #eadfcf;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fffbf5;
+  --color-surface-container: #f7eee1;
+  --color-surface-container-high: #f3e6d4;
+  --color-surface-container-highest: #f6e2cc;
+  --color-surface-variant: #f1e5d4;
+  --color-on-surface: #241d17;
+  --color-on-background: #241d17;
+  --color-on-surface-variant: #76604e;
+  --color-inverse-surface: #38291e;
+  --color-inverse-on-surface: #fffaf2;
+  --color-outline: #957961;
+  --color-outline-variant: #dfc7ac;
+  --color-primary: #c62818;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #a82114;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #fbe1d5;
+  --color-primary-fixed-dim: #f5b69c;
+  --color-on-primary-fixed: #51160e;
+  --color-on-primary-fixed-variant: #8e2416;
+  --color-inverse-primary: #ffb6a1;
+  --color-app-title: #a62117;
+  --color-secondary: #2a7e4b;
+  --color-secondary-container: #e3eddf;
+  --color-on-secondary-container: #214c31;
+  --color-income: #2a7e4b;
+  --color-expense: #c62818;
+  --color-tertiary: #a66508;
+  --color-tertiary-container: #f9e5c1;
+  --color-on-tertiary-container: #68410a;
+  --color-link: #ad2415;
+  --color-fab-icon: #fffaf2;
+  --color-selected-day-ink: #ffffff;
+  --color-calendar-heat: #c4a992;
+  --color-holiday: #b3261e;
+  --autumn-sun: #e58e26;
+  --autumn-glow: #ff5a43;
+  --icon-gradient-top: #e58e26;
+  --icon-gradient-mid: #d73d23;
+  --icon-gradient-bottom: #b52316;
+  --shadow-main-fab: 0 0 0 1px #fff4dc, 0 0 13px #ff5a4377, 0 4px 9px #9c24152c;
+}
+[data-theme='autumn'] .app-shell {
+  isolation: isolate;
+  background: linear-gradient(#faf6eeb3,#faf6eeb3), url('../assets/themes/autumn/paper.webp') center / 512px;
+  background-color: #faf6ee;
+}
+[data-theme='autumn'] .app-shell::before,
+[data-theme='autumn'] .app-shell::after {
+  content: ''; position: absolute; pointer-events: none; z-index: -1;
+  background-repeat: no-repeat; background-size: contain;
+}
+[data-theme='autumn'] .app-shell::before {
+  width: 190px; height: 190px; right: -18px;
+  top: env(safe-area-inset-top, 0px); opacity: .44;
+  background-image: url('../assets/themes/autumn/foliage.webp');
+}
+[data-theme='autumn'] .app-shell::after {
+  width: 125px; height: 150px; left: -25px; bottom: 0; opacity: .5;
+  background-image: url('../assets/themes/autumn/corner.webp');
+}
+[data-theme='autumn'] .paper-grid-bg { background-image: none; }
+[data-theme='autumn'] .app-shell header { background-color: transparent; border-bottom-color: transparent; }
+[data-theme='autumn'] .app-shell:has(input)::before { width: 145px; height: 145px; opacity: .32; }
+[data-theme='autumn'] [data-app-header] a[href='/account'] {
+  position: relative; border: 1px solid #dfac6b88; background: #fffaf3cc;
+  margin-right: 0;
+}
+[data-theme='autumn'] .autumn-recent-empty {
+  margin: 0 16px 24px; padding: 28px 16px; background: #ffffffed;
+  border: 1px solid #dcb38c70; border-radius: 20px; box-shadow: 0 4px 9px #74401d13;
+}
+[data-theme='autumn'] .papercut-text-shadow { text-shadow: none; }
+[data-theme='autumn'] :is(.ledger-card,.entry-card,.rate-card) {
+  background: #fffffff2; border: 1px solid #dcb38c70; border-radius: 20px;
+  box-shadow: 0 4px 9px #74401d13;
+}
+[data-theme='autumn'] .autumn-balance { border-color: #d8543f88; overflow: hidden; }
+[data-theme='autumn'] .autumn-balance::after {
+  content: ''; position: absolute; width: 100px; height: 100px; right: 8px; top: 30px;
+  opacity: .2; background: url('../assets/themes/autumn/leaf.webp') center / contain no-repeat;
+  pointer-events: none;
+}
+[data-theme='autumn'] .autumn-balance .washi-tape-texture { display: none; }
+[data-theme='autumn'] .autumn-balance > .text-center { text-align: left; }
+[data-theme='autumn'] .autumn-balance h2 { justify-content: flex-start; }
+[data-theme='autumn'] .autumn-drawer { isolation: isolate; background: #faf6ee url('../assets/themes/autumn/paper.webp') center / 512px; }
+[data-theme='autumn'] .autumn-drawer::after {
+  content: ''; position: absolute; bottom: 0; left: -15px; width: 200px; height: 220px;
+  background: url('../assets/themes/autumn/foliage.webp') center / contain no-repeat;
+  transform: rotate(180deg); opacity: .32; z-index: -1; pointer-events: none;
+}
+[data-theme='autumn'] .autumn-bottom-nav {
+  background: #fffaf3ed; border: 1px solid #d9985b70;
+  box-shadow: 0 4px 14px #925b2b24, inset 0 1px #ffffff;
+}
+[data-theme='autumn'] .tab-bubble { background: #f5d6ba55; border-color: #db936466; }
+[data-theme='autumn'] .icon-ring-glow {
+  inset: -8px; filter: blur(2.5px);
+  background: radial-gradient(circle closest-side,#ff5a4300 35%,#ff5a43a6 63%,#e58e2644 78%,#e58e2600 100%);
+  animation: autumn-icon-breathe 5.5s ease-in-out infinite;
+}
+[data-theme='autumn'] .icon-bare-glow { filter: blur(3px); animation: autumn-icon-breathe 5.5s ease-in-out infinite; }
+[data-theme='autumn'] .rate-fab-glow {
+  background: radial-gradient(circle,#ff5a4366 0%,#ff5a4300 70%) !important;
+}
+[data-theme='autumn'] .pb-navigation-icon[data-active='false'] .icon-bare-glow { display: none; }
+[data-theme='autumn'] .pb-navigation-icon[data-active='false'] { color: #704426; }
+[data-theme='autumn'] .pb-navigation-icon[data-active='true'] .icon-bare-crisp { filter: drop-shadow(0 0 1px #fff0c9) drop-shadow(0 0 2px #e58e2677); }
+[data-theme='autumn'] .autumn-main-fab { border: 1px solid #fff3da; isolation: isolate; }
+[data-theme='autumn'] .autumn-main-fab::before {
+  content: ''; position: absolute; inset: -7px; border: 2px solid #ff5a43aa;
+  border-radius: 50%; filter: blur(3px); z-index: -1; pointer-events: none;
+  animation: autumn-icon-breathe 5.5s ease-in-out infinite;
+}
+[data-theme='autumn'] .autumn-main-fab::after {
+  content: ''; position: absolute; inset: -2px; border: 1px solid #e58e26;
+  border-radius: 50%; opacity: 0; pointer-events: none;
+}
+[data-theme='autumn'] .autumn-main-fab:active::after { animation: autumn-press-ring .5s ease-out; }
+@keyframes autumn-icon-breathe { 0%,100% { opacity: .45; transform: scale(.97); } 50% { opacity: .9; transform: scale(1.05); } }
+@keyframes autumn-press-ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.35); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='autumn'] :is(.icon-ring-glow,.icon-bare-glow),
+  [data-theme='autumn'] .autumn-main-fab::before,
+  [data-theme='autumn'] .autumn-main-fab:active::after { animation: none; }
+}

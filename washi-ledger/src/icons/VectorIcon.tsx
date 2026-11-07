@@ -24,9 +24,9 @@ interface AppIconProps {
 }
 
 const GRADIENT_STOPS = [
-  { offset: '0%', color: '#e4ca95' },
-  { offset: '55%', color: '#d98668' },
-  { offset: '100%', color: '#d67966' },
+  { offset: '0%', color: 'var(--icon-gradient-top, #e4ca95)' },
+  { offset: '55%', color: 'var(--icon-gradient-mid, #d98668)' },
+  { offset: '100%', color: 'var(--icon-gradient-bottom, #d67966)' },
 ]
 
 /** 纯图标形状渲染层——数据来源+viewBox偏移量说明见lib/iconGlyphs.ts顶部注释。

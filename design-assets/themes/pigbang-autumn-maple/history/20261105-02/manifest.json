@@ -1,0 +1,61 @@
+{
+  "status": "素材预览，未接入App",
+  "base_images": 4,
+  "visual_layers": 5,
+  "watermark": "复用L-04-leaf.png，以CSS opacity控制，不另存位图",
+  "assets": [
+    {
+      "name": "和纸纹理",
+      "file": "layers/L-01-paper.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 2001997
+    },
+    {
+      "name": "右上枫枝",
+      "file": "layers/L-02-branch.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "bytes": 668315
+    },
+    {
+      "name": "左下枫叶",
+      "file": "layers/L-03-corner.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 871093
+    },
+    {
+      "name": "单片枫叶",
+      "file": "layers/L-04-leaf.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "bytes": 521872
+    }
+  ]
+}

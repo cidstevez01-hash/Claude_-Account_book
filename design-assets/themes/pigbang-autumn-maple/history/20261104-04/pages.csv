@@ -1,0 +1,26 @@
+﻿id,kind,name,route,source,file,actual_size,status
+P-01,独立页面,首页/概览,/,washi-ledger/src/features/ledger/DashboardPage.tsx,pages/P-01-DashboardPage.png,780×1688,已制作，待确认
+P-02,独立页面,明细/出入金,/history,washi-ledger/src/features/history/HistoryPage.tsx,pages/P-02-HistoryPage.png,780×1688,已制作，待确认
+P-03,独立页面,统计,/stats,washi-ledger/src/features/stats/StatsPage.tsx,pages/P-03-StatsPage.png,780×1688,已制作，待确认
+P-04,独立页面,记一笔（含编辑/复制）,/add,washi-ledger/src/features/add-entry/AddTransactionPage.tsx,pages/P-04-AddTransactionPage.png,780×1688,已制作，待确认
+P-05,独立页面,汇率换算,/rate,washi-ledger/src/features/rate/RatePage.tsx,pages/P-05-RatePage.png,780×1688,已制作，待确认
+P-06,独立页面,设置,/settings,washi-ledger/src/features/settings/SettingsPage.tsx,pages/P-06-SettingsPage.png,780×1688,已制作，待确认
+P-07,独立页面,主题选择,/theme,washi-ledger/src/features/settings/ThemePage.tsx,pages/P-07-ThemePage.png,780×1688,已制作，待确认
+P-08,独立页面,诊断日志,/settings/debug-log,washi-ledger/src/features/settings/DebugLogPage.tsx,pages/P-08-DebugLogPage.png,780×1688,已制作，待确认
+P-09,独立页面,固定收支规则列表,/settings/recurring-rules,washi-ledger/src/features/settings/RecurringRulesPage.tsx,pages/P-09-RecurringRulesPage.png,780×1688,已制作，待确认
+P-10,独立页面,固定收支规则表单（新增/编辑）,/settings/recurring-rules/form,washi-ledger/src/features/settings/RecurringRuleFormPage.tsx,pages/P-10-RecurringRuleFormPage.png,780×1688,已制作，待确认
+P-11,独立页面,我的账户（登录/未登录）,/account,washi-ledger/src/features/account/AccountPage.tsx,pages/P-11-AccountPage.png,780×1688,已制作，待确认
+P-12,独立页面,头像选择,/account/avatar,washi-ledger/src/features/account/ChangeAvatarPage.tsx,pages/P-12-ChangeAvatarPage.png,780×1688,已制作，待确认
+P-13,独立页面,登录,/signin,washi-ledger/src/features/auth/SignInPage.tsx,pages/P-13-SignInPage.png,780×1688,已制作，待确认
+P-14,独立页面,注册（含验证码步骤）,/register,washi-ledger/src/features/auth/SignUpPage.tsx,pages/P-14-SignUpPage.png,780×1688,已制作，待确认
+P-15,独立页面,关于,/about,washi-ledger/src/features/about/AboutPage.tsx,pages/P-15-AboutPage.png,780×1688,已制作，待确认
+P-16,独立页面,日历,/calendar,washi-ledger/src/features/calendar/CalendarPage.tsx,pages/P-16-CalendarPage.png,780×1688,已制作，待确认
+D-01,共用弹层,抽屉导航,共用弹层,washi-ledger/src/design-system/components/NavDrawer.tsx,pages/D-01-NavDrawer.png,780×1688,已制作，待确认
+D-02,共用弹层,记账详情弹层,共用弹层,washi-ledger/src/features/ledger/EntryDetailSheet.tsx,pages/D-02-EntryDetailSheet.png,780×1688,已制作，待确认
+D-03,共用弹层,分类统计明细弹层,共用弹层,washi-ledger/src/features/ledger/CategoryDetailSheet.tsx; washi-ledger/src/features/stats/CategoryDetailSheet.tsx,pages/D-03-CategoryDetailSheet.png,780×1688,已制作，待确认
+D-04,共用弹层,小票/PDF预览,共用弹层,washi-ledger/src/features/ledger/ReceiptPreviewSheet.tsx,pages/D-04-ReceiptPreviewSheet.png,780×1688,已制作，待确认
+D-05,共用弹层,小票扫描弹层,共用弹层,washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx,pages/D-05-ReceiptScanSheet.png,780×1688,已制作，待确认
+D-06,共用弹层,日期区间选择器,共用弹层,washi-ledger/src/design-system/components/RangeCalendarPicker.tsx,pages/D-06-RangeCalendarPicker.png,780×1688,已制作，待确认
+D-07,内嵌选择器,分类/子分类选择器,内嵌组件,washi-ledger/src/features/add-entry/CategoryPicker.tsx,pages/D-07-CategoryPicker.png,780×1688,已制作，待确认
+D-08,内嵌选择器,标签选择器,内嵌组件,washi-ledger/src/features/add-entry/TagPicker.tsx,pages/D-08-TagPicker.png,780×1688,已制作，待确认
+D-09,共用弹层,确认弹窗,共用弹层,washi-ledger/src/design-system/components/ConfirmDialog.tsx,pages/D-09-ConfirmDialog.png,780×1688,已制作，待确认

@@ -182,7 +182,7 @@ export function BottomNav() {
   return (
     <nav
       ref={navRef}
-      className="bottom-nav-shell fixed inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
+      className="autumn-bottom-nav bottom-nav-shell fixed inset-x-0 mx-auto w-[90%] max-w-[400px] z-50
                  flex items-center px-lg py-xs
                  bg-surface/80 backdrop-blur-md border border-white/20 rounded-full shadow-lg"
       style={{

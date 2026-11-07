@@ -4,6 +4,7 @@ import barChart from './shared/navigation/bar_chart.svg?raw'
 import { defaultIconTheme } from './default'
 import { nostalgiaIconTheme } from './nostalgia'
 import { summerIconTheme } from './summer'
+import { autumnIconTheme } from './autumn'
 import type { NavigationIconKey } from './types'
 export type { NavigationIconKey } from './types'
 
@@ -13,6 +14,7 @@ export const ICON_THEMES = {
   default: defaultIconTheme,
   nostalgia: nostalgiaIconTheme,
   summer: summerIconTheme,
+  autumn: autumnIconTheme,
 }
 
 function resolveTheme(theme: string) {

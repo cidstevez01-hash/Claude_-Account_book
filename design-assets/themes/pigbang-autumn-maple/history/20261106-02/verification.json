@@ -1,0 +1,50 @@
+[
+  {
+    "id": "01",
+    "name": "首页",
+    "broken": 0,
+    "horizontalOverflow": false
+  },
+  {
+    "id": "02",
+    "name": "明细",
+    "broken": 0,
+    "horizontalOverflow": false
+  },
+  {
+    "id": "03",
+    "name": "统计",
+    "broken": 0,
+    "horizontalOverflow": false
+  },
+  {
+    "id": "04",
+    "name": "记一笔",
+    "broken": 0,
+    "horizontalOverflow": false
+  },
+  {
+    "id": "05",
+    "name": "日历",
+    "broken": 0,
+    "horizontalOverflow": false
+  },
+  {
+    "id": "06",
+    "name": "汇率",
+    "broken": 0,
+    "horizontalOverflow": false
+  },
+  {
+    "id": "07",
+    "name": "设置",
+    "broken": 0,
+    "horizontalOverflow": false
+  },
+  {
+    "id": "08",
+    "name": "抽屉",
+    "broken": 0,
+    "horizontalOverflow": false
+  }
+]

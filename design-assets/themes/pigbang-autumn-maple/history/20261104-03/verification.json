@@ -1,0 +1,23 @@
+{
+  "regions": [
+    {
+      "name": "watermark",
+      "left": 735,
+      "top": 385,
+      "width": 199,
+      "height": 170
+    },
+    {
+      "name": "bottom-left",
+      "left": 0,
+      "top": 1310,
+      "width": 132,
+      "height": 145
+    }
+  ],
+  "outsideChanges": 0,
+  "closedContourCount": 2,
+  "petioleCount": 2,
+  "method": "original paper restoration and continuous vector contours",
+  "newApiCalls": 0
+}

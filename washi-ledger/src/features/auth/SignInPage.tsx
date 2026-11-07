@@ -41,7 +41,7 @@ export function SignInPage() {
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col justify-center px-md bg-surface paper-grid-bg overflow-y-auto overflow-x-hidden overscroll-y-contain"
+      className="app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col justify-center px-md bg-surface paper-grid-bg overflow-y-auto overflow-x-hidden overscroll-y-contain"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <RouteFade className="flex flex-col">

@@ -20,6 +20,7 @@ const THEME_PREVIEWS: Record<ThemeSkin, { primary: string; surface: string; outl
   nostalgia: { primary: '#d1665a', surface: '#f7f1e7', outlineVariant: '#e7dcc4' },
   // R-29：数值抄自index.css :root[data-theme="summer"]的--color-primary/--color-surface/
   // --color-outline-variant，跟旧App--seal/--paper/--grid对应
+  autumn: { primary: '#c62818', surface: '#faf6ee', outlineVariant: '#e58e26' },
   summer: { primary: '#E85D4A', surface: '#101B33', outlineVariant: '#2A3D63' },
 }
 
@@ -32,15 +33,16 @@ export function ThemePage() {
   // paper-grid-bg，summer下背景变成一片网格纸，跟其它页面(能看到星空烟花)不一致
   const isSummer = settings.themeSkin === 'summer'
 
-  const cards: { skin: ThemeSkin; nameKey: 'themeDefaultName' | 'themeNostalgiaName' | 'themeSummerName' }[] = [
+  const cards: { skin: ThemeSkin; nameKey: 'themeDefaultName' | 'themeNostalgiaName' | 'themeSummerName' | 'themeAutumnName' }[] = [
     { skin: 'default', nameKey: 'themeDefaultName' },
     { skin: 'nostalgia', nameKey: 'themeNostalgiaName' },
     { skin: 'summer', nameKey: 'themeSummerName' },
+    { skin: 'autumn', nameKey: 'themeAutumnName' },
   ]
 
   return (
     <div
-      className={`fixed inset-0 mx-auto max-w-[480px] flex flex-col overflow-hidden ${
+      className={`app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col overflow-hidden ${
         isSummer ? 'bg-transparent' : 'bg-surface'
       }`}
     >

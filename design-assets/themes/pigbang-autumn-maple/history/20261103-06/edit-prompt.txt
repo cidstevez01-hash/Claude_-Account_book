@@ -1,0 +1,8 @@
+Edit IMAGE 1, the full PigBang outline-only autumn home screen. IMAGE 2 and IMAGE 3 are user-marked closeups identifying the exact paired leaf lobes. Red rectangles are annotations, never add them to the output. Two leaves ONLY: (A) the faint outline leaf watermark in the balance card, (B) the large outline leaf at the bottom-left near the bottom navigation.
+
+For EACH of these two leaves, correct only the two upper lateral lobes marked by the rectangles. Use the leaf's central main vein as the AXIS OF REFLECTION. Make the two marked lobes equal in size and mirror-matched in outline: same length from the axis, same width, same tip height relative to the axis, matching serrations and inner veins. The reflection axis follows the actual leaf orientation, not necessarily the screen vertical. Use the more complete larger lobe and reflect it onto the smaller side. Retain the existing central main lobe, lower lobes, petiole, placement and scale. Do not add extra lobes.
+
+Keep THIN OUTLINE ONLY, completely unfilled interiors, existing copper/amber line color and gentle glow. The watermark stays faint; bottom-left leaf retains its stronger fine line. No filled leaves or solid leaf-shaped glow.
+
+Change nothing else. Preserve all other leaves, top-right cluster, small drifting leaves, all UI, typography, chart, cards, paper texture, highlights, icons, background, navigation, dates, status bar and avatar. Only the specified two lobe pairs within the mask may differ. Return full 1024x1536 image, no red boxes or annotations.
+

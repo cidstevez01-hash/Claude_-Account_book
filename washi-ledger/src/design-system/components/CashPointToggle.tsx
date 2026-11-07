@@ -42,7 +42,7 @@ interface CashPointToggleProps {
  * 硬币堆叠图(栅格图没法用currentColor，用filter:grayscale做未激活态) */
 export function CashPointToggle({ mode, onToggle, ariaLabel }: CashPointToggleProps) {
   const { settings } = useSettings()
-  const isSummer = settings.themeSkin === 'summer'
+  const isSummer = settings.themeSkin === 'summer' || settings.themeSkin === 'autumn'
   const pos = mode === 'cash' ? CASH_BOTTOM_LEFT : POINT_BOTTOM_LEFT
   const isCashActive = mode === 'cash'
   const scale = (v: number) => (v / STAGE) * 40

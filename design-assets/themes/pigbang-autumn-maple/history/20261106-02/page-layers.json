@@ -1,0 +1,151 @@
+[
+  {
+    "id": "01",
+    "name": "首页",
+    "component": "DashboardPage",
+    "source": "20261104-04/pages/P-01-DashboardPage.html",
+    "paper": true,
+    "foliage": {
+      "position": "右上页边，位于内容下层",
+      "width": 170,
+      "opacity": 0.36
+    },
+    "corner": {
+      "width": 70,
+      "position": "左下页边"
+    },
+    "scatter": true,
+    "watermark": true,
+    "preview": "pages/01.png"
+  },
+  {
+    "id": "02",
+    "name": "明细",
+    "component": "HistoryPage",
+    "source": "20261104-04/pages/P-02-HistoryPage.html",
+    "paper": true,
+    "foliage": {
+      "position": "右上页边，位于内容下层",
+      "width": 132,
+      "opacity": 0.27
+    },
+    "corner": {
+      "width": 48,
+      "position": "左下页边"
+    },
+    "scatter": true,
+    "watermark": false,
+    "preview": "pages/02.png"
+  },
+  {
+    "id": "03",
+    "name": "统计",
+    "component": "StatsPage",
+    "source": "20261104-04/pages/P-03-StatsPage.html",
+    "paper": true,
+    "foliage": {
+      "position": "右上页边，位于内容下层",
+      "width": 130,
+      "opacity": 0.25
+    },
+    "corner": {
+      "width": 48,
+      "position": "左下页边"
+    },
+    "scatter": false,
+    "watermark": false,
+    "preview": "pages/03.png"
+  },
+  {
+    "id": "04",
+    "name": "记一笔",
+    "component": "AddTransactionPage",
+    "source": "20261104-04/pages/P-04-AddTransactionPage.html",
+    "paper": true,
+    "foliage": {
+      "position": "右上页边，位于内容下层",
+      "width": 105,
+      "opacity": 0.22
+    },
+    "corner": {
+      "width": 38,
+      "position": "左下页边"
+    },
+    "scatter": false,
+    "watermark": false,
+    "preview": "pages/04.png"
+  },
+  {
+    "id": "05",
+    "name": "日历",
+    "component": "CalendarPage",
+    "source": "20261104-04/pages/P-16-CalendarPage.html",
+    "paper": true,
+    "foliage": {
+      "position": "右上页边，位于内容下层",
+      "width": 115,
+      "opacity": 0.24
+    },
+    "corner": {
+      "width": 42,
+      "position": "左下页边"
+    },
+    "scatter": false,
+    "watermark": false,
+    "preview": "pages/05.png"
+  },
+  {
+    "id": "06",
+    "name": "汇率",
+    "component": "RatePage",
+    "source": "20261104-04/pages/P-05-RatePage.html",
+    "paper": true,
+    "foliage": {
+      "position": "右上页边，位于内容下层",
+      "width": 115,
+      "opacity": 0.24
+    },
+    "corner": {
+      "width": 42,
+      "position": "左下页边"
+    },
+    "scatter": false,
+    "watermark": false,
+    "preview": "pages/06.png"
+  },
+  {
+    "id": "07",
+    "name": "设置",
+    "component": "SettingsPage",
+    "source": "20261104-04/pages/P-06-SettingsPage.html",
+    "paper": true,
+    "foliage": {
+      "position": "右上页边，位于内容下层",
+      "width": 140,
+      "opacity": 0.3
+    },
+    "corner": {
+      "width": 60,
+      "position": "左下页边"
+    },
+    "scatter": false,
+    "watermark": false,
+    "preview": "pages/07.png"
+  },
+  {
+    "id": "08",
+    "name": "抽屉",
+    "component": "NavDrawer",
+    "source": "20261105-01/drawer-layout.html",
+    "paper": true,
+    "foliage": {
+      "position": "抽屉左下，旋转180度",
+      "width": 190,
+      "opacity": 0.3
+    },
+    "corner": null,
+    "scatter": false,
+    "watermark": false,
+    "preview": "pages/08.png"
+  }
+]

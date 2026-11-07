@@ -1,0 +1,80 @@
+[
+  {
+    "id": "S-01",
+    "name": "明细",
+    "component": "HistoryPage",
+    "layout": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-04\\pages\\P-02-HistoryPage.png",
+    "reference": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-02\\pigbang-lineart-two-petioles.png",
+    "prompt": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\prompts\\S-01-history.txt",
+    "output": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\pages\\S-01-history-low.png",
+    "model": "gpt-image-2",
+    "quality": "low",
+    "size": "768x1664",
+    "status": "已生成，待确认"
+  },
+  {
+    "id": "S-02",
+    "name": "统计",
+    "component": "StatsPage",
+    "layout": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-04\\pages\\P-03-StatsPage.png",
+    "reference": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-02\\pigbang-lineart-two-petioles.png",
+    "prompt": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\prompts\\S-02-stats.txt",
+    "output": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\pages\\S-02-stats-low.png",
+    "model": "gpt-image-2",
+    "quality": "low",
+    "size": "768x1664",
+    "status": "已生成，待确认"
+  },
+  {
+    "id": "S-03",
+    "name": "记一笔",
+    "component": "AddTransactionPage",
+    "layout": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-04\\pages\\P-04-AddTransactionPage.png",
+    "reference": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-02\\pigbang-lineart-two-petioles.png",
+    "prompt": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\prompts\\S-03-add-entry.txt",
+    "output": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\pages\\S-03-add-entry-low.png",
+    "model": "gpt-image-2",
+    "quality": "low",
+    "size": "768x1664",
+    "status": "已生成，待确认"
+  },
+  {
+    "id": "S-04",
+    "name": "日历",
+    "component": "CalendarPage",
+    "layout": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-04\\pages\\P-16-CalendarPage.png",
+    "reference": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-02\\pigbang-lineart-two-petioles.png",
+    "prompt": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\prompts\\S-04-calendar.txt",
+    "output": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\pages\\S-04-calendar-low.png",
+    "model": "gpt-image-2",
+    "quality": "low",
+    "size": "768x1664",
+    "status": "已生成，待确认"
+  },
+  {
+    "id": "S-05",
+    "name": "汇率换算",
+    "component": "RatePage",
+    "layout": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-04\\pages\\P-05-RatePage.png",
+    "reference": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-02\\pigbang-lineart-two-petioles.png",
+    "prompt": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\prompts\\S-05-rate.txt",
+    "output": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\pages\\S-05-rate-low.png",
+    "model": "gpt-image-2",
+    "quality": "low",
+    "size": "768x1664",
+    "status": "已生成，待确认"
+  },
+  {
+    "id": "S-06",
+    "name": "设置",
+    "component": "SettingsPage",
+    "layout": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-04\\pages\\P-06-SettingsPage.png",
+    "reference": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-02\\pigbang-lineart-two-petioles.png",
+    "prompt": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\prompts\\S-06-settings.txt",
+    "output": "C:\\Users\\Zero1\\Claude_-Account_book\\design-assets\\themes\\pigbang-autumn-maple\\history\\20261104-05\\pages\\S-06-settings-low.png",
+    "model": "gpt-image-2",
+    "quality": "low",
+    "size": "768x1664",
+    "status": "已生成，待确认"
+  }
+]

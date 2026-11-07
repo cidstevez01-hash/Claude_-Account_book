@@ -21,8 +21,8 @@ export function NavigationIcon({ icon, theme, size, className, active, glowDelay
   } as CSSProperties
   const glyph = (glowing = false) => (
     <svg width={size} height={size} viewBox="0 0 256 256" aria-hidden="true" style={{ display: 'block' }}>
-      {resolved.glow && !glowing && <defs><radialGradient id={gradientId} cx="50%" cy="30%" r="75%"><stop offset="0%" stopColor="#e4ca95" /><stop offset="55%" stopColor="#d98668" /><stop offset="100%" stopColor="#d67966" /></radialGradient></defs>}
-      <g dangerouslySetInnerHTML={{ __html: resolved.glow && !glowing ? resolved.body.replaceAll('currentColor', `url(#${gradientId})`) : resolved.body }} />
+      {resolved.glow && !glowing && <defs><radialGradient id={gradientId} cx="50%" cy="30%" r="75%"><stop offset="0%" stopColor="var(--icon-gradient-top, #e4ca95)" /><stop offset="55%" stopColor="var(--icon-gradient-mid, #d98668)" /><stop offset="100%" stopColor="var(--icon-gradient-bottom, #d67966)" /></radialGradient></defs>}
+      <g dangerouslySetInnerHTML={{ __html: resolved.glow && !glowing && (theme !== 'autumn' || active) ? resolved.body.replaceAll('currentColor', `url(#${gradientId})`) : resolved.body }} />
     </svg>
   )
   return (

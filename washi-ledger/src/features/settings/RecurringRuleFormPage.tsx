@@ -153,7 +153,7 @@ export function RecurringRuleFormPage() {
 
   return (
     <div
-      className="fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
+      className="app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <RouteFade className="flex flex-col flex-1 min-h-0">

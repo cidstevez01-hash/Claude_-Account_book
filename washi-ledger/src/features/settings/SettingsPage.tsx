@@ -155,7 +155,9 @@ export function SettingsPage() {
                 ? t('themeNostalgiaName')
                 : settings.themeSkin === 'summer'
                   ? t('themeSummerName')
-                  : t('themeDefaultName')}
+                  : settings.themeSkin === 'autumn'
+                    ? t('themeAutumnName')
+                    : t('themeDefaultName')}
             </span>
             <ThemeIcon className="material-symbols-outlined text-[18px]" icon="chevron_right" />
           </div>

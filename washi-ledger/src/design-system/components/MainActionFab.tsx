@@ -59,7 +59,7 @@ interface SubLayout {
 
 export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) {
   const { settings } = useSettings()
-  const isSummer = settings.themeSkin === 'summer'
+  const isSummer = settings.themeSkin === 'summer' || settings.themeSkin === 'autumn'
   const keyboardOpen = useKeyboardInset() > 0
   const [expanded, setExpanded] = useState(false)
   const [subLayout, setSubLayout] = useState<SubLayout | null>(null)
@@ -202,7 +202,7 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
         aria-label={ariaLabel}
         onClick={handleClick}
         {...bind}
-        className="stamp-shadow fixed z-[55] flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-fab-icon active:scale-90"
+        className="autumn-main-fab stamp-shadow fixed z-[55] flex items-center justify-center w-[58px] h-[58px] rounded-full bg-primary text-fab-icon active:scale-90"
         style={{
           right: rightCss,
           bottom: bottomCss,

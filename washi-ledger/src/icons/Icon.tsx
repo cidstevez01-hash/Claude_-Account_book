@@ -55,9 +55,9 @@ export function ThemeIcon({ icon, fw, className, style, effect, size = 24, firef
     return <NavigationIcon icon={icon} theme={settings.themeSkin} size={size} className={className} active={active} glowDelayMs={glowDelayMs} />
   }
 
-  if (isSummer && effect && glyph) {
+  if ((isSummer || settings.themeSkin === 'autumn') && effect && glyph) {
     return effect === 'ring' ? (
-      <RingIconEffect icon={glyphKey} glyph={glyph} size={size} className={className} fireflies={fireflies} />
+      <RingIconEffect icon={glyphKey} glyph={glyph} size={size} className={className} fireflies={isSummer && fireflies} />
     ) : (
       <BareIconEffect icon={glyphKey} glyph={glyph} size={size} className={className} glowDelayMs={glowDelayMs} />
     )
