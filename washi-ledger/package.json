@@ -1,7 +1,7 @@
 {
   "name": "pigbang",
   "private": true,
-  "version": "1.0.0-20261107-dev.3",
+  "version": "1.0.0-20261107-dev.4",
   "type": "module",
   "scripts": {
     "dev": "vite",

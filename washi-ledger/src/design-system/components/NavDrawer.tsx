@@ -8,6 +8,7 @@ import { getAvatarPreset } from '../../lib/avatarPresets'
 import { loadAvatarId } from '../../lib/avatarStorage'
 import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from './ThemeIcon'
+import { AutumnLeaves } from './AutumnLeaves'
 import type { TranslationKey } from '../../lib/i18n'
 
 interface NavDrawerProps {
@@ -87,6 +88,7 @@ export function NavDrawer({ open, onClose }: NavDrawerProps) {
                     ${open ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
+        <AutumnLeaves restingOnly />
         <div className="flex items-center gap-sm p-md border-b-[1.5px] border-dashed border-outline-variant">
           {showAvatar ? (
             // 不需要border-primary装饰环——这里只是展示头像，不是选择/编辑状态。
