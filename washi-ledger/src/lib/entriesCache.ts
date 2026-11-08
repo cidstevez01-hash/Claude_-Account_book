@@ -49,3 +49,12 @@ export function saveCachedEntries(userId: string | null, entries: Entry[]): void
     console.error('写入本地记账缓存失败', e)
   }
 }
+
+/** Publish a successful save before navigating back; preserve the current account's other rows. */
+export function upsertCachedEntry(userId: string, entry: Entry): void {
+  const entries = loadCachedEntries(userId)
+  const exists = entries.some((item) => item.id === entry.id)
+  saveCachedEntries(userId, exists
+    ? entries.map((item) => item.id === entry.id ? entry : item)
+    : [...entries, entry])
+}

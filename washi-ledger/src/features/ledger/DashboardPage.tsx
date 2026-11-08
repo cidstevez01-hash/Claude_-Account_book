@@ -314,6 +314,7 @@ export function DashboardPage() {
           {/* R-22搜索框(标题下方、列表上方)在组件内部自己渲染，见RecentEntriesList.tsx */}
           <RecentEntriesList
             entries={recentEntries}
+            allEntries={displayEntries}
             categories={categories}
             tags={tags}
             paymentMethods={catalog.paymentMethods}
@@ -342,6 +343,7 @@ export function DashboardPage() {
           />
 
           <CategoryDetailSheet
+            allEntries={displayEntries}
             open={detailSelection != null}
             header={detailHeader}
             categories={categories}

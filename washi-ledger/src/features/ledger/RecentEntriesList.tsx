@@ -8,10 +8,13 @@ import { EntryDetailSheet } from './EntryDetailSheet'
 import { dayLabel } from './dayLabel'
 import { consumeDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import { useEntryHighlight } from '../../hooks/useEntryHighlight'
+import { useEntryDetailSelection } from '../../hooks/useEntryDetailSelection'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 interface RecentEntriesListProps {
   entries: Entry[]
+  /** Same display currency, without list filters: edits may move the selected record out of range. */
+  allEntries: Entry[]
   categories: Category[]
   tags: Tag[]
   paymentMethods: PaymentMethod[]
@@ -36,6 +39,7 @@ interface RecentEntriesListProps {
 
 export function RecentEntriesList({
   entries,
+  allEntries,
   categories,
   tags,
   paymentMethods,
@@ -63,7 +67,7 @@ export function RecentEntriesList({
   const groups = groupByDayPinned(filteredEntries)
   // R-40→R-42：点一条记录直接打开详情弹层(原来点了先展开操作抽屉那套在R-42去掉了，
   // 编辑/复制/删除现在是详情弹层自己头部的图标)
-  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const [viewEntry, setViewEntry] = useEntryDetailSelection(allEntries)
   const { highlightedId, highlightEntry } = useEntryHighlight('entry')
 
   // B-66→R-XX：从详情弹层点编辑/复制跳去/add后，不管是点返回(不保存)还是保存成功，
@@ -83,19 +87,12 @@ export function RecentEntriesList({
   useEffect(() => {
     const pendingId = pendingEntryIdRef.current
     if (!pendingId) return
-    const found = entries.find((e) => e.id === pendingId)
+    const found = allEntries.find((e) => e.id === pendingId)
     if (found) {
       setViewEntry(found)
       pendingEntryIdRef.current = null
     }
-  }, [entries])
-
-  // B-66：删除确认框现在盖在详情弹层上面而不是先关掉详情弹层(见EntryDetailSheet.tsx
-  // handleDelete的说明)，确认删除后entries会把这条记录移除，这里跟着自动关掉详情
-  // 弹层，不然会留一个显示着已经不存在的记录的"僵尸"详情弹层
-  useEffect(() => {
-    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
-  }, [entries, viewEntry])
+  }, [allEntries, setViewEntry])
   // 搜索框收起/展开——照旧仓库index.html的#ledgerSearch真实交互搬：默认是30x30
   // 圆形虚线图标按钮，点了才展开成圆角矩形(12px，不是整胶囊)。失焦时如果没输入
   // 内容才收起，有内容就保持展开(用户还能看到/清空自己搜的词)
@@ -106,7 +103,7 @@ export function RecentEntriesList({
 
   // 时间范围内本来就一条记录都没有(不是搜索筛没的)——保留原来的"引导记第一笔"大提示，
   // 不显示标题/搜索框，这时候搜什么都没有意义
-  if (entries.length === 0) {
+  if (entries.length === 0 && !viewEntry) {
     return (
       <div className="autumn-recent-empty text-center py-16 px-md text-on-surface-variant">
         <ThemeIcon className="material-symbols-outlined text-4xl mb-2 block opacity-40" icon="receipt_long" />

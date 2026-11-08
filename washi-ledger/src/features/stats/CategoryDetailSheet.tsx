@@ -7,6 +7,7 @@ import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
 import { useI18n } from '../../lib/i18n'
 import { useEntryHighlight } from '../../hooks/useEntryHighlight'
+import { useEntryDetailSelection } from '../../hooks/useEntryDetailSelection'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 export interface CategoryDetailHeader {
@@ -32,6 +33,8 @@ interface CategoryDetailSheetProps {
    * B-31之前误共用同一个组件，两边概念混在一起，改成统计页专属的独立组件 */
   monthLabel: string
   entries: Entry[]
+  /** Detail restoration must also find records moved outside this category/period. */
+  allEntries: Entry[]
   /** 顶部总额的显示币种——调用方应该已经用toDisplayEntries()把entries统一换算成
    * 这个币种了，这里只管格式化，不做换算 */
   currency?: string
@@ -58,6 +61,7 @@ export function CategoryDetailSheet({
   tags,
   monthLabel,
   entries,
+  allEntries,
   currency = 'CNY',
   onClose,
   onEdit,
@@ -66,7 +70,7 @@ export function CategoryDetailSheet({
   initialViewEntryId,
 }: CategoryDetailSheetProps) {
   const { t } = useI18n()
-  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const [viewEntry, setViewEntry] = useEntryDetailSelection(allEntries)
   const { highlightedId, highlightEntry } = useEntryHighlight('cat-entry')
 
   // B-66→R-XX：同features/ledger/CategoryDetailSheet.tsx
@@ -77,16 +81,12 @@ export function CategoryDetailSheet({
   useEffect(() => {
     const pendingId = pendingViewIdRef.current
     if (!pendingId) return
-    const found = entries.find((e) => e.id === pendingId)
+    const found = allEntries.find((e) => e.id === pendingId)
     if (found) {
       setViewEntry(found)
       pendingViewIdRef.current = null
     }
-  }, [entries])
-
-  useEffect(() => {
-    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
-  }, [entries, viewEntry])
+  }, [allEntries, setViewEntry])
 
   // 弹出/收起做平缓过渡——照旧仓库index.html真实的.sheet/.sheet.show搬：初始
   // transform:translateY(105%)，show时translateY(0)，0.3s cubic-bezier(.32,.72,0,1)。

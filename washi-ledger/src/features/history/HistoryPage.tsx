@@ -293,6 +293,7 @@ export function HistoryPage() {
           <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
         ) : (
           <HistoryEntryList
+            allEntries={displayEntries}
             entries={filtered}
             categories={categories}
             paymentMethods={catalog.paymentMethods}

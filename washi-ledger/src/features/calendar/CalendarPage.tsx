@@ -16,6 +16,7 @@ import { useSettings } from '../../hooks/useSettings'
 import { useDisplayRates } from '../../hooks/useDisplayRates'
 import { useJpHolidays } from '../../hooks/useJpHolidays'
 import { useEntryHighlight } from '../../hooks/useEntryHighlight'
+import { useEntryDetailSelection } from '../../hooks/useEntryDetailSelection'
 import { toDisplayEntries } from '../../data/currencyDisplay'
 import { formatCurrency, formatAmountNoSymbol } from '../../data/currencyDisplay'
 import { hasEntriesInMonth } from '../../data/summary'
@@ -23,7 +24,6 @@ import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
 import { consumeDetailSheetReturnMemory, setDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
-import type { Entry } from '../../types'
 
 const WEEKDAY_LABELS_ZH = ['日', '一', '二', '三', '四', '五', '六']
 const WEEKDAY_LABELS_JA = ['日', '月', '火', '水', '木', '金', '土']
@@ -167,7 +167,7 @@ export function CalendarPage() {
   )
   const hasSelectedRecord = filteredEntries.length > 0
   const selectedHolidayName = holidays[selectedDate]
-  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const [viewEntry, setViewEntry] = useEntryDetailSelection(displayEntries)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const { highlightedId, highlightEntry } = useEntryHighlight('entry')
 
@@ -186,17 +186,12 @@ export function CalendarPage() {
   useEffect(() => {
     const pendingId = pendingEntryIdRef.current
     if (!pendingId) return
-    const found = entries.find((e) => e.id === pendingId)
+    const found = displayEntries.find((e) => e.id === pendingId)
     if (found) {
       setViewEntry(found)
       pendingEntryIdRef.current = null
     }
-  }, [entries])
-  // 删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录移除，这里跟着
-  // 自动关掉详情弹层
-  useEffect(() => {
-    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
-  }, [entries, viewEntry])
+  }, [displayEntries, setViewEntry])
 
   async function handleRefresh() {
     await Promise.all([reload(), reloadCatalog()])

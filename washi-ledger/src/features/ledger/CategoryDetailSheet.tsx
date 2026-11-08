@@ -7,6 +7,7 @@ import { EntryDetailSheet } from './EntryDetailSheet'
 import { dayLabel } from './dayLabel'
 import { useI18n } from '../../lib/i18n'
 import { useEntryHighlight } from '../../hooks/useEntryHighlight'
+import { useEntryDetailSelection } from '../../hooks/useEntryDetailSelection'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 export interface CategoryDetailHeader {
@@ -33,6 +34,8 @@ interface CategoryDetailSheetProps {
    * 本来就不一样，拆成两个独立文件，不再共用 */
   rangeLabel: string
   entries: Entry[]
+  /** Detail restoration must also find records moved to another category or date. */
+  allEntries: Entry[]
   /** 顶部总额的显示币种——调用方应该已经用toDisplayEntries()把entries统一换算成
    * 这个币种了，这里只管格式化，不做换算 */
   currency?: string
@@ -60,6 +63,7 @@ export function CategoryDetailSheet({
   tags,
   rangeLabel,
   entries,
+  allEntries,
   currency = 'CNY',
   onClose,
   onEdit,
@@ -68,7 +72,7 @@ export function CategoryDetailSheet({
   initialViewEntryId,
 }: CategoryDetailSheetProps) {
   const { t } = useI18n()
-  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const [viewEntry, setViewEntry] = useEntryDetailSelection(allEntries)
   const { highlightedId, highlightEntry } = useEntryHighlight('cat-entry')
 
   // B-66→R-XX：initialViewEntryId由DashboardPage在恢复detailSelection、重新张开这个
@@ -85,18 +89,12 @@ export function CategoryDetailSheet({
   useEffect(() => {
     const pendingId = pendingViewIdRef.current
     if (!pendingId) return
-    const found = entries.find((e) => e.id === pendingId)
+    const found = allEntries.find((e) => e.id === pendingId)
     if (found) {
       setViewEntry(found)
       pendingViewIdRef.current = null
     }
-  }, [entries])
-
-  // B-66：删除确认框现在盖在详情弹层上面而不是先关掉详情弹层，确认删除后entries
-  // 会把这条记录移除，这里跟着自动关掉详情弹层，不留"僵尸"详情弹层
-  useEffect(() => {
-    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
-  }, [entries, viewEntry])
+  }, [allEntries, setViewEntry])
 
   // 弹出/收起做平缓过渡——照旧仓库index.html真实的.sheet/.sheet.show搬：初始
   // transform:translateY(105%)，show时translateY(0)，0.3s cubic-bezier(.32,.72,0,1)。

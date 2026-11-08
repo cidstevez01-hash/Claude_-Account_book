@@ -14,6 +14,7 @@ import { useCatalog } from '../../hooks/useCatalog'
 import { useEntries } from '../../hooks/useEntries'
 import { useSettings } from '../../hooks/useSettings'
 import { upsertEntry, resolvePointRate } from '../../data/catalog'
+import { upsertCachedEntry } from '../../lib/entriesCache'
 import { uploadReceiptPdf, deleteReceiptPdf, getReceiptSignedUrl } from '../../data/receiptStorage'
 import { openReceiptDocumentNative } from '../../lib/receiptViewer'
 import { ReceiptPreviewSheet } from '../ledger/ReceiptPreviewSheet'
@@ -274,6 +275,7 @@ export function AddTransactionPage() {
     try {
       addToOutbox(user.id, entry)
       await upsertEntry(entry, user.id)
+      upsertCachedEntry(user.id, entry)
       removeFromOutbox(user.id, entry.id)
       saved = true
     } catch (e) {

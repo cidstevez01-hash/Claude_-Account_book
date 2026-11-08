@@ -1,5 +1,5 @@
 import { ThemeIcon } from '../../icons/Icon'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useI18n } from '../../lib/i18n'
 import { groupByDay } from '../../data/summary'
 import { formatCurrency } from '../../data/currencyDisplay'
@@ -8,10 +8,13 @@ import { EntryDetailSheet } from '../ledger/EntryDetailSheet'
 import { dayLabel } from '../ledger/dayLabel'
 import { consumeDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 import { useEntryHighlight } from '../../hooks/useEntryHighlight'
+import { useEntryDetailSelection } from '../../hooks/useEntryDetailSelection'
 import type { Category, Entry, PaymentMethod, Tag } from '../../types'
 
 interface HistoryEntryListProps {
   entries: Entry[]
+  /** Same display currency, without date/type/search filters. */
+  allEntries: Entry[]
   categories: Category[]
   paymentMethods: PaymentMethod[]
   tags: Tag[]
@@ -33,10 +36,10 @@ interface HistoryEntryListProps {
  * 编辑/复制/删除不再限制"只能在仪表盘操作"，这里也要传onEdit/onCopy/onDelete给
  * EntryDetailSheet(原来点击条目完全没反应、后来R-40接上只读详情弹层，这版详情
  * 弹层自己头部多了这三个操作图标) */
-export function HistoryEntryList({ entries, categories, paymentMethods, tags, currency, onEdit, onCopy, onDelete, focusEntryId }: HistoryEntryListProps) {
+export function HistoryEntryList({ entries, allEntries, categories, paymentMethods, tags, currency, onEdit, onCopy, onDelete, focusEntryId }: HistoryEntryListProps) {
   const { t } = useI18n()
   const groups = groupByDay(entries)
-  const [viewEntry, setViewEntry] = useState<Entry | null>(null)
+  const [viewEntry, setViewEntry] = useEntryDetailSelection(allEntries)
   const { highlightedId, highlightEntry } = useEntryHighlight('entry')
 
   // B-66→R-XX：同RecentEntriesList.tsx——从详情弹层点编辑/复制跳去/add，不管点返回
@@ -52,19 +55,14 @@ export function HistoryEntryList({ entries, categories, paymentMethods, tags, cu
   useEffect(() => {
     const pendingId = pendingEntryIdRef.current
     if (!pendingId) return
-    const found = entries.find((e) => e.id === pendingId)
+    const found = allEntries.find((e) => e.id === pendingId)
     if (found) {
       setViewEntry(found)
       pendingEntryIdRef.current = null
     }
-  }, [entries])
-  // 删除确认框现在盖在详情弹层上面，确认删除后entries会把这条记录移除，这里跟着
-  // 自动关掉详情弹层
-  useEffect(() => {
-    if (viewEntry && !entries.some((e) => e.id === viewEntry.id)) setViewEntry(null)
-  }, [entries, viewEntry])
+  }, [allEntries, setViewEntry])
 
-  if (entries.length === 0) {
+  if (entries.length === 0 && !viewEntry) {
     return (
       <div className="text-center py-16 px-md text-on-surface-variant">
         <ThemeIcon className="material-symbols-outlined text-4xl mb-2 block opacity-40" icon="receipt_long" />

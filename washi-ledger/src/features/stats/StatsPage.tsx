@@ -416,6 +416,7 @@ export function StatsPage() {
       )}
 
       <CategoryDetailSheet
+        allEntries={displayEntries}
         open={detailCatCode != null}
         header={detailHeader}
         categories={categories}
