@@ -3,11 +3,11 @@ import { useSettings } from '../../hooks/useSettings'
 
 // Fixed routes and negative time offsets keep a populated, repeatable field on page changes.
 const FALLING_LEAVES = [
-  // Left, middle and right landing lanes. Cross the page before reaching the cards.
-  [90, -.82, 22, 60, -25], [94, -.48, 19, 78, 35], [88, -.72, 25, 70, -60],
-  [92, -.2, 21, 92, 10], [96, -.88, 27, 84, 55], [86, -.46, 24, 64, -10],
-  [94, -.78, 20, 80, 80], [91, -.12, 28, 96, -45], [96, -.86, 23, 74, 20],
-  [90, -.55, 26, 88, 65], [93, -.28, 18, 68, -70], [94, -.74, 29, 82, 40],
+  // Parallel lanes share drift and duration, so they cannot overtake or converge.
+  // Artwork points upward: 180–225deg makes the blade face down/down-left.
+  [52, -.38, 30, 70, 200],
+  [78, -.38, 30, 96, 220],
+  [104, -.38, 30, 80, 208],
 ] as const
 
 /** Decorative overlay: no hit testing, no layout or safe-area space, no new imagery. */
@@ -52,12 +52,15 @@ export function AutumnLeaves({ restingOnly = false }: { restingOnly?: boolean })
           left: `${left}%`, '--leaf-drift': drift,
           '--leaf-size': `calc(clamp(260px,74vw,330px) * ${size / 289})`,
           '--leaf-angle': `${angle}deg`, '--leaf-sway': `${18 + index % 4 * 7}px`,
-          '--leaf-flutter-duration': `${3.8 + index % 5 * .65}s`,
-          '--leaf-flutter-delay': `${-(epoch % (3.8 + index % 5 * .65))}s`,
+          '--leaf-flight-duration': `${duration}s`,
+          '--leaf-flight-delay': `${-((epoch + index * 10) % duration)}s`,
           animationDuration: `${duration}s`,
-          animationDelay: `${-((epoch + index * 5.7) % duration)}s`,
+          animationDelay: `${-((epoch + index * 10) % duration)}s`,
         } as CSSProperties}>
-          <i className={index % 5 === 0 ? 'autumn-leaf-blade autumn-leaf-tumbling' : 'autumn-leaf-blade'} />
+          <i className="autumn-leaf-blade">
+            <span className="autumn-leaf-panel autumn-leaf-left" />
+            <span className="autumn-leaf-panel autumn-leaf-right" />
+          </i>
         </span>
       ))}
       {[0, 1, 2, 3].map(index => <span className="autumn-resting-leaf" key={`rest-${index}`} />)}

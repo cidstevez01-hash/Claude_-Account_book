@@ -76,20 +76,27 @@
   position: absolute; width: var(--leaf-size); height: var(--leaf-size);
   pointer-events: none;
 }
-[data-theme='autumn'] :is(.autumn-resting-leaf,.autumn-leaf-blade) {
+[data-theme='autumn'] :is(.autumn-resting-leaf,.autumn-leaf-panel) {
   background: url('../assets/themes/autumn/leaf.webp') center / contain no-repeat;
 }
 [data-theme='autumn'] .autumn-leaf-blade {
-  inset: 0; transform-origin: 50% 58%;
-  animation: autumn-leaf-flutter var(--leaf-flutter-duration) ease-in-out infinite;
-  animation-delay: var(--leaf-flutter-delay);
+  inset: 0; transform-origin: 50% 58%; transform-style: preserve-3d;
+  animation: autumn-leaf-flutter var(--leaf-flight-duration) ease-in-out infinite;
+  animation-delay: var(--leaf-flight-delay);
 }
-[data-theme='autumn'] .autumn-leaf-tumbling { animation-name: autumn-leaf-tumble; }
+[data-theme='autumn'] .autumn-leaf-panel {
+  position: absolute; inset: 0; transform-origin: 50% 58%;
+  animation: autumn-leaf-flex var(--leaf-flight-duration) ease-in-out infinite;
+  animation-delay: var(--leaf-flight-delay);
+}
+/* Both halves reuse the same original bitmap, joined along its central vein. */
+[data-theme='autumn'] .autumn-leaf-left { clip-path: inset(0 50% 0 0); --fold-side: 1; }
+[data-theme='autumn'] .autumn-leaf-right { clip-path: inset(0 0 0 50%); --fold-side: -1; }
 [data-theme='autumn'] .autumn-falling-leaf {
-  top: -64px; opacity: 0;
+  top: -64px; opacity: 0; perspective: 380px;
   animation: autumn-leaf-fall 24s cubic-bezier(.36,.05,.65,.95) infinite;
 }
-[data-theme='autumn'] :is(.autumn-falling-leaf,.autumn-leaf-blade) {
+[data-theme='autumn'] :is(.autumn-falling-leaf,.autumn-leaf-blade,.autumn-leaf-panel) {
   animation-play-state: var(--leaf-play-state,running);
 }
 [data-theme='autumn'] .autumn-resting-leaf { opacity: .4; bottom: 12px; }
@@ -106,18 +113,29 @@
   80% { opacity: .45; }
   100% { opacity: 0; transform: translate3d(calc(var(--autumn-scene-width) * var(--leaf-drift)),calc(100dvh + 130px),0); }
 }
-/* The carrier descends; the blade independently rocks, turns edge-on and unfolds. */
+/* A steady breeze: initial wobble decays into small, wind-biased rocking.
+   All poses share the carrier's time and pause state, with no per-frame JS. */
 @keyframes autumn-leaf-flutter {
-  0%,100% { transform: translateX(calc(var(--leaf-sway) * -1)) rotateZ(calc(var(--leaf-angle) - 28deg)) rotateY(-35deg) rotateX(18deg); }
-  24% { transform: translateX(-4px) rotateZ(var(--leaf-angle)) rotateY(76deg) rotateX(-16deg); }
-  51% { transform: translateX(var(--leaf-sway)) rotateZ(calc(var(--leaf-angle) + 36deg)) rotateY(20deg) rotateX(-28deg); }
-  78% { transform: translateX(3px) rotateZ(calc(var(--leaf-angle) + 8deg)) rotateY(-72deg) rotateX(12deg); }
+  0% { transform: translateX(calc(var(--leaf-sway) * -.7)) rotateZ(calc(var(--leaf-angle) - 22deg)) rotateY(-42deg) rotateX(20deg); }
+  12% { transform: translateX(calc(var(--leaf-sway) * .65)) rotateZ(calc(var(--leaf-angle) + 20deg)) rotateY(55deg) rotateX(-16deg); }
+  24% { transform: translateX(calc(var(--leaf-sway) * -.45)) rotateZ(calc(var(--leaf-angle) - 14deg)) rotateY(-32deg) rotateX(13deg); }
+  36% { transform: translateX(calc(var(--leaf-sway) * .35)) rotateZ(calc(var(--leaf-angle) + 13deg)) rotateY(36deg) rotateX(-10deg); }
+  48% { transform: translateX(calc(var(--leaf-sway) * -.25)) rotateZ(calc(var(--leaf-angle) - 8deg)) rotateY(-20deg) rotateX(8deg); }
+  60% { transform: translateX(calc(var(--leaf-sway) * .2)) rotateZ(calc(var(--leaf-angle) + 9deg)) rotateY(25deg) rotateX(-7deg); }
+  72% { transform: translateX(-4px) rotateZ(calc(var(--leaf-angle) - 3deg)) rotateY(-10deg) rotateX(6deg); }
+  86% { transform: translateX(3px) rotateZ(calc(var(--leaf-angle) + 6deg)) rotateY(18deg) rotateX(-4deg); }
+  100% { transform: translateX(-2px) rotateZ(calc(var(--leaf-angle) + 1deg)) rotateY(4deg) rotateX(4deg); }
 }
-@keyframes autumn-leaf-tumble {
-  0% { transform: translateX(calc(var(--leaf-sway) * -1)) rotateZ(var(--leaf-angle)) rotateY(0deg) rotateX(20deg); }
-  32% { transform: translateX(var(--leaf-sway)) rotateZ(calc(var(--leaf-angle) + 55deg)) rotateY(110deg) rotateX(-25deg); }
-  67% { transform: translateX(0) rotateZ(calc(var(--leaf-angle) + 135deg)) rotateY(240deg) rotateX(25deg); }
-  100% { transform: translateX(calc(var(--leaf-sway) * -1)) rotateZ(calc(var(--leaf-angle) + 360deg)) rotateY(360deg) rotateX(20deg); }
+@keyframes autumn-leaf-flex {
+  0% { transform: rotateY(calc(var(--fold-side) * 16deg)); opacity: .9; }
+  12% { transform: rotateY(calc(var(--fold-side) * -13deg)); opacity: 1; }
+  24% { transform: rotateY(calc(var(--fold-side) * 12deg)); opacity: .86; }
+  36% { transform: rotateY(calc(var(--fold-side) * -9deg)); opacity: .98; }
+  48% { transform: rotateY(calc(var(--fold-side) * 9deg)); opacity: .9; }
+  60% { transform: rotateY(calc(var(--fold-side) * -6deg)); opacity: 1; }
+  72% { transform: rotateY(calc(var(--fold-side) * 7deg)); opacity: .91; }
+  86% { transform: rotateY(calc(var(--fold-side) * -4deg)); opacity: .98; }
+  100% { transform: rotateY(calc(var(--fold-side) * 5deg)); opacity: .94; }
 }
 [data-theme='autumn'] [data-app-header] a[href='/account'] {
   position: relative; border: 1px solid #dfac6b88; background: #fffaf3cc;
@@ -182,7 +200,7 @@
 @keyframes autumn-press-ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.35); } }
 @media (prefers-reduced-motion: reduce) {
   [data-theme='autumn'] .autumn-falling-leaf { display: none; animation: none; }
-  [data-theme='autumn'] .autumn-leaf-blade { animation: none; }
+  [data-theme='autumn'] :is(.autumn-leaf-blade,.autumn-leaf-panel) { animation: none; }
   [data-theme='autumn'] :is(.icon-ring-glow,.icon-bare-glow),
   [data-theme='autumn'] .autumn-main-fab::before,
   [data-theme='autumn'] .autumn-main-fab:active::after { animation: none; }

@@ -1,0 +1,237 @@
+{
+  "emptyDataOnly": true,
+  "externalRequestsBlocked": true,
+  "result": [
+    {
+      "width": 320,
+      "route": "/",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": "none",
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 320,
+      "route": "/stats",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 320,
+      "route": "/add",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": "none",
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 390,
+      "route": "/stats",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 390,
+      "route": "/add",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "test": "drawer",
+      "old": "none",
+      "falling": 0,
+      "resting": 4
+    },
+    {
+      "test": "background pause and foreground resume",
+      "passed": true
+    },
+    {
+      "test": "reduced motion",
+      "passed": true
+    },
+    {
+      "width": 430,
+      "route": "/",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": "none",
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 430,
+      "route": "/stats",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 430,
+      "route": "/add",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 768,
+      "route": "/",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": "none",
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 768,
+      "route": "/stats",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    },
+    {
+      "width": 768,
+      "route": "/add",
+      "leaves": 3,
+      "resting": 4,
+      "oldBottom": "none",
+      "watermark": null,
+      "pointerEvents": "none",
+      "overflow": false,
+      "animations": [
+        "autumn-leaf-fall",
+        "autumn-leaf-fall",
+        "autumn-leaf-fall"
+      ],
+      "trajectorySamples": 40,
+      "collisionSamples": 180,
+      "collisions": 0
+    }
+  ],
+  "errors": []
+}
