@@ -37,5 +37,11 @@
       "bytes": 21346
     }
   ],
-  "note": "Original images unchanged. Foliage line-color separation removes ivory for transparent runtime overlay; other layers resized/compressed. Watermark reuses leaf."
+  "note": "Original images unchanged. Foliage line-color separation removes ivory for transparent runtime overlay; other layers resized/compressed. Watermark reuses leaf.",
+  "canopyOcclusion": {
+    "file": "foliage-occlusion.svg",
+    "source": "design-assets/themes/pigbang-autumn-maple/history/20261109-01/foliage-occlusion.svg",
+    "purpose": "Filled canopy-envelope mask excludes rear falling leaves, including transparent line-art interiors",
+    "alignment": "Same size and offset as foliage.webp"
+  }
 }

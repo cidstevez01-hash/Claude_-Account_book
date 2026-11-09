@@ -1,0 +1,222 @@
+/* 丹枫金秋 — adopted Image 2 design 20261107-05; other skins are unaffected. */
+:root[data-theme='autumn'] {
+  --color-surface: #faf6ee;
+  --color-background: #faf6ee;
+  --color-surface-bright: #fffdf9;
+  --color-surface-dim: #eadfcf;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fffbf5;
+  --color-surface-container: #f7eee1;
+  --color-surface-container-high: #f3e6d4;
+  --color-surface-container-highest: #f6e2cc;
+  --color-surface-variant: #f1e5d4;
+  --color-on-surface: #241d17;
+  --color-on-background: #241d17;
+  --color-on-surface-variant: #76604e;
+  --color-inverse-surface: #38291e;
+  --color-inverse-on-surface: #fffaf2;
+  --color-outline: #957961;
+  --color-outline-variant: #dfc7ac;
+  --color-primary: #c62818;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #a82114;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #fbe1d5;
+  --color-primary-fixed-dim: #f5b69c;
+  --color-on-primary-fixed: #51160e;
+  --color-on-primary-fixed-variant: #8e2416;
+  --color-inverse-primary: #ffb6a1;
+  --color-app-title: #a62117;
+  --color-secondary: #2a7e4b;
+  --color-secondary-container: #e3eddf;
+  --color-on-secondary-container: #214c31;
+  --color-income: #2a7e4b;
+  --color-expense: #c62818;
+  --color-tertiary: #a66508;
+  --color-tertiary-container: #f9e5c1;
+  --color-on-tertiary-container: #68410a;
+  --color-link: #ad2415;
+  --color-fab-icon: #fffaf2;
+  --color-selected-day-ink: #ffffff;
+  --color-calendar-heat: #c4a992;
+  --color-holiday: #b3261e;
+  --autumn-sun: #e58e26;
+  --autumn-glow: #ff5a43;
+  --icon-gradient-top: #e58e26;
+  --icon-gradient-mid: #d73d23;
+  --icon-gradient-bottom: #b52316;
+  --shadow-main-fab: 0 0 0 1px #fff4dc, 0 0 13px #ff5a4377, 0 4px 9px #9c24152c;
+}
+[data-theme='autumn'] .app-shell {
+  --autumn-foliage-size: clamp(260px,74vw,330px);
+  isolation: isolate;
+  background: linear-gradient(#faf6ee66,#faf6ee66), url('../assets/themes/autumn/paper.webp') center / 512px;
+  background-color: #faf6ee;
+}
+[data-theme='autumn'] .app-shell::before,
+[data-theme='autumn'] .app-shell::after {
+  content: ''; position: absolute; pointer-events: none; z-index: -1;
+  background-repeat: no-repeat; background-size: contain;
+}
+[data-theme='autumn'] .app-shell::before {
+  width: var(--autumn-foliage-size); height: var(--autumn-foliage-size); right: -32px;
+  /* Only interactive header content is inset; decoration reaches the screen edge. */
+  top: -18px; opacity: .68;
+  background-image: url('../assets/themes/autumn/foliage.webp');
+}
+[data-theme='autumn'] .app-shell::after {
+  content: none;
+}
+[data-theme='autumn'] .paper-grid-bg { background-image: none; }
+[data-theme='autumn'] .app-shell header { background-color: transparent; border-bottom-color: transparent; }
+[data-theme='autumn'] .autumn-scattered-leaves {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden;
+  contain: layout paint; --autumn-scene-width: min(100vw,480px);
+}
+/* Subtract a filled silhouette from the rear decoration only. Text, cards and
+   the visible foreground line-art keep their original colours and stacking. */
+[data-theme='autumn'] .autumn-scattered-leaves:not(.autumn-resting-only) {
+  -webkit-mask-image: linear-gradient(#fff,#fff), url('../assets/themes/autumn/foliage-occlusion.svg');
+  mask-image: linear-gradient(#fff,#fff), url('../assets/themes/autumn/foliage-occlusion.svg');
+  -webkit-mask-size: 100% 100%, var(--autumn-foliage-size) var(--autumn-foliage-size);
+  mask-size: 100% 100%, var(--autumn-foliage-size) var(--autumn-foliage-size);
+  -webkit-mask-position: 0 0, right -32px top -18px;
+  mask-position: 0 0, right -32px top -18px;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+[data-theme='autumn'] :is(.autumn-falling-leaf,.autumn-resting-leaf,.autumn-leaf-blade) {
+  position: absolute; width: var(--leaf-size); height: var(--leaf-size);
+  pointer-events: none;
+}
+[data-theme='autumn'] :is(.autumn-resting-leaf,.autumn-leaf-panel) {
+  background: url('../assets/themes/autumn/leaf.webp') center / contain no-repeat;
+}
+[data-theme='autumn'] .autumn-leaf-blade {
+  inset: 0; transform-origin: 50% 58%; transform-style: preserve-3d;
+  animation: autumn-leaf-flutter var(--leaf-flight-duration) ease-in-out infinite;
+  animation-delay: var(--leaf-flight-delay);
+}
+[data-theme='autumn'] .autumn-leaf-panel {
+  position: absolute; inset: 0; transform-origin: 50% 58%;
+  animation: autumn-leaf-flex var(--leaf-flight-duration) ease-in-out infinite;
+  animation-delay: var(--leaf-flight-delay);
+}
+/* Both halves reuse the same original bitmap, joined along its central vein. */
+[data-theme='autumn'] .autumn-leaf-left { clip-path: inset(0 50% 0 0); --fold-side: 1; }
+[data-theme='autumn'] .autumn-leaf-right { clip-path: inset(0 0 0 50%); --fold-side: -1; }
+[data-theme='autumn'] .autumn-falling-leaf {
+  top: -64px; opacity: 0; perspective: 380px;
+  animation: autumn-leaf-fall 24s cubic-bezier(.36,.05,.65,.95) infinite;
+}
+[data-theme='autumn'] :is(.autumn-falling-leaf,.autumn-leaf-blade,.autumn-leaf-panel) {
+  animation-play-state: var(--leaf-play-state,running);
+}
+[data-theme='autumn'] .autumn-resting-leaf { opacity: .4; bottom: 12px; }
+[data-theme='autumn'] .autumn-resting-leaf:nth-last-child(4) { left: 3%; --leaf-size: 36px; transform: rotate(-32deg); }
+[data-theme='autumn'] .autumn-resting-leaf:nth-last-child(3) { left: 28%; bottom: 1px; --leaf-size: 28px; transform: rotate(74deg); }
+[data-theme='autumn'] .autumn-resting-leaf:nth-last-child(2) { left: 65%; bottom: 23px; --leaf-size: 33px; transform: rotate(18deg); }
+[data-theme='autumn'] .autumn-resting-leaf:last-child { left: 88%; bottom: 7px; --leaf-size: 25px; transform: rotate(-65deg); }
+@keyframes autumn-leaf-fall {
+  0% { opacity: 0; transform: translate3d(0,0,0); }
+  10% { opacity: .55; }
+  28% { transform: translate3d(calc(var(--autumn-scene-width) * var(--leaf-drift) * .65),calc(100dvh * .28),0); }
+  48% { transform: translate3d(calc(var(--autumn-scene-width) * var(--leaf-drift) * .82),calc(100dvh * .43),0); }
+  72% { transform: translate3d(calc(var(--autumn-scene-width) * var(--leaf-drift) * .95),calc(100dvh * .75),0); }
+  80% { opacity: .45; }
+  100% { opacity: 0; transform: translate3d(calc(var(--autumn-scene-width) * var(--leaf-drift)),calc(100dvh + 130px),0); }
+}
+/* A steady breeze: initial wobble decays into small, wind-biased rocking.
+   All poses share the carrier's time and pause state, with no per-frame JS. */
+@keyframes autumn-leaf-flutter {
+  0% { transform: translateX(calc(var(--leaf-sway) * -.7)) rotateZ(calc(var(--leaf-angle) - 22deg)) rotateY(-42deg) rotateX(20deg); }
+  12% { transform: translateX(calc(var(--leaf-sway) * .65)) rotateZ(calc(var(--leaf-angle) + 20deg)) rotateY(55deg) rotateX(-16deg); }
+  24% { transform: translateX(calc(var(--leaf-sway) * -.45)) rotateZ(calc(var(--leaf-angle) - 14deg)) rotateY(-32deg) rotateX(13deg); }
+  36% { transform: translateX(calc(var(--leaf-sway) * .35)) rotateZ(calc(var(--leaf-angle) + 13deg)) rotateY(36deg) rotateX(-10deg); }
+  48% { transform: translateX(calc(var(--leaf-sway) * -.25)) rotateZ(calc(var(--leaf-angle) - 8deg)) rotateY(-20deg) rotateX(8deg); }
+  60% { transform: translateX(calc(var(--leaf-sway) * .2)) rotateZ(calc(var(--leaf-angle) + 9deg)) rotateY(25deg) rotateX(-7deg); }
+  72% { transform: translateX(-4px) rotateZ(calc(var(--leaf-angle) - 3deg)) rotateY(-10deg) rotateX(6deg); }
+  86% { transform: translateX(3px) rotateZ(calc(var(--leaf-angle) + 6deg)) rotateY(18deg) rotateX(-4deg); }
+  100% { transform: translateX(-2px) rotateZ(calc(var(--leaf-angle) + 1deg)) rotateY(4deg) rotateX(4deg); }
+}
+@keyframes autumn-leaf-flex {
+  0% { transform: rotateY(calc(var(--fold-side) * 16deg)); opacity: .9; }
+  12% { transform: rotateY(calc(var(--fold-side) * -13deg)); opacity: 1; }
+  24% { transform: rotateY(calc(var(--fold-side) * 12deg)); opacity: .86; }
+  36% { transform: rotateY(calc(var(--fold-side) * -9deg)); opacity: .98; }
+  48% { transform: rotateY(calc(var(--fold-side) * 9deg)); opacity: .9; }
+  60% { transform: rotateY(calc(var(--fold-side) * -6deg)); opacity: 1; }
+  72% { transform: rotateY(calc(var(--fold-side) * 7deg)); opacity: .91; }
+  86% { transform: rotateY(calc(var(--fold-side) * -4deg)); opacity: .98; }
+  100% { transform: rotateY(calc(var(--fold-side) * 5deg)); opacity: .94; }
+}
+[data-theme='autumn'] [data-app-header] a[href='/account'] {
+  position: relative; border: 1px solid #dfac6b88; background: #fffaf3cc;
+  margin-right: 0;
+}
+[data-theme='autumn'] .autumn-recent-empty {
+  margin: 0 16px 24px; padding: 28px 16px; background: #ffffffed;
+  border: 1px solid #dcb38c70; border-radius: 20px; box-shadow: 0 4px 9px #74401d13;
+}
+[data-theme='autumn'] .papercut-text-shadow { text-shadow: none; }
+[data-theme='autumn'] :is(.ledger-card,.entry-card,.rate-card) {
+  border: 1px solid #dcb38c70; border-radius: 20px;
+  box-shadow: 0 4px 9px #74401d13;
+}
+/* Include graph panels as well as ledger cards; keep text fully opaque. */
+[data-theme='autumn'] :is(.ledger-card,.entry-card,.rate-card,.autumn-summary-tile,.autumn-recent-empty,main section.bg-surface-container-lowest) {
+  background: color-mix(in srgb,var(--color-surface-container-lowest) 55%,transparent) !important;
+}
+[data-theme='autumn'] [data-date-range-bar] {
+  background: color-mix(in srgb,var(--color-surface-container-low) 65%,transparent);
+}
+[data-theme='autumn'] .autumn-balance { border-color: #d8543f88; overflow: hidden; }
+[data-theme='autumn'] .autumn-balance::after {
+  content: none;
+}
+[data-theme='autumn'] .autumn-balance .washi-tape-texture { display: none; }
+[data-theme='autumn'] .autumn-balance > .text-center { text-align: left; }
+[data-theme='autumn'] .autumn-balance h2 { justify-content: flex-start; }
+[data-theme='autumn'] .autumn-drawer { isolation: isolate; background: #faf6ee url('../assets/themes/autumn/paper.webp') center / 512px; }
+[data-theme='autumn'] .autumn-drawer::after {
+  content: none;
+}
+[data-theme='autumn'] .autumn-bottom-nav {
+  background: #fffaf3cc; border: 1px solid #d9985b70;
+  box-shadow: 0 4px 14px #925b2b24, inset 0 1px #ffffff;
+}
+[data-theme='autumn'] .tab-bubble { background: #f5d6ba55; border-color: #db936466; }
+[data-theme='autumn'] .icon-ring-glow {
+  inset: -8px; filter: blur(2.5px);
+  background: radial-gradient(circle closest-side,#ff5a4300 35%,#ff5a43a6 63%,#e58e2644 78%,#e58e2600 100%);
+  animation: autumn-icon-breathe 5.5s ease-in-out infinite;
+}
+[data-theme='autumn'] .icon-bare-glow { filter: blur(3px); animation: autumn-icon-breathe 5.5s ease-in-out infinite; }
+[data-theme='autumn'] .rate-fab-glow {
+  background: radial-gradient(circle,#ff5a4366 0%,#ff5a4300 70%) !important;
+}
+[data-theme='autumn'] .pb-navigation-icon[data-active='false'] .icon-bare-glow { display: none; }
+[data-theme='autumn'] .pb-navigation-icon[data-active='false'] { color: #704426; }
+[data-theme='autumn'] .pb-navigation-icon[data-active='true'] .icon-bare-crisp { filter: drop-shadow(0 0 1px #fff0c9) drop-shadow(0 0 2px #e58e2677); }
+[data-theme='autumn'] .autumn-main-fab { border: 1px solid #fff3da; isolation: isolate; }
+[data-theme='autumn'] .autumn-main-fab::before {
+  content: ''; position: absolute; inset: -7px; border: 2px solid #ff5a43aa;
+  border-radius: 50%; filter: blur(3px); z-index: -1; pointer-events: none;
+  animation: autumn-icon-breathe 5.5s ease-in-out infinite;
+}
+[data-theme='autumn'] .autumn-main-fab::after {
+  content: ''; position: absolute; inset: -2px; border: 1px solid #e58e26;
+  border-radius: 50%; opacity: 0; pointer-events: none;
+}
+[data-theme='autumn'] .autumn-main-fab:active::after { animation: autumn-press-ring .5s ease-out; }
+@keyframes autumn-icon-breathe { 0%,100% { opacity: .45; transform: scale(.97); } 50% { opacity: .9; transform: scale(1.05); } }
+@keyframes autumn-press-ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.35); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='autumn'] .autumn-falling-leaf { display: none; animation: none; }
+  [data-theme='autumn'] :is(.autumn-leaf-blade,.autumn-leaf-panel) { animation: none; }
+  [data-theme='autumn'] :is(.icon-ring-glow,.icon-bare-glow),
+  [data-theme='autumn'] .autumn-main-fab::before,
+  [data-theme='autumn'] .autumn-main-fab:active::after { animation: none; }
+}

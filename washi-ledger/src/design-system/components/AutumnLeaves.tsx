@@ -5,9 +5,11 @@ import { useSettings } from '../../hooks/useSettings'
 const FALLING_LEAVES = [
   // Parallel lanes share drift and duration, so they cannot overtake or converge.
   // Artwork points upward: 180–225deg makes the blade face down/down-left.
-  [52, -.38, 30, 70, 200],
-  [78, -.38, 30, 96, 220],
-  [104, -.38, 30, 80, 208],
+  // Sizes calibrated to nearby canopy leaves at each lane's emergence edge,
+  // rather than assigning a large foreground leaf independently of its source.
+  [52, -.38, 30, 60, 200],
+  [78, -.38, 30, 52, 220],
+  [104, -.38, 30, 46, 208],
 ] as const
 
 /** Decorative overlay: no hit testing, no layout or safe-area space, no new imagery. */

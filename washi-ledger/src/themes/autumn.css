@@ -48,6 +48,7 @@
   --shadow-main-fab: 0 0 0 1px #fff4dc, 0 0 13px #ff5a4377, 0 4px 9px #9c24152c;
 }
 [data-theme='autumn'] .app-shell {
+  --autumn-foliage-size: clamp(260px,74vw,330px);
   isolation: isolate;
   background: linear-gradient(#faf6ee66,#faf6ee66), url('../assets/themes/autumn/paper.webp') center / 512px;
   background-color: #faf6ee;
@@ -58,7 +59,7 @@
   background-repeat: no-repeat; background-size: contain;
 }
 [data-theme='autumn'] .app-shell::before {
-  width: clamp(260px,74vw,330px); height: clamp(260px,74vw,330px); right: -32px;
+  width: var(--autumn-foliage-size); height: var(--autumn-foliage-size); right: -32px;
   /* Only interactive header content is inset; decoration reaches the screen edge. */
   top: -18px; opacity: .68;
   background-image: url('../assets/themes/autumn/foliage.webp');
@@ -71,6 +72,20 @@
 [data-theme='autumn'] .autumn-scattered-leaves {
   position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden;
   contain: layout paint; --autumn-scene-width: min(100vw,480px);
+}
+/* Subtract a filled silhouette from the rear decoration only. Text, cards and
+   the visible foreground line-art keep their original colours and stacking. */
+[data-theme='autumn'] .autumn-scattered-leaves:not(.autumn-resting-only) {
+  -webkit-mask-image: linear-gradient(#fff,#fff), url('../assets/themes/autumn/foliage-occlusion.svg');
+  mask-image: linear-gradient(#fff,#fff), url('../assets/themes/autumn/foliage-occlusion.svg');
+  -webkit-mask-size: 100% 100%, var(--autumn-foliage-size) var(--autumn-foliage-size);
+  mask-size: 100% 100%, var(--autumn-foliage-size) var(--autumn-foliage-size);
+  -webkit-mask-position: 0 0, right -32px top -18px;
+  mask-position: 0 0, right -32px top -18px;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 [data-theme='autumn'] :is(.autumn-falling-leaf,.autumn-resting-leaf,.autumn-leaf-blade) {
   position: absolute; width: var(--leaf-size); height: var(--leaf-size);
