@@ -19,11 +19,18 @@ function loadTs(name, dependencies = {}) {
   return exports
 }
 const totals = loadTs('receiptTotal.ts')
-let detections = []
+const dates = loadTs('receiptDate.ts', { './date': loadTs('date.ts') })
+const detectionsByImage = new Map()
 const receipt = loadTs('receiptFieldExtract.ts', {
   './receiptTotal': totals,
+  './receiptDate': dates,
   './appLog': { logModule() {} },
-  '@capacitor-community/image-to-text': { Ocr: { async detectText() { return { textDetections: detections } } } },
+  '@capacitor-community/image-to-text': { Ocr: { async detectText({ base64 }) {
+    assert.ok(detectionsByImage.has(base64), `Unexpected scan of ${base64}`)
+    const result = detectionsByImage.get(base64)
+    if (result instanceof Error) throw result
+    return { textDetections: result }
+  } } },
 })
 const rows = lines => lines.map((text, index) => ({ text, y: 1 - index * 0.02 }))
 const check = (name, lines, expected) => test(name, () => {
@@ -102,10 +109,84 @@ test('其他行/标签左边的数字不与总计关联', () => {
   ])
   assert.equal(result.amount, null)
 })
+function nativeBox(b, confidence = 0.95, alternative) {
+  return {
+    text: b.text,
+    topLeft: [b.left, b.top], topRight: [b.right, b.top],
+    bottomLeft: [b.left, b.bottom], bottomRight: [b.right, b.bottom],
+    candidates: [{ text: b.text, confidence }, ...(alternative ? [{ text: alternative, confidence: 0.4 }] : [])],
+  }
+}
 test('原生OCR入口保留坐标并使用新金额判定', async () => {
-  const nativeBox = b => ({text:b.text,topLeft:[b.left,b.top],topRight:[b.right,b.top],bottomLeft:[b.left,b.bottom],bottomRight:[b.right,b.bottom]})
-  detections = [block('合計',0.1,0.25,0.6,0.58),block('¥2,112',0.7,0.9,0.65,0.57),block('合計5,000円以上のご購入で',0.1,0.9,0.3,0.28)].map(nativeBox)
+  detectionsByImage.set('test-only', [
+    block('合計', 0.1, 0.25, 0.6, 0.58),
+    block('¥2,112', 0.7, 0.9, 0.65, 0.57),
+    block('合計5,000円以上のご購入で', 0.1, 0.9, 0.3, 0.28),
+  ].map(b => nativeBox(b)))
   const result = await receipt.recognizeReceiptFields('test-only', 'native-entry-fixture')
   assert.equal(result.amount,2112)
   assert.equal(result.receiptId,'native-entry-fixture')
+})
+
+for (const [label, textRows, expected] of [
+  ['OCR 日文日期与尾部活动期限', ['2026年11月07日(土)11:08 レジ0631', 'キャンペーン期限 2026/12/10'], '2026-11-07'],
+  ['明确的交易日期优先', ['2026/12/10', '取引日時', '２０２６／１１／０７ １１：０８'], '2026-11-07'],
+  ['日文年号', ['購入日 令和8年11月7日'], '2026-11-07'],
+  ['无效日期', ['取引日 2026/02/29'], null],
+  ['两个交易日期冲突', ['取引日 2026-11-07', '決済日 2026-11-08'], null],
+  ['分行期限标签', ['クーポン有効期限', '2026/12/10'], null],
+  ['活动日期区间', ['2026/11/01 ～ 2026/11/30'], null],
+]) {
+  test(label, () => assert.equal(dates.selectReceiptDate(rows(textRows)), expected))
+}
+
+test('低置信度的合计仅重读一次，保留第一次识别的日期', async () => {
+  const full = 'low-confidence'
+  const cropped = 'low-confidence-crop'
+  detectionsByImage.set(full, [
+    nativeBox(block('2026年11月7日(土)11:08', 0.1, 0.9, 0.9, 0.88)),
+    nativeBox(block('合計 ¥2,112', 0.1, 0.9, 0.5, 0.48), 0.45),
+    nativeBox(block('合計5,000円以上のご購入で', 0.1, 0.9, 0.24, 0.22)),
+  ])
+  detectionsByImage.set(cropped, [nativeBox(block('合計 ¥2,112', 0.1, 0.9, 0.63, 0.37))])
+  let attempts = 0
+  let partial
+  const result = await receipt.recognizeReceiptFields(full, 'low-confidence-id', band => {
+    attempts++
+    assert.ok(band.bottom > 0.24 && band.top < 0.88)
+    return { imageDataUrl: cropped, band }
+  }, fields => { partial = fields })
+  assert.equal(attempts, 1)
+  assert.equal(partial.amount, null)
+  assert.equal(partial.date, '2026-11-07')
+  assert.equal(result.amount, 2112)
+  assert.equal(result.date, '2026-11-07')
+})
+
+test('同一票面两次结果仍有金额候选冲突时留空', async () => {
+  const full = 'alternatives'
+  const cropped = 'alternatives-crop'
+  detectionsByImage.set(full, [nativeBox(block('合計 ¥2,112', 0.1, 0.9, 0.51, 0.49), 0.95, '合計 ¥2,172')])
+  detectionsByImage.set(cropped, [nativeBox(block('合計 ¥2,112', 0.1, 0.9, 0.63, 0.37), 0.95, '合計 ¥2,172')])
+  let attempts = 0
+  const result = await receipt.recognizeReceiptFields(full, 'alternatives-id', band => {
+    attempts++
+    return { imageDataUrl: cropped, band }
+  })
+  assert.equal(attempts, 1)
+  assert.equal(result.amount, null)
+})
+
+test('金额重读失败仍返回日期与小票ID', async () => {
+  const full = 'retry-error'
+  const cropped = 'retry-error-crop'
+  detectionsByImage.set(full, [
+    nativeBox(block('2026/11/07 11:08', 0.1, 0.9, 0.8, 0.78)),
+    nativeBox(block('合計 ¥2,112', 0.1, 0.9, 0.51, 0.49), 0.45),
+  ])
+  detectionsByImage.set(cropped, new Error('OCR failed'))
+  const result = await receipt.recognizeReceiptFields(full, 'retry-error-id', band => ({ imageDataUrl: cropped, band }))
+  assert.equal(result.amount, null)
+  assert.equal(result.date, '2026-11-07')
+  assert.equal(result.receiptId, 'retry-error-id')
 })

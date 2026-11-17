@@ -5,6 +5,7 @@ export interface ReceiptTextBlock {
   right: number
   top: number
   bottom: number
+  candidates?: { text: string; confidence: number }[]
 }
 
 export interface ReceiptTextRow {
@@ -19,6 +20,8 @@ interface TotalCandidate {
   amount: number
   kind: TotalKind
   source: 'field' | 'position'
+  confidence?: number
+  hasAlternative?: boolean
 }
 
 export interface ReceiptTotalResult {
@@ -27,6 +30,7 @@ export interface ReceiptTotalResult {
   reason: string
   candidates: TotalCandidate[]
   rejectedRows: number[]
+  corroborated: boolean
 }
 
 const LABELS: { kind: TotalKind; pattern: RegExp }[] = [
@@ -59,9 +63,35 @@ function fieldValue(suffix: string): number | null {
   return match ? numberValue(match[1]) : null
 }
 
-function positionValue(row: ReceiptTextRow, rows: ReceiptTextRow[], pattern: RegExp): number | null {
+function totalFieldValue(raw: string): number | null {
+  const text = normalize(raw)
+  for (const { pattern } of LABELS) {
+    const match = text.match(pattern)
+    if (match) return fieldValue(text.slice(match[0].length))
+  }
+  return null
+}
+
+/** 局部重读只围绕合计字段，排除含促销说明等正文的行。 */
+export function isReceiptTotalHint(raw: string): boolean {
+  const text = normalize(raw)
+  return LABELS.some(({ pattern }) => {
+    const match = text.match(pattern)
+    if (!match) return false
+    const suffix = text.slice(match[0].length)
+    return EMPTY_FIELD.test(suffix) || fieldValue(suffix) != null
+      || /^\s*[:=/]?\s*(?:¥\s*)?[\d,.IlOo]+\s*円?\s*$/u.test(suffix)
+  })
+}
+
+function blockConfidence(blocks: ReceiptTextBlock[]): number | undefined {
+  const scores = blocks.flatMap(({ candidates }) => candidates?.[0] ? [candidates[0].confidence] : [])
+  return scores.length ? Math.min(...scores) : undefined
+}
+
+function positionValue(row: ReceiptTextRow, rows: ReceiptTextRow[], pattern: RegExp): Pick<TotalCandidate, 'amount' | 'confidence' | 'hasAlternative'> | null {
   if (!row.blocks) return null
-  const matches: number[] = []
+  const matches = new Map<number, Pick<TotalCandidate, 'amount' | 'confidence' | 'hasAlternative'>>()
   for (const label of row.blocks) {
     const text = normalize(label.text)
     const match = text.match(pattern)
@@ -75,11 +105,21 @@ function positionValue(row: ReceiptTextRow, rows: ReceiptTextRow[], pattern: Reg
       if (height <= 0 || overlap < Math.min(labelHeight, height) * 0.35) continue
       const money = normalize(block.text).match(ONLY_VALUE)
       const value = money ? numberValue(money[1]) : null
-      if (value != null && value > 0) matches.push(value)
+      if (value != null && value > 0) {
+        const confidence = blockConfidence([label, block])
+        const hasAlternative = block.candidates?.slice(1).some(({ text: alternative }) => {
+          const parsed = normalize(alternative).match(ONLY_VALUE)
+          return parsed != null && numberValue(parsed[1]) !== value
+        })
+        const existing = matches.get(value)
+        if (!existing || (confidence ?? 0) > (existing.confidence ?? 0)) {
+          matches.set(value, { amount: value, confidence, hasAlternative })
+        }
+      }
     }
   }
-  const values = [...new Set(matches)]
-  return values.length === 1 ? values[0] : null
+  if (matches.size !== 1) return null
+  return [...matches.values()][0]
 }
 
 /** 只对明确的“税前小计 + 外税”提供辅助证据；内税、优惠/积分等复杂结算不套此公式。 */
@@ -129,18 +169,30 @@ export function selectReceiptTotal(rows: ReceiptTextRow[]): ReceiptTotalResult {
       const suffix = text.slice(match[0].length)
       let amount = fieldValue(suffix)
       let source: TotalCandidate['source'] = 'field'
+      let confidence = blockConfidence(row.blocks ?? [])
+      let hasAlternative = row.blocks?.some((block, blockIndex, blocks) =>
+        block.candidates?.slice(1).some(({ text: alternative }) => {
+          const value = totalFieldValue(blocks.map((b, i) => i === blockIndex ? alternative : b.text).join(' '))
+          return value != null && value !== amount
+        }),
+      )
       // 仅对“标签本身没有金额”启用坐标配对；广告/乱码字段不能借此绕过完整字段校验。
       if (amount == null && EMPTY_FIELD.test(suffix)) {
-        amount = positionValue(row, rows, pattern)
+        const match = positionValue(row, rows, pattern)
+        amount = match?.amount ?? null
+        confidence = match?.confidence
+        hasAlternative = match?.hasAlternative
         source = 'position'
       }
-      if (amount != null && amount > 0) candidates.push({ rowIndex, amount, kind, source })
+      if (amount != null && amount > 0) candidates.push({ rowIndex, amount, kind, source, confidence, hasAlternative })
       else rejectedRows.push(rowIndex)
       break
     }
   })
 
-  const empty = (reason: string): ReceiptTotalResult => ({ amount: null, rowIndex: -1, reason, candidates, rejectedRows })
+  const empty = (reason: string): ReceiptTotalResult => ({
+    amount: null, rowIndex: -1, reason, candidates, rejectedRows, corroborated: false,
+  })
   if (!candidates.length) return empty('没有可确认的完整合计金额字段')
   let possible = [...new Set(candidates.map((candidate) => candidate.amount))]
   const arithmetic = candidates.map((candidate) => externalTaxTotal(rows, candidate.rowIndex))
@@ -163,5 +215,7 @@ export function selectReceiptTotal(rows: ReceiptTextRow[]): ReceiptTotalResult {
   const amount = possible[0]
   const selected = candidates.find((candidate) => candidate.amount === amount && candidate.kind === 'total')
     ?? candidates.find((candidate) => candidate.amount === amount)!
-  return { amount, rowIndex: selected.rowIndex, reason, candidates, rejectedRows }
+  const corroborated = arithmetic.some((value) => sameAmount(amount, value))
+    || candidates.some((candidate) => candidate.amount === amount && candidate.kind !== selected.kind)
+  return { amount, rowIndex: selected.rowIndex, reason, candidates, rejectedRows, corroborated }
 }

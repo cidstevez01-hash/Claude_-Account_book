@@ -1,6 +1,7 @@
 import { Ocr, type TextDetection } from '@capacitor-community/image-to-text'
 import { logModule } from './appLog'
-import { selectReceiptTotal, type ReceiptTextRow } from './receiptTotal'
+import { isReceiptTotalHint, selectReceiptTotal, type ReceiptTextRow, type ReceiptTotalResult } from './receiptTotal'
+import { selectReceiptDate } from './receiptDate'
 
 /** 扫描小票后自动填金额/备注——免费方案，用iOS Vision框架(通过
  * @capacitor-community/image-to-text，纯本地识别不联网不花钱)。跟Claude视觉API
@@ -23,6 +24,7 @@ export interface RecognizedReceiptFields {
   /** 仅属于此张小票的OCR行，禁止跨扫描混合后再找合计 */
   ocrRows: string[]
   amount: number | null
+  date: string | null
   storeName: string | null
   items: string[]
 }
@@ -104,10 +106,12 @@ function boxHeight(box: TextDetection): number {
 
 /** 按Y坐标把文本框聚类成行——同一行内的框Y中心差距应该在半个字高以内，
  * 不是简单按Y值相等分组(OCR识别出来的坐标不会真的完全对齐) */
-function groupIntoRows(boxes: TextDetection[]): ReceiptTextRow[] {
+type ReceiptTextDetection = TextDetection & { candidates?: { text: string; confidence: number }[] }
+
+function groupIntoRows(boxes: ReceiptTextDetection[]): ReceiptTextRow[] {
   // Y值越大越靠上，降序排列就是从上到下的阅读顺序
   const sorted = [...boxes].sort((a, b) => yCenter(b) - yCenter(a))
-  const clusters: { ySum: number; boxes: TextDetection[] }[] = []
+  const clusters: { ySum: number; boxes: ReceiptTextDetection[] }[] = []
   for (const box of sorted) {
     const last = clusters[clusters.length - 1]
     const lastY = last ? last.ySum / last.boxes.length : null
@@ -130,17 +134,21 @@ function groupIntoRows(boxes: TextDetection[]): ReceiptTextRow[] {
         right: Math.max(box.topRight[0], box.bottomRight[0]),
         top: Math.max(box.topLeft[1], box.topRight[1]),
         bottom: Math.min(box.bottomLeft[1], box.bottomRight[1]),
+        candidates: box.candidates,
       })),
     }
   })
 }
 
 /** 从识别出的文本行里拆金额/店名/购入明细——见文件头注释的整体思路 */
-export function extractReceiptFields(rows: ReceiptTextRow[], receiptId: string): RecognizedReceiptFields {
+export function extractReceiptFields(
+  rows: ReceiptTextRow[],
+  receiptId: string,
+  total = selectReceiptTotal(rows),
+): RecognizedReceiptFields {
   const ocrRows = rows.map((row) => row.text)
-  if (rows.length === 0) return { receiptId, ocrRows, amount: null, storeName: null, items: [] }
+  if (rows.length === 0) return { receiptId, ocrRows, amount: null, date: null, storeName: null, items: [] }
 
-  const total = selectReceiptTotal(rows)
   const totalRowIdx = total.rowIndex
   const amount = total.amount
   logModule('receipt', `合計判定 receiptId=${receiptId}: 金额=${amount ?? '未确认'}, 原因=${total.reason}`, 'info', {
@@ -161,26 +169,113 @@ export function extractReceiptFields(rows: ReceiptTextRow[], receiptId: string):
     .filter((t) => t.length > 0 && !isMetadataRow(t))
   if (totalRowIdx < 0) items = items.slice(0, MAX_FALLBACK_ITEMS)
 
-  return { receiptId, ocrRows, amount, storeName, items }
+  return { receiptId, ocrRows, amount, date: selectReceiptDate(rows), storeName, items }
+}
+
+// Vision 的置信度仅用来触发复读；有独立结算证据时优先采用结算证据。
+const MIN_TOTAL_CONFIDENCE = 0.65
+
+function needsTotalRetry(total: ReceiptTotalResult): boolean {
+  if (total.amount == null) return true
+  if (total.corroborated) return false
+  return total.candidates.filter(({ amount }) => amount === total.amount)
+    .every(({ confidence, hasAlternative }) => hasAlternative || (confidence ?? 1) < MIN_TOTAL_CONFIDENCE)
+}
+
+export interface ReceiptScanBand {
+  bottom: number
+  top: number
+}
+
+function findTotalBand(rows: ReceiptTextRow[], total: ReceiptTotalResult): ReceiptScanBand | null {
+  const candidateRows = new Set(total.candidates.map(({ rowIndex }) => rowIndex))
+  const hints = rows.filter((row, i) => candidateRows.has(i) || isReceiptTotalHint(row.text)
+    || row.blocks?.some(({ candidates }, index, blocks) =>
+      candidates?.slice(1).some(({ text }) =>
+        isReceiptTotalHint(blocks.map((block, j) => j === index ? text : block.text).join(' ')),
+      ),
+    ))
+  const blocks = hints.flatMap(({ blocks }) => blocks ?? [])
+  if (!blocks.length) return null
+  const pad = Math.min(0.08, Math.max(0.025, ...blocks.map(({ top, bottom }) => (top - bottom) * 1.5)))
+  const bottom = Math.max(0, Math.min(...blocks.map((block) => block.bottom)) - pad)
+  const top = Math.min(1, Math.max(...blocks.map((block) => block.top)) + pad)
+  return top - bottom <= 0.55 ? { bottom, top } : null
+}
+
+async function detectRows(base64: string, band?: ReceiptScanBand): Promise<ReceiptTextRow[]> {
+  const result = await Ocr.detectText({ base64 })
+  const detections: ReceiptTextDetection[] = result.textDetections
+  const boxes = band ? detections.map((box) => {
+    const project = ([x, y]: [number, number]): [number, number] => [x, band.bottom + y * (band.top - band.bottom)]
+    return {
+      ...box, topLeft: project(box.topLeft), topRight: project(box.topRight),
+      bottomLeft: project(box.bottomLeft), bottomRight: project(box.bottomRight),
+    }
+  }) : detections
+  return groupIntoRows(boxes)
+}
+
+async function retryTotal(
+  rows: ReceiptTextRow[],
+  initial: ReceiptTotalResult,
+  crop: (band: ReceiptScanBand) => { imageDataUrl: string; band: ReceiptScanBand },
+  receiptId: string,
+): Promise<ReceiptTotalResult> {
+  const uncertain = initial.amount == null ? initial : { ...initial, amount: null, reason: '合计候选不确定，需要确认' }
+  const region = findTotalBand(rows, initial)
+  if (!region) return uncertain
+  try {
+    const { imageDataUrl, band } = crop(region)
+    const reread = await detectRows(imageDataUrl, band)
+    const rereadCandidates = selectReceiptTotal(reread).candidates
+    if (!rereadCandidates.length) return uncertain
+    const merged = [...rows.filter(({ y }) => y < band.bottom || y > band.top), ...reread].sort((a, b) => b.y - a.y)
+    const result = selectReceiptTotal(merged)
+    logModule('receipt', `合计局部重读 receiptId=${receiptId}: ${result.amount ?? '未确认'}，${result.reason}`)
+    if (result.amount == null || !rereadCandidates.some(({ amount }) => amount === result.amount)) return uncertain
+    // 新旧识别均读到同一合计，或重读结果通过独立结算核对，才填入不确定的金额。
+    const repeated = initial.candidates.length > 0
+      && initial.candidates.every(({ amount }) => amount === result.amount)
+      && rereadCandidates.some(({ amount, confidence, hasAlternative }) =>
+        amount === result.amount && !hasAlternative && (confidence ?? 0) >= MIN_TOTAL_CONFIDENCE,
+      )
+    if (!result.corroborated && !repeated) return uncertain
+    const row = merged[result.rowIndex]
+    const originalIndex = rows.findIndex(({ y }) => Math.abs(y - row.y) <= 0.01)
+    const rowIndex = originalIndex >= 0 ? originalIndex : rows.findIndex(({ y }) => y < row.y)
+    return { ...result, rowIndex: rowIndex >= 0 ? rowIndex : rows.length }
+  } catch (error) {
+    logModule('receipt', `合计局部重读失败 receiptId=${receiptId}: ${String(error)}`, 'warn')
+    return uncertain
+  }
 }
 
 /** web端(沙盒/浏览器预览)没有这个原生能力，插件会抛错——调用方要兜底，返回
  * 全空结果而不是抛错中断整个扫描确认流程(自动填表单是锦上添花，失败不能挡住
  * 用户正常保存这条记录) */
-export async function recognizeReceiptFields(imageDataUrl: string, receiptId: string): Promise<RecognizedReceiptFields> {
+export async function recognizeReceiptFields(
+  imageDataUrl: string,
+  receiptId: string,
+  crop?: (band: ReceiptScanBand) => { imageDataUrl: string; band: ReceiptScanBand },
+  onRetry?: (fields: RecognizedReceiptFields) => void,
+): Promise<RecognizedReceiptFields> {
   try {
     logModule('receipt', '调用Ocr.detectText()识别小票文字')
-    const { textDetections } = await Ocr.detectText({ base64: imageDataUrl })
-    logModule('receipt', `Ocr.detectText()识别出${textDetections.length}个文本块`)
-    const rows = groupIntoRows(textDetections)
+    const rows = await detectRows(imageDataUrl)
     logModule('receipt', `OCR原始行 receiptId=${receiptId} (${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
-    const fields = extractReceiptFields(rows, receiptId)
+    const initial = selectReceiptTotal(rows)
+    let fields = extractReceiptFields(rows, receiptId, initial)
+    if (crop && needsTotalRetry(initial)) {
+      onRetry?.({ ...fields, amount: null })
+      fields = extractReceiptFields(rows, receiptId, await retryTotal(rows, initial, crop, receiptId))
+    }
     logModule('receipt',
-      `OCR解析 receiptId=${receiptId}: 金额=${fields.amount}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
+      `OCR解析 receiptId=${receiptId}: 金额=${fields.amount}, 日期=${fields.date}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
     )
     return fields
   } catch (e) {
     logModule('receipt', `OCR失败 receiptId=${receiptId} (web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
-    return { receiptId, ocrRows: [], amount: null, storeName: null, items: [] }
+    return { receiptId, ocrRows: [], amount: null, date: null, storeName: null, items: [] }
   }
 }

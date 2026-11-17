@@ -4,7 +4,7 @@ import { useI18n } from '../../lib/i18n'
 import { pickFromGallery, scanDocumentNative } from '../../lib/receiptCamera'
 import { blobToImage } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
-import { recognizeReceiptFields, type RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
+import { recognizeReceiptFields, type ReceiptScanBand, type RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import { logModule } from '../../lib/appLog'
 
 // R-32三期：拍照页面改成调用系统原生扫描能力(见lib/receiptCamera.ts)，取代之前
@@ -22,14 +22,33 @@ interface ReceiptScanSheetProps {
 
 const OCR_WAIT_MS = 5000
 function emptyFields(receiptId: string): RecognizedReceiptFields {
-  return { receiptId, ocrRows: [], amount: null, storeName: null, items: [] }
+  return { receiptId, ocrRows: [], amount: null, date: null, storeName: null, items: [] }
 }
 
-// OCR识别慢或卡住时不能让保存一直转圈——超时就按空结果保存，金额/备注留给用户手填
-function waitForFields(pending: Promise<RecognizedReceiptFields> | null, receiptId: string): Promise<RecognizedReceiptFields> {
-  if (!pending) return Promise.resolve(emptyFields(receiptId))
+function cropReceiptBand(canvas: HTMLCanvasElement, { bottom, top }: ReceiptScanBand) {
+  // Vision 的 Y 轴向上，Canvas 的 Y 轴向下。保留小票整行宽度及像素尺寸。
+  const start = Math.floor((1 - top) * canvas.height)
+  const end = Math.ceil((1 - bottom) * canvas.height)
+  const crop = document.createElement('canvas')
+  crop.width = canvas.width
+  crop.height = end - start
+  const context = crop.getContext('2d')
+  if (!context) throw new Error('Cannot crop receipt for text recognition')
+  context.drawImage(canvas, 0, start, crop.width, crop.height, 0, 0, crop.width, crop.height)
+  return {
+    imageDataUrl: crop.toDataURL('image/png'),
+    band: { bottom: 1 - end / canvas.height, top: 1 - start / canvas.height },
+  }
+}
+
+// 局部重读超时时保留首轮日期和备注，未确认的金额留空。
+function waitForFields(
+  pending: Promise<RecognizedReceiptFields> | null,
+  fallback: () => RecognizedReceiptFields,
+): Promise<RecognizedReceiptFields> {
+  if (!pending) return Promise.resolve(fallback())
   return new Promise((resolve) => {
-    const timer = window.setTimeout(() => resolve(emptyFields(receiptId)), OCR_WAIT_MS)
+    const timer = window.setTimeout(() => resolve(fallback()), OCR_WAIT_MS)
     pending.then(
       (fields) => {
         window.clearTimeout(timer)
@@ -37,7 +56,7 @@ function waitForFields(pending: Promise<RecognizedReceiptFields> | null, receipt
       },
       () => {
         window.clearTimeout(timer)
-        resolve(emptyFields(receiptId))
+        resolve(fallback())
       },
     )
   })
@@ -66,6 +85,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   // "存为PDF"时才去等这个promise的结果——大多数情况下用户看几眼预览图确认的这段
   // 时间，识别早就跑完了，真等到的时候也就是极快的一下
   const recognizeResultRef = useRef<Promise<RecognizedReceiptFields> | null>(null)
+  const partialFieldsRef = useRef<RecognizedReceiptFields | null>(null)
   // 保存中状态：savingRef是真正的防重入开关(state更新是异步的，快速连点时挡不住)，
   // saving只负责界面上禁用按钮、显示转圈
   const savingRef = useRef(false)
@@ -88,7 +108,12 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
     setPreviewUrl(dataUrl)
     setStage('review')
-    recognizeResultRef.current = recognizeReceiptFields(dataUrl, receiptId)
+    recognizeResultRef.current = recognizeReceiptFields(
+      dataUrl, receiptId, (band) => cropReceiptBand(canvas, band),
+      (fields) => {
+        if (receiptIdRef.current === receiptId) partialFieldsRef.current = fields
+      },
+    )
   }
 
   async function startScan() {
@@ -138,6 +163,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     setPreviewUrl(null)
     resultCanvasRef.current = null
     recognizeResultRef.current = null
+    partialFieldsRef.current = null
     receiptIdRef.current = null
     startScan()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -153,7 +179,10 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     try {
       const pdf = buildReceiptPdf(resultCanvasRef.current, { entryDate })
       const receiptId = receiptIdRef.current ?? createReceiptId()
-      const fields = await waitForFields(recognizeResultRef.current, receiptId)
+      const fields = await waitForFields(recognizeResultRef.current, () => {
+        const partial = partialFieldsRef.current
+        return partial?.receiptId === receiptId ? partial : emptyFields(receiptId)
+      })
       const ok = await onConfirm(pdf, fields)
       if (!ok) setSaveFailed(true)
     } finally {

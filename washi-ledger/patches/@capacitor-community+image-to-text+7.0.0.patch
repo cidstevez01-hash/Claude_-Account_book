@@ -1,7 +1,13 @@
 diff --git a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift b/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift
-index 7c707e9..353dcde 100644
+index 7c707e9..3187dc2 100644
 --- a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift
 +++ b/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift
+@@ -61,4 +61,4 @@ public class TextDetector {
+         guard let cgImage = image.cgImage else {
+-            print("Looks like uiImage is nil")
++            call.reject("Could not decode image for text recognition")
+             return
+         }
 @@ -87,6 +87,11 @@ public class TextDetector {
      lazy var textDetectionRequest: VNRecognizeTextRequest = {
          // Specifying the image analysis request to perform - text detection here
@@ -14,3 +20,26 @@ index 7c707e9..353dcde 100644
          return textDetectRequest
      }()
  
+@@ -106,10 +111,15 @@ public class TextDetector {
+-            self.detectedText = results.map {[
+-                "topLeft": [Double($0.topLeft.x), Double($0.topLeft.y)] as [Double],
+-                "topRight": [Double($0.topRight.x), Double($0.topRight.y)] as [Double],
+-                "bottomLeft": [Double($0.bottomLeft.x), Double($0.bottomLeft.y)] as [Double],
+-                "bottomRight": [Double($0.bottomRight.x), Double($0.bottomRight.y)] as [Double],
+-                "text": $0.topCandidates(1).first?.string as String?
+-            ]}
++            self.detectedText = results.compactMap { observation -> [String: Any]? in
++                let candidates = observation.topCandidates(3)
++                guard let first = candidates.first else { return nil }
++                return [
++                    "topLeft": [Double(observation.topLeft.x), Double(observation.topLeft.y)],
++                    "topRight": [Double(observation.topRight.x), Double(observation.topRight.y)],
++                    "bottomLeft": [Double(observation.bottomLeft.x), Double(observation.bottomLeft.y)],
++                    "bottomRight": [Double(observation.bottomRight.x), Double(observation.bottomRight.y)],
++                    "text": first.string,
++                    "candidates": candidates.map { ["text": $0.string, "confidence": Double($0.confidence)] as [String: Any] }
++                ]
++            }
+             self.call.resolve(["textDetections": self.detectedText])
+         }
+     }

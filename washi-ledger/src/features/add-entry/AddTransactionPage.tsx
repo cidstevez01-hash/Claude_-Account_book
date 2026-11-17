@@ -75,8 +75,8 @@ export function AddTransactionPage() {
 
   const [type, setType] = useState<EntryType>(() => initialSourceEntry?.type ?? 'expense')
   const [amount, setAmount] = useState(() => (initialSourceEntry ? String(initialSourceEntry.amount) : ''))
-  // 按小票ID保存每张小票独立识别到的合计；最终金额从这些小票重算，避免重复确认造成重复累加。
-  const receiptAmountsByIdRef = useRef<Map<string, number>>(new Map())
+  // 每张小票按 ID 保存合计和凭证路径；删除凭证后用剩余小票重算。
+  const receiptsByIdRef = useRef(new Map<string, { path: string; amount: number | null }>())
   // 用户触碰金额栏后重置自动汇总组；有手填内容时后续扫描不覆盖手填值。
   const amountWasManuallyEditedRef = useRef(false)
   const [catCode, setCatCode] = useState<string | null>(() => initialSourceEntry?.catCode ?? null)
@@ -85,6 +85,8 @@ export function AddTransactionPage() {
   const [date, setDate] = useState(() =>
     initialSourceEntry ? (mode === 'copy' ? todayStr() : initialSourceEntry.date) : todayStr()
   )
+  // 同一笔记录只自动采用第一个明确的票面日期，手选日期始终优先。
+  const receiptDateLockedRef = useRef(false)
   const [tagCode, setTagCode] = useState<string | null>(() => initialSourceEntry?.tagCode ?? null)
   const [points, setPoints] = useState(() => (initialSourceEntry?.points != null ? String(initialSourceEntry.points) : ''))
   const [note, setNote] = useState(() => initialSourceEntry?.note ?? '')
@@ -147,13 +149,13 @@ export function AddTransactionPage() {
     if (!src) return
     setSourceEntry(src)
     setType(src.type)
-    receiptAmountsByIdRef.current.clear()
+    receiptsByIdRef.current.clear()
     amountWasManuallyEditedRef.current = false
     setAmount(String(src.amount))
     setCatCode(src.catCode)
     setSubCode(src.subCode)
     setPayCode(src.paymentMethod)
-    setDate(mode === 'copy' ? todayStr() : src.date)
+    if (!receiptDateLockedRef.current) setDate(mode === 'copy' ? todayStr() : src.date)
     setTagCode(src.tagCode)
     setPoints(src.points != null ? String(src.points) : '')
     setNote(src.note ?? '')
@@ -210,7 +212,11 @@ export function AddTransactionPage() {
   // 的receiptPaths被悄悄带着存进收入记录里；不去删Storage里已经传上去的文件(留成
   // 孤儿文件，跟放弃整个新建流程不保存时是同一种可接受的取舍)，只清本地状态
   useEffect(() => {
-    if (mode === 'add' && type !== 'expense' && receiptPaths.length > 0) setReceiptPaths([])
+    if (mode === 'add' && type !== 'expense' && receiptPaths.length > 0) {
+      if (receiptsByIdRef.current.size && !amountWasManuallyEditedRef.current) setAmount('')
+      receiptsByIdRef.current.clear()
+      setReceiptPaths([])
+    }
   }, [type, mode, receiptPaths])
 
   useEffect(() => {
@@ -228,10 +234,17 @@ export function AddTransactionPage() {
 
   function touchAmount(v: string) {
     pointsArmed.current = true
-    receiptAmountsByIdRef.current.clear()
     const hasManualValue = v.trim().length > 0
     amountWasManuallyEditedRef.current = hasManualValue
     setAmount(v)
+  }
+  function updateReceiptAmount() {
+    if (amountWasManuallyEditedRef.current) return
+    const amounts = Array.from(receiptsByIdRef.current.values(), (receipt) => receipt.amount)
+    // 有任一张金额待确认时，金额栏留空，避免把部分小票的和当成整笔支出。
+    const total = amounts.length && amounts.every((value) => value != null)
+      ? String(amounts.reduce((sum, value) => sum + value, 0)) : ''
+    setAmount(total)
   }
   function touchPayCode(code: string) {
     pointsArmed.current = true
@@ -239,6 +252,7 @@ export function AddTransactionPage() {
   }
   function touchDate(v: string) {
     pointsArmed.current = true
+    receiptDateLockedRef.current = true
     setDate(v)
   }
 
@@ -316,12 +330,7 @@ export function AddTransactionPage() {
   // R-32：扫描确认后立刻传Storage(不是等整条记录save才一起传)——entryId已经在
   // 组件挂载时就确定好了(见上面newEntryId的说明)，不需要等真正save entries才能拿到
   // 一个id；这样用户扫完就能立刻点"查看凭证"核对是否传成功，不用等保存完这一步
-  // R-XO：扫描识别出的金额/备注只当"默认值"填——用户已经手动填过的字段不能被
-  // 扫描结果覆盖掉(比如先手打了金额，扫描识别出的是另一个数，不该悄悄改掉用户
-  // 已经输入的内容)。编辑模式(mode==='edit')整个自动写入直接关掉，不只靠"字段
-  // 是否为空"这个隐式判断——编辑的是一条已经存在的正式记录，哪怕它的note当初
-  // 就是空的(没写备注的旧数据)，在编辑页重新扫描小票也不该被自动带入内容，
-  // 这跟新建/复制页面"扫描是在帮你起草一条还没定型的新记录"性质不同
+  // 编辑模式仍保护已有金额和备注。R-54 在三种模式下都允许用票面日期填入日期栏。
   // R-41：扫描确认后追加到receiptPaths末尾(不再是setReceiptPath整个覆盖)——一次
   // 只扫一张的交互本身不变(ReceiptScanSheet职责不变)，"能扫多张"是这里的列表管理
   // 逻辑，用户扫完一张想再加一张，自己点列表末尾的"继续扫描"再次打开这个弹层
@@ -332,21 +341,14 @@ export function AddTransactionPage() {
       const path = await uploadReceiptPdf(user.id, entryId, pdf)
       setReceiptPaths((prev) => [...prev, path])
       setScanSheetOpen(false)
+      if (fields.date && !receiptDateLockedRef.current) {
+        receiptDateLockedRef.current = true
+        setDate(fields.date)
+      }
       if (mode !== 'edit') {
-        if (fields.amount != null) {
-          if (!amountWasManuallyEditedRef.current) {
-            // 每张已确认小票按ID保存；同一ID再次确认会覆盖原值，不会重复累加。
-            receiptAmountsByIdRef.current.set(fields.receiptId, fields.amount)
-            const sum = Array.from(receiptAmountsByIdRef.current.values()).reduce((total, value) => total + value, 0)
-            logModule('receipt', `小票金额汇总: receiptId=${fields.receiptId}, 本张合計=${fields.amount}, 小票数=${receiptAmountsByIdRef.current.size}, 汇总=${sum}`)
-            setAmount(String(sum))
-          } else {
-            // 保留用户已有/手动调整的金额；后续扫描也不会把它误认为上一张小票的金额。
-            logModule('receipt', `检测到手填金额，保留手填值=${amount}；忽略自动汇总 receiptId=${fields.receiptId}, 合計=${fields.amount}`)
-          }
-        } else {
-          logModule('receipt', `本张小票未识别到合計金额，金额栏保持不变 receiptId=${fields.receiptId}`)
-        }
+        receiptsByIdRef.current.set(fields.receiptId, { path, amount: fields.amount })
+        updateReceiptAmount()
+        logModule('receipt', `小票金额汇总 receiptId=${fields.receiptId}: 本张合計=${fields.amount ?? '未确认'}, 小票数=${receiptsByIdRef.current.size}`)
         // 备注：每张小票的店名+明细都追加到已有备注后面，两张之间空一行，不再只在备注为空时写入
         const formatted = formatReceiptNote(fields)
         if (formatted) {
@@ -370,6 +372,12 @@ export function AddTransactionPage() {
     try {
       await deleteReceiptPdf(path)
       setReceiptPaths((prev) => prev.filter((p) => p !== path))
+      for (const [id, receipt] of receiptsByIdRef.current) {
+        if (receipt.path !== path) continue
+        receiptsByIdRef.current.delete(id)
+        updateReceiptAmount()
+        break
+      }
     } catch (e) {
       console.error('レシート凭证删除失败', e)
     } finally {
