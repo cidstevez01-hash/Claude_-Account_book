@@ -241,6 +241,13 @@ export function AddTransactionPage() {
   function updateReceiptAmount() {
     if (amountWasManuallyEditedRef.current) return
     const amounts = Array.from(receiptsByIdRef.current.values(), (receipt) => receipt.amount)
+    if (mode === 'edit') {
+      // 新扫描缺少任一金额，或扫描凭证已全部移除时，恢复原账目金额。
+      if (!amounts.length || amounts.some((value) => value == null)) {
+        setAmount(sourceEntry ? String(sourceEntry.amount) : '')
+        return
+      }
+    }
     // 有任一张金额待确认时，金额栏留空，避免把部分小票的和当成整笔支出。
     const total = amounts.length && amounts.every((value) => value != null)
       ? String(amounts.reduce((sum, value) => sum + value, 0)) : ''
@@ -330,7 +337,7 @@ export function AddTransactionPage() {
   // R-32：扫描确认后立刻传Storage(不是等整条记录save才一起传)——entryId已经在
   // 组件挂载时就确定好了(见上面newEntryId的说明)，不需要等真正save entries才能拿到
   // 一个id；这样用户扫完就能立刻点"查看凭证"核对是否传成功，不用等保存完这一步
-  // 编辑模式仍保护已有金额和备注。R-54 在三种模式下都允许用票面日期填入日期栏。
+  // 三种模式共用扫描回填；本次手填的金额和日期优先。
   // R-41：扫描确认后追加到receiptPaths末尾(不再是setReceiptPath整个覆盖)——一次
   // 只扫一张的交互本身不变(ReceiptScanSheet职责不变)，"能扫多张"是这里的列表管理
   // 逻辑，用户扫完一张想再加一张，自己点列表末尾的"继续扫描"再次打开这个弹层
@@ -345,16 +352,14 @@ export function AddTransactionPage() {
         receiptDateLockedRef.current = true
         setDate(fields.date)
       }
-      if (mode !== 'edit') {
-        receiptsByIdRef.current.set(fields.receiptId, { path, amount: fields.amount })
-        updateReceiptAmount()
-        logModule('receipt', `小票金额汇总 receiptId=${fields.receiptId}: 本张合計=${fields.amount ?? '未确认'}, 小票数=${receiptsByIdRef.current.size}`)
-        // 备注：每张小票的店名+明细都追加到已有备注后面，两张之间空一行，不再只在备注为空时写入
-        const formatted = formatReceiptNote(fields)
-        if (formatted) {
-          setNote((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${formatted}` : formatted))
-          logModule('receipt', `小票备注追加: receiptId=${fields.receiptId}, ${formatted.split('\n').length}行`)
-        }
+      receiptsByIdRef.current.set(fields.receiptId, { path, amount: fields.amount })
+      updateReceiptAmount()
+      logModule('receipt', `小票金额汇总 receiptId=${fields.receiptId}: 本张合計=${fields.amount ?? '未确认'}, 小票数=${receiptsByIdRef.current.size}`)
+      // 备注按张追加到已有内容之后。
+      const formatted = formatReceiptNote(fields)
+      if (formatted) {
+        setNote((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${formatted}` : formatted))
+        logModule('receipt', `小票备注追加: receiptId=${fields.receiptId}, ${formatted.split('\n').length}行`)
       }
       return true
     } catch (e) {

@@ -19,9 +19,10 @@ interface TotalCandidate {
   rowIndex: number
   amount: number
   kind: TotalKind
-  source: 'field' | 'position'
+  source: 'field' | 'position' | 'reconciled'
   confidence?: number
   hasAlternative?: boolean
+  requiresCorroboration?: boolean
 }
 
 export interface ReceiptTotalResult {
@@ -50,7 +51,8 @@ const ONLY_VALUE = new RegExp(String.raw`^\s*(?:¥\s*|JPY\s*)?(${NUMBER})\s*円?
 const EMPTY_FIELD = new RegExp(String.raw`^\s*[:=/]?\s*(?:${COUNT}\s*)?(?:${TAX_NOTE}\s*)?[*★☆】\])]*\s*$`, 'u')
 
 function normalize(text: string): string {
-  return text.normalize('NFKC').replace(/^[\s※*★☆●○■□◆◇【[（(]+/u, '').trim()
+  return text.normalize('NFKC').replace(/^[\s※*★☆●○■□◆◇【[（(]+/u, '')
+    .replace(/^\d+\s*名(?:様)?\s*/u, '').trim()
 }
 
 function numberValue(raw: string): number | null {
@@ -61,6 +63,10 @@ function numberValue(raw: string): number | null {
 function fieldValue(suffix: string): number | null {
   const match = suffix.replace(/^[\s:：=)】\]]+/u, '').match(VALUE_FIELD)
   return match ? numberValue(match[1]) : null
+}
+
+function monetaryValue(text: string): number | null {
+  return /¥|JPY|円/iu.test(text) ? fieldValue(text) : null
 }
 
 function totalFieldValue(raw: string): number | null {
@@ -80,6 +86,7 @@ export function isReceiptTotalHint(raw: string): boolean {
     if (!match) return false
     const suffix = text.slice(match[0].length)
     return EMPTY_FIELD.test(suffix) || fieldValue(suffix) != null
+      || /^[士土±]\s*¥/u.test(suffix.trim())
       || /^\s*[:=/]?\s*(?:¥\s*)?[\d,.IlOo]+\s*円?\s*$/u.test(suffix)
   })
 }
@@ -130,13 +137,21 @@ function externalTaxTotal(rows: ReceiptTextRow[], rowIndex: number): number | nu
     const match = normalize(rows[i].text).match(/^小\s*計\s*/u)
     if (!match) continue
     subtotalIndex = i
-    subtotal = fieldValue(normalize(rows[i].text).slice(match[0].length))
+    const suffix = normalize(rows[i].text).slice(match[0].length)
+    subtotal = monetaryValue(suffix)
+    // 小计标签旁可能是件数或乱码，真正的金额被拆到下一行。
+    // 仅配对紧邻的完整货币字段，避免把其他结算字段挪过来。
+    if (subtotal == null && (EMPTY_FIELD.test(suffix) || /^\s*\d+\s*$/u.test(suffix))) {
+      const next = normalize(rows[i + 1]?.text ?? '')
+      if (ONLY_VALUE.test(next)) subtotal = monetaryValue(next)
+    }
     break
   }
   if (subtotal == null) return null
   const taxes = new Map<string, number>()
   for (let i = subtotalIndex + 1; i < rowIndex; i++) {
     const text = normalize(rows[i].text)
+    if (isPaymentBoundary(text)) return null
     if (/割引|値引|クーポン|ポイント|調整|端数|内税/u.test(text)) return null
     const match = text.match(/^外\s*(?:税\s*(?:額\s*)?)?(?:(\d+(?:\.\d+)?)\s*%\s*)?/u)
     if (!match) continue
@@ -154,6 +169,32 @@ function externalTaxTotal(rows: ReceiptTextRow[], rowIndex: number): number | nu
   return subtotal + (all ?? rateSum)
 }
 
+function isPaymentBoundary(text: string): boolean {
+  return /^(?:お預[りか]?|預[りか]|お釣[り]?|おつり|釣銭|現計|現金|コード決済|クレジット|メルペイ|PayPay|SmartCode|楽天ポイント|[-・*]*.*ポイント情報)/iu.test(text)
+}
+
+/** 仅从小计、外税之后和付款之前寻找漏掉标签的完整货币字段。 */
+function recoverUnlabelledTotal(rows: ReceiptTextRow[]): TotalCandidate[] {
+  const candidates: TotalCandidate[] = []
+  let subtotalSeen = false
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    const text = normalize(rows[rowIndex].text)
+    if (/^小\s*計/u.test(text)) subtotalSeen = true
+    if (!subtotalSeen) continue
+    if (isPaymentBoundary(text)) break
+    if (!ONLY_VALUE.test(text)) continue
+    const amount = monetaryValue(text)
+    if (amount == null || amount <= 0) continue
+    const expected = externalTaxTotal(rows, rowIndex)
+    if (expected == null || !sameAmount(expected, amount)) continue
+    candidates.push({
+      rowIndex, amount, kind: 'total', source: 'reconciled',
+      confidence: blockConfidence(rows[rowIndex].blocks ?? []), requiresCorroboration: true,
+    })
+  }
+  return candidates
+}
+
 function sameAmount(a: number, b: number): boolean {
   return Math.abs(a - b) < 0.005
 }
@@ -169,6 +210,12 @@ export function selectReceiptTotal(rows: ReceiptTextRow[]): ReceiptTotalResult {
       const suffix = text.slice(match[0].length)
       let amount = fieldValue(suffix)
       let source: TotalCandidate['source'] = 'field'
+      let requiresCorroboration = false
+      if (amount == null && /^[士土±]\s*¥/u.test(suffix.trim())) {
+        amount = fieldValue(suffix.trim().slice(1))
+        source = 'reconciled'
+        requiresCorroboration = true
+      }
       let confidence = blockConfidence(row.blocks ?? [])
       let hasAlternative = row.blocks?.some((block, blockIndex, blocks) =>
         block.candidates?.slice(1).some(({ text: alternative }) => {
@@ -184,11 +231,12 @@ export function selectReceiptTotal(rows: ReceiptTextRow[]): ReceiptTotalResult {
         hasAlternative = match?.hasAlternative
         source = 'position'
       }
-      if (amount != null && amount > 0) candidates.push({ rowIndex, amount, kind, source, confidence, hasAlternative })
+      if (amount != null && amount > 0) candidates.push({ rowIndex, amount, kind, source, confidence, hasAlternative, requiresCorroboration })
       else rejectedRows.push(rowIndex)
       break
     }
   })
+  candidates.push(...recoverUnlabelledTotal(rows))
 
   const empty = (reason: string): ReceiptTotalResult => ({
     amount: null, rowIndex: -1, reason, candidates, rejectedRows, corroborated: false,
@@ -201,6 +249,11 @@ export function selectReceiptTotal(rows: ReceiptTextRow[]): ReceiptTotalResult {
     possible = possible.filter((amount) => arithmetic.some((value) => sameAmount(amount, value)))
     if (!possible.length) return empty('合计金额与明确的税前小计及外税不一致')
   }
+  possible = possible.filter((amount) => candidates.some((candidate) =>
+    candidate.amount === amount && (!candidate.requiresCorroboration
+      || arithmetic.some((value) => sameAmount(value, amount))),
+  ))
+  if (!possible.length) return empty('标签残缺的金额缺少独立结算证据')
   let reason = arithmetic.length ? '完整合计字段通过外税结算核对' : '完整合计金额字段'
   if (possible.length > 1) {
     // 核对的是不同语义字段，不是全票数字出现次数。
