@@ -1,5 +1,6 @@
 import { ThemeIcon } from '../../icons/Icon'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useHorizontalSwipe } from '../../hooks/useHorizontalSwipe'
 import { useI18n } from '../../lib/i18n'
 
 interface RangeCalendarPickerProps {
@@ -38,7 +39,7 @@ function buildMonthGrid(year: number, month: number): (Date | null)[] {
  * - 只有起点、还没终点 → 这次点击定终点；如果点的日期比起点早，自动交换(终点变起点)；
  *   如果点的正好是起点当天，起点终点都设成这天——必须支持"同一天选两次"生成合法的
  *   单日区间(一天内有多条记账记录，需要能单独看某一天)
- * - 起止都已经选完(草稿完整) → 这次点击重新开始，视为新的起点，原来的终点清空
+ * - 草稿完整时点区间外日期 → 扩展对应一端；点区间内日期 → 开始新的一段选择
  *
  * 主题自适应：选中态用--color-primary/--color-on-primary/--color-primary-fixed这些
  * 会跟主题换的token，不是写死的颜色，怀旧主题换成什么颜色这里的高亮就跟着变 */
@@ -66,10 +67,10 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
   // 滑动切月的过渡方向——跟transitionDir是两套独立状态，一个管年/月快速跳转页的
   // 缩放过渡，一个管日历格子本身的左右滑入过渡，互不影响
   const [monthSlideDir, setMonthSlideDir] = useState<'left' | 'right'>('left')
-  // 左右‹›翻月按钮拿掉了，改成日历格子区域本身左右滑动切月——这个ref必须跟其他
-  // hooks一样放在"if (!open) return null"之前，不然open从true变false时组件这次
-  // 渲染会少调一个hook，触发React"hooks数量不一致"报错(#310)，之前踩过这个坑
-  const touchStartXRef = useRef<number | null>(null)
+  const swipe = useHorizontalSwipe((direction) => {
+    if (direction === 'previous') handlePrevMonth()
+    else handleNextMonth()
+  })
 
   // 每次重新打开都用当时真正生效的startDate/endDate重置草稿——不然上次点"取消"
   // 丢弃的半路草稿会在下次打开时还留着(组件本身没卸载，state不会自动清空)
@@ -129,19 +130,6 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
     setViewMonth(d.getMonth())
   }
 
-  // 40px是滑动判定阈值，太小容易跟"点某一天"的轻触误判成滑动
-  function handleGridTouchStart(e: React.TouchEvent) {
-    touchStartXRef.current = e.touches[0].clientX
-  }
-  function handleGridTouchEnd(e: React.TouchEvent) {
-    const startX = touchStartXRef.current
-    touchStartXRef.current = null
-    if (startX == null) return
-    const deltaX = e.changedTouches[0].clientX - startX
-    if (deltaX <= -40) handleNextMonth()
-    else if (deltaX >= 40) handlePrevMonth()
-  }
-
   // 日历页点标题"2026年8月"打开月份快速跳转页——完全仿照Windows日历的层级顺序：
   // 日→月→年，逐级放大到更粗粒度的视图，不是日→年→月。这是往上跳一级，过渡方向
   // 是'out'(缩小到位)
@@ -171,9 +159,12 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
 
   function tapDay(dateStr: string) {
     if (pendingStart && pendingEnd) {
-      // 已经是完整区间——这次点击重新开始，视为新起点
-      setPendingStart(dateStr)
-      setPendingEnd(null)
+      if (dateStr < pendingStart) setPendingStart(dateStr)
+      else if (dateStr > pendingEnd) setPendingEnd(dateStr)
+      else {
+        setPendingStart(dateStr)
+        setPendingEnd(null)
+      }
       return
     }
     if (!pendingStart) {
@@ -270,7 +261,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
             结束日期"这句要么被截断要么挤占太多空间，用户明确要求"显示不全索性不要"——
             拿掉了，靠日历本身的状态(只有一个实心圆点/确定按钮禁用)传达"还没选完" */}
         {/* 左右‹›翻月按钮拿掉了——用户明确要求让位给日历本身，改成日历格子区域直接
-            左右滑动切月(见下面handleGridTouchStart/End)。标题保留，点它打开月份快速
+            左右滑动切月(共用 useHorizontalSwipe)。标题保留，点它打开月份快速
             跳转页(日→月→年逐级上跳，仿照Windows日历，不是日→年→月)，这个跟滑动
             翻月是两回事 */}
         <div className="flex items-center justify-center mb-2">
@@ -293,8 +284,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
         <div
           key={`${viewYear}-${viewMonth}`}
           className={`grid grid-cols-7 ${monthSlideDir === 'left' ? 'grid-slide-in-left' : 'grid-slide-in-right'}`}
-          onTouchStart={handleGridTouchStart}
-          onTouchEnd={handleGridTouchEnd}
+          {...swipe}
         >
           {grid.map((date, i) => {
             if (!date) return <span key={`blank-${i}`} className="h-9" />

@@ -23,6 +23,7 @@ import { hasEntriesInMonth } from '../../data/summary'
 import { deleteEntry } from '../../data/catalog'
 import { useI18n } from '../../lib/i18n'
 import { todayStr } from '../../lib/date'
+import { useHorizontalSwipe } from '../../hooks/useHorizontalSwipe'
 import { consumeDetailSheetReturnMemory, setDetailSheetReturnMemory } from '../../lib/detailSheetReturnMemory'
 
 const WEEKDAY_LABELS_ZH = ['日', '一', '二', '三', '四', '五', '六']
@@ -97,6 +98,10 @@ export function CalendarPage() {
   const nextAnchor = new Date(year, month + 1, 1)
   const disablePrev = !hasEntriesInMonth(entries, prevAnchor.getFullYear(), prevAnchor.getMonth() + 1)
   const disableNext = !hasEntriesInMonth(entries, nextAnchor.getFullYear(), nextAnchor.getMonth() + 1)
+  const swipe = useHorizontalSwipe((direction) => {
+    if (direction === 'previous' && !disablePrev) shiftMonth(-1)
+    if (direction === 'next' && !disableNext) shiftMonth(1)
+  })
 
   const [selectedDate, setSelectedDate] = useState(() => todayStr())
 
@@ -236,7 +241,7 @@ export function CalendarPage() {
             disableNext={disableNext}
           />
 
-          <div className="bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
+          <div {...swipe} className="bg-surface-container-lowest rounded-xl p-md border-[1.5px] border-dashed border-outline-variant papercut-shadow">
             <div className="grid grid-cols-7 gap-1 mb-1">
               {weekdayLabels.map((w) => (
                 <div key={w} className="text-center text-label-caps text-on-surface-variant font-sans">

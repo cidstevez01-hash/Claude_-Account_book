@@ -68,11 +68,7 @@ export function AccountPage() {
   return (
     <AppLayout title={t('accountTitle')} leftButton="back">
       <div className="flex flex-col items-center px-md pt-lg pb-lg">
-        {/* 头像圆形裁切(overflow-hidden)必须只包住图片本身，不能连编辑徽标一起包进去——
-            徽标故意露出头像圆形边界一点(-right-0.5 bottom-0)，如果跟图片共用一个
-            overflow-hidden+rounded-full容器，超出头像圆形范围的那部分徽标会被这个
-            圆形遮罩连带裁掉，露出来的是个缺了一块的诡异形状(真机截图复现过)。改成
-            外层wrapper不裁切，圆形裁切单独套一层只包图片，徽标作为wrapper的兄弟节点 */}
+        {/* 只裁切头像图片，编辑徽章及主题外圈光效保持完整。 */}
         <div className="relative w-20 h-20 mb-3">
           {/* 头像图片本身就有色彩/图案，不是"编辑中"状态，不需要再叠一圈border-primary
               装饰环——那圈环只该出现在ChangeAvatarPage选择网格里表示"当前选中哪一个" */}
@@ -83,9 +79,11 @@ export function AccountPage() {
             to="/account/avatar"
             onClick={(e) => viewTransitionLinkClick(e, navigate, '/account/avatar')}
             aria-label={t('changeAvatarAria')}
-            className="absolute -right-0.5 bottom-0 w-[26px] h-[26px] rounded-full bg-primary border-2 border-surface flex items-center justify-center active:scale-90 transition-transform"
+            className="absolute -right-[11px] -bottom-[9px] w-11 h-11 flex items-center justify-center rounded-full active:scale-90 transition-transform"
           >
-            <ThemeIcon className="material-symbols-outlined text-[13px] text-on-primary" icon="edit" />
+            <span className="relative w-[26px] h-[26px] rounded-full bg-surface-container-lowest border-2 border-outline-variant flex items-center justify-center [--icon-size:26px]">
+              <ThemeIcon className="material-symbols-outlined text-primary" style={{ fontSize: 12 }} icon="edit" size={12} effect="ring" fireflies />
+            </span>
           </Link>
         </div>
         <h2 className="text-body-md text-on-surface-variant">{user!.email}</h2>
