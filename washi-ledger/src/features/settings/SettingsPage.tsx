@@ -4,6 +4,7 @@ import { useSettings } from '../../hooks/useSettings'
 import { useI18n } from '../../lib/i18n'
 import { CURRENCIES } from '../../data/rate'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
+import { THEME_NAME_KEYS } from '../../lib/themeSkin'
 import type { Lang } from '../../types'
 
 interface SettingsRowProps {
@@ -146,19 +147,7 @@ export function SettingsPage() {
 
         <SettingsRow icon="palette" effect="ring" fireflies label={t('themeLabel')} onClick={() => navigate('/theme')}>
           <div className="flex items-center gap-1">
-            {/* 之前这里写死显示"PigBang"，跟ThemePage.tsx选卡片切主题完全没接上——
-                切完主题回设置页这一行还是那个死字符串，看起来像"没生效"。改成
-                跟ThemePage.tsx同一套themeDefaultName/themeNostalgiaName翻译键，
-                真实反映settings.themeSkin当前值 */}
-            <span>
-              {settings.themeSkin === 'nostalgia'
-                ? t('themeNostalgiaName')
-                : settings.themeSkin === 'summer'
-                  ? t('themeSummerName')
-                  : settings.themeSkin === 'autumn'
-                    ? t('themeAutumnName')
-                    : t('themeDefaultName')}
-            </span>
+            <span>{t(THEME_NAME_KEYS[settings.themeSkin])}</span>
             <ThemeIcon className="material-symbols-outlined text-[18px]" icon="chevron_right" />
           </div>
         </SettingsRow>

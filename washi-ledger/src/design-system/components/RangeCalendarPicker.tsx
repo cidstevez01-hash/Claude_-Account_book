@@ -39,7 +39,7 @@ function buildMonthGrid(year: number, month: number): (Date | null)[] {
  * - 只有起点、还没终点 → 这次点击定终点；如果点的日期比起点早，自动交换(终点变起点)；
  *   如果点的正好是起点当天，起点终点都设成这天——必须支持"同一天选两次"生成合法的
  *   单日区间(一天内有多条记账记录，需要能单独看某一天)
- * - 草稿完整时点区间外日期 → 扩展对应一端；点区间内日期 → 开始新的一段选择
+ * - 草稿完整时点区间外日期 → 扩展对应一端；点区间内日期 → 保留结束日期，只修改开始日期
  *
  * 主题自适应：选中态用--color-primary/--color-on-primary/--color-primary-fixed这些
  * 会跟主题换的token，不是写死的颜色，怀旧主题换成什么颜色这里的高亮就跟着变 */
@@ -163,7 +163,6 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
       else if (dateStr > pendingEnd) setPendingEnd(dateStr)
       else {
         setPendingStart(dateStr)
-        setPendingEnd(null)
       }
       return
     }

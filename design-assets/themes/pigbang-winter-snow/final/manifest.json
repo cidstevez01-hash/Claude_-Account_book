@@ -1,7 +1,7 @@
 {
   "date": "2026-11-23",
   "product": "PigBang",
-  "status": "Both themes approved and integrated locally",
+  "status": "Random snowfall and settings label fix integrated",
   "approvedBy": "全都可以接入了",
   "runtimeBackground": {
     "file": "washi-ledger/src/design-system/components/WinterBackground.tsx",
@@ -23,8 +23,18 @@
       }
     ],
     "falling": {
-      "count": 14,
-      "cssAnimation": true,
+      "count": 3,
+      "size": 60,
+      "randomFreePaths": true,
+      "spawnAboveTop": true,
+      "releaseOnlyAfterFullExit": true,
+      "speedsPixelsPerSecond": [
+        26,
+        35,
+        48
+      ],
+      "browserNativeAnimation": true,
+      "jsPerFrame": false,
       "pauseWhenHidden": true,
       "reducedMotion": true
     }
@@ -302,17 +312,21 @@
     "approved": true,
     "checked": true
   },
-  "pendingSnowfallSizePreview": {
-    "source": "history/20261123-29-snowfall-three-speeds",
-    "size": 60,
-    "maxVisibleSnowflakes": 3,
-    "lanes": 3,
-    "durationsSeconds": [
-      20,
-      30,
-      40
-    ],
-    "collisionCheck": "Full 120-second combined cycle at four viewport sizes for both themes; at most three visible falling flakes, no bounding-box overlaps.",
-    "integrated": false
+  "version": "1.0.0-20261123-dev.2",
+  "latestIntegration": "history/20261123-30-snowfall-random-free-paths",
+  "validation": {
+    "productionBuild": "passed",
+    "lint": {
+      "result": "passed",
+      "existingWarnings": 6
+    },
+    "nativeBrowserScenarios": 11,
+    "nativeBrowserResult": "passed",
+    "dateRangeScenarios": 4,
+    "dateRangeResult": "passed",
+    "scheduleUnitTests": 3,
+    "randomSimulationScenarios": 256,
+    "randomSimulationSecondsPerScenario": 300,
+    "nativeDeviceVerification": "user"
   }
 }

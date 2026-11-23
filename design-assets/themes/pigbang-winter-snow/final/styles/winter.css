@@ -78,8 +78,6 @@
 [data-theme="winter"] :is(input,textarea,select) { color:var(--color-on-surface); }
 [data-theme="winter"] [data-app-header] a[href="/account"] { box-shadow:0 0 0 1px #DDC4B8,0 0 0 5px #ffffff8c; }
 [data-theme="winter"] .winter-fall-layer { position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;contain:layout paint; }
-[data-theme="winter"] .winter-flake { position:absolute;top:-32px;left:var(--snow-x);width:var(--snow-size);height:var(--snow-size);background:var(--winter-snowflake-image) center/contain no-repeat;opacity:1;animation:winter-snowfall var(--snow-duration) linear infinite;animation-delay:var(--snow-delay);animation-play-state:var(--snow-play-state,running);will-change:transform; }
-@keyframes winter-snowfall { from { transform:translate3d(0,-25px,0) rotate(0deg); } to { transform:translate3d(var(--snow-drift),950px,0) rotate(105deg); } }
 @media(prefers-reduced-motion:reduce) { [data-theme="winter"] .winter-fall-layer { display:none; } }
 
 :root[data-theme="winter"] {
@@ -184,14 +182,9 @@
 }
 [data-theme="winter"] .winter-fall-layer {position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2;contain:layout paint;}
 [data-theme="winter"] .winter-flake {
- position:absolute;top:-32px;left:var(--snow-x);width:var(--snow-size);height:var(--snow-size);
+ position:absolute;top:0;left:0;width:60px;height:60px;
  background:var(--winter-snowflake-image) center/contain no-repeat;opacity:0;
- animation:winter-snowfall var(--snow-duration) linear infinite;animation-delay:var(--snow-delay);animation-play-state:var(--snow-play-state,running);will-change:transform;
-}
-@keyframes winter-snowfall {
- 0%{opacity:0;transform:translate3d(0,-25px,0) rotate(0deg);}
- 12%,86%{opacity:1;}
- 100%{opacity:0;transform:translate3d(var(--snow-drift),calc(100dvh + 64px),0) rotate(105deg);}
+ will-change:transform;
 }
 @media(prefers-reduced-motion:reduce){[data-theme="winter"] .winter-fall-layer {display:none;}}
 [data-theme="winter"] .autumn-drawer {background:linear-gradient(#FFFFFFED,#FFFFFFED),var(--winter-ink-image) center/cover #FFFFFF;border-color:#BEA06A;}

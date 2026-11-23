@@ -112,9 +112,17 @@ async function savedRange(page, name, startDate, endDate) {
         await page.getByRole('button', { name: '确定', exact: true }).click();
         await savedRange(page, name, '2026-11-05', '2026-11-25');
         await page.reload(); await page.locator('[data-date-range-bar]').click(); await boundaries(page, [5, 25]);
-        await day(page, 15); assert.equal(await page.getByRole('button', { name: '确定', exact: true }).isDisabled(), true);
-        await day(page, 15); await page.getByRole('button', { name: '确定', exact: true }).click();
-        await savedRange(page, name, '2026-11-15', '2026-11-15');
+        await day(page, 15); await boundaries(page, [15, 25]);
+        assert.equal(await page.getByRole('button', { name: '确定', exact: true }).isEnabled(), true);
+        await page.getByRole('button', { name: '确定', exact: true }).click();
+        await savedRange(page, name, '2026-11-15', '2026-11-25');
+        await page.reload(); await page.locator('[data-date-range-bar]').click(); await boundaries(page, [15, 25]);
+        await day(page, 20); await boundaries(page, [20, 25]);
+        await page.getByRole('button', { name: '取消', exact: true }).click();
+        await savedRange(page, name, '2026-11-15', '2026-11-25');
+        await page.locator('[data-date-range-bar]').click(); await day(page, 25); await boundaries(page, [25]);
+        await page.getByRole('button', { name: '确定', exact: true }).click();
+        await savedRange(page, name, '2026-11-25', '2026-11-25');
       });
       await check('R-56 ' + name + ' extend across months and year', async ({ page }) => {
         await page.goto(origin + url); await page.locator('[data-date-range-bar]').click();

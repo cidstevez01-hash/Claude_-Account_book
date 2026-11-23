@@ -1,0 +1,332 @@
+{
+  "date": "2026-11-23",
+  "product": "PigBang",
+  "status": "Random snowfall and settings label fix integrated",
+  "approvedBy": "全都可以接入了",
+  "runtimeBackground": {
+    "file": "washi-ledger/src/design-system/components/WinterBackground.tsx",
+    "ink": {
+      "fit": "center/100% auto no-repeat",
+      "opacity": 0.62,
+      "mask": "layers/snowflake-clearance.svg"
+    },
+    "fixedSnowflakes": [
+      {
+        "width": 340,
+        "right": -115,
+        "top": -82
+      },
+      {
+        "width": 300,
+        "left": -145,
+        "bottom": -100
+      }
+    ],
+    "falling": {
+      "count": 3,
+      "size": 60,
+      "randomFreePaths": true,
+      "spawnAboveTop": true,
+      "releaseOnlyAfterFullExit": true,
+      "speedsPixelsPerSecond": [
+        26,
+        35,
+        48
+      ],
+      "browserNativeAnimation": true,
+      "jsPerFrame": false,
+      "pauseWhenHidden": true,
+      "reducedMotion": true
+    }
+  },
+  "variants": [
+    {
+      "key": "winter",
+      "name": "冬雪 · 暖金",
+      "designSource": "history/20261123-22-warm-clearance",
+      "images": {
+        "home": "home.png",
+        "stats": "stats.png",
+        "theme": "theme.png",
+        "add": "add.png"
+      },
+      "layers": [
+        {
+          "file": "layers/warm-snowflake.png",
+          "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1"
+        },
+        {
+          "file": "layers/warm-ink.webp",
+          "sha256": "4871536d10e18cefc40956e68343a8dd65decf4bce5f23be7d578de91e045740"
+        }
+      ],
+      "snowflake": {
+        "runtimeFilter": "none",
+        "opacity": 1,
+        "source": {
+          "file": "layers/41-approved-snowflake.png",
+          "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+          "approval": "对，就是这张",
+          "reference": "../20261123-16-recovered-snowflake/recovered-snowflake.png",
+          "runtimeColorFilters": false
+        }
+      },
+      "clearance": {
+        "file": "layers/50-snowflake-clearance.svg",
+        "contour": [
+          [
+            70,
+            200
+          ],
+          [
+            72,
+            196
+          ],
+          [
+            74,
+            194
+          ],
+          [
+            364,
+            28
+          ],
+          [
+            368,
+            26
+          ],
+          [
+            372,
+            26
+          ],
+          [
+            664,
+            194
+          ],
+          [
+            668,
+            198
+          ],
+          [
+            668,
+            540
+          ],
+          [
+            666,
+            544
+          ],
+          [
+            376,
+            712
+          ],
+          [
+            372,
+            714
+          ],
+          [
+            366,
+            714
+          ],
+          [
+            362,
+            712
+          ],
+          [
+            76,
+            546
+          ],
+          [
+            72,
+            542
+          ],
+          [
+            70,
+            538
+          ]
+        ],
+        "sourceSize": 740,
+        "strokeWidth": 88,
+        "feather": 6,
+        "targetLayer": "original-ink",
+        "maskComposite": "subtract, add"
+      }
+    },
+    {
+      "key": "winter-silver",
+      "name": "冬雪 · 银灰",
+      "designSource": "history/20261123-23-silver-clearance",
+      "images": {
+        "home": "silver/home.png",
+        "stats": "silver/stats.png",
+        "theme": "silver/theme.png",
+        "add": "silver/add.png"
+      },
+      "layers": [
+        {
+          "file": "layers/silver-snowflake.png",
+          "sha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67"
+        },
+        {
+          "file": "layers/silver-ink.webp",
+          "sha256": "5f31eecd2dcf08c3b44061f9e2edc64a2e3fa2cdb827bafd0375833e7ae210b2"
+        }
+      ],
+      "palette": [
+        {
+          "offset": "0",
+          "color": "#CAD4E1"
+        },
+        {
+          "offset": ".34",
+          "color": "#DBD6E4"
+        },
+        {
+          "offset": ".65",
+          "color": "#C7D9E2"
+        },
+        {
+          "offset": "1",
+          "color": "#DCCFDC"
+        }
+      ],
+      "snowflake": {
+        "runtimeFilter": "none",
+        "opacity": 1,
+        "source": {
+          "file": "layers/41-approved-snowflake.png",
+          "sha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+          "reference": "../20261123-09-pearl-ink/pearl-snowflake-alpha.png",
+          "runtimeColorFilters": false,
+          "approval": "银灰主色，保留原冷色雪花"
+        }
+      },
+      "clearance": {
+        "file": "layers/50-snowflake-clearance.svg",
+        "contour": [
+          [
+            70,
+            200
+          ],
+          [
+            72,
+            196
+          ],
+          [
+            74,
+            194
+          ],
+          [
+            364,
+            28
+          ],
+          [
+            368,
+            26
+          ],
+          [
+            372,
+            26
+          ],
+          [
+            664,
+            194
+          ],
+          [
+            668,
+            198
+          ],
+          [
+            668,
+            540
+          ],
+          [
+            666,
+            544
+          ],
+          [
+            376,
+            712
+          ],
+          [
+            372,
+            714
+          ],
+          [
+            366,
+            714
+          ],
+          [
+            362,
+            712
+          ],
+          [
+            76,
+            546
+          ],
+          [
+            72,
+            542
+          ],
+          [
+            70,
+            538
+          ]
+        ],
+        "sourceSize": 740,
+        "strokeWidth": 88,
+        "feather": 6,
+        "targetLayer": "original-ink",
+        "maskComposite": "subtract, add"
+      }
+    }
+  ],
+  "clearanceMask": {
+    "file": "layers/snowflake-clearance.svg",
+    "sha256": "e3c41143094557e7d1c17070208011cce538382f32a440b141dbbb16a75c1184"
+  },
+  "checks": {
+    "date": "2026-11-23",
+    "functionalScenarios": 52,
+    "passed": 52,
+    "clearanceBothThemes": "passed",
+    "frozenArtworkHashes": "passed",
+    "productionBuild": "passed",
+    "lint": {
+      "result": "passed",
+      "existingWarnings": 6
+    },
+    "nativeDeviceVerification": "user",
+    "push": false,
+    "ipaRun": false
+  },
+  "artworkHistory": "../history/",
+  "notes": [
+    "Screenshots show the actual app with an isolated empty account. Status bar and safe area are simulated.",
+    "The two original snowflake PNGs are immutable. No runtime recoloring.",
+    "SVG icons retain existing geometry; only their palette changes.",
+    "Previous design iterations remain in history."
+  ],
+  "thumbnailUpdate": {
+    "date": "2026-11-23",
+    "source": "history/20261123-26-clean-thumbnails",
+    "emptyFramesRemoved": true,
+    "approved": true,
+    "checked": true
+  },
+  "version": "1.0.0-20261123-dev.2",
+  "latestIntegration": "history/20261123-30-snowfall-random-free-paths",
+  "validation": {
+    "productionBuild": "passed",
+    "lint": {
+      "result": "passed",
+      "existingWarnings": 6
+    },
+    "nativeBrowserScenarios": 11,
+    "nativeBrowserResult": "passed",
+    "dateRangeScenarios": 4,
+    "dateRangeResult": "passed",
+    "scheduleUnitTests": 3,
+    "randomSimulationScenarios": 256,
+    "randomSimulationSecondsPerScenario": 300,
+    "nativeDeviceVerification": "user"
+  }
+}

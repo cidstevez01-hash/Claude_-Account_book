@@ -1,0 +1,15 @@
+{
+  "scenarios": 256,
+  "simulatedSecondsPerScenario": 300,
+  "states": 307456,
+  "pairs": 832286,
+  "births": 8764,
+  "exits": 8031,
+  "blockedSpawnAttemptsSkipped": 401,
+  "distinctHorizontalPositions": 8591,
+  "allBirthsAboveScreen": true,
+  "allPathsReservedUntilFullExit": true,
+  "maxConcurrent": 3,
+  "nonIntersectingPaths": true,
+  "distinctConcurrentSpeeds": true
+}
