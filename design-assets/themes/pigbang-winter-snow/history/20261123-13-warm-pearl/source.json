@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-23",
+  "status": "Design preview only",
+  "scope": "Slightly warm original ink and snowflake colors together: warm lavender, soft rose, champagne apricot. Original source textures and alpha, composition, opacity, layout and UI styling preserved.",
+  "previousVersion": "../20261123-12-original-ink-recolor/composition.json",
+  "palette": [
+    {
+      "offset": "0",
+      "color": "#C6A4C9"
+    },
+    {
+      "offset": ".34",
+      "color": "#DEB3BE"
+    },
+    {
+      "offset": ".65",
+      "color": "#E6C89F"
+    },
+    {
+      "offset": "1",
+      "color": "#D7B5CE"
+    }
+  ],
+  "originalInkSha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e",
+  "snowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "method": "Non-destructive SVG color blend applied to original assets, clipped to exact source alpha. No raster redraw or shape changes.",
+  "inkOpacity": 0.18,
+  "snowflakeOpacity": 1,
+  "sourceAssetsUnedited": true,
+  "otherUiStylesUnchanged": true,
+  "previousVersionPreserved": true,
+  "data": "Isolated empty account; no live account requests or writes."
+}

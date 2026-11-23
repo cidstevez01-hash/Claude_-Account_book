@@ -1,0 +1,25 @@
+{
+  "checkedOn": "2026-11-22",
+  "theme": "PigBang 冬雪 · 水彩初雪",
+  "status": "Exact source located. Official transparent PNG download awaits account access. No replacement preview approved or published.",
+  "sourcePage": "https://www.rawpixel.com/image/12065853/png-white-background-paper",
+  "sourceId": "12065853",
+  "sourceTitle": "PNG Snowflake christmas outdoors holiday.",
+  "officialFormatsObserved": [
+    { "format": "PNG", "width": 800, "height": 718 },
+    { "format": "PNG", "width": 3500, "height": 3143 }
+  ],
+  "downloadObservation": "The page labels the image Premium. Clicking Download opened a sign-up/login dialog. No account was created, no purchase was made, and no official transparent PNG was downloaded.",
+  "preview": {
+    "file": "original-preview.jpg",
+    "originalLocation": "../20261122-03/watercolor-reference.png",
+    "actualFormat": "JPEG",
+    "width": 800,
+    "height": 719,
+    "hasAlpha": false,
+    "sha256": "fe4848ab09f6bf6daacaa1e083ec0e2e89dc300639196f6cbd8fb50e605d4419",
+    "note": "Exact original CDN preview bytes, copied without editing. The .png filename and URL did not reflect the actual JPEG response. Checkerboard is baked into this preview, not evidence that the official PNG lacks transparency."
+  },
+  "correction": "The image generation operation in revisions 03 and 04 changed the selected snowflake's shape and color. Those generated files are not the original artwork and must not be presented as unchanged original assets.",
+  "userRequirement": "Use the selected original artwork without redraw or recoloring, retaining its surrounding paint dots."
+}

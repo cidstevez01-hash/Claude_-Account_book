@@ -5,6 +5,8 @@ import { defaultIconTheme } from './default'
 import { nostalgiaIconTheme } from './nostalgia'
 import { summerIconTheme } from './summer'
 import { autumnIconTheme } from './autumn'
+import { winterIconTheme } from './winter'
+import { winterSilverIconTheme } from './winter-silver'
 import type { NavigationIconKey } from './types'
 export type { NavigationIconKey } from './types'
 
@@ -15,6 +17,8 @@ export const ICON_THEMES = {
   nostalgia: nostalgiaIconTheme,
   summer: summerIconTheme,
   autumn: autumnIconTheme,
+  winter: winterIconTheme,
+  'winter-silver': winterSilverIconTheme,
 }
 
 function resolveTheme(theme: string) {

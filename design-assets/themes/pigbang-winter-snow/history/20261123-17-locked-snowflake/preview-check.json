@@ -1,0 +1,26 @@
+[
+  {
+    "previousVersionsPreserved": true,
+    "snowflakeAssetHashLocked": true,
+    "backgroundAndIconsUnchanged": true
+  },
+  {
+    "standaloneMeanRgbErrorFromApprovedReference": 0.09899
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "usesExactApprovedPng": true,
+    "runtimeColorFilter": false,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "usesExactApprovedPng": true,
+    "runtimeColorFilter": false,
+    "overflow": false
+  }
+]

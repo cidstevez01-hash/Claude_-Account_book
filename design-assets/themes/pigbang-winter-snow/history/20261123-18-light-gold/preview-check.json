@@ -1,0 +1,57 @@
+[
+  {
+    "previousVersionsPreserved": true,
+    "snowflakeAssetHashLocked": true,
+    "inkAndTransparencyUnchanged": true,
+    "controls": [
+      {
+        "key": "fab",
+        "contrast": [
+          3.93,
+          3.99,
+          3.54
+        ],
+        "fillLuminance": [
+          0.751,
+          0.764,
+          0.671
+        ]
+      },
+      {
+        "key": "selectedTab",
+        "contrast": [
+          5.27,
+          5.43,
+          4.95
+        ],
+        "fillLuminance": [
+          0.732,
+          0.756,
+          0.685
+        ]
+      }
+    ]
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "snowflakeUnchanged": true,
+    "actual": {
+      "fabFill": "linear-gradient(115deg, rgb(246, 223, 166) 0%, rgb(247, 223, 192) 50%, rgb(243, 205, 205) 100%)",
+      "plusColor": "rgb(139, 103, 44)",
+      "selectedFill": null
+    }
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "snowflakeUnchanged": true,
+    "actual": {
+      "fabFill": "linear-gradient(115deg, rgb(246, 223, 166) 0%, rgb(247, 223, 192) 50%, rgb(243, 205, 205) 100%)",
+      "plusColor": "rgb(139, 103, 44)",
+      "selectedFill": "linear-gradient(115deg, rgb(245, 220, 163) 0%, rgb(247, 222, 188) 50%, rgb(243, 208, 204) 100%)"
+    }
+  }
+]

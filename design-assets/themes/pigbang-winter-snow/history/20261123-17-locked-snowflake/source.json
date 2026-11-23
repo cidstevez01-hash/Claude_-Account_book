@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-23",
+  "status": "Design preview; snowflake asset approved and locked",
+  "scope": "Bind the exact recovered snowflake approved by user as a fixed transparent PNG. No runtime color filter, desaturation or alternative snowflake styling. Other theme assets and layout unchanged.",
+  "approvedSnowflake": {
+    "file": "layers/41-approved-snowflake.png",
+    "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+    "approval": "对，就是这张",
+    "reference": "../20261123-16-recovered-snowflake/recovered-snowflake.png",
+    "runtimeColorFilters": false
+  },
+  "originalInkSha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e",
+  "inkDisplayOpacity": 0.62,
+  "cardSurface": {
+    "edgeOpacity": 0.2,
+    "centerOpacity": 0.82,
+    "backdropBlur": 0
+  },
+  "appSourceChanged": false,
+  "data": "Isolated empty-account rendering; no live account requests or writes."
+}

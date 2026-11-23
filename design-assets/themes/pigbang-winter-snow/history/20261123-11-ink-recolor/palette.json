@@ -1,0 +1,9 @@
+{
+  "base": "#FFFEFF",
+  "replacements": {
+    "#DAD0EF": "#E1D2EC",
+    "#E9DEF3": "#F0E1F2",
+    "#C8EEE5": "#CDEADF",
+    "#CBE8F2": "#D2E6EE"
+  }
+}

@@ -1,0 +1,11 @@
+BACKGROUND PALETTE STUDY ONLY for PigBang winter snowflake theme.
+The user explicitly forbids changing any other product design. Do NOT redesign an app screen. Do NOT invent or modify any layout, card, chart, navigation, typography, icon, button, or wording of the existing app. Deliver an isolated color study, not a new product interface.
+
+Create one clear landscape comparison board with exactly FIVE large background swatches, labeled in Chinese with the actual hexadecimal base color. Explore five visibly distinguishable very light NON-BLUE backgrounds: pure white, neutral pearl/soft gray white, warm paper white, very pale champagne/cream, and a restrained pale rose white. The user dislikes the blue whole-page wash. No blue/cyan background, no blue gradients, no dark theme. Only vary the background base color. Keep all comparison sample sizes, image scale and labels consistent, so the background color alone determines differences.
+
+Reference artwork is the user's selected ORIGINAL blue watercolor snowflake with organic branches, central blue bead and scattered paint dots:
+https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV85X3dhdGVyY29sb3JfaWxsdXN0cmF0aW9uX29mX2Ffc25vd19mbGFrZV9yZWFsaV8yNTFkMDRkZS01M2M2LTRhMTgtYWUwMC00MGFmMmM5MWNmOWIucG5n.png
+Canonical artwork page: https://www.rawpixel.com/image/12065853/png-white-background-paper
+Include this exact image URL as an unmodified reference image for the color study. Use the literal URL in an img tag. Do NOT generate another snowflake, redraw, recolor, stylize, approximate, or alter the original snowflake/paint dots. The public reference JPEG has a BAKED gray/white checkerboard and is not actually transparent despite its URL suffix. Do NOT tile or spread that checkerboard into any proposed background. If the actual transparent PNG is unavailable, place the unmodified reference image in a separate labeled reference area outside the swatches; do not fake background removal or imply transparency was solved.
+
+Keep the five color fields large enough to judge subtle differences. No product UI is to be designed. Use short Chinese names and hex labels, with at most one short suggested preference line. Output the five exact background hex values as well as the visual board.

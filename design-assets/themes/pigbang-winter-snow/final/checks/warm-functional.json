@@ -1,0 +1,106 @@
+[
+  {
+    "name": "theme selector, local persistence and legacy skin switching",
+    "result": "passed"
+  },
+  {
+    "name": "Japanese theme selection and reload",
+    "result": "passed"
+  },
+  {
+    "name": "remote winter decoding",
+    "result": "passed"
+  },
+  {
+    "name": "missing remote column preserves local theme and existing fallback",
+    "result": "passed"
+  },
+  {
+    "name": "single background survives route changes and does not intercept controls",
+    "result": "passed"
+  },
+  {
+    "name": "animation, page lifecycle pause and reduced motion",
+    "result": "passed"
+  },
+  {
+    "name": "expense and income semantics in donut and selected trend",
+    "result": "passed"
+  },
+  {
+    "name": "other skins do not mount or fetch winter artwork on home",
+    "result": "passed"
+  },
+  {
+    "name": "layout and full background at width 320",
+    "result": "passed"
+  },
+  {
+    "name": "layout and full background at width 390",
+    "result": "passed"
+  },
+  {
+    "name": "layout and full background at width 430",
+    "result": "passed"
+  },
+  {
+    "name": "layout and full background at width 1280",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /add",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /theme",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /settings",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /account",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /account/avatar",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /signin",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /register",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /rate",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /calendar",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /about",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /settings/debug-log",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /settings/recurring-rules",
+    "result": "passed"
+  },
+  {
+    "name": "winter shell /settings/recurring-rules/form",
+    "result": "passed"
+  },
+  {
+    "name": "final empty-account screenshots",
+    "result": "passed"
+  }
+]

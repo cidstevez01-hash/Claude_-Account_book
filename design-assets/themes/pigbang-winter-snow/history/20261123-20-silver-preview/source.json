@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-23",
+  "status": "Silver theme preview; awaiting visual approval",
+  "scope": "Silver-gray variant using the same approved warm layout and readability, with original cool pearl snowflake preserved unchanged. Preview awaiting visual approval.",
+  "coolSnowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "colorsOnly": true,
+  "geometryAndTypeSizeUnchanged": true,
+  "incomeExpenseSemanticsPreserved": true,
+  "appSourceChanged": false
+}

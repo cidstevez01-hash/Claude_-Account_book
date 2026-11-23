@@ -4,6 +4,7 @@ import { useSettings } from '../../hooks/useSettings'
 import { ThemeIcon } from '../../design-system/components/ThemeIcon'
 import { RouteFade } from '../../design-system/components/RouteFade'
 import { AutumnLeaves } from '../../design-system/components/AutumnLeaves'
+import { isWinterTheme } from '../../lib/themeSkin'
 import type { ThemeSkin } from '../../types'
 
 /** 主题选择——独立整屏子页面，照design-assets-v2/_25的Bento卡片布局做。_25设计稿画了
@@ -22,6 +23,8 @@ const THEME_PREVIEWS: Record<ThemeSkin, { primary: string; surface: string; outl
   // R-29：数值抄自index.css :root[data-theme="summer"]的--color-primary/--color-surface/
   // --color-outline-variant，跟旧App--seal/--paper/--grid对应
   autumn: { primary: '#c62818', surface: '#faf6ee', outlineVariant: '#e58e26' },
+  winter: { primary: '#A17E3C', surface: '#FFF9F5', outlineVariant: '#D0B58A' },
+  'winter-silver': { primary: '#7086A0', surface: '#F8FAFC', outlineVariant: '#B3BDD0' },
   summer: { primary: '#E85D4A', surface: '#101B33', outlineVariant: '#2A3D63' },
 }
 
@@ -34,11 +37,13 @@ export function ThemePage() {
   // paper-grid-bg，summer下背景变成一片网格纸，跟其它页面(能看到星空烟花)不一致
   const isSummer = settings.themeSkin === 'summer'
 
-  const cards: { skin: ThemeSkin; nameKey: 'themeDefaultName' | 'themeNostalgiaName' | 'themeSummerName' | 'themeAutumnName' }[] = [
+  const cards: { skin: ThemeSkin; nameKey: 'themeDefaultName' | 'themeNostalgiaName' | 'themeSummerName' | 'themeAutumnName' | 'themeWinterName' | 'themeWinterSilverName' }[] = [
     { skin: 'default', nameKey: 'themeDefaultName' },
     { skin: 'nostalgia', nameKey: 'themeNostalgiaName' },
     { skin: 'summer', nameKey: 'themeSummerName' },
     { skin: 'autumn', nameKey: 'themeAutumnName' },
+    { skin: 'winter', nameKey: 'themeWinterName' },
+    { skin: 'winter-silver', nameKey: 'themeWinterSilverName' },
   ]
 
   return (
@@ -106,12 +111,17 @@ export function ThemePage() {
                   active ? 'border-dashed border-primary bg-surface-container-highest' : 'border-outline-variant bg-surface-container-lowest'
                 }`}
               >
-                <div className="w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1">
+                <div className={`${isWinterTheme(skin) ? `winter-theme-preview winter-theme-preview--${skin === 'winter' ? 'warm' : 'silver'} ` : ''}w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1`}>
+                  {isWinterTheme(skin) ? <>
+                    <div className="winter-theme-preview-card" />
+                    <div className="winter-theme-preview-nav" />
+                  </> : <>
                   <div className="h-1/2 w-full" style={{ background: preview.primary }} />
                   <div className="h-1/2 w-full flex">
                     <div className="h-full w-1/2" style={{ background: preview.surface }} />
                     <div className="h-full w-1/2" style={{ background: preview.outlineVariant }} />
                   </div>
+                  </>}
                 </div>
                 <span className="text-body-md text-on-surface leading-tight">{t(nameKey)}</span>
                 <div

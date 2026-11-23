@@ -13,7 +13,7 @@ import { LEGACY_ZH, LEGACY_JA } from './legacy'
  */
 export const dict = {
   zh: {
-    appTitle: LEGACY_ZH.appTitle,
+    appTitle: 'PigBang',
     tabDashboard: '概览', // 用户明确要求，旧App没有完全对应的词(旧App叫"记账")
     tabHistory: LEGACY_ZH.ledgerSectionTitle, // 用户要求改成"出入金"，旧App正好有这个词
     tabStats: LEGACY_ZH.tabStats,
@@ -266,6 +266,8 @@ export const dict = {
     themeDefaultName: 'PigBang', // 新App专属(默认主题卡片名字，R-19：App名称确定沿用PigBang)
     themeNostalgiaName: '怀旧', // 新App专属(R-14新增主题，颜色/背景改回旧App基本主题色调)
     themeAutumnName: '红叶 · 丹枫金秋',
+    themeWinterName: '冬雪 · 暖金',
+    themeWinterSilverName: '冬雪 · 银灰',
     themeSummerName: '夏 · 花火', // 旧App data-skin="summerB"同款名字直接搬(见index.html THEME_SKINS)
     emailLabel: LEGACY_ZH.cloudEmailPlaceholder,
     passwordLabel: LEGACY_ZH.cloudPasswordPlaceholder,
@@ -298,7 +300,7 @@ export const dict = {
     historyClearSearchAria: '清空搜索', // 明细/出入金页面搜索框的清空按钮
   },
   ja: {
-    appTitle: LEGACY_JA.appTitle,
+    appTitle: 'PigBang',
     tabDashboard: LEGACY_JA.tabLedger, // 用户明确要求用"家計簿"，正好是旧App记账tab的日文
     tabHistory: LEGACY_JA.ledgerSectionTitle, // 旧App zh/ja都是"出入金"(中日通用汉字词，不是detailWord的"明細")
     tabStats: LEGACY_JA.tabStats,
@@ -525,6 +527,8 @@ export const dict = {
     themeDefaultName: 'PigBang',
     themeNostalgiaName: 'ノスタルジー',
     themeAutumnName: '紅葉・丹楓の秋',
+    themeWinterName: '冬雪・ウォームゴールド',
+    themeWinterSilverName: '冬雪・シルバー',
     themeSummerName: '夏・花火',
     emailLabel: LEGACY_JA.cloudEmailPlaceholder,
     passwordLabel: LEGACY_JA.cloudPasswordPlaceholder,

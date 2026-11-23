@@ -7,6 +7,7 @@ interface TrendLegendProps {
   aggregate: TrendLegendItem[]
   selectedBucket: TrendBucket | null
   valuePrefix?: string
+  valueColorClass?: string
   onSelectCategory?: (catCode: string) => void
   onClosePoint?: () => void
   /** 聚合图例数据源整体切换时(比如切换按日/按月、切换收支类型、翻月年)传一个变化的
@@ -21,6 +22,7 @@ export function TrendLegend({
   aggregate,
   selectedBucket,
   valuePrefix = '¥',
+  valueColorClass = 'text-primary',
   onSelectCategory,
   onClosePoint,
   resetKey,
@@ -37,7 +39,7 @@ export function TrendLegend({
               那边的label不受影响 */}
           <span className="text-body-lg text-on-surface">{selectedBucket.key}</span>
           <div className="flex items-center gap-2">
-            <span className="font-serif text-stat-figure font-semibold text-primary">
+            <span className={`font-serif text-stat-figure font-semibold ${valueColorClass}`}>
               {valuePrefix}
               {selectedBucket.total.toLocaleString()}
             </span>

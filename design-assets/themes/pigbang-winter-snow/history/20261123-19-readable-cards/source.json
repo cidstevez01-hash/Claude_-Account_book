@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-23",
+  "status": "Design preview only; app source unchanged",
+  "scope": "Readability refinement only: deeper warm-gray text, opaque thin gold card borders, a slight white reading surface and inner highlight. Approved snowflake, ink artwork and light-gold icons/buttons stay unchanged.",
+  "baseline": "../20261123-18-light-gold/composition.json",
+  "approvedSnowflake": {
+    "file": "layers/41-approved-snowflake.png",
+    "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+    "approval": "对，就是这张",
+    "reference": "../20261123-16-recovered-snowflake/recovered-snowflake.png",
+    "runtimeColorFilters": false
+  },
+  "readability": {
+    "body": "#483C35",
+    "secondary": "#66574F",
+    "activeCategoryText": "#87672E",
+    "border": "#BEA06A",
+    "borderWidth": "unchanged",
+    "innerHighlight": "#FFFFFFE6"
+  },
+  "cardSurface": {
+    "edgeOpacity": 0.3607843137254902,
+    "centerOpacity": 0.9490196078431372,
+    "backdropBlur": 0
+  },
+  "artworkAndIconColorsUnchanged": true,
+  "lightGoldControlFillsUnchanged": true,
+  "layoutAndTypeSizeUnchanged": true,
+  "previousVersionsPreserved": true,
+  "data": "Isolated empty-account rendering; no live account requests or writes."
+}

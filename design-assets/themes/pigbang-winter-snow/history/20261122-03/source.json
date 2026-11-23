@@ -1,0 +1,12 @@
+{
+  "theme": "PigBang 冬雪 · 水彩初雪",
+  "date": "2026-11-22",
+  "status": "design preview; not integrated into the app",
+  "selection": "User explicitly confirmed the third image in the earlier three-image set: blue watercolor snowflake, not the magic-circle illustration.",
+  "referencePage": "https://www.rawpixel.com/search/ice%20flakes%20snowflake%20transparent%20png",
+  "referenceImage": "https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV85X3dhdGVyY29sb3JfaWxsdXN0cmF0aW9uX29mX2Ffc25vd19mbGFrZV9yZWFsaV8yNTFkMDRkZS01M2M2LTRhMTgtYWUwMC00MGFmMmM5MWNmOWIucG5n.png",
+  "sourceLicense": "Not established; preview reference. No commercial-use license claim.",
+  "imageOperation": "Built-in image generation tool used for background extraction, preserving the selected watercolor snowflake artwork and removing the checkerboard.",
+  "editPrompt": "Image 1 is the edit target: the exact blue watercolor snowflake selected by the user for an app theme. Preserve the existing snowflake artwork faithfully: its eight main painted arms, uneven organic watercolor branches, cobalt-to-pale-blue pigment gradients, central blue bead, feathery edges and scattered blue paint droplets. Remove ONLY the gray-and-white checkerboard background. Output the snowflake and blue paint droplets on a genuinely transparent alpha background, including clean transparent spaces between branches and partial transparency at the soft painted edges. Keep the entire snowflake in frame, centered, with a little transparent padding. Do not redesign its silhouette, do not replace it with six-arm geometric crystals, do not add magic circles, runes, glow, new objects, text or watermark.",
+  "invariants": ["Preserve the established palette", "Preserve translucent cards", "Preserve layout and business logic", "Preserve red expense and green income"]
+}

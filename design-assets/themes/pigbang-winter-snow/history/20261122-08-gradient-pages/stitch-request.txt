@@ -1,0 +1,9 @@
+Continue the PigBang winter background study. The user rejected flat swatches and explicitly wants GRADIENT backgrounds demonstrated in the existing real app pages. Your scope is ONLY the page BACKGROUND, never the app UI. Do NOT design or change cards, layouts, typography, icons, buttons, charts, content, navigation, or the snowflake artwork.
+
+Provide exactly THREE mobile portrait background gradients, one per proposed family:
+1. 白→暖纸白 (white to warm paper white),
+2. 白→银灰 (white to neutral silver-gray),
+3. 白→淡香槟 (white to pale champagne).
+They should be visibly distinguishable gentle gradients, brightest at the top, a slightly richer but still light bottom. No large blue/cyan tint and no blue gradient. Keep the center calm for readable translucent cards. No additional patterns or textures, no extra decorative elements. Use original palette-family thinking from the previous board, but gradients must be visible at normal phone size.
+
+Return exact CSS linear-gradient declarations with angle and color stops for the three backgrounds. Also render three simple background-only mobile-ratio panels in the generated HTML, labeled in Chinese OUTSIDE the panels. Do not draw or add app UI at all: we will apply your background CSS to the app's existing actual rendered homepage and statistics page without changing any other design. Do not generate/redraw a snowflake; the selected original artwork is being extracted deterministically and will be overlaid locally, unchanged in form and pigment. Keep this screen as a new artifact, not an overwrite of the earlier palette board.

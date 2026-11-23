@@ -1,0 +1,70 @@
+[
+  {
+    "independentInkLayers": 3,
+    "transparentBackgrounds": true,
+    "originalSnowflakeUnchanged": true
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 430,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  },
+  {
+    "middleRegionRgbChangeFromPrevious": 27.413,
+    "contributions": [
+      {
+        "name": "lavender",
+        "middleRegionRgbChange": 5.092
+      },
+      {
+        "name": "cyan",
+        "middleRegionRgbChange": 4.678
+      },
+      {
+        "name": "mint",
+        "middleRegionRgbChange": 12.215
+      }
+    ],
+    "trendCardBackground": "rgba(255, 255, 255, 0.34)"
+  },
+  {
+    "trendControlsStillWork": true
+  },
+  {
+    "screen": "stats",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 430,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 1280,
+    "overflow": false
+  }
+]

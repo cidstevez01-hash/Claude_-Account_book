@@ -1,0 +1,64 @@
+[
+  {
+    "kind": "silver",
+    "snowflakeAndInkArtworkUnchanged": true,
+    "onlyInkClearanceAdded": true
+  },
+  {
+    "width": 320,
+    "clearance": [
+      {
+        "corner": "top",
+        "overlappingInkPixelsRemoved": 296,
+        "maxRemainingAlpha": 0
+      },
+      {
+        "corner": "bottom",
+        "overlappingInkPixelsRemoved": 0,
+        "maxRemainingAlpha": 0
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "clearance": [
+      {
+        "corner": "top",
+        "overlappingInkPixelsRemoved": 984,
+        "maxRemainingAlpha": 0
+      },
+      {
+        "corner": "bottom",
+        "overlappingInkPixelsRemoved": 1863,
+        "maxRemainingAlpha": 0
+      }
+    ]
+  },
+  {
+    "width": 480,
+    "clearance": [
+      {
+        "corner": "top",
+        "overlappingInkPixelsRemoved": 1632,
+        "maxRemainingAlpha": 0
+      },
+      {
+        "corner": "bottom",
+        "overlappingInkPixelsRemoved": 3932,
+        "maxRemainingAlpha": 0
+      }
+    ]
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  }
+]

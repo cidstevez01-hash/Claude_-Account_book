@@ -1,0 +1,94 @@
+[
+  {
+    "file": "approved-reference.png",
+    "sha256": "072adb1b570701bf4bed9a8645b8ca7ef5973e0f925d6fcca3cfa557a7eb1e40"
+  },
+  {
+    "file": "card-readability-detail.png",
+    "sha256": "f9614da51ed49ce27064716d0df20694be374a7b3bcf1c004b9ee92be3de421b"
+  },
+  {
+    "file": "comparison-pages.png",
+    "sha256": "ec8310d813824c226cd6504f809f2f2d4b4a76cd05bfcf2a5bd4da5a82c06e2f"
+  },
+  {
+    "file": "composition.json",
+    "sha256": "8c52b0aaff6321de9630e2a95c0e705b828b3cc7ad953ae0da44987d28daacea"
+  },
+  {
+    "file": "index.html",
+    "sha256": "c1f66f9114752b02aa2ce0aa40ce354b26333f5fae0ac7a32feb607d25d199ed"
+  },
+  {
+    "file": "preview-check.json",
+    "sha256": "5ec1444c7689ab5fad1419786fcf7480dd65112418a8ec98944d8aa1da9c2084"
+  },
+  {
+    "file": "previous-version-preserved.json",
+    "sha256": "de22787fb841df93d46e95ceac8cab71e17a4821ec1980a3494ddc8c1e488e46"
+  },
+  {
+    "file": "readable-cards-home.png",
+    "sha256": "2d76f077edc703e12a8d1ff8db3eab91d12f1f17e3896a86e32b98ad1c286ce6"
+  },
+  {
+    "file": "readable-cards-stats.png",
+    "sha256": "c0e1492101775121d0b5f55324c4bcd856e52df14b76bd75d6ffe2466503ae84"
+  },
+  {
+    "file": "render-preview.cjs",
+    "sha256": "b5ce7078a515a15e71a9d932870568e815d815a1f75c91a62f2ef13338e652dc"
+  },
+  {
+    "file": "source.json",
+    "sha256": "3222b8c9773adcf24d710fcb91398c1afc4f6c9212e088fe9865f1e302f02dff"
+  },
+  {
+    "file": "winter.css",
+    "sha256": "cd5d2a37c6313e5c8eb28bc70fe577ef80c1bffa72397ed37006f0602fbae145"
+  },
+  {
+    "file": "icons\\bar_chart.svg",
+    "sha256": "b666cd3833e6b5197b0bde83d39e1dd9daa518fb30af5d30cbe82f360809138c"
+  },
+  {
+    "file": "icons\\book.svg",
+    "sha256": "fc95fa5b052e045b207e5fcc24bdcf979cbf791afad0200c29e6242a71878e1b"
+  },
+  {
+    "file": "icons\\history.svg",
+    "sha256": "ad8f2c9ef43cbe92fdd7292be6eb734e7b319bc3f3279db9a9c8cda0684d5b0c"
+  },
+  {
+    "file": "layers\\00-paper.svg",
+    "sha256": "70e85ffd6d457af15034d9fcfc5d9aec79f2b23e632c621b1144c32db722420d"
+  },
+  {
+    "file": "layers\\10-original-ink.png",
+    "sha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e"
+  },
+  {
+    "file": "layers\\11-ink-color-filter.svg",
+    "sha256": "2fa6f7617d315337be53ab6627390196e47ea652f3d810331304a1a2cab4da82"
+  },
+  {
+    "file": "layers\\40-pearl-snowflake.png",
+    "sha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67"
+  },
+  {
+    "file": "layers\\41-approved-snowflake.png",
+    "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1"
+  },
+  {
+    "file": "styles\\composition.css",
+    "sha256": "cf4d0d7ce6b584d2554d4d18bb0666074587b001f3b75fd7fb4b764ce24345b3"
+  },
+  {
+    "file": "styles\\icon-palette.css",
+    "sha256": "2fdea4b838831a15091086fa8378989bc5c10ecf29bec024cae199427d2b18da"
+  },
+  {
+    "file": "styles\\readability.css",
+    "sha256": "f38040d3e76cf605664c63f4d3b19f08615729a78ff1ba0c9fa9cf0cdc4c4f57"
+  }
+]

@@ -4,6 +4,7 @@ import { useDraggableFab } from '../../hooks/useDraggableFab'
 import { useKeyboardInset } from '../../hooks/useKeyboardInset'
 import { useSettings } from '../../hooks/useSettings'
 import { loadMainFabPosition, saveMainFabPosition } from '../../lib/mainFabPosition'
+import { isWinterTheme } from '../../lib/themeSkin'
 
 /** R-XX：新建"+"和汇率快捷入口合并成一个可拖拽展开的悬浮按钮——参考Material Design
  * 的Speed Dial模式(很多App的"+"发布按钮都是这个路子：收起态一个圆按钮，点开在
@@ -60,6 +61,7 @@ interface SubLayout {
 export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) {
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer' || settings.themeSkin === 'autumn'
+  const accentToken = isSummer || isWinterTheme(settings.themeSkin) ? '--color-primary' : '--color-secondary'
   const keyboardOpen = useKeyboardInset() > 0
   const [expanded, setExpanded] = useState(false)
   const [subLayout, setSubLayout] = useState<SubLayout | null>(null)
@@ -168,8 +170,8 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
               background: 'color-mix(in srgb, var(--color-surface-container-lowest) 55%, transparent)',
               backdropFilter: 'blur(8px) saturate(140%)',
               WebkitBackdropFilter: 'blur(8px) saturate(140%)',
-              border: `1.5px dashed var(${isSummer ? '--color-primary' : '--color-secondary'})`,
-              color: `var(${isSummer ? '--color-primary' : '--color-secondary'})`,
+              border: `1.5px dashed var(${accentToken})`,
+              color: `var(${accentToken})`,
               boxShadow: '0 3px 10px -4px rgba(0,0,0,.3)',
               transform: subVisible ? 'scale(1)' : 'scale(0.5)',
               opacity: subVisible ? 1 : 0,
@@ -188,7 +190,7 @@ export function MainActionFab({ icon, ariaLabel, actions }: MainActionFabProps) 
                 inset: -8,
                 background: isSummer
                   ? 'radial-gradient(circle, rgba(232, 93, 74, 0.45) 0%, rgba(232, 93, 74, 0) 70%)'
-                  : 'radial-gradient(circle, color-mix(in srgb, var(--color-secondary) 45%, transparent) 0%, color-mix(in srgb, var(--color-secondary) 0%, transparent) 70%)',
+                  : `radial-gradient(circle, color-mix(in srgb, var(${accentToken}) 45%, transparent) 0%, color-mix(in srgb, var(${accentToken}) 0%, transparent) 70%)`,
               }}
               aria-hidden="true"
             />

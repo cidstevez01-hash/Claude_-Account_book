@@ -1,0 +1,9 @@
+{
+  "sourceSha256": "5a643d78eb57c3a9e998f861c158fe4de0b3857261d48e512af0464033ae27b0",
+  "width": 740,
+  "height": 740,
+  "method": "Flood-fill only the near-white background connected to the canvas border; soft alpha at its boundary; keep interior pearl/glitter highlights. No AI redraw or RGB edits.",
+  "changedRgbPixels": 0,
+  "transparentPixels": 432959,
+  "softEdgePixels": 5874
+}

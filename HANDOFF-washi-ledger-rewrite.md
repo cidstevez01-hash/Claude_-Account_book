@@ -76,7 +76,15 @@ washi-ledger/
 
 ## 版本号/分支/CI
 
-- 版本号：main 的 PigBang 基础版本为`1.0.0`；测试版本写入`washi-ledger/package.json`，规则为`{origin/main版本}-{YYYYMMDD}-dev.{N}`。同一天每次推送 N 加 1，新一天从 1 开始；日期按日本时间。当前工作版本为`1.0.0-20261109-dev.1`，记录见`VERSIONS.md`「PigBang 重写版」一节。该版本包含B-90编辑返回详情刷新修复，并保留「红叶 · 丹枫金秋」独立主题及落叶飘摆、翻面、卡片覆盖和后台暂停，原Image2素材及设计历史保留在`design-assets/themes/pigbang-autumn-maple/`，运行图层来源见`final/manifest.json`。
+### 冬雪主题 · 2026-11-23 最新确认
+
+- 用户已确认**暖金与银灰两版全部接入**，此前“冷色仅保留预览”已被取代。主题键为 `winter` / `winter-silver`，通过同一 `isWinterTheme` 判断共享持久背景和生命周期；两套配色与导航图标分别注册，不更改其它主题。
+- 暖金雪花必须逐字节使用 `approved-snowflake.json` 中锁定的 PNG（SHA256 `d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1`）。银灰保留原冷色 PNG（SHA256 `8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67`）。不可再加 CSS 换色滤镜、再生成或替换素材。
+- 晕染及散点必须绕开固定雪花完整外轮廓与周边留白；遮罩只施于墨染层，不能只用雪花盖住墨团。两版共用独立 `snowflake-clearance.svg`；墨染 `center/100% auto` 保留源图比例，不能拉伸到 `100% 100%`。
+- 设计历史完整保留于 `design-assets/themes/pigbang-winter-snow/history/`。22/23 是最终确认的两版设计；25 是 App 实际接入页面及图层，`final/` 与实际使用内容同步。页面为隔离空账本截图，展示状态栏和安全区经过模拟，不是真机截图。
+- 本地完成后未推送、未打 IPA。当前版本以 `washi-ledger/package.json` 实际值为准；下次推送前按日本日期和版本规则重新核对，不能照抄本文件历史版本号。
+
+- 版本号：main 的 PigBang 基础版本为`1.0.0`；测试版本写入`washi-ledger/package.json`，规则为`{origin/main版本}-{YYYYMMDD}-dev.{N}`。同一天每次推送 N 加 1，新一天从 1 开始；日期按日本时间。已推送记录见`VERSIONS.md`「PigBang 重写版」一节，本地工作版本以package.json实际值为准。「红叶 · 丹枫金秋」独立主题及落叶飘摆、翻面、卡片覆盖和后台暂停继续保留，原Image2素材及设计历史在`design-assets/themes/pigbang-autumn-maple/`，运行图层来源见`final/manifest.json`。
 - 分支：main 保存基线，当前测试分支为`pigbang_20261031`；历史`washi-ledger-rewrite`分支名只作追溯。
 - CI：`.github/workflows/washi-ledger-ci.yml`(push/PR改到`washi-ledger/**`时自动typecheck+build)、`.github/workflows/washi-ledger-ios-test-build.yml`(workflow_dispatch，出未签名 IPA；用户明确要求时可由 Codex 触发)。完整测试版本用于 App 显示和 IPA 文件名，原生短版本取数字基础版本，构建号取 Actions 运行号。
 - 每次改动的详细记录见`DEVLOG.md`里`washi-ledger-rewrite`分支那几行（跟`accountbook-YYYYMMDD`那条主线分开记录，见`DEVLOG.md`顶部的说明）

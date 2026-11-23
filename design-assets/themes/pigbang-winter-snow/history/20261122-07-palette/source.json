@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-22",
+  "scope": "Background color comparison only. Existing layout, cards, typography, icons, buttons and business logic are unchanged.",
+  "status": "awaiting user selection; no app changes from this palette study",
+  "projectId": "3427609373183458934",
+  "screenId": "ccbe9f8ee8334f7d89948e75873eff74",
+  "sourcePage": "https://www.rawpixel.com/image/12065853/png-white-background-paper",
+  "artwork": "Original preview used unchanged only in a separate reference area. Transparency problem remains unresolved; no generated replacement or checkerboard used as a candidate background.",
+  "palette": [
+    {
+      "name": "纯白",
+      "hex": "#FFFFFF"
+    },
+    {
+      "name": "珍珠灰白",
+      "hex": "#F4F4F6"
+    },
+    {
+      "name": "暖纸白",
+      "hex": "#FAF8F5"
+    },
+    {
+      "name": "奶油白",
+      "hex": "#F9F6F0"
+    },
+    {
+      "name": "浅玫瑰白",
+      "hex": "#FAF4F4"
+    }
+  ],
+  "stitchPreference": "#FAF8F5",
+  "referenceCorrection": "Stitch initially produced a placeholder image despite the supplied URL. Only that img src was corrected to embed the exact downloaded original JPEG in index.html and in the Stitch screen HTML. stitch-original.html and stitch-board.png preserve the initial tool output. The conversation palette uses the identical JPEG bytes, verified by SHA-256.",
+  "validation": "Five exact swatch colors, original reference image identity and selection interaction passed; no horizontal overflow at 320px, 390px and 736px. See palette-check.json.",
+  "imageMetadata": {
+    "mimeType": "png"
+  }
+}

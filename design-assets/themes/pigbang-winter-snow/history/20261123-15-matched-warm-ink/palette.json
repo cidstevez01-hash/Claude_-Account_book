@@ -1,0 +1,26 @@
+{
+  "name": "暖粉·蜜桃墨染",
+  "ink": [
+    {
+      "offset": "0",
+      "color": "#E1B9AE"
+    },
+    {
+      "offset": ".34",
+      "color": "#DEB3BE"
+    },
+    {
+      "offset": ".65",
+      "color": "#E6C89F"
+    },
+    {
+      "offset": "1",
+      "color": "#E4C1AB"
+    }
+  ],
+  "replacements": {
+    "#C6A4C9": "#E1B9AE",
+    "#D7B5CE": "#E4C1AB"
+  },
+  "snowflake": "Byte-identical to revision 14; no changes"
+}

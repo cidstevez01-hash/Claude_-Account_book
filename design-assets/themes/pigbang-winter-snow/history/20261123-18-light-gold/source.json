@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-23",
+  "status": "Design preview only; app source unchanged",
+  "scope": "Light gold and champagne icon paint. Bright champagne, peach and blush fills for the plus button and selected cashflow/points tab. Clear gold text on light surfaces. Approved snowflake, ink artwork, composition and layout unchanged.",
+  "baseline": "../20261123-17-locked-snowflake/composition.json",
+  "approvedSnowflake": {
+    "file": "layers/41-approved-snowflake.png",
+    "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+    "approval": "对，就是这张",
+    "reference": "../20261123-16-recovered-snowflake/recovered-snowflake.png",
+    "runtimeColorFilters": false
+  },
+  "snowflakeLocked": true,
+  "inkAndCardTransparencyUnchanged": true,
+  "iconGeometryUnchanged": true,
+  "previousVersionsPreserved": true,
+  "data": "Isolated empty-account rendering; no live account requests or writes."
+}

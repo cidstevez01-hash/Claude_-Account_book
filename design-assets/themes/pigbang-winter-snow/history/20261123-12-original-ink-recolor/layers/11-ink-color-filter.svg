@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+<defs>
+ <linearGradient id="pearl" x1="0" y1="0" x2="1" y2="1">
+  <stop stop-color="#B19BD1"/>
+  <stop offset=".38" stop-color="#A8CFDD"/>
+  <stop offset=".66" stop-color="#94D1B8"/>
+  <stop offset="1" stop-color="#C0A5D8"/>
+ </linearGradient>
+ <filter id="tint" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+  <feImage href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjE1MzYiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0icGVhcmwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICA8c3RvcCBzdG9wLWNvbG9yPSIjQjE5QkQxIi8+CiAgPHN0b3Agb2Zmc2V0PSIuMzgiIHN0b3AtY29sb3I9IiNBOENGREQiLz4KICA8c3RvcCBvZmZzZXQ9Ii42NiIgc3RvcC1jb2xvcj0iIzk0RDFCOCIvPgogIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0MwQTVEOCIvPgogPC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMjQiIGhlaWdodD0iMTUzNiIgZmlsbD0idXJsKCNwZWFybCkiLz48L3N2Zz4=" result="palette" preserveAspectRatio="none"/>
+  <feBlend in="palette" in2="SourceGraphic" mode="color" result="colored"/>
+  <feComposite in="colored" in2="SourceAlpha" operator="in"/>
+ </filter>
+</defs>
+<image href="./10-original-ink.png" width="1024" height="1536" filter="url(#tint)"/>
+</svg>

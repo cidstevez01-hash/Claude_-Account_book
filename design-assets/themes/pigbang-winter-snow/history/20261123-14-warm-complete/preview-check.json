@@ -1,0 +1,91 @@
+[
+  {
+    "previousVersionsPreserved": true,
+    "originalSourcesAndWarmInkUnchanged": true,
+    "warmSnowflakeKeepsSourceLocalColorVariation": true,
+    "allOriginalPigmentRegionsRetained": true
+  },
+  {
+    "selectedControlContrasts": [
+      {
+        "color": "#946171",
+        "whiteTextContrast": 4.99
+      },
+      {
+        "color": "#8D6B5B",
+        "whiteTextContrast": 4.79
+      },
+      {
+        "color": "#856B52",
+        "whiteTextContrast": 4.97
+      }
+    ]
+  },
+  {
+    "snowflakeMulticolor": {
+      "alphaMismatch": 0,
+      "whitePearlMismatch": 0,
+      "changedPixels": 108504,
+      "hueBins": {
+        "gold": 54702,
+        "peach": 28305,
+        "coral": 13755,
+        "warm-violet": 3210,
+        "violet": 29,
+        "other": 431
+      }
+    }
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "regions": [
+      {
+        "id": "top-left",
+        "visibleRgbDifference": 2.173
+      },
+      {
+        "id": "middle-right",
+        "visibleRgbDifference": 6.204
+      },
+      {
+        "id": "bottom-right",
+        "visibleRgbDifference": 1.651
+      }
+    ],
+    "colors": {
+      "title": "rgb(141, 94, 112)",
+      "menu": "rgb(149, 106, 122)",
+      "fab": "linear-gradient(115deg, rgb(148, 97, 113) 0%, rgb(141, 107, 91) 46%, rgb(133, 107, 82) 100%)",
+      "nav": "linear-gradient(110deg, rgba(250, 236, 228, 0.61) 0%, rgba(255, 248, 241, 0.78) 40%, rgba(255, 246, 239, 0.78) 60%, rgba(244, 226, 208, 0.5) 100%)"
+    },
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "regions": [
+      {
+        "id": "top-left",
+        "visibleRgbDifference": 2.036
+      },
+      {
+        "id": "middle-right",
+        "visibleRgbDifference": 5.388
+      },
+      {
+        "id": "bottom-right",
+        "visibleRgbDifference": 1.588
+      }
+    ],
+    "colors": {
+      "title": "rgb(141, 94, 112)",
+      "menu": "rgb(149, 106, 122)",
+      "fab": "linear-gradient(115deg, rgb(148, 97, 113) 0%, rgb(141, 107, 91) 46%, rgb(133, 107, 82) 100%)",
+      "nav": "linear-gradient(110deg, rgba(250, 236, 228, 0.61) 0%, rgba(255, 248, 241, 0.78) 40%, rgba(255, 246, 239, 0.78) 60%, rgba(244, 226, 208, 0.5) 100%)"
+    },
+    "overflow": false
+  }
+]

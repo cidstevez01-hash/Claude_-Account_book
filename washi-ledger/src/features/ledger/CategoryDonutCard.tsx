@@ -168,7 +168,7 @@ export function CategoryDonutCard({
                     </span>
                     <span
                       className="font-serif text-[13px] tabular-nums w-[82px] text-right shrink-0"
-                      style={{ color: tab === 'expense' ? 'var(--color-primary)' : 'var(--color-secondary)' }}
+                      style={{ color: tab === 'expense' ? 'var(--color-expense)' : 'var(--color-income)' }}
                     >
                       {formatCurrency(share.amount, currency)}
                     </span>

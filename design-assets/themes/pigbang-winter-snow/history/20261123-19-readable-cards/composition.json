@@ -1,0 +1,184 @@
+{
+  "date": "2026-11-23",
+  "viewport": [
+    390,
+    844
+  ],
+  "blendMode": "normal",
+  "layers": [
+    {
+      "id": "paper",
+      "name": "纯白底纸",
+      "file": "layers/00-paper.svg",
+      "z": 0,
+      "opacity": 1,
+      "fit": "fill"
+    },
+    {
+      "id": "original-ink",
+      "name": "原始墨团和散点，仅换色",
+      "file": "layers/11-ink-color-filter.svg",
+      "z": 1,
+      "opacity": 0.62,
+      "fit": "fill"
+    },
+    {
+      "id": "snow-top",
+      "name": "右上珠光雪花",
+      "file": "layers/41-approved-snowflake.png",
+      "z": 4,
+      "opacity": 1,
+      "width": 340,
+      "right": -115,
+      "top": -82
+    },
+    {
+      "id": "snow-bottom",
+      "name": "左下珠光雪花",
+      "file": "layers/41-approved-snowflake.png",
+      "z": 4,
+      "opacity": 1,
+      "width": 300,
+      "left": -145,
+      "bottom": -100
+    },
+    {
+      "id": "snow-fall",
+      "name": "飘雪",
+      "file": "layers/41-approved-snowflake.png",
+      "z": 5,
+      "opacity": 1,
+      "instances": 14
+    }
+  ],
+  "snowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "styles": [
+    "styles/icon-palette.css",
+    "styles/composition.css",
+    "styles/readability.css"
+  ],
+  "icons": [
+    {
+      "key": "book",
+      "file": "icons/book.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/book.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#C6A155",
+        "#F1D795",
+        "#DDB575"
+      ]
+    },
+    {
+      "key": "history",
+      "file": "icons/history.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/history.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#C09B50",
+        "#E9C982",
+        "#D6B67A"
+      ]
+    },
+    {
+      "key": "bar_chart",
+      "file": "icons/bar_chart.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/bar_chart.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#D2AF5F",
+        "#EDCF8E",
+        "#E6BD9C"
+      ]
+    }
+  ],
+  "centralWhiteOverlay": false,
+  "baseline": "../20261123-18-light-gold/composition.json",
+  "change": "Readability refinement only: deeper warm-gray text, opaque thin gold card borders, a slight white reading surface and inner highlight. Approved snowflake, ink artwork and light-gold icons/buttons stay unchanged.",
+  "originalInkSha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e",
+  "warmPalette": [
+    {
+      "offset": "0",
+      "color": "#E1B9AE"
+    },
+    {
+      "offset": ".34",
+      "color": "#DEB3BE"
+    },
+    {
+      "offset": ".65",
+      "color": "#E6C89F"
+    },
+    {
+      "offset": "1",
+      "color": "#E4C1AB"
+    }
+  ],
+  "inkRegions": [
+    {
+      "id": "top-left",
+      "rect": [
+        0,
+        0.06,
+        0.33,
+        0.22
+      ]
+    },
+    {
+      "id": "middle-right",
+      "rect": [
+        0.66,
+        0.3,
+        0.34,
+        0.3
+      ]
+    },
+    {
+      "id": "bottom-right",
+      "rect": [
+        0.6,
+        0.78,
+        0.4,
+        0.22
+      ]
+    }
+  ],
+  "cardSurface": {
+    "edgeOpacity": 0.3607843137254902,
+    "centerOpacity": 0.9490196078431372,
+    "backdropBlur": 0
+  },
+  "approvedSnowflake": {
+    "file": "layers/41-approved-snowflake.png",
+    "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+    "approval": "对，就是这张",
+    "reference": "../20261123-16-recovered-snowflake/recovered-snowflake.png",
+    "runtimeColorFilters": false
+  },
+  "controls": {
+    "fab": {
+      "stops": [
+        "#F6DFA6",
+        "#F7DFC0",
+        "#F3CDCD"
+      ],
+      "foreground": "#8B672C"
+    },
+    "selectedTab": {
+      "stops": [
+        "#F5DCA3",
+        "#F7DEBC",
+        "#F3D0CC"
+      ],
+      "foreground": "#705331"
+    }
+  },
+  "readability": {
+    "body": "#483C35",
+    "secondary": "#66574F",
+    "activeCategoryText": "#87672E",
+    "border": "#BEA06A",
+    "borderWidth": "unchanged",
+    "innerHighlight": "#FFFFFFE6"
+  }
+}

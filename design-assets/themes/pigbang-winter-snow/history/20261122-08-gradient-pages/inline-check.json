@@ -1,0 +1,33 @@
+[
+  {
+    "variant": "silver-gray",
+    "actualHomeAndStatsImages": true,
+    "selection": true
+  },
+  {
+    "variant": "champagne",
+    "actualHomeAndStatsImages": true,
+    "selection": true
+  },
+  {
+    "variant": "warm-paper",
+    "actualHomeAndStatsImages": true,
+    "selection": true
+  },
+  {
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "width": 736,
+    "overflow": false
+  },
+  {
+    "width": 1024,
+    "overflow": false
+  }
+]

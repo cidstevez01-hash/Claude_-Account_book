@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-23",
+  "status": "design preview; awaiting user choice; no app-source changes in this revision",
+  "scope": "Replace snowflake background art and add same-family pigment ink-wash background only. Existing cards, typography, icons, buttons, layouts and business logic stay locked.",
+  "referenceImage": "https://img.magnific.com/premium-psd/colorful-pastel-snowflake-3_799627-216.jpg?q=80&semt=ais_hybrid&w=740",
+  "referenceMatches": "Same snowflake as the user screenshot: pastel lavender, cyan, mint and glitter highlights.",
+  "referenceDimensions": [
+    740,
+    740
+  ],
+  "referenceAlpha": "Deterministic near-white connected-background removal only; unchanged RGB; see alpha-check.json.",
+  "sourceLicense": "No license established by this preview. Do not represent this as original app-owned art or freely licensed.",
+  "background": {
+    "base": "#FFFEFF",
+    "lavender": "#DAD0EF",
+    "violet": "#E9DEF3",
+    "mint": "#C8EEE5",
+    "cyan": "#CBE8F2",
+    "implementation": "Self-contained native SVG with soft irregular pigment edges, no raster generation."
+  },
+  "stitchProject": "3427609373183458934",
+  "stitchScreen": "dc179ce0db434dff991ea252b0d33576",
+  "data": "Isolated empty account; no fabricated entries and no live account requests or writes.",
+  "previewChrome": "Status bar and safe area simulated for display only."
+}

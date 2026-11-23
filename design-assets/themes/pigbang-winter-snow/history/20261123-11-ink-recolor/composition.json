@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-23",
+  "viewport": [
+    390,
+    844
+  ],
+  "blendMode": "normal",
+  "layers": [
+    {
+      "id": "paper",
+      "name": "底纸",
+      "file": "layers/00-paper.svg",
+      "z": 0,
+      "opacity": 1,
+      "fit": "fill"
+    },
+    {
+      "id": "wash",
+      "name": "原稿柔焦墨染",
+      "file": "layers/10-original-wash.svg",
+      "z": 1,
+      "opacity": 1,
+      "fit": "fill"
+    },
+    {
+      "id": "edges",
+      "name": "原稿水彩边缘",
+      "file": "layers/20-original-edges.svg",
+      "z": 2,
+      "opacity": 1,
+      "fit": "fill"
+    },
+    {
+      "id": "clear-center",
+      "name": "原稿中央留白",
+      "file": "layers/30-original-clear-center.svg",
+      "z": 3,
+      "opacity": 1,
+      "fit": "fill"
+    },
+    {
+      "id": "snow-top",
+      "name": "右上珠光雪花",
+      "file": "layers/40-pearl-snowflake.png",
+      "z": 4,
+      "opacity": 1,
+      "width": 340,
+      "right": -115,
+      "top": -82
+    },
+    {
+      "id": "snow-bottom",
+      "name": "左下珠光雪花",
+      "file": "layers/40-pearl-snowflake.png",
+      "z": 4,
+      "opacity": 1,
+      "width": 300,
+      "left": -145,
+      "bottom": -100
+    },
+    {
+      "id": "snow-fall",
+      "name": "飘雪",
+      "file": "layers/40-pearl-snowflake.png",
+      "z": 5,
+      "opacity": 1,
+      "instances": 14
+    }
+  ],
+  "snowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "styles": [
+    "styles/icon-palette.css",
+    "styles/composition.css"
+  ],
+  "icons": [
+    {
+      "key": "book",
+      "file": "icons/book.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/book.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#77509E",
+        "#9A80BA",
+        "#3B8876"
+      ]
+    },
+    {
+      "key": "history",
+      "file": "icons/history.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/history.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#2F7F6E",
+        "#5C9F9A",
+        "#7D63A6"
+      ]
+    },
+    {
+      "key": "bar_chart",
+      "file": "icons/bar_chart.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/bar_chart.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#429A82",
+        "#8B6BAA",
+        "#548CA1"
+      ]
+    }
+  ],
+  "cardOpacity": 0.7215686274509804,
+  "trendCardOpacity": 0.7215686274509804,
+  "centralWhiteOverlay": true,
+  "baseline": "../20261123-09-pearl-ink/pearl-ink-background.svg",
+  "change": "Only SVG color literals changed; original geometry, filters, gradient stops, opacity and central clearing preserved."
+}

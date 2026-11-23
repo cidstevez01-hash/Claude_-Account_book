@@ -1,0 +1,59 @@
+[
+  {
+    "viewport": 320,
+    "backgroundWidth": 320,
+    "clearance": [
+      {
+        "corner": "top",
+        "overlappingInkPixelsRemoved": 295,
+        "maxRemainingAlpha": 0
+      },
+      {
+        "corner": "bottom",
+        "overlappingInkPixelsRemoved": 0,
+        "maxRemainingAlpha": 0
+      }
+    ]
+  },
+  {
+    "viewport": 390,
+    "backgroundWidth": 390,
+    "clearance": [
+      {
+        "corner": "top",
+        "overlappingInkPixelsRemoved": 971,
+        "maxRemainingAlpha": 0
+      },
+      {
+        "corner": "bottom",
+        "overlappingInkPixelsRemoved": 1880,
+        "maxRemainingAlpha": 0
+      }
+    ]
+  },
+  {
+    "meanAlphaErrorAgainstApprovedPreview": 0.3908
+  },
+  {
+    "viewport": 1280,
+    "backgroundWidth": 480,
+    "clearance": [
+      {
+        "corner": "top",
+        "overlappingInkPixelsRemoved": 1600,
+        "maxRemainingAlpha": 0
+      },
+      {
+        "corner": "bottom",
+        "overlappingInkPixelsRemoved": 3918,
+        "maxRemainingAlpha": 0
+      }
+    ]
+  },
+  {
+    "theme": "winter-silver",
+    "integrated": true,
+    "approvedSnowflakeHashLocked": true,
+    "pageErrors": []
+  }
+]

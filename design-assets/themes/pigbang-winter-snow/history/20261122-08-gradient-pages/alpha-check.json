@@ -1,0 +1,10 @@
+{
+  "method": "Deterministic chroma alpha mask only, no generation or redraw. Neutral checkerboard and neutral JPEG noise removed; faint low-chroma pigment is partially transparent.",
+  "sourceSha256": "fe4848ab09f6bf6daacaa1e083ec0e2e89dc300639196f6cbd8fb50e605d4419",
+  "width": 800,
+  "height": 719,
+  "changedRgbPixels": 0,
+  "transparent": 402867,
+  "opaque": 142880,
+  "partial": 29453
+}

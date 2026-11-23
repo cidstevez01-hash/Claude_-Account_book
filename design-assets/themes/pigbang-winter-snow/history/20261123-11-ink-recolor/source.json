@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-23",
+  "status": "Preview only; awaiting visual approval; app source unchanged",
+  "baseline": "../20261123-09-pearl-ink/pearl-ink-background.svg",
+  "scope": "Only SVG color literals changed; original geometry, filters, gradient stops, opacity and central clearing preserved.",
+  "colors": {
+    "#DAD0EF": "#E1D2EC",
+    "#E9DEF3": "#F0E1F2",
+    "#C8EEE5": "#CDEADF",
+    "#CBE8F2": "#D2E6EE"
+  },
+  "independentLayers": [
+    "00-paper.svg",
+    "10-original-wash.svg",
+    "20-original-edges.svg",
+    "30-original-clear-center.svg"
+  ],
+  "sourceSnowflake": "../20261123-09-pearl-ink/pearl-snowflake-alpha.png",
+  "snowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "iconPalette": "Byte-identical to revision 10; no further icon changes",
+  "cardOpacity": "Restored to original ink preview #FFFFFFB8",
+  "data": "Isolated empty account. No live account requests or writes."
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "warm-paper",
+    "name": "暖纸白",
+    "css": "linear-gradient(180deg, #FFFFFF 0%, #FAF8F4 45%, #F4EFE6 100%)",
+    "stops": [
+      "#FFFFFF",
+      "#FAF8F4",
+      "#F4EFE6"
+    ]
+  },
+  {
+    "id": "silver-gray",
+    "name": "银灰",
+    "css": "linear-gradient(180deg, #FFFFFF 0%, #F6F7F9 50%, #ECEEF2 100%)",
+    "stops": [
+      "#FFFFFF",
+      "#F6F7F9",
+      "#ECEEF2"
+    ]
+  },
+  {
+    "id": "champagne",
+    "name": "淡香槟",
+    "css": "linear-gradient(180deg, #FFFFFF 0%, #FCFAF6 45%, #F5EFE3 100%)",
+    "stops": [
+      "#FFFFFF",
+      "#FCFAF6",
+      "#F5EFE3"
+    ]
+  }
+]

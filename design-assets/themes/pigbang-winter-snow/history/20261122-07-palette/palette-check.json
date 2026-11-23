@@ -1,0 +1,20 @@
+[
+  {
+    "paletteCount": 5,
+    "swatchColors": "passed",
+    "originalImageIdentity": "passed",
+    "selection": "passed"
+  },
+  {
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "width": 736,
+    "overflow": false
+  }
+]

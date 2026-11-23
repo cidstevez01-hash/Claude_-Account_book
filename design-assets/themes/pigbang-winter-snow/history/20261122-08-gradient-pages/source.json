@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-22",
+  "capturedOn": "2026-11-23",
+  "scope": "Preview actual rendered homepage and statistics page with background-only gradient variants. Existing UI layout, typography, cards, icons and buttons unchanged.",
+  "status": "preview; awaiting user's choice; no app-source changes in this revision",
+  "stitchProject": "3427609373183458934",
+  "stitchScreen": "675603afca9945ceba4de1ec843fe753",
+  "gradients": [
+    {
+      "id": "warm-paper",
+      "name": "暖纸白",
+      "css": "linear-gradient(180deg, #FFFFFF 0%, #FAF8F4 45%, #F4EFE6 100%)",
+      "stops": [
+        "#FFFFFF",
+        "#FAF8F4",
+        "#F4EFE6"
+      ]
+    },
+    {
+      "id": "silver-gray",
+      "name": "银灰",
+      "css": "linear-gradient(180deg, #FFFFFF 0%, #F6F7F9 50%, #ECEEF2 100%)",
+      "stops": [
+        "#FFFFFF",
+        "#F6F7F9",
+        "#ECEEF2"
+      ]
+    },
+    {
+      "id": "champagne",
+      "name": "淡香槟",
+      "css": "linear-gradient(180deg, #FFFFFF 0%, #FCFAF6 45%, #F5EFE3 100%)",
+      "stops": [
+        "#FFFFFF",
+        "#FCFAF6",
+        "#F5EFE3"
+      ]
+    }
+  ],
+  "originalArtwork": "Original downloaded JPEG; user authorized checkerboard removal. Only alpha changed, all decoded original RGB samples retained. No generated replacement snowflake or ink texture.",
+  "data": "Isolated empty account, no fabricated entries, no real account requests or writes.",
+  "nativeChrome": "Status bar and 54px safe area simulated in preview only."
+}

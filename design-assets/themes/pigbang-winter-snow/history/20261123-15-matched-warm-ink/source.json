@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-23",
+  "status": "Design preview only; app source unchanged",
+  "scope": "Only replace the two purple ink color stops with warm pink and peach matching the approved snowflake. Snowflake artwork and standalone preview, icons, card opacity, ink geometry and layout unchanged.",
+  "baseline": "../20261123-14-warm-complete/composition.json",
+  "originalInkSha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e",
+  "snowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "snowflakeFilterSha256": "2a728a91d135b6c8ee655c07e47a684b7cb62b0852446cbd0a3de9d91a121ab2",
+  "snowflakeStandaloneSha256": "03c1fa130111957665de06ec1cc5ac29ca9a1f3c9424dabdfd4db3882b536f84",
+  "inkDisplayOpacity": 0.62,
+  "cardSurface": {
+    "edgeOpacity": 0.2,
+    "centerOpacity": 0.82,
+    "backdropBlur": 0
+  },
+  "onlyTwoInkColorStopsChanged": true,
+  "previousArtifactsPreserved": true,
+  "data": "Isolated empty-account rendering; no live account requests or writes."
+}

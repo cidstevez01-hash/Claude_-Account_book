@@ -1,0 +1,93 @@
+/* Design preview only. This file is not imported by the application. */
+:root[data-preview-theme="winter"] {
+  --color-surface: #FFF9F5;
+  --color-background: #FFF9F5;
+  --color-surface-bright: #ffffff;
+  --color-surface-dim: #EBD9D0;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #FFF9F4;
+  --color-surface-container: #F6E9E2;
+  --color-surface-container-high: #F0E1D9;
+  --color-surface-container-highest: #ECDCD3;
+  --color-surface-variant: #EBDDD4;
+  --color-on-surface: #554344;
+  --color-on-background: #554344;
+  --color-on-surface-variant: #7B6562;
+  --color-inverse-surface: #503E40;
+  --color-inverse-on-surface: #FFF9F4;
+  --color-outline: #AB8A81;
+  --color-outline-variant: #DCC5BE;
+  --color-primary: #966475;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #966475;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #F6E5E2;
+  --color-primary-fixed-dim: #EBC9C5;
+  --color-on-primary-fixed: #654348;
+  --color-on-primary-fixed-variant: #986778;
+  --color-inverse-primary: #E8C1C5;
+  --color-app-title: #8E6073;
+  --color-secondary: #32785f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e2f0e9;
+  --color-on-secondary-container: #24523f;
+  --color-income: #32785f;
+  --color-expense: #b34c55;
+  --color-tertiary: #8b6c35;
+  --color-tertiary-container: #f2ebdc;
+  --color-on-tertiary-container: #654e25;
+  --color-link: #946B79;
+  --color-fab-icon: #ffffff;
+  --color-selected-day-ink: #ffffff;
+  --color-calendar-heat: #CDA58D;
+  --color-holiday: #b34c55;
+  --icon-gradient-top: #E7C4C5;
+  --icon-gradient-mid: #BC8B8B;
+  --icon-gradient-bottom: #966475;
+  --shadow-main-fab: 0 0 0 1px #ffffffd9, 0 0 20px #D3AB995e, 0 6px 14px #8F625226;
+}
+[data-preview-theme="winter"] body { background: #ffffff; }
+[data-preview-theme="winter"] .app-shell {
+  isolation: isolate;
+  background: #FFFEFF;
+}
+[data-preview-theme="winter"] .app-shell::before { content:none; }
+[data-preview-theme="winter"] .app-shell::after { content: none; }
+[data-preview-theme="winter"] .paper-grid-bg { background-image: none; }
+[data-preview-theme="winter"] [data-app-header] { background: transparent; border-bottom-color: transparent; }
+[data-preview-theme="winter"] .papercut-text-shadow { text-shadow: 0 1px 0 #ffffffbd; }
+[data-preview-theme="winter"] .papercut-shadow { box-shadow: 0 7px 22px #8F625210,inset 0 1px 0 #ffffffdc; }
+[data-preview-theme="winter"] :is(.ledger-card,.bg-surface-container-lowest) {
+  background-color: #ffffffb8; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-color: #D9BFB6B3;
+}
+[data-preview-theme="winter"] :is(section.bg-surface-container-lowest,.ledger-card) { border-style: solid; }
+[data-preview-theme="winter"] [data-date-range-bar] { background-color:#ffffff94;border-style:solid;border-color:#D9BFB6B3;box-shadow:inset 0 1px 0 #ffffff; }
+[data-preview-theme="winter"] .ledger-card { border-radius:20px;box-shadow:0 7px 22px #8F625210,inset 0 1px 0 #ffffffdc; }
+[data-preview-theme="winter"] .washi-tape-texture { background:repeating-linear-gradient(112deg,#F4E5DA9C 0 3px,#ffffffb0 3px 5px);border:1px solid #E4CABA80; }
+[data-preview-theme="winter"] .ledger-card .text-label-caps.text-primary { color:var(--color-expense); }
+[data-preview-theme="winter"] .autumn-summary-tile:nth-child(2) .text-stat-figure { color:var(--color-expense); }
+[data-preview-theme="winter"] nav {
+  background: #FFF8F2F0; border-color: #D9BFB6B3; box-shadow: 0 9px 28px #8F62521F,inset 0 1px 0 #fff;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+[data-preview-theme="winter"] .tab-bubble { background:linear-gradient(155deg,#ffffffeb,#F2DCD2DB);border:1px solid #D9B7A9C4;box-shadow:0 2px 8px #A6786726,inset 0 1px 1px #fff; }
+[data-preview-theme="winter"] .pb-navigation-icon { --pb-icon-accent:#E4C29C!important;--pb-icon-paper:#FFF9F4!important; }
+[data-preview-theme="winter"] .pb-navigation-icon[data-active="true"] { color:#966475; filter:drop-shadow(0 0 5px #E7C4C58C); }
+[data-preview-theme="winter"] .stamp-shadow { background:linear-gradient(145deg,#BF9294,#966475);box-shadow:var(--shadow-main-fab);border:1px solid #FFF9F4; }
+[data-preview-theme="winter"] :is(input,textarea,select) { color:var(--color-on-surface); }
+[data-preview-theme="winter"] [data-app-header] a[href="/account"] { box-shadow:0 0 0 1px #DDC4B8,0 0 0 5px #ffffff8c; }
+[data-preview-theme="winter"] .winter-fall-layer { position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;contain:layout paint; }
+[data-preview-theme="winter"] .winter-flake { position:absolute;top:-32px;left:var(--snow-x);width:var(--snow-size);height:var(--snow-size);background:url("./layers/41-approved-snowflake.png") center/contain no-repeat;opacity:1;animation:winter-snowfall var(--snow-duration) linear infinite;animation-delay:var(--snow-delay);animation-play-state:var(--snow-play-state,running);will-change:transform; }
+@keyframes winter-snowfall { from { transform:translate3d(0,-25px,0) rotate(0deg); } to { transform:translate3d(var(--snow-drift),950px,0) rotate(105deg); } }
+@media(prefers-reduced-motion:reduce) { [data-preview-theme="winter"] .winter-fall-layer { display:none; } }
+/* Native safe area and status are simulated only in the design preview. */
+.winter-preview-status { position:absolute;z-index:10;top:17px;left:29px;right:23px;height:24px;display:flex;align-items:center;justify-content:space-between;color:#503E40;font:600 14px/1 system-ui;pointer-events:none; }
+.winter-preview-island { position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:112px;height:29px;border-radius:22px;background:#142632; }
+.winter-preview-status-right { display:flex;align-items:center;gap:6px; }
+.winter-preview-signal { display:flex;align-items:end;gap:2px;height:12px; }
+.winter-preview-signal b {display:block;width:3px;background:#503E40;border-radius:1px;height:5px;}
+.winter-preview-signal b:nth-child(2){height:7px}.winter-preview-signal b:nth-child(3){height:10px}.winter-preview-signal b:nth-child(4){height:12px}
+.winter-preview-battery { width:23px;height:12px;border-radius:4px;border:1px solid #503E4060;position:relative;padding:1.5px; }
+.winter-preview-battery::before {content:"";display:block;width:82%;height:100%;background:#503E40;border-radius:2px;}
+.winter-preview-battery::after {content:"";position:absolute;right:-3px;top:3px;height:4px;width:2px;background:#503E4080;border-radius:1px;}

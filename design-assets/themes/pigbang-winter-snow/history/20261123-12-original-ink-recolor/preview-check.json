@@ -1,0 +1,22 @@
+[
+  {
+    "originalInkAndSnowflakeByteIdentical": true,
+    "originalInkPageOpacity": 0.18
+  },
+  {
+    "alphaMismatch": 0,
+    "colorChange": 11791302
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  }
+]

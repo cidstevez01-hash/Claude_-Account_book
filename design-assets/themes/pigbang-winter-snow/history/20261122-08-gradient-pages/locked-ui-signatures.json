@@ -1,0 +1,186 @@
+{
+  "home": [
+    {
+      "tag": "HEADER",
+      "text": "menuPigBangperson",
+      "rect": [
+        0,
+        54,
+        390,
+        64
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "",
+      "borderRadius": "0px",
+      "backgroundColor": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "calendar_today2026年11月1日~2026年11月30日",
+      "rect": [
+        16,
+        134,
+        358,
+        50
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "1px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "8px",
+      "backgroundColor": "rgba(255, 255, 255, 0.58)"
+    },
+    {
+      "tag": "SECTION",
+      "text": "累计结余JP¥0.00arrow_downward累计收入JP¥0arrow_upward累计支出JP¥0",
+      "rect": [
+        16,
+        196,
+        358,
+        207
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "2px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "20px",
+      "backgroundColor": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "tag": "SECTION",
+      "text": "支出收入分类这个月还没有记录",
+      "rect": [
+        16,
+        427,
+        358,
+        178.5
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "1px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "12px",
+      "backgroundColor": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "add",
+      "rect": [
+        312,
+        666,
+        58,
+        58
+      ],
+      "color": "rgb(255, 255, 255)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "1px solid rgb(247, 252, 255)",
+      "borderRadius": "9999px",
+      "backgroundColor": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "tag": "NAV",
+      "text": "概览出入金统计",
+      "rect": [
+        19.5,
+        741.5,
+        351,
+        78.5
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "1px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "9999px",
+      "backgroundColor": "rgba(248, 252, 255, 0.94)"
+    },
+    {
+      "tag": "NAV",
+      "text": "currency_exchange汇率换算calendar_month日历settings设置info关于",
+      "rect": [
+        -304.1875,
+        77.75,
+        303.1875,
+        766.25
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "15px / 22.5px \"Noto Sans SC\", sans-serif",
+      "border": "0px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "0px",
+      "backgroundColor": "rgba(248, 252, 255, 0.94)"
+    }
+  ],
+  "stats": [
+    {
+      "tag": "HEADER",
+      "text": "menu统计person",
+      "rect": [
+        0,
+        54,
+        390,
+        64
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "",
+      "borderRadius": "0px",
+      "backgroundColor": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "tag": "SECTION",
+      "text": "收支趋势支出收入按日按月00111123456789101112131415161718192021222324252627282930",
+      "rect": [
+        16,
+        362.15625,
+        358,
+        295
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "1px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "12px",
+      "backgroundColor": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "add",
+      "rect": [
+        312,
+        666,
+        58,
+        58
+      ],
+      "color": "rgb(255, 255, 255)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "1px solid rgb(247, 252, 255)",
+      "borderRadius": "9999px",
+      "backgroundColor": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "tag": "NAV",
+      "text": "概览出入金统计",
+      "rect": [
+        19.5,
+        741.5,
+        351,
+        78.5
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "16px / 24px \"Noto Sans SC\", sans-serif",
+      "border": "1px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "9999px",
+      "backgroundColor": "rgba(248, 252, 255, 0.94)"
+    },
+    {
+      "tag": "NAV",
+      "text": "currency_exchange汇率换算calendar_month日历settings设置info关于",
+      "rect": [
+        -304.1875,
+        77.75,
+        303.1875,
+        766.25
+      ],
+      "color": "rgb(32, 61, 83)",
+      "font": "15px / 22.5px \"Noto Sans SC\", sans-serif",
+      "border": "0px solid rgba(180, 207, 223, 0.7)",
+      "borderRadius": "0px",
+      "backgroundColor": "rgba(248, 252, 255, 0.94)"
+    }
+  ]
+}

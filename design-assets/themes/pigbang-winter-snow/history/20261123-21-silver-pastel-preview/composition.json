@@ -1,0 +1,185 @@
+{
+  "date": "2026-11-23",
+  "viewport": [
+    390,
+    844
+  ],
+  "blendMode": "normal",
+  "layers": [
+    {
+      "id": "paper",
+      "name": "纯白底纸",
+      "file": "layers/00-paper.svg",
+      "z": 0,
+      "opacity": 1,
+      "fit": "fill"
+    },
+    {
+      "id": "original-ink",
+      "name": "原始墨团和散点，仅换色",
+      "file": "layers/11-ink-color-filter.svg",
+      "z": 1,
+      "opacity": 0.62,
+      "fit": "fill"
+    },
+    {
+      "id": "snow-top",
+      "name": "右上珠光雪花",
+      "file": "layers/41-approved-snowflake.png",
+      "z": 4,
+      "opacity": 1,
+      "width": 340,
+      "right": -115,
+      "top": -82
+    },
+    {
+      "id": "snow-bottom",
+      "name": "左下珠光雪花",
+      "file": "layers/41-approved-snowflake.png",
+      "z": 4,
+      "opacity": 1,
+      "width": 300,
+      "left": -145,
+      "bottom": -100
+    },
+    {
+      "id": "snow-fall",
+      "name": "飘雪",
+      "file": "layers/41-approved-snowflake.png",
+      "z": 5,
+      "opacity": 1,
+      "instances": 14
+    }
+  ],
+  "snowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "styles": [
+    "styles/icon-palette.css",
+    "styles/composition.css",
+    "styles/readability.css",
+    "styles/pastel-accents.css"
+  ],
+  "icons": [
+    {
+      "key": "book",
+      "file": "icons/book.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/book.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#9FB5D7",
+        "#C8CEE9",
+        "#C7B5D7"
+      ]
+    },
+    {
+      "key": "history",
+      "file": "icons/history.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/history.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#99B3CB",
+        "#C4DDE8",
+        "#C0AECF"
+      ]
+    },
+    {
+      "key": "bar_chart",
+      "file": "icons/bar_chart.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/bar_chart.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#A3BED7",
+        "#C4BCE2",
+        "#DABFD7"
+      ]
+    }
+  ],
+  "centralWhiteOverlay": false,
+  "baseline": "../20261123-20-silver-preview/composition.json",
+  "change": "Silver-gray base with light ice-blue and lilac-pink accents in pigment, controls and icons. Original cool snowflake and approved geometry remain unchanged.",
+  "originalInkSha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e",
+  "inkRegions": [
+    {
+      "id": "top-left",
+      "rect": [
+        0,
+        0.06,
+        0.33,
+        0.22
+      ]
+    },
+    {
+      "id": "middle-right",
+      "rect": [
+        0.66,
+        0.3,
+        0.34,
+        0.3
+      ]
+    },
+    {
+      "id": "bottom-right",
+      "rect": [
+        0.6,
+        0.78,
+        0.4,
+        0.22
+      ]
+    }
+  ],
+  "cardSurface": {
+    "edgeOpacity": 0.3607843137254902,
+    "centerOpacity": 0.9490196078431372,
+    "backdropBlur": 0
+  },
+  "approvedSnowflake": {
+    "file": "layers/41-approved-snowflake.png",
+    "sha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+    "reference": "../20261123-09-pearl-ink/pearl-snowflake-alpha.png",
+    "runtimeColorFilters": false,
+    "approval": "银灰主色，保留原冷色雪花"
+  },
+  "controls": {
+    "fab": {
+      "stops": [
+        "#DEE7F3",
+        "#E8E2F2",
+        "#F4E0EB"
+      ],
+      "foreground": "#627189"
+    },
+    "selectedTab": {
+      "stops": [
+        "#DDE7F4",
+        "#E7E4F1",
+        "#EEDFED"
+      ],
+      "foreground": "#596A80"
+    }
+  },
+  "readability": {
+    "body": "#3B3F43",
+    "secondary": "#575B5F",
+    "activeCategoryText": "#676B6F",
+    "border": "#9FA3A7",
+    "borderWidth": "unchanged",
+    "innerHighlight": "#FFFFFFE6"
+  },
+  "inkPalette": [
+    {
+      "offset": "0",
+      "color": "#CAD4E1"
+    },
+    {
+      "offset": ".34",
+      "color": "#DBD6E4"
+    },
+    {
+      "offset": ".65",
+      "color": "#C7D9E2"
+    },
+    {
+      "offset": "1",
+      "color": "#DCCFDC"
+    }
+  ]
+}

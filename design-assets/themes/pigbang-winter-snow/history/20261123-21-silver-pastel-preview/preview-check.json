@@ -1,0 +1,18 @@
+[
+  {
+    "originalCoolSnowflakeUnchanged": true,
+    "incomeExpenseSemanticsPreserved": true
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  }
+]

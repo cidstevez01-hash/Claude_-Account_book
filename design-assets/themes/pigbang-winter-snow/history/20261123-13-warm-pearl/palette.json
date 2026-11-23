@@ -1,0 +1,21 @@
+{
+  "name": "轻暖珠光",
+  "stops": [
+    {
+      "offset": "0",
+      "color": "#C6A4C9"
+    },
+    {
+      "offset": ".34",
+      "color": "#DEB3BE"
+    },
+    {
+      "offset": ".65",
+      "color": "#E6C89F"
+    },
+    {
+      "offset": "1",
+      "color": "#D7B5CE"
+    }
+  ]
+}

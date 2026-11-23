@@ -1,0 +1,9 @@
+[data-preview-theme="winter"] .pearl-composition { position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1; }
+[data-preview-theme="winter"] .pearl-composition > .pearl-layer { position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none; }
+[data-preview-theme="winter"] .pearl-composition > .pearl-snow { position:absolute;height:auto;pointer-events:none; }
+[data-preview-theme="winter"] .pearl-composition > .winter-fall-layer { z-index:5; }
+[data-preview-theme="winter"] :is(.ledger-card,.bg-surface-container-lowest) { background-color:rgba(255,255,255,.56);border-color:#C4B4D3B8; }
+[data-preview-theme="winter"] .ledger-card { background-color:rgba(255,255,255,.64); }
+[data-preview-theme="winter"][data-preview-screen="stats"] main section.bg-surface-container-lowest { background-color:rgba(255,255,255,.34); }
+[data-preview-theme="winter"] [data-date-range-bar] { background:linear-gradient(110deg,#EFE2F3A8,#E4EFF1A0,#DAF1E6A8);border-color:#BFB1D1B8; }
+[data-preview-theme="winter"] .autumn-summary-tile { background-color:#FFFFFF9E; }

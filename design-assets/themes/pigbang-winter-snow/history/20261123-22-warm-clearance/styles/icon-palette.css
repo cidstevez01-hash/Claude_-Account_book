@@ -1,0 +1,26 @@
+:root[data-preview-theme="winter"] {
+ --color-primary:#A17E3C;--color-primary-container:#F4DBAE;--color-on-primary-container:#705331;
+ --color-primary-fixed:#FFF0D1;--color-on-primary-fixed:#705331;
+ --color-fab-icon:#8B672C;--color-surface-container:#FFF2DC;--color-surface-container-highest:#F9E8C9;
+ --icon-gradient-top:#F3DDA4;--icon-gradient-mid:#E3C27C;--icon-gradient-bottom:#C6A155;
+ --shadow-main-fab:0 0 0 1px #FFFFFFE6,0 0 18px #EBC77B4F,0 5px 14px #D5AF6530;
+}
+[data-preview-theme="winter"] nav.bottom-nav-shell {background:linear-gradient(110deg,#FFF4E89C 0%,#FFFAF0C7 40%,#FFF8EBC7 60%,#FBE8D580 100%);border-color:#E6CEA8B8;box-shadow:0 9px 28px #D7B77824,inset 0 1px 0 #FFFFFF;backdrop-filter:none;-webkit-backdrop-filter:none;}
+[data-preview-theme="winter"] .tab-bubble {background:linear-gradient(120deg,#FFF2CDEB,#F8E3BCEB,#F8DCD0ED);border-color:#DFC18BBB;box-shadow:0 2px 8px #D9B66C30,inset 0 1px 1px #FFFFFF;}
+[data-preview-theme="winter"] nav a[href="/"] {color:#92703B;}
+[data-preview-theme="winter"] nav a[href="/history"] {color:#95763D;}
+[data-preview-theme="winter"] nav a[href="/stats"] {color:#997541;}
+[data-preview-theme="winter"] .pb-navigation-icon[data-icon="book"] {color:#C6A155!important;}
+[data-preview-theme="winter"] .pb-navigation-icon[data-icon="history"] {color:#C09B50!important;}
+[data-preview-theme="winter"] .pb-navigation-icon[data-icon="bar_chart"] {color:#D2AF5F!important;}
+[data-preview-theme="winter"] .pb-navigation-icon {--pb-icon-accent:#F3D69D!important;--pb-icon-paper:#FFFBF3!important;filter:none!important;}
+[data-preview-theme="winter"] [data-app-header] button .material-symbols-outlined {color:#BD9545;}
+[data-preview-theme="winter"] [data-app-header] a[href="/account"] {color:#B28B3D;background:linear-gradient(135deg,#FFF2CFB3,#F9E7D3B3,#F9DCD7B3);box-shadow:0 0 0 1px #E7CE9E,0 0 0 5px #FFFFFF73;}
+[data-preview-theme="winter"] [data-date-range-bar] .material-symbols-outlined {color:#BD9545;}
+[data-preview-theme="winter"] .stamp-shadow {background:linear-gradient(115deg,#F6DFA6 0%,#F7DFC0 50%,#F3CDCD 100%);color:#8B672C;border-color:#FFFDF6;box-shadow:var(--shadow-main-fab);}
+[data-preview-theme="winter"] .stamp-shadow .material-symbols-outlined {color:#8B672C;}
+[data-preview-theme="winter"] .bg-surface-container-highest.rounded-lg {background:linear-gradient(110deg,#FBEDCEE8,#FBECDDE0,#F9DFD5E8);}
+[data-preview-theme="winter"] .bg-surface-container-highest.rounded-lg button {color:#836942;}
+[data-preview-theme="winter"] .bg-surface-container-highest.rounded-lg button.bg-surface {background:linear-gradient(112deg,#F3DDB0,#F8E1C8,#F4D4C8);color:#705331;}
+[data-preview-theme="winter"] main .bg-primary-container.rounded-full {background:linear-gradient(115deg,#F5DCA3 0%,#F7DEBC 50%,#F3D0CC 100%);}
+[data-preview-theme="winter"] main .w-full.bg-surface-container.rounded-full {background:linear-gradient(110deg,#FFF5E4DA,#FFF1E8D6,#FFF4E7DA);border-color:#E5CAA088;}

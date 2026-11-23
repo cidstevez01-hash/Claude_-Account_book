@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PigBang 冬季雪花主题背景色对比研究 (Background Palette Study)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-neutral-900 text-neutral-100 min-h-screen p-6 md:p-10 flex flex-col justify-between">
+<!-- Header Section -->
+<header class="max-w-7xl mx-auto w-full mb-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b border-neutral-700/80 pb-5 gap-4">
+<div>
+<div class="flex items-center gap-3">
+<span class="px-2.5 py-0.5 rounded text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">Design Specification</span>
+<span class="text-xs text-neutral-400">Isolated Palette Study • Non-Blue Light Tones</span>
+</div>
+<h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mt-2">
+          PigBang 冬季雪花主题 · 背景基色对比研究看板
+        </h1>
+<p class="text-sm text-neutral-400 mt-1 max-w-3xl leading-relaxed">
+          严格遵循要求：拒绝大面积蓝/青色蒙版与深色底色，仅测试五款可清晰分辨的极浅非蓝背景基色，确保比对样本尺寸、标签规范完全一致，仅通过背景基底色温与纯度呈现纯粹视觉差异。
+        </p>
+</div>
+<div class="bg-neutral-800/90 rounded-lg p-3 px-4 border border-neutral-700 text-xs text-neutral-300 shrink-0">
+<span class="font-medium text-amber-400 block mb-1">设计评估建议结论</span>
+<span>首选推荐：<strong class="text-white">暖纸白 (#FAF8F5)</strong> 或 <strong class="text-white">微香槟白 (#F9F6F0)</strong>，能中和水彩群青冷调并烘托冬季温润质感。</span>
+</div>
+</div>
+</header>
+<!-- Main Comparison Area: Exactly 5 Swatches -->
+<main class="max-w-7xl mx-auto w-full flex-1">
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 lg:gap-5 mb-8">
+<!-- Swatch 1: Pure White -->
+<div class="flex flex-col bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700/80 shadow-lg">
+<!-- Color Display Box -->
+<div class="h-64 sm:h-72 w-full relative flex flex-col items-center justify-center p-6 border-b border-neutral-700/60" style="background-color: #FFFFFF;">
+<div class="w-20 h-20 rounded-full border border-neutral-200/80 shadow-sm flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+<span class="text-xs text-neutral-400 font-mono">100% L</span>
+</div>
+<span class="text-[11px] text-neutral-500 mt-4 tracking-wide font-medium">高明度纯净基底</span>
+</div>
+<!-- Meta Label -->
+<div class="p-4 bg-neutral-800/95 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-mono px-2 py-0.5 rounded bg-neutral-700 text-neutral-200 font-semibold">#FFFFFF</span>
+<span class="text-[11px] text-neutral-400">方案 01</span>
+</div>
+<h3 class="text-base font-semibold text-white mt-1">纯白</h3>
+<p class="text-xs text-neutral-400 mt-1 leading-normal">
+              绝对无偏色冷白。最大化凸显蓝色水彩雪花的原本笔触与饱和度，对比最强烈，视觉边缘最清晰。
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-neutral-700/50 text-[11px] text-neutral-400">
+            特性：极简、高对比、纯粹透亮
+          </div>
+</div>
+</div>
+<!-- Swatch 2: Pearl Soft Gray White -->
+<div class="flex flex-col bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700/80 shadow-lg">
+<!-- Color Display Box -->
+<div class="h-64 sm:h-72 w-full relative flex flex-col items-center justify-center p-6 border-b border-neutral-700/60" style="background-color: #F4F4F6;">
+<div class="w-20 h-20 rounded-full border border-neutral-300/60 shadow-sm flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+<span class="text-xs text-neutral-500 font-mono">珍珠冷灰</span>
+</div>
+<span class="text-[11px] text-neutral-500 mt-4 tracking-wide font-medium">中性微明度基底</span>
+</div>
+<!-- Meta Label -->
+<div class="p-4 bg-neutral-800/95 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-mono px-2 py-0.5 rounded bg-neutral-700 text-neutral-200 font-semibold">#F4F4F6</span>
+<span class="text-[11px] text-neutral-400">方案 02</span>
+</div>
+<h3 class="text-base font-semibold text-white mt-1">中性珍珠灰白</h3>
+<p class="text-xs text-neutral-400 mt-1 leading-normal">
+              极微弱的纯中性灰调珍珠感。完全不含蓝绿色成分，柔和消解长时间纯白带来的刺眼感，质感沉稳克制。
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-neutral-700/50 text-[11px] text-neutral-400">
+            特性：柔和耐看、抗眩光、现代雅致
+          </div>
+</div>
+</div>
+<!-- Swatch 3: Warm Paper White -->
+<div class="flex flex-col bg-neutral-800 rounded-xl overflow-hidden border border-amber-500/40 shadow-lg ring-1 ring-amber-500/20">
+<!-- Color Display Box -->
+<div class="h-64 sm:h-72 w-full relative flex flex-col items-center justify-center p-6 border-b border-neutral-700/60" style="background-color: #FAF8F5;">
+<div class="w-20 h-20 rounded-full border border-amber-200/60 shadow-sm flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+<span class="text-xs text-amber-800/80 font-mono">纸质温润</span>
+</div>
+<span class="text-[11px] text-amber-900/60 mt-4 tracking-wide font-medium">水彩画纸天然色</span>
+</div>
+<!-- Meta Label -->
+<div class="p-4 bg-neutral-800/95 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30">#FAF8F5</span>
+<span class="text-[11px] text-amber-400 font-medium">★ 首选推荐</span>
+</div>
+<h3 class="text-base font-semibold text-white mt-1">暖纸白</h3>
+<p class="text-xs text-neutral-400 mt-1 leading-normal">
+              仿真水彩棉浆画纸原浆温润感。暖调细致平稳，能极好地衬托出原图冷蓝飞溅墨点的艺术质感与冬季温度。
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-neutral-700/50 text-[11px] text-neutral-400">
+            特性：烘托艺术感、自然亲和、温润柔美
+          </div>
+</div>
+</div>
+<!-- Swatch 4: Very Pale Champagne / Cream -->
+<div class="flex flex-col bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700/80 shadow-lg">
+<!-- Color Display Box -->
+<div class="h-64 sm:h-72 w-full relative flex flex-col items-center justify-center p-6 border-b border-neutral-700/60" style="background-color: #F9F6F0;">
+<div class="w-20 h-20 rounded-full border border-yellow-200/60 shadow-sm flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+<span class="text-xs text-stone-700/80 font-mono">微甘醇香</span>
+</div>
+<span class="text-[11px] text-stone-600/70 mt-4 tracking-wide font-medium">柔和奶油色系</span>
+</div>
+<!-- Meta Label -->
+<div class="p-4 bg-neutral-800/95 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-mono px-2 py-0.5 rounded bg-neutral-700 text-neutral-200 font-semibold">#F9F6F0</span>
+<span class="text-[11px] text-neutral-400">方案 04</span>
+</div>
+<h3 class="text-base font-semibold text-white mt-1">微香槟奶油白</h3>
+<p class="text-xs text-neutral-400 mt-1 leading-normal">
+              极淡的香槟奶油底色，带来舒适惬意的冬日暖炉氛围，平衡水彩雪花冷调，避免冰冷距离感。
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-neutral-700/50 text-[11px] text-neutral-400">
+            特性：冬日暖意、舒适静谧、柔和高贵
+          </div>
+</div>
+</div>
+<!-- Swatch 5: Restrained Pale Rose White -->
+<div class="flex flex-col bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700/80 shadow-lg">
+<!-- Color Display Box -->
+<div class="h-64 sm:h-72 w-full relative flex flex-col items-center justify-center p-6 border-b border-neutral-700/60" style="background-color: #FAF4F4;">
+<div class="w-20 h-20 rounded-full border border-rose-200/60 shadow-sm flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+<span class="text-xs text-rose-900/60 font-mono">微蕴粉白</span>
+</div>
+<span class="text-[11px] text-rose-800/60 mt-4 tracking-wide font-medium">克制微粉暖底</span>
+</div>
+<!-- Meta Label -->
+<div class="p-4 bg-neutral-800/95 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-mono px-2 py-0.5 rounded bg-neutral-700 text-neutral-200 font-semibold">#FAF4F4</span>
+<span class="text-[11px] text-neutral-400">方案 05</span>
+</div>
+<h3 class="text-base font-semibold text-white mt-1">克制浅玫瑰白</h3>
+<p class="text-xs text-neutral-400 mt-1 leading-normal">
+              极度克制的淡粉玫瑰调白。与原图蓝色水彩形成天然柔和冷暖补色呼应，具有微妙的冬日晚霞与雪景反光意境。
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-neutral-700/50 text-[11px] text-neutral-400">
+            特性：冷暖微妙映衬、优雅、具诗意情绪
+          </div>
+</div>
+</div>
+</div>
+<!-- Independent Unmodified Reference Artwork Display Area -->
+<div class="bg-neutral-800/90 rounded-xl border border-neutral-700/90 p-5 md:p-6 mb-4">
+<div class="flex flex-col lg:flex-row items-center gap-6">
+<!-- Left: Image Box with literal unmodified reference URL -->
+<div class="w-full lg:w-72 shrink-0 flex flex-col items-center justify-center bg-neutral-900/80 rounded-lg p-3 border border-neutral-700">
+<div class="relative w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center overflow-hidden rounded bg-neutral-950">
+<img alt="RawPixel Original Snowflake Reference Artwork" class="max-w-full max-h-full object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+</div>
+<span class="text-[11px] text-neutral-400 mt-2 font-mono text-center">原始参考素材（含固化棋盘背景）</span>
+</div>
+<!-- Right: Reference Notes and Specifications -->
+<div class="flex-1 space-y-3">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-sky-950 text-sky-400 border border-sky-800 rounded text-xs font-semibold">独立参考区 · 原始水彩雪花</span>
+<span class="text-xs text-neutral-400 font-mono">未作任何重新绘制、着色或篡改</span>
+</div>
+<h2 class="text-lg font-bold text-white">指定水彩雪花原图及色彩匹配说明</h2>
+<p class="text-xs text-neutral-300 leading-relaxed">
+            上方图片直接采用用户指定之 RawPixel 原始资源原链接（包含蓝色有机分支、中心蓝珠及飞溅水彩圆点）。严格遵守要求：未对图片进行任何透明度硬抠图或虚假去底，亦未将烘焙棋盘格平铺于任何测试色样中，完全置于独立对比说明区供校对色温配合。
+          </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 text-xs">
+<div class="bg-neutral-900/60 p-2.5 rounded border border-neutral-700/60">
+<span class="text-neutral-400 block font-medium">雪花核心色彩提取</span>
+<span class="text-neutral-200 mt-0.5 block">钴蓝至群青水彩（#2A5C9A, #4E83C1, #7FA7D9）</span>
+</div>
+<div class="bg-neutral-900/60 p-2.5 rounded border border-neutral-700/60">
+<span class="text-neutral-400 block font-medium">非蓝基色搭配逻辑</span>
+<span class="text-neutral-200 mt-0.5 block">以 96%~100% 极高明度微暖/中性底色避免全屏发蓝</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Metadata -->
+<footer class="max-w-7xl mx-auto w-full pt-4 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-2">
+<div>PigBang Winter Theme • Color Palette Research Artifact • 纯色板比对看板</div>
+<div class="font-mono text-neutral-400">Pure White (#FFFFFF) | Pearl (#F4F4F6) | Warm Paper (#FAF8F5) | Champagne (#F9F6F0) | Pale Rose (#FAF4F4)</div>
+</footer>
+</body>
+</html>
+

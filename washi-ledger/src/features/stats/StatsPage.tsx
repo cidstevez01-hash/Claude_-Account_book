@@ -308,6 +308,7 @@ export function StatsPage() {
               aggregate={trendAggregate}
               selectedBucket={selectedTrendIdx != null ? trendBuckets[selectedTrendIdx] : null}
               valuePrefix={symbolFor(settings.currency)}
+              valueColorClass={trendType === 'expense' ? 'text-expense' : 'text-income'}
               onSelectCategory={(catCode) => setDetailCatCode(catCode)}
               onClosePoint={() => setSelectedTrendIdx(null)}
               resetKey={`${trendDim}-${trendType}-${trendPeriodLabel}`}

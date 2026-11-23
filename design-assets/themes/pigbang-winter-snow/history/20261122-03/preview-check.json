@@ -1,0 +1,36 @@
+[
+  {
+    "screen": "home",
+    "width": 390,
+    "overflow": false,
+    "cardBackground": "rgba(255, 255, 255, 0.72)"
+  },
+  {
+    "screen": "stats",
+    "width": 390,
+    "overflow": false,
+    "cardBackground": "rgba(255, 255, 255, 0.72)"
+  },
+  {
+    "snowMoves": true,
+    "count": 14
+  },
+  {
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "width": 430,
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "gallerySwitches": true
+  },
+  {
+    "galleryMobileOverflow": false
+  }
+]

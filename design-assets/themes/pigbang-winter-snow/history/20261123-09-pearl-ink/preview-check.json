@@ -1,0 +1,50 @@
+[
+  {
+    "screen": "home",
+    "background": "native pastel SVG ink wash",
+    "originalPearlArt": true,
+    "otherUiIdenticalToPreviousPreview": true,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 430,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "background": "native pastel SVG ink wash",
+    "originalPearlArt": true,
+    "otherUiIdenticalToPreviousPreview": true,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 430,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "galleryHasBothActualPages": true,
+    "galleryMobileOverflow": false
+  }
+]

@@ -1,0 +1,55 @@
+[
+  {
+    "previousVersionPreserved": true,
+    "snowflakeArtworkAndStandaloneByteIdentical": true,
+    "iconsCardOpacityLayoutUnchanged": true,
+    "onlyTwoInkColorStopsChanged": true
+  },
+  {
+    "ink": {
+      "alphaMismatch": 0,
+      "visiblePigmentPixels": 131483,
+      "purplePigmentPixels": 0
+    }
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "regions": [
+      {
+        "id": "top-left",
+        "visibleRgbDifference": 2.403
+      },
+      {
+        "id": "middle-right",
+        "visibleRgbDifference": 6.299
+      },
+      {
+        "id": "bottom-right",
+        "visibleRgbDifference": 1.816
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "regions": [
+      {
+        "id": "top-left",
+        "visibleRgbDifference": 2.262
+      },
+      {
+        "id": "middle-right",
+        "visibleRgbDifference": 5.473
+      },
+      {
+        "id": "bottom-right",
+        "visibleRgbDifference": 1.747
+      }
+    ],
+    "overflow": false
+  }
+]

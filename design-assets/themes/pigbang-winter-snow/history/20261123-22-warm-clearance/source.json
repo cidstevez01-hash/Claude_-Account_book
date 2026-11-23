@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-23",
+  "status": "Warm clearance preview",
+  "scope": "Exclude original ink pigment and dots from the outer envelope of the two fixed snowflakes, including a small feathered clearance. Source snowflake colors, size, position and all UI styling remain unchanged.",
+  "baseline": "../20261123-19-readable-cards/composition.json",
+  "snowflakeSha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+  "originalArtworkUnchanged": true,
+  "inkGeometryAndColorsUnchanged": true,
+  "clearance": {
+    "file": "layers/50-snowflake-clearance.svg",
+    "contour": [
+      [
+        70,
+        200
+      ],
+      [
+        72,
+        196
+      ],
+      [
+        74,
+        194
+      ],
+      [
+        364,
+        28
+      ],
+      [
+        368,
+        26
+      ],
+      [
+        372,
+        26
+      ],
+      [
+        664,
+        194
+      ],
+      [
+        668,
+        198
+      ],
+      [
+        668,
+        540
+      ],
+      [
+        666,
+        544
+      ],
+      [
+        376,
+        712
+      ],
+      [
+        372,
+        714
+      ],
+      [
+        366,
+        714
+      ],
+      [
+        362,
+        712
+      ],
+      [
+        76,
+        546
+      ],
+      [
+        72,
+        542
+      ],
+      [
+        70,
+        538
+      ]
+    ],
+    "sourceSize": 740,
+    "strokeWidth": 88,
+    "feather": 6,
+    "targetLayer": "original-ink",
+    "maskComposite": "subtract, add"
+  }
+}

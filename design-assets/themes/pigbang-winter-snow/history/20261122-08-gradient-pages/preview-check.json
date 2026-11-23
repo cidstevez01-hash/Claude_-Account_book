@@ -1,0 +1,78 @@
+[
+  {
+    "variant": "warm-paper",
+    "screen": "home",
+    "background": "linear-gradient(rgb(255, 255, 255) 0%, rgb(250, 248, 244) 45%, rgb(244, 239, 230) 100%)",
+    "otherUiIdentical": true,
+    "overflow": false
+  },
+  {
+    "variant": "silver-gray",
+    "screen": "home",
+    "background": "linear-gradient(rgb(255, 255, 255) 0%, rgb(246, 247, 249) 50%, rgb(236, 238, 242) 100%)",
+    "otherUiIdentical": true,
+    "overflow": false
+  },
+  {
+    "variant": "champagne",
+    "screen": "home",
+    "background": "linear-gradient(rgb(255, 255, 255) 0%, rgb(252, 250, 246) 45%, rgb(245, 239, 227) 100%)",
+    "otherUiIdentical": true,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 430,
+    "overflow": false
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "variant": "warm-paper",
+    "screen": "stats",
+    "background": "linear-gradient(rgb(255, 255, 255) 0%, rgb(250, 248, 244) 45%, rgb(244, 239, 230) 100%)",
+    "otherUiIdentical": true,
+    "overflow": false
+  },
+  {
+    "variant": "silver-gray",
+    "screen": "stats",
+    "background": "linear-gradient(rgb(255, 255, 255) 0%, rgb(246, 247, 249) 50%, rgb(236, 238, 242) 100%)",
+    "otherUiIdentical": true,
+    "overflow": false
+  },
+  {
+    "variant": "champagne",
+    "screen": "stats",
+    "background": "linear-gradient(rgb(255, 255, 255) 0%, rgb(252, 250, 246) 45%, rgb(245, 239, 227) 100%)",
+    "otherUiIdentical": true,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 320,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 430,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "width": 1280,
+    "overflow": false
+  },
+  {
+    "gallerySwitchesPages": true,
+    "galleryMobileOverflow": false
+  }
+]

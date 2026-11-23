@@ -1,0 +1,24 @@
+[
+  {
+    "originalBackgroundGeometryFiltersAndOpacityUnchanged": true,
+    "onlyBackgroundColorsReplaced": true,
+    "snowflakeByteIdentical": true
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false,
+    "cardBackground": "rgba(255, 255, 255, 0.72)"
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false,
+    "cardBackground": "rgba(255, 255, 255, 0.72)"
+  },
+  {
+    "snowflakeRegionMeanRgbChangeFromWhite": 1.983
+  }
+]

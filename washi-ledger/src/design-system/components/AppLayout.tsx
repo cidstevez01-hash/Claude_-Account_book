@@ -17,6 +17,7 @@ import { useAuth, hasEverSignedIn } from '../../features/auth/useAuth'
 import { useSettings } from '../../hooks/useSettings'
 import { getAvatarPreset } from '../../lib/avatarPresets'
 import { loadAvatarId } from '../../lib/avatarStorage'
+import { isWinterTheme } from '../../lib/themeSkin'
 
 interface AppLayoutProps {
   title: string
@@ -177,7 +178,7 @@ export function AppLayout({
             剪下来贴上去"的贴纸感，再叠一层3px 4px偏移、不带模糊的深色阴影(旧App用--ink
             15%左右透明度)做投影厚度——纯高斯模糊text-shadow做不出这种硬边剪纸质感 */}
         <h1 className="font-serif text-headline-lg font-extrabold text-app-title tracking-tight papercut-text-shadow">
-          {settings.themeSkin === 'autumn' && title === t('appTitle') ? 'PigBang' : title}
+          {(settings.themeSkin === 'autumn' || isWinterTheme(settings.themeSkin)) && title === t('appTitle') ? 'PigBang' : title}
         </h1>
         {/* R-18：右上角在子页面不显示任何东西——用一个等宽的空div占位，让标题(左右各
             靠一个w-10按钮/占位)还能居中，不是直接不渲染导致标题偏向左边 */}

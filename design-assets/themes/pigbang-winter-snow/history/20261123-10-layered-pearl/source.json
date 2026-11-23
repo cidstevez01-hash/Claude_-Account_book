@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-23",
+  "status": "Actual-page preview, awaiting visual approval. This revision does not modify application source files.",
+  "scope": "Deeper multi-color ink wash through the middle trend card; coordinated icon and control palettes; independent layer files. Existing layout, fonts, chart structure and icon geometry remain unchanged.",
+  "previousRevision": "../20261123-09-pearl-ink/",
+  "referenceImage": "https://img.magnific.com/premium-psd/colorful-pastel-snowflake-3_799627-216.jpg?q=80&semt=ais_hybrid&w=740",
+  "snowflake": "The previous extracted original PNG is copied byte-for-byte. No redraw, RGB recoloring, or image generation.",
+  "background": "Native SVG layers. Paper, lavender pigment, cyan pigment and mint pigment are separate files and separate rendered image elements; no central white overlay. The composed page PNGs are preview outputs only.",
+  "composition": "composition.json is the source of layer order, placement and opacity used by render-preview.cjs.",
+  "icons": "Original repository-owned navigation SVG geometry. Palettes changed in separately stored SVG assets; remaining symbols and button surfaces use styles/icon-palette.css. No new glyph shapes or extra icon rings.",
+  "surfaces": "Card opacity 0.56, main balance card 0.64, central stats trend card 0.34; shape and layout unchanged. Income/expense semantic colors retained.",
+  "validation": "preview-check.json records actual layout/font/icon geometry comparisons, three-color contributions in the middle region, functional trend controls and responsive overflow checks.",
+  "data": "Isolated empty account; no invented financial entries, no requests or writes to live accounts. Status bar/safe area simulated for preview only.",
+  "sourceLicense": "No license established by this preview; no claim of freely licensed or app-owned reference artwork."
+}

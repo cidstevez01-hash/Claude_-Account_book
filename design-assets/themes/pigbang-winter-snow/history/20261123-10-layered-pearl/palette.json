@@ -1,0 +1,17 @@
+{
+  "paper": "#FFFEFF",
+  "lavender": "#B9A0DD",
+  "cyan": "#9FCADD",
+  "mint": "#8AD7BD",
+  "iconPurple": "#725195",
+  "iconTeal": "#2C7968",
+  "iconCyan": "#4F859A",
+  "selectedGradient": [
+    "#765199",
+    "#566E8A",
+    "#2B7668"
+  ],
+  "selectedInk": "#FFFFFF",
+  "income": "#32785F",
+  "expense": "#B34C55"
+}

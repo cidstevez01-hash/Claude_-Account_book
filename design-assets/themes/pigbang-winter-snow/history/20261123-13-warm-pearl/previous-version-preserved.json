@@ -1,0 +1,90 @@
+[
+  {
+    "file": "comparison-pages.png",
+    "sha256": "ffc4f70d5da5894d9bf368268dc339fa44c3bab650b991bd10ea5716e8224c90"
+  },
+  {
+    "file": "composition.json",
+    "sha256": "169c48e93ff546aa4787e9e926cdc1c375697e4bd478bd637e66af132248d0bc"
+  },
+  {
+    "file": "index.html",
+    "sha256": "2f132c7d728ae50b4828bc951c516974f1a4b3695b05f55bec069cb7d46c61fa"
+  },
+  {
+    "file": "ink-background-original.png",
+    "sha256": "0f64271d939136238c8cc22a387288d590c8b10cd38114cb88840ab0063154fc"
+  },
+  {
+    "file": "ink-background-recolored.png",
+    "sha256": "db1195ff43e15ef13e6209e17d0e04ac8ab7c0e113b26b21364986d0581f1cca"
+  },
+  {
+    "file": "ink-recolor-home.png",
+    "sha256": "a16652317c0fbd9cbe6c5296f43d160d19f87b6b05932d8522d9e162ca298fb2"
+  },
+  {
+    "file": "ink-recolor-home.webp",
+    "sha256": "06454e00586770fb0236315808229d2fb9ddc3298f0aaa1d5c0ccc18943eea8b"
+  },
+  {
+    "file": "ink-recolor-stats.png",
+    "sha256": "15e75aa76c1234548762b511e194e2e95e3c2fb6ca90c83a8b24eae8bc705913"
+  },
+  {
+    "file": "ink-recolor-stats.webp",
+    "sha256": "8edd8334352bc71499808bec605a2a55eafb9b132ffcb04dc79c3b3a67e0fefe"
+  },
+  {
+    "file": "preview-check.json",
+    "sha256": "01ffd8d3b454caf40c0e3e0250a6b7fa66ec210ef0c693523f01efc1f40e0f6b"
+  },
+  {
+    "file": "render-preview.cjs",
+    "sha256": "d53b1493cce4c4291b57ab51d5141fcddeb9a4b28aa68d6b5ebe7019db8fa19c"
+  },
+  {
+    "file": "source.json",
+    "sha256": "61246e8140ee98a015a9a62b207f07fa68fb509c558741ed7a8aa4a32933606b"
+  },
+  {
+    "file": "winter.css",
+    "sha256": "54054292e9055558f1562b443c44dd111a30488e708785b49d106e1fe8e76c2c"
+  },
+  {
+    "file": "icons\\bar_chart.svg",
+    "sha256": "928190d961e6f8aad4e3744a90e87216d0a7d90853b66f8175db9eba24ce2e2a"
+  },
+  {
+    "file": "icons\\book.svg",
+    "sha256": "d3236288ee4e17a53381b9aa6d8cb8a6b23eea76aab3a8c51f979db3e8fb8726"
+  },
+  {
+    "file": "icons\\history.svg",
+    "sha256": "1ccabe3eac548da1de3b34f9e69fc4f63709502864adbe51f2c5c747302fe8d7"
+  },
+  {
+    "file": "layers\\00-paper.svg",
+    "sha256": "70e85ffd6d457af15034d9fcfc5d9aec79f2b23e632c621b1144c32db722420d"
+  },
+  {
+    "file": "layers\\10-original-ink.png",
+    "sha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e"
+  },
+  {
+    "file": "layers\\11-ink-color-filter.svg",
+    "sha256": "e274f2adbdc1e67569f257b608baff72612d9c0ecbe6bf17b7b35d4800a60f95"
+  },
+  {
+    "file": "layers\\40-pearl-snowflake.png",
+    "sha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67"
+  },
+  {
+    "file": "styles\\composition.css",
+    "sha256": "8f8eb1361cc8dcd156a3c7d0480c654f2ada76d181e29751c22b4033ee594776"
+  },
+  {
+    "file": "styles\\icon-palette.css",
+    "sha256": "b559bac4e540d1e83f76dc040f7976529f19561b943fe485adc9533b540d5a0f"
+  }
+]

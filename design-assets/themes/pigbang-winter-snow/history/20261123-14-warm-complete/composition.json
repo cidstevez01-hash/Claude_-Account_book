@@ -1,0 +1,158 @@
+{
+  "date": "2026-11-23",
+  "viewport": [
+    390,
+    844
+  ],
+  "blendMode": "normal",
+  "layers": [
+    {
+      "id": "paper",
+      "name": "纯白底纸",
+      "file": "layers/00-paper.svg",
+      "z": 0,
+      "opacity": 1,
+      "fit": "fill"
+    },
+    {
+      "id": "original-ink",
+      "name": "原始墨团和散点，仅换色",
+      "file": "layers/11-ink-color-filter.svg",
+      "z": 1,
+      "opacity": 0.62,
+      "fit": "fill"
+    },
+    {
+      "id": "snow-top",
+      "name": "右上珠光雪花",
+      "file": "layers/41-warm-snowflake.svg",
+      "z": 4,
+      "opacity": 1,
+      "width": 340,
+      "right": -115,
+      "top": -82
+    },
+    {
+      "id": "snow-bottom",
+      "name": "左下珠光雪花",
+      "file": "layers/41-warm-snowflake.svg",
+      "z": 4,
+      "opacity": 1,
+      "width": 300,
+      "left": -145,
+      "bottom": -100
+    },
+    {
+      "id": "snow-fall",
+      "name": "飘雪",
+      "file": "layers/41-warm-snowflake.svg",
+      "z": 5,
+      "opacity": 1,
+      "instances": 14
+    }
+  ],
+  "snowflakeSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "styles": [
+    "styles/icon-palette.css",
+    "styles/composition.css"
+  ],
+  "icons": [
+    {
+      "key": "book",
+      "file": "icons/book.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/book.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#A06B7D",
+        "#C295A4",
+        "#AE895D"
+      ]
+    },
+    {
+      "key": "history",
+      "file": "icons/history.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/history.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#9F755C",
+        "#B89178",
+        "#A2788F"
+      ]
+    },
+    {
+      "key": "bar_chart",
+      "file": "icons/bar_chart.svg",
+      "origin": "washi-ledger/src/icons/themes/shared/navigation/bar_chart.svg",
+      "geometry": "unchanged",
+      "colors": [
+        "#B99169",
+        "#AF829C",
+        "#C19B90"
+      ]
+    }
+  ],
+  "centralWhiteOverlay": false,
+  "baseline": "../20261123-13-warm-pearl/composition.json",
+  "change": "Warm icons and control surfaces; restore visible original top-left, middle-right and bottom-right pigment forms through edge-translucent cards. Preserve snowflakes and original ink geometry, source texture and central white space.",
+  "originalInkSha256": "d8b06e5f297d8c334da2283d31a887bd4151d41b583e9e98729a96f58a01a79e",
+  "warmPalette": [
+    {
+      "offset": "0",
+      "color": "#C6A4C9"
+    },
+    {
+      "offset": ".34",
+      "color": "#DEB3BE"
+    },
+    {
+      "offset": ".65",
+      "color": "#E6C89F"
+    },
+    {
+      "offset": "1",
+      "color": "#D7B5CE"
+    }
+  ],
+  "inkRegions": [
+    {
+      "id": "top-left",
+      "rect": [
+        0,
+        0.06,
+        0.33,
+        0.22
+      ]
+    },
+    {
+      "id": "middle-right",
+      "rect": [
+        0.66,
+        0.3,
+        0.34,
+        0.3
+      ]
+    },
+    {
+      "id": "bottom-right",
+      "rect": [
+        0.6,
+        0.78,
+        0.4,
+        0.22
+      ]
+    }
+  ],
+  "cardSurface": {
+    "edgeOpacity": 0.2,
+    "centerOpacity": 0.82,
+    "backdropBlur": 0
+  },
+  "snowflakeColorMethod": "Source-local color transformation with restrained chroma. Original color variations stay interleaved across the branches; no positional gradient. Original luminance, white sparkle and alpha retained.",
+  "snowflakePalette": [
+    "浅金",
+    "蜜桃",
+    "珊瑚粉",
+    "暖紫"
+  ],
+  "snowflakeSaturation": 0.55
+}

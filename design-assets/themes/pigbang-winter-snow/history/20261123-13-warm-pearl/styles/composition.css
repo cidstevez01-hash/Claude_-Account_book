@@ -1,0 +1,5 @@
+/* Original ink-wash composition; no new card transparency overrides. */
+[data-preview-theme="winter"] .pearl-composition { position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden; }
+[data-preview-theme="winter"] .pearl-layer { position:absolute;inset:0;width:100%;height:100%;object-fit:fill; }
+[data-preview-theme="winter"] .pearl-snow { position:absolute;height:auto;max-width:none; }
+[data-preview-theme="winter"] .winter-fall-layer { z-index:5; }

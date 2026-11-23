@@ -1,0 +1,37 @@
+{
+  "icons": {
+    "book": [
+      "#C6A155",
+      "#F1D795",
+      "#DDB575"
+    ],
+    "history": [
+      "#C09B50",
+      "#E9C982",
+      "#D6B67A"
+    ],
+    "bar_chart": [
+      "#D2AF5F",
+      "#EDCF8E",
+      "#E6BD9C"
+    ]
+  },
+  "controls": {
+    "fab": {
+      "stops": [
+        "#F6DFA6",
+        "#F7DFC0",
+        "#F3CDCD"
+      ],
+      "foreground": "#8B672C"
+    },
+    "selectedTab": {
+      "stops": [
+        "#F5DCA3",
+        "#F7DEBC",
+        "#F3D0CC"
+      ],
+      "foreground": "#705331"
+    }
+  }
+}

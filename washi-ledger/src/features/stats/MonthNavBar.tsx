@@ -16,7 +16,7 @@ interface MonthNavBarProps {
 export function MonthNavBar({ monthLabel, onPrevMonth, onNextMonth, disablePrev, disableNext }: MonthNavBarProps) {
   const { t } = useI18n()
   return (
-    <div className="mx-md flex items-center justify-between bg-surface-container-low border border-outline-variant rounded-xl px-md py-3">
+    <div data-month-nav className="mx-md flex items-center justify-between bg-surface-container-low border border-outline-variant rounded-xl px-md py-3">
       <button
         type="button"
         aria-label={t('prevMonthAria')}

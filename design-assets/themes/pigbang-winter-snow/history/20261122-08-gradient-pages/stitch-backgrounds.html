@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PigBang 冬季雪花主题 · 移动端渐变背景基底对比看板</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans SC', sans-serif;
+      background-color: #0F1117;
+      color: #E2E8F0;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Three designated background gradients */
+    .bg-grad-warm-paper {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FAF8F4 45%, #F4EFE6 100%);
+    }
+    .bg-grad-silver-gray {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F6F7F9 50%, #ECEEF2 100%);
+    }
+    .bg-grad-champagne {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FCFAF6 45%, #F5EFE3 100%);
+    }
+  </style>
+</head>
+<body class="min-h-screen py-12 px-6 sm:px-10 lg:px-16 antialiased selection:bg-amber-500/20 selection:text-amber-200">
+  <div class="max-w-7xl mx-auto space-y-10">
+
+    <!-- Header Section -->
+    <header class="border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-amber-400/10 text-amber-300 border border-amber-400/20">
+          <span>PigBang Design Spec</span>
+          <span class="text-white/30">•</span>
+          <span>Winter Snow Theme Background Gradient Study</span>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white">
+          冬季雪花主题 · 移动端渐变基底对比看板
+        </h1>
+        <p class="text-sm md:text-base text-slate-400 max-w-3xl leading-relaxed">
+          根据要求摒弃纯平色板，改用<span class="text-slate-200 font-medium">顶部至底部垂直渐变</span>。严格维持顶部纯净高亮（#FFFFFF）、底部微透质感、中间过渡开阔透气，确保应用内半透明卡片可读性与雪花原画不偏色。完全剔除大面积蓝青色阶，仅保留三种纯净无蓝调基底方案。
+        </p>
+      </div>
+
+      <!-- Quick Guidance / Summary Box -->
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-4 md:w-96 text-xs text-slate-300 space-y-2 shrink-0 backdrop-blur-sm">
+        <div class="flex items-center gap-1.5 font-semibold text-amber-300 text-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          应用规则说明
+        </div>
+        <p class="leading-normal text-slate-400">
+          仅提供纯净 9:19.5 移动端背景面板，不包含任何业务 UI、图标或重绘雪花。下方代码可直接一键注入至现有首页与统计页最外层背景容器。
+        </p>
+      </div>
+    </header>
+
+    <!-- Main Comparison Columns -->
+    <main class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+
+      <!-- Option 1: 白 → 暖纸白 -->
+      <section class="flex flex-col space-y-4">
+        <!-- External Label & Title (OUTSIDE the panel) -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-medium text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">方案 01 · 推荐首选</span>
+            <span class="text-xs text-slate-400">白 → 暖纸白</span>
+          </div>
+          <h2 class="text-xl font-bold text-white tracking-tight">暖纸白微渐变 (Warm Paper)</h2>
+          <p class="text-xs text-slate-400 leading-relaxed min-h-[36px]">
+            顶部 100% 纯白确保状态栏通透，中底部自然过渡至水彩棉浆纸质暖白，中和蓝色水彩飞溅冷调，赋予冬日温润亲和质感。
+          </p>
+        </div>
+
+        <!-- Pure Background Mobile Aspect Ratio Panel (NO UI INSIDE) -->
+        <div class="relative w-full aspect-[9/19.5] rounded-[36px] p-2 bg-gradient-to-b from-white/20 to-white/5 shadow-2xl shadow-black/60 border border-white/20 ring-1 ring-black/40">
+          <div class="w-full h-full rounded-[28px] bg-grad-warm-paper overflow-hidden relative shadow-inner">
+            <!-- Simulated Safe Area Indicators (Pure Boundary lines, no UI) -->
+            <div class="absolute inset-x-0 top-0 h-10 border-b border-black/[0.03] flex items-center justify-center">
+              <span class="text-[10px] font-mono tracking-widest text-slate-400/60 uppercase">Top 100% #FFFFFF</span>
+            </div>
+            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+              <div class="w-3/4 py-4 rounded-xl border border-dashed border-stone-400/20 flex flex-col items-center justify-center">
+                <span class="text-[10px] font-mono text-stone-500/70 tracking-wider">#FAF8F4 · 卡片预留平缓过渡区</span>
+              </div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 h-10 border-t border-stone-800/[0.04] flex items-center justify-center">
+              <span class="text-[10px] font-mono tracking-widest text-stone-600/70 uppercase">Bottom 100% #F4EFE6</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSS Snippet and Parameters -->
+        <div class="bg-[#161922] border border-white/10 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span class="font-semibold text-slate-300">CSS 渐变声明</span>
+            <span class="font-mono text-[11px] text-amber-300">180deg 垂直渐变</span>
+          </div>
+          <div class="p-3 bg-black/40 rounded-xl border border-white/5 font-mono text-[11px] text-amber-200/90 leading-relaxed overflow-x-auto select-all">
+background: linear-gradient(180deg, #FFFFFF 0%, #FAF8F4 45%, #F4EFE6 100%);
+          </div>
+          <div class="grid grid-cols-3 gap-1 pt-1 text-center font-mono text-[10px]">
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">顶部 0%</span>
+              <span class="font-bold text-white">#FFFFFF</span>
+            </div>
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">中间 45%</span>
+              <span class="font-bold text-amber-100">#FAF8F4</span>
+            </div>
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">底部 100%</span>
+              <span class="font-bold text-amber-200">#F4EFE6</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Option 2: 白 → 银灰 -->
+      <section class="flex flex-col space-y-4">
+        <!-- External Label & Title (OUTSIDE the panel) -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-medium text-slate-300 bg-white/10 px-2 py-0.5 rounded border border-white/20">方案 02</span>
+            <span class="text-xs text-slate-400">白 → 银灰</span>
+          </div>
+          <h2 class="text-xl font-bold text-white tracking-tight">中性银灰微渐变 (Silver Gray)</h2>
+          <p class="text-xs text-slate-400 leading-relaxed min-h-[36px]">
+            无色相偏移的中性银珍珠灰。杜绝蓝绿杂色，底部略沉稳收敛，能将原有深蓝/青水彩雪花的笔触边缘反衬得极度锐利清晰。
+          </p>
+        </div>
+
+        <!-- Pure Background Mobile Aspect Ratio Panel (NO UI INSIDE) -->
+        <div class="relative w-full aspect-[9/19.5] rounded-[36px] p-2 bg-gradient-to-b from-white/20 to-white/5 shadow-2xl shadow-black/60 border border-white/20 ring-1 ring-black/40">
+          <div class="w-full h-full rounded-[28px] bg-grad-silver-gray overflow-hidden relative shadow-inner">
+            <!-- Simulated Safe Area Indicators (Pure Boundary lines, no UI) -->
+            <div class="absolute inset-x-0 top-0 h-10 border-b border-black/[0.03] flex items-center justify-center">
+              <span class="text-[10px] font-mono tracking-widest text-slate-400/60 uppercase">Top 100% #FFFFFF</span>
+            </div>
+            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+              <div class="w-3/4 py-4 rounded-xl border border-dashed border-slate-400/20 flex flex-col items-center justify-center">
+                <span class="text-[10px] font-mono text-slate-500/70 tracking-wider">#F6F7F9 · 卡片预留平缓过渡区</span>
+              </div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 h-10 border-t border-slate-800/[0.04] flex items-center justify-center">
+              <span class="text-[10px] font-mono tracking-widest text-slate-600/70 uppercase">Bottom 100% #ECEEF2</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSS Snippet and Parameters -->
+        <div class="bg-[#161922] border border-white/10 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span class="font-semibold text-slate-300">CSS 渐变声明</span>
+            <span class="font-mono text-[11px] text-slate-300">180deg 垂直渐变</span>
+          </div>
+          <div class="p-3 bg-black/40 rounded-xl border border-white/5 font-mono text-[11px] text-slate-200 leading-relaxed overflow-x-auto select-all">
+background: linear-gradient(180deg, #FFFFFF 0%, #F6F7F9 50%, #ECEEF2 100%);
+          </div>
+          <div class="grid grid-cols-3 gap-1 pt-1 text-center font-mono text-[10px]">
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">顶部 0%</span>
+              <span class="font-bold text-white">#FFFFFF</span>
+            </div>
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">中间 50%</span>
+              <span class="font-bold text-slate-200">#F6F7F9</span>
+            </div>
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">底部 100%</span>
+              <span class="font-bold text-slate-300">#ECEEF2</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Option 3: 白 → 淡香槟 -->
+      <section class="flex flex-col space-y-4">
+        <!-- External Label & Title (OUTSIDE the panel) -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-medium text-amber-200 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">方案 03</span>
+            <span class="text-xs text-slate-400">白 → 淡香槟</span>
+          </div>
+          <h2 class="text-xl font-bold text-white tracking-tight">微甘淡香槟微渐变 (Pale Champagne)</h2>
+          <p class="text-xs text-slate-400 leading-relaxed min-h-[36px]">
+            带有微甜奶油香槟底蕴，在手机底端呈现极其轻微的高级暖调，避开冷冰疏离感，烘托冬日室内壁炉与热饮般的舒适情绪。
+          </p>
+        </div>
+
+        <!-- Pure Background Mobile Aspect Ratio Panel (NO UI INSIDE) -->
+        <div class="relative w-full aspect-[9/19.5] rounded-[36px] p-2 bg-gradient-to-b from-white/20 to-white/5 shadow-2xl shadow-black/60 border border-white/20 ring-1 ring-black/40">
+          <div class="w-full h-full rounded-[28px] bg-grad-champagne overflow-hidden relative shadow-inner">
+            <!-- Simulated Safe Area Indicators (Pure Boundary lines, no UI) -->
+            <div class="absolute inset-x-0 top-0 h-10 border-b border-black/[0.03] flex items-center justify-center">
+              <span class="text-[10px] font-mono tracking-widest text-slate-400/60 uppercase">Top 100% #FFFFFF</span>
+            </div>
+            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+              <div class="w-3/4 py-4 rounded-xl border border-dashed border-amber-300/20 flex flex-col items-center justify-center">
+                <span class="text-[10px] font-mono text-amber-700/60 tracking-wider">#FCFAF6 · 卡片预留平缓过渡区</span>
+              </div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 h-10 border-t border-amber-900/[0.04] flex items-center justify-center">
+              <span class="text-[10px] font-mono tracking-widest text-amber-800/70 uppercase">Bottom 100% #F5EFE3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSS Snippet and Parameters -->
+        <div class="bg-[#161922] border border-white/10 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span class="font-semibold text-slate-300">CSS 渐变声明</span>
+            <span class="font-mono text-[11px] text-amber-200">180deg 垂直渐变</span>
+          </div>
+          <div class="p-3 bg-black/40 rounded-xl border border-white/5 font-mono text-[11px] text-amber-100/90 leading-relaxed overflow-x-auto select-all">
+background: linear-gradient(180deg, #FFFFFF 0%, #FCFAF6 45%, #F5EFE3 100%);
+          </div>
+          <div class="grid grid-cols-3 gap-1 pt-1 text-center font-mono text-[10px]">
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">顶部 0%</span>
+              <span class="font-bold text-white">#FFFFFF</span>
+            </div>
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">中间 45%</span>
+              <span class="font-bold text-amber-50">#FCFAF6</span>
+            </div>
+            <div class="bg-white/5 py-1.5 rounded border border-white/5">
+              <span class="block text-slate-400 text-[9px]">底部 100%</span>
+              <span class="font-bold text-amber-200">#F5EFE3</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Technical Implementation Note Footer -->
+    <footer class="pt-8 border-t border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>无蓝调轻微渐变规范 · 确保 100% 与真实原画雪花直接层叠合成无冲突</span>
+      </div>
+      <div>
+        <span>PigBang Winter Palette Gradient Deliverable · Ready for local injection</span>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>
+

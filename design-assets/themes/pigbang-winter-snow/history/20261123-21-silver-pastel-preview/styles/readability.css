@@ -1,0 +1,28 @@
+/* Readability only. Approved artwork and light-gold control fills stay intact. */
+:root[data-preview-theme="winter"] {
+ --color-on-surface:#3B3F43;
+ --color-on-background:#3B3F43;
+ --color-on-surface-variant:#575B5F;
+ --color-outline-variant:#B5B9BD;
+}
+[data-preview-theme="winter"] :is(.ledger-card,.bg-surface-container-lowest) {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF5C 0%,#FFFFFFC2 22%,#FFFFFFF2 40%,#FFFFFFF2 60%,#FFFFFFC2 78%,#FFFFFF5C 100%);
+ border-color:#9FA3A7;
+ box-shadow:0 4px 15px #A5A9AD17,inset 0 0 0 1px #FFFFFFE6;
+}
+[data-preview-theme="winter"] [data-date-range-bar] {
+ background-color:#FFFFFFB0;
+ border-color:#9FA3A7;
+ box-shadow:inset 0 0 0 1px #FFFFFFE6;
+}
+[data-preview-theme="winter"][data-preview-screen="stats"] main .bg-surface-container-low.border.rounded-xl {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF5C 0%,#FFFFFFC2 22%,#FFFFFFF2 40%,#FFFFFFF2 60%,#FFFFFFC2 78%,#FFFFFF5C 100%);
+ border-color:#9FA3A7;
+ box-shadow:inset 0 0 0 1px #FFFFFFE6;
+}
+[data-preview-theme="winter"] main section > .flex.border-b > button.text-primary {color:#676B6F;}
+[data-preview-theme="winter"] main section > .flex.border-b > button {border-bottom-color:#B1B5B9;}
+[data-preview-theme="winter"] main section > .flex.border-b > button.border-primary {border-bottom-color:#84888C;}
+[data-preview-theme="winter"] main section > .flex.border-b > button.border-transparent {border-bottom-color:transparent;}

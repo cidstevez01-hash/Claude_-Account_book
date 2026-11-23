@@ -1,0 +1,15 @@
+/* Full original pigment composition; central whitespace comes from the source. */
+[data-preview-theme="winter"] .pearl-composition {position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;}
+[data-preview-theme="winter"] .pearl-layer {position:absolute;inset:0;width:100%;height:100%;object-fit:fill;}
+[data-preview-theme="winter"] .pearl-snow {position:absolute;height:auto;max-width:none;}
+[data-preview-theme="winter"] .winter-fall-layer {z-index:5;}
+[data-preview-theme="winter"] :is(.ledger-card,.bg-surface-container-lowest) {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF33 0%,#FFFFFFB8 27%,#FFFFFFD1 44%,#FFFFFFD1 56%,#FFFFFFB8 73%,#FFFFFF33 100%);
+ backdrop-filter:none;-webkit-backdrop-filter:none;border-color:#DCC4BBA6;
+}
+[data-preview-theme="winter"] [data-date-range-bar] {background-color:#FFFFFF6B;border-color:#DCC4BBA6;}
+[data-preview-theme="winter"][data-preview-screen="stats"] main .bg-surface-container-low.border.rounded-xl {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF33 0%,#FFFFFFB8 27%,#FFFFFFD1 44%,#FFFFFFD1 56%,#FFFFFFB8 73%,#FFFFFF33 100%);
+}

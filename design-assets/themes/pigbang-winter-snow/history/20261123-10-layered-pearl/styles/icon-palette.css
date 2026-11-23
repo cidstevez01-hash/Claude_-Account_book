@@ -1,0 +1,20 @@
+:root[data-preview-theme="winter"] { --color-primary:#735198;--color-primary-container:#735198;--color-on-primary-container:#FFFFFF;--color-app-title:#69528D;--color-outline-variant:#C9BDDC;--color-surface-container:#ECE3F2;--color-surface-container-highest:#DBEAE5;--color-surface:#FBF8FD; }
+[data-preview-theme="winter"] nav.bottom-nav-shell { background:linear-gradient(110deg,#F4EAF8EB,#EAF5EFE8,#EAF1F7EB);border-color:#C3B3D3B8;box-shadow:0 9px 28px #6B547B24,inset 0 1px 0 #FFFFFF; }
+[data-preview-theme="winter"] .tab-bubble { background:linear-gradient(120deg,#E6D7F5ED,#D8E9ECEB,#CBE9D9ED);border-color:#B8A6CCBB;box-shadow:0 2px 8px #7D5F9630,inset 0 1px 1px #FFFFFF; }
+[data-preview-theme="winter"] nav a[href="/"] { color:#725195; }
+[data-preview-theme="winter"] nav a[href="/history"] { color:#2C7968; }
+[data-preview-theme="winter"] nav a[href="/stats"] { color:#6C5793; }
+[data-preview-theme="winter"] .pb-navigation-icon[data-icon="book"] { color:#725195!important; }
+[data-preview-theme="winter"] .pb-navigation-icon[data-icon="history"] { color:#2C7968!important; }
+[data-preview-theme="winter"] .pb-navigation-icon[data-icon="bar_chart"] { color:#6C5793!important; }
+[data-preview-theme="winter"] .pb-navigation-icon { filter:none!important; }
+[data-preview-theme="winter"] [data-app-header] button .material-symbols-outlined { color:#75559A; }
+[data-preview-theme="winter"] [data-app-header] a[href="/account"] { color:#2D7666;background:linear-gradient(135deg,#E8DAF4B3,#D7ECE8B3,#D5EDDEB3);box-shadow:0 0 0 1px #C5B9D6,0 0 0 5px #FFFFFF73; }
+[data-preview-theme="winter"] [data-date-range-bar] .material-symbols-outlined { color:#735198; }
+[data-preview-theme="winter"] .stamp-shadow { background:linear-gradient(115deg,#765199 0%,#566E8A 46%,#2B7668 100%);border-color:#FCF8FF;box-shadow:0 0 0 1px #FFFFFFD9,0 0 19px #A990CA55,0 6px 14px #567B6E38; }
+[data-preview-theme="winter"] .stamp-shadow .material-symbols-outlined { color:#FFFFFF; }
+[data-preview-theme="winter"] .bg-surface-container-highest.rounded-lg { background:linear-gradient(110deg,#DED0EBE8,#DAE7EAE0,#CDE9DDE8); }
+[data-preview-theme="winter"] .bg-surface-container-highest.rounded-lg button { color:#546B67; }
+[data-preview-theme="winter"] .bg-surface-container-highest.rounded-lg button.bg-surface { background:linear-gradient(112deg,#CEBCE5,#D0DFE7,#BBDECC);color:#48345E; }
+[data-preview-theme="winter"] main .bg-primary-container.rounded-full { background:linear-gradient(115deg,#765199 0%,#566E8A 46%,#2B7668 100%); }
+[data-preview-theme="winter"] main .w-full.bg-surface-container.rounded-full { background:linear-gradient(110deg,#E6DDF0DA,#DCEDE8D6,#E9F0F6DA);border-color:#B8A9CB88; }

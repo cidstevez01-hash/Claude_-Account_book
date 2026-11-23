@@ -1,0 +1,47 @@
+<div id="pigbang-gradient-pages-20261123-08">
+  <style>
+    #pigbang-gradient-pages-20261123-08 { color:var(--foreground); }
+    #pigbang-gradient-pages-20261123-08 .pb-schemes { margin-bottom:calc(var(--font-size-base) * 1.25);justify-content:flex-start;padding-right:90px; }
+    #pigbang-gradient-pages-20261123-08 .pb-pages { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--font-size-base) * 1.5); }
+    #pigbang-gradient-pages-20261123-08 figure { margin:0;min-width:0; }
+    #pigbang-gradient-pages-20261123-08 figcaption { margin-bottom:calc(var(--font-size-base) * .6);font-weight:500; }
+    #pigbang-gradient-pages-20261123-08 .pb-page { display:block;max-width:390px;width:100%;height:auto;margin:auto; }
+    #pigbang-gradient-pages-20261123-08 .pb-caption { margin-top:calc(var(--font-size-base) * 1.1); }
+    @media(max-width:800px) { #pigbang-gradient-pages-20261123-08 .pb-pages { grid-template-columns:1fr; } }
+    @media(max-width:480px) { #pigbang-gradient-pages-20261123-08 .pb-schemes { padding-right:0; } }
+  </style>
+  <div class="viz-row pb-schemes" aria-label="渐变背景方案">
+    <button class="btn" type="button" data-scheme="warm-paper" aria-pressed="true">暖纸白渐变</button>
+    <button class="btn" type="button" data-scheme="silver-gray" aria-pressed="false">银灰渐变</button>
+    <button class="btn" type="button" data-scheme="champagne" aria-pressed="false">淡香槟渐变</button>
+  </div>
+  <div class="pb-pages">
+    <figure><figcaption>实际首页</figcaption><img class="pb-page" data-page="home" width="390" height="844" alt="暖纸白渐变，实际首页预览"></figure>
+    <figure><figcaption>实际统计页</figcaption><img class="pb-page" data-page="stats" width="390" height="844" alt="暖纸白渐变，实际统计页预览"></figure>
+  </div>
+  <div class="pb-caption text-small text-muted" data-caption aria-live="polite">暖纸白 · 空账本预览</div>
+  <script>
+    (function () {
+      const root=document.getElementById('pigbang-gradient-pages-20261123-08');
+      const images=__PAGE_DATA_JSON__;
+      const names={'warm-paper':'暖纸白','silver-gray':'银灰','champagne':'淡香槟'};
+      let scheme='warm-paper';
+      function render() {
+        root.querySelectorAll('[data-scheme]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.scheme===scheme)));
+        root.querySelectorAll('[data-page]').forEach(img=>{img.src=images[scheme][img.dataset.page];img.alt=names[scheme]+'渐变，实际'+(img.dataset.page==='home'?'首页':'统计页')+'预览';});
+        root.querySelector('[data-caption]').textContent=names[scheme]+' · 空账本预览';
+      }
+      function restore(saved) {
+        const value=saved?.privateContent?.scheme||saved?.modelContent?.scheme;
+        if(Object.hasOwn(names,value))scheme=value;
+        render();
+      }
+      root.querySelectorAll('[data-scheme]').forEach(button=>button.addEventListener('click',()=>{
+        scheme=button.dataset.scheme;render();
+        if(window.openai?.setWidgetState)Promise.resolve(window.openai.setWidgetState({modelContent:{scheme,backgroundName:names[scheme],scope:'实际首页和统计页，仅改变渐变背景，其他设计不改'},privateContent:{scheme}})).catch(()=>{});
+      }));
+      window.addEventListener('openai:set_globals',event=>{if(event.detail?.globals?.widgetState)restore(event.detail.globals.widgetState);});
+      restore(window.openai?.widgetState);
+    }());
+  </script>
+</div>

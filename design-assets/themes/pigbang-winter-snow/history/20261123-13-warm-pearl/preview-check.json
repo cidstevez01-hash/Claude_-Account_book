@@ -1,0 +1,30 @@
+[
+  {
+    "previousVersionPreserved": true,
+    "originalSourcesUnedited": true,
+    "positionsSizesAndOpacityUnchanged": true,
+    "otherUiStylesUnchanged": true
+  },
+  {
+    "asset": "ink",
+    "alphaMismatch": 0,
+    "colorChange": 22586398
+  },
+  {
+    "asset": "snowflake",
+    "alphaMismatch": 0,
+    "colorChange": 13154816
+  },
+  {
+    "screen": "home",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  },
+  {
+    "screen": "stats",
+    "layoutAndTypographyUnchanged": true,
+    "iconGeometryUnchanged": true,
+    "overflow": false
+  }
+]

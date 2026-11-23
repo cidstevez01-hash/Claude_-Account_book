@@ -1,0 +1,50 @@
+{
+  "status": "Historical preview reconstructed from recorded original source and historical filter parameters; original old preview file was overwritten.",
+  "referenceScreenshot": "user-reference-screenshot.png",
+  "referenceDimensions": {
+    "format": "png",
+    "mediaType": "image/png",
+    "width": 388,
+    "height": 224,
+    "space": "srgb",
+    "channels": 3,
+    "depth": "uchar",
+    "density": 72,
+    "isProgressive": false,
+    "isPalette": false,
+    "bitsPerSample": 8,
+    "hasProfile": false,
+    "hasAlpha": false,
+    "autoOrient": {
+      "width": 388,
+      "height": 224
+    }
+  },
+  "selectedHistoricalStage": "first-multicolor",
+  "matches": [
+    {
+      "id": "first-multicolor",
+      "meanRgbError": 6.50311,
+      "candidateWidth": 412,
+      "xOffset": -16,
+      "yOffset": -4
+    },
+    {
+      "id": "multicolor-before-desaturation",
+      "meanRgbError": 9.59285,
+      "candidateWidth": 412,
+      "xOffset": -16,
+      "yOffset": -4
+    },
+    {
+      "id": "later-desaturated",
+      "meanRgbError": 10.52618,
+      "candidateWidth": 408,
+      "xOffset": -12,
+      "yOffset": -4
+    }
+  ],
+  "originalSourceSha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+  "recoveredSha256": "072adb1b570701bf4bed9a8645b8ca7ef5973e0f925d6fcca3cfa557a7eb1e40",
+  "appSourceChanges": false
+}
