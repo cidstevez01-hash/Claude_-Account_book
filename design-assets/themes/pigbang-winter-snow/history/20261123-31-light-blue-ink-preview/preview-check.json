@@ -1,0 +1,55 @@
+[
+  {
+    "asset": [
+      1024,
+      1536
+    ],
+    "alphaChangedPixels": 0,
+    "visiblePigmentMinRgb": [
+      167,
+      210,
+      242
+    ],
+    "visiblePigmentMaxRgb": [
+      222,
+      240,
+      252
+    ],
+    "originalTextureAlphaPreserved": true
+  },
+  {
+    "screen": "home",
+    "onlyInkImageChanged": true,
+    "layoutUnchanged": true,
+    "primaryAndOutlineUnchanged": true,
+    "snowflakeUnchanged": true,
+    "clearanceMaskUnchanged": true,
+    "inkOpacity": "0.62"
+  },
+  {
+    "screen": "stats",
+    "onlyInkImageChanged": true,
+    "layoutUnchanged": true,
+    "primaryAndOutlineUnchanged": true,
+    "snowflakeUnchanged": true,
+    "clearanceMaskUnchanged": true,
+    "inkOpacity": "0.62"
+  },
+  {
+    "width": 320,
+    "noHorizontalOverflow": true
+  },
+  {
+    "width": 390,
+    "noHorizontalOverflow": true
+  },
+  {
+    "width": 1280,
+    "noHorizontalOverflow": true
+  },
+  {
+    "previewOnly": true,
+    "runtimeSourceHashesUnchanged": true,
+    "pageErrors": []
+  }
+]

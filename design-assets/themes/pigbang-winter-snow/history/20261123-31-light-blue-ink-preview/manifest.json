@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-23",
+  "title": "银灰主题 · 浅冰蓝晕染预览",
+  "status": "preview only, awaiting user choice",
+  "integrated": false,
+  "palette": {
+    "dark": "#9DCDF0",
+    "light": "#E0F1FC"
+  },
+  "sourceInk": "layers/10-current-silver-ink.webp",
+  "previewInk": "layers/20-light-blue-ink.webp",
+  "filter": "layers/11-light-blue-ink.svg",
+  "snowflake": "layers/41-original-snowflake.png",
+  "clearanceMask": "layers/50-snowflake-clearance.svg",
+  "fit": "center/100% auto no-repeat",
+  "opacity": 0.62,
+  "originalHashes": {
+    "src/assets/themes/winter/silver-ink.webp": "5f31eecd2dcf08c3b44061f9e2edc64a2e3fa2cdb827bafd0375833e7ae210b2",
+    "src/assets/themes/winter/silver-snowflake.png": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+    "src/assets/themes/winter/snowflake-clearance.svg": "e3c41143094557e7d1c17070208011cce538382f32a440b141dbbb16a75c1184",
+    "src/themes/winter-silver.css": "774197a6b73a6dc08b2cf8823aa984b7eabf037a640d946ee89f1dbc912145bc",
+    "src/themes/winter.css": "a06ab10092be9ac5c3e4bd0593e35a5ed3c22ec2c63e0e0d569032cd52725cc6",
+    "src/design-system/components/WinterBackground.tsx": "9792de6418f1a5e8ab38e38c666b053584b15edc898346551200ad24cdff6dca"
+  },
+  "checks": [
+    {
+      "asset": [
+        1024,
+        1536
+      ],
+      "alphaChangedPixels": 0,
+      "visiblePigmentMinRgb": [
+        167,
+        210,
+        242
+      ],
+      "visiblePigmentMaxRgb": [
+        222,
+        240,
+        252
+      ],
+      "originalTextureAlphaPreserved": true
+    },
+    {
+      "screen": "home",
+      "onlyInkImageChanged": true,
+      "layoutUnchanged": true,
+      "primaryAndOutlineUnchanged": true,
+      "snowflakeUnchanged": true,
+      "clearanceMaskUnchanged": true,
+      "inkOpacity": "0.62"
+    },
+    {
+      "screen": "stats",
+      "onlyInkImageChanged": true,
+      "layoutUnchanged": true,
+      "primaryAndOutlineUnchanged": true,
+      "snowflakeUnchanged": true,
+      "clearanceMaskUnchanged": true,
+      "inkOpacity": "0.62"
+    },
+    {
+      "width": 320,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1280,
+      "noHorizontalOverflow": true
+    },
+    {
+      "previewOnly": true,
+      "runtimeSourceHashesUnchanged": true,
+      "pageErrors": []
+    }
+  ]
+}
