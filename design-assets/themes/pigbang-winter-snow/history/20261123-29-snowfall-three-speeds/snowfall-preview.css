@@ -1,0 +1,2 @@
+.winter-flake{width:60px!important;height:60px!important;background-image:var(--winter-snowflake-image)!important;filter:none!important;animation-name:winter-three-speed-preview!important;animation-duration:var(--snow-duration)!important;animation-delay:0s!important;animation-timing-function:linear!important;transform-origin:50% 50%!important}
+@keyframes winter-three-speed-preview{0%{opacity:0;transform:translate3d(calc(-50% - 4px),-100px,0) rotate(0deg)}12%,86%{opacity:1}100%{opacity:0;transform:translate3d(calc(-50% + 4px),calc(100dvh + 100px),0) rotate(105deg)}}

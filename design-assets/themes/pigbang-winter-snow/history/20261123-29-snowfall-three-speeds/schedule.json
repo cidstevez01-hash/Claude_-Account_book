@@ -1,0 +1,54 @@
+{
+  "size": 60,
+  "maxVisibleSnowflakes": 3,
+  "durationSeconds": [
+    20,
+    30,
+    40
+  ],
+  "driftRangePixels": [
+    -4,
+    4
+  ],
+  "lanes": [
+    {
+      "center": 17,
+      "count": 1,
+      "offset": 0.24,
+      "durationSeconds": 20
+    },
+    {
+      "center": 50,
+      "count": 1,
+      "offset": 0.55,
+      "durationSeconds": 30
+    },
+    {
+      "center": 83,
+      "count": 1,
+      "offset": 0.76,
+      "durationSeconds": 40
+    }
+  ],
+  "schedule": [
+    {
+      "channel": 0,
+      "left": 17,
+      "durationSeconds": 20,
+      "phaseSeconds": 4.8
+    },
+    {
+      "channel": 1,
+      "left": 50,
+      "durationSeconds": 30,
+      "phaseSeconds": 16.5
+    },
+    {
+      "channel": 2,
+      "left": 83,
+      "durationSeconds": 40,
+      "phaseSeconds": 30.4
+    }
+  ],
+  "previewOnly": true
+}

@@ -303,10 +303,16 @@
     "checked": true
   },
   "pendingSnowfallSizePreview": {
-    "source": "history/20261123-28-snowfall-60px-spaced",
+    "source": "history/20261123-29-snowfall-three-speeds",
     "size": 60,
+    "maxVisibleSnowflakes": 3,
     "lanes": 3,
-    "collisionCheck": "Full 32-second cycle at four viewport sizes for both themes; no visible falling-flake bounding boxes intersected.",
+    "durationsSeconds": [
+      20,
+      30,
+      40
+    ],
+    "collisionCheck": "Full 120-second combined cycle at four viewport sizes for both themes; at most three visible falling flakes, no bounding-box overlaps.",
     "integrated": false
   }
 }
