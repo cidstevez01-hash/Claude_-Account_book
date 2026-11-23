@@ -1,0 +1,98 @@
+{
+  "size": 60,
+  "durationSeconds": 32,
+  "driftRangePixels": [
+    -4,
+    4
+  ],
+  "lanes": [
+    {
+      "center": 17,
+      "count": 5,
+      "offset": 0.08
+    },
+    {
+      "center": 50,
+      "count": 4,
+      "offset": 0.18
+    },
+    {
+      "center": 83,
+      "count": 5,
+      "offset": 0.02
+    }
+  ],
+  "schedule": [
+    {
+      "channel": 0,
+      "left": 17,
+      "phaseSeconds": 2.56
+    },
+    {
+      "channel": 0,
+      "left": 17,
+      "phaseSeconds": 8.96
+    },
+    {
+      "channel": 0,
+      "left": 17,
+      "phaseSeconds": 15.360000000000001
+    },
+    {
+      "channel": 0,
+      "left": 17,
+      "phaseSeconds": 21.759999999999998
+    },
+    {
+      "channel": 0,
+      "left": 17,
+      "phaseSeconds": 28.16
+    },
+    {
+      "channel": 1,
+      "left": 50,
+      "phaseSeconds": 5.76
+    },
+    {
+      "channel": 1,
+      "left": 50,
+      "phaseSeconds": 13.76
+    },
+    {
+      "channel": 1,
+      "left": 50,
+      "phaseSeconds": 21.759999999999998
+    },
+    {
+      "channel": 1,
+      "left": 50,
+      "phaseSeconds": 29.759999999999998
+    },
+    {
+      "channel": 2,
+      "left": 83,
+      "phaseSeconds": 0.64
+    },
+    {
+      "channel": 2,
+      "left": 83,
+      "phaseSeconds": 7.04
+    },
+    {
+      "channel": 2,
+      "left": 83,
+      "phaseSeconds": 13.440000000000001
+    },
+    {
+      "channel": 2,
+      "left": 83,
+      "phaseSeconds": 19.84
+    },
+    {
+      "channel": 2,
+      "left": 83,
+      "phaseSeconds": 26.240000000000002
+    }
+  ],
+  "previewOnly": true
+}

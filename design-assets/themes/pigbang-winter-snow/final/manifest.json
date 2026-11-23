@@ -303,8 +303,10 @@
     "checked": true
   },
   "pendingSnowfallSizePreview": {
-    "source": "history/20261123-27-snowfall-80px",
-    "size": 80,
+    "source": "history/20261123-28-snowfall-60px-spaced",
+    "size": 60,
+    "lanes": 3,
+    "collisionCheck": "Full 32-second cycle at four viewport sizes for both themes; no visible falling-flake bounding boxes intersected.",
     "integrated": false
   }
 }

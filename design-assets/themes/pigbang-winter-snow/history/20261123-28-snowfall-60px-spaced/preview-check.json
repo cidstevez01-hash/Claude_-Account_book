@@ -1,0 +1,132 @@
+[
+  {
+    "kind": "warm",
+    "viewport": [
+      320,
+      568
+    ],
+    "backgroundWidth": 320,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 15811,
+    "minimumGapPixels": 20.29,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "warm",
+    "viewport": [
+      390,
+      844
+    ],
+    "backgroundWidth": 390,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 17749,
+    "minimumGapPixels": 43.39,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "warm",
+    "viewport": [
+      430,
+      932
+    ],
+    "backgroundWidth": 430,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 18130,
+    "minimumGapPixels": 56.59,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "warm",
+    "viewport": [
+      1280,
+      844
+    ],
+    "backgroundWidth": 480,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 17749,
+    "minimumGapPixels": 73.09,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "warm",
+    "previewOnly": true,
+    "size": 60,
+    "flakes": 14,
+    "sourceSameAsFixedSnowflake": true,
+    "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+    "pageErrors": []
+  },
+  {
+    "kind": "silver",
+    "viewport": [
+      320,
+      568
+    ],
+    "backgroundWidth": 320,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 15811,
+    "minimumGapPixels": 20.29,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "silver",
+    "viewport": [
+      390,
+      844
+    ],
+    "backgroundWidth": 390,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 17749,
+    "minimumGapPixels": 43.39,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "silver",
+    "viewport": [
+      430,
+      932
+    ],
+    "backgroundWidth": 430,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 18130,
+    "minimumGapPixels": 56.59,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "silver",
+    "viewport": [
+      1280,
+      844
+    ],
+    "backgroundWidth": 480,
+    "cycleSeconds": 32,
+    "sampleIntervalMs": 125,
+    "pairsChecked": 17749,
+    "minimumGapPixels": 73.09,
+    "maxOverlapArea": 0,
+    "collisions": []
+  },
+  {
+    "kind": "silver",
+    "previewOnly": true,
+    "size": 60,
+    "flakes": 14,
+    "sourceSameAsFixedSnowflake": true,
+    "sha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+    "pageErrors": []
+  }
+]
