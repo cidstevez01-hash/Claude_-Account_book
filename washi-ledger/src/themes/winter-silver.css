@@ -228,8 +228,5 @@
 .winter-theme-preview--silver {
  --winter-preview-snowflake:url('../assets/themes/winter/silver-snowflake.png');
  --winter-preview-ink:url('../assets/themes/winter/silver-ink.webp');
- --winter-preview-outline:#A5ADB4;
 }
 .winter-theme-preview {position:relative;background:var(--winter-preview-snowflake) right -20px top -14px/100px auto no-repeat,var(--winter-preview-ink) center/100% 100% no-repeat,#FFFFFF;}
-.winter-theme-preview-card {position:absolute;top:34%;left:10%;right:10%;height:32%;background:#FFFFFFE0;border:1px solid var(--winter-preview-outline);border-radius:9px;}
-.winter-theme-preview-nav {position:absolute;bottom:10%;left:12%;right:12%;height:11%;background:#FFFFFFD9;border:1px solid var(--winter-preview-outline);border-radius:99px;}

@@ -1,0 +1,62 @@
+[
+  {
+    "kind": "warm",
+    "emptyFramesRemoved": true,
+    "originalThumbnailArtwork": true,
+    "selectionWorks": true
+  },
+  {
+    "kind": "silver",
+    "emptyFramesRemoved": true,
+    "originalThumbnailArtwork": true,
+    "selectionWorks": true
+  },
+  {
+    "kind": "warm",
+    "sourceSameAsFixedSnowflake": true,
+    "previewOnly": true,
+    "size": 80,
+    "originalSizes": [
+      14,
+      20,
+      16,
+      28,
+      18,
+      12,
+      24,
+      14,
+      20,
+      16,
+      28,
+      18,
+      12,
+      24
+    ],
+    "flakes": 14,
+    "sha256": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1"
+  },
+  {
+    "kind": "silver",
+    "sourceSameAsFixedSnowflake": true,
+    "previewOnly": true,
+    "size": 80,
+    "originalSizes": [
+      14,
+      20,
+      16,
+      28,
+      18,
+      12,
+      24,
+      14,
+      20,
+      16,
+      28,
+      18,
+      12,
+      24
+    ],
+    "flakes": 14,
+    "sha256": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67"
+  }
+]

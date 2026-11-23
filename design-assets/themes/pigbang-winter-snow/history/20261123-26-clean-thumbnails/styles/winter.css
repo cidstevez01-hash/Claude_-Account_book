@@ -1,0 +1,202 @@
+/* Approved warm winter theme. Design source: design-assets/themes/pigbang-winter-snow/history/20261123-22-warm-clearance. */
+:root[data-theme="winter"] {
+  --color-surface: #FFF9F5;
+  --color-background: #FFF9F5;
+  --color-surface-bright: #ffffff;
+  --color-surface-dim: #EBD9D0;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #FFF9F4;
+  --color-surface-container: #F6E9E2;
+  --color-surface-container-high: #F0E1D9;
+  --color-surface-container-highest: #ECDCD3;
+  --color-surface-variant: #EBDDD4;
+  --color-on-surface: #554344;
+  --color-on-background: #554344;
+  --color-on-surface-variant: #7B6562;
+  --color-inverse-surface: #503E40;
+  --color-inverse-on-surface: #FFF9F4;
+  --color-outline: #AB8A81;
+  --color-outline-variant: #DCC5BE;
+  --color-primary: #966475;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #966475;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #F6E5E2;
+  --color-primary-fixed-dim: #EBC9C5;
+  --color-on-primary-fixed: #654348;
+  --color-on-primary-fixed-variant: #986778;
+  --color-inverse-primary: #E8C1C5;
+  --color-app-title: #8E6073;
+  --color-secondary: #32785f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e2f0e9;
+  --color-on-secondary-container: #24523f;
+  --color-income: #32785f;
+  --color-expense: #b34c55;
+  --color-tertiary: #8b6c35;
+  --color-tertiary-container: #f2ebdc;
+  --color-on-tertiary-container: #654e25;
+  --color-link: #946B79;
+  --color-fab-icon: #ffffff;
+  --color-selected-day-ink: #ffffff;
+  --color-calendar-heat: #CDA58D;
+  --color-holiday: #b34c55;
+  --icon-gradient-top: #E7C4C5;
+  --icon-gradient-mid: #BC8B8B;
+  --icon-gradient-bottom: #966475;
+  --shadow-main-fab: 0 0 0 1px #ffffffd9, 0 0 20px #D3AB995e, 0 6px 14px #8F625226;
+}
+[data-theme="winter"] body { background: #ffffff; }
+[data-theme="winter"] .app-shell {
+  isolation: isolate;
+  background: #FFFEFF;
+}
+[data-theme="winter"] .app-shell::before { content:none; }
+[data-theme="winter"] .app-shell::after { content: none; }
+[data-theme="winter"] .paper-grid-bg { background-image: none; }
+[data-theme="winter"] [data-app-header] { background: transparent; border-bottom-color: transparent; }
+[data-theme="winter"] .papercut-text-shadow { text-shadow: 0 1px 0 #ffffffbd; }
+[data-theme="winter"] .papercut-shadow { box-shadow: 0 7px 22px #8F625210,inset 0 1px 0 #ffffffdc; }
+[data-theme="winter"] :is(.ledger-card,.bg-surface-container-lowest) {
+  background-color: #ffffffb8; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-color: #D9BFB6B3;
+}
+[data-theme="winter"] :is(section.bg-surface-container-lowest,.ledger-card) { border-style: solid; }
+[data-theme="winter"] [data-date-range-bar] { background-color:#ffffff94;border-style:solid;border-color:#D9BFB6B3;box-shadow:inset 0 1px 0 #ffffff; }
+[data-theme="winter"] .ledger-card { border-radius:20px;box-shadow:0 7px 22px #8F625210,inset 0 1px 0 #ffffffdc; }
+[data-theme="winter"] .washi-tape-texture { background:repeating-linear-gradient(112deg,#F4E5DA9C 0 3px,#ffffffb0 3px 5px);border:1px solid #E4CABA80; }
+[data-theme="winter"] .ledger-card .text-label-caps.text-primary { color:var(--color-expense); }
+[data-theme="winter"] .autumn-summary-tile:nth-child(2) .text-stat-figure { color:var(--color-expense); }
+[data-theme="winter"] .bottom-nav-shell {
+  background: #FFF8F2F0; border-color: #D9BFB6B3; box-shadow: 0 9px 28px #8F62521F,inset 0 1px 0 #fff;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+[data-theme="winter"] .tab-bubble { background:linear-gradient(155deg,#ffffffeb,#F2DCD2DB);border:1px solid #D9B7A9C4;box-shadow:0 2px 8px #A6786726,inset 0 1px 1px #fff; }
+[data-theme="winter"] .pb-navigation-icon { --pb-icon-accent:#E4C29C!important;--pb-icon-paper:#FFF9F4!important; }
+[data-theme="winter"] .pb-navigation-icon[data-active="true"] { color:#966475; filter:drop-shadow(0 0 5px #E7C4C58C); }
+[data-theme="winter"] .stamp-shadow { background:linear-gradient(145deg,#BF9294,#966475);box-shadow:var(--shadow-main-fab);border:1px solid #FFF9F4; }
+[data-theme="winter"] :is(input,textarea,select) { color:var(--color-on-surface); }
+[data-theme="winter"] [data-app-header] a[href="/account"] { box-shadow:0 0 0 1px #DDC4B8,0 0 0 5px #ffffff8c; }
+[data-theme="winter"] .winter-fall-layer { position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;contain:layout paint; }
+[data-theme="winter"] .winter-flake { position:absolute;top:-32px;left:var(--snow-x);width:var(--snow-size);height:var(--snow-size);background:var(--winter-snowflake-image) center/contain no-repeat;opacity:1;animation:winter-snowfall var(--snow-duration) linear infinite;animation-delay:var(--snow-delay);animation-play-state:var(--snow-play-state,running);will-change:transform; }
+@keyframes winter-snowfall { from { transform:translate3d(0,-25px,0) rotate(0deg); } to { transform:translate3d(var(--snow-drift),950px,0) rotate(105deg); } }
+@media(prefers-reduced-motion:reduce) { [data-theme="winter"] .winter-fall-layer { display:none; } }
+
+:root[data-theme="winter"] {
+ --color-primary:#A17E3C;--color-primary-container:#F4DBAE;--color-on-primary-container:#705331;
+ --color-primary-fixed:#FFF0D1;--color-on-primary-fixed:#705331;
+ --color-fab-icon:#8B672C;--color-surface-container:#FFF2DC;--color-surface-container-highest:#F9E8C9;
+ --icon-gradient-top:#F3DDA4;--icon-gradient-mid:#E3C27C;--icon-gradient-bottom:#C6A155;
+ --shadow-main-fab:0 0 0 1px #FFFFFFE6,0 0 18px #EBC77B4F,0 5px 14px #D5AF6530;
+}
+[data-theme="winter"] nav.bottom-nav-shell {background:linear-gradient(110deg,#FFF4E89C 0%,#FFFAF0C7 40%,#FFF8EBC7 60%,#FBE8D580 100%);border-color:#E6CEA8B8;box-shadow:0 9px 28px #D7B77824,inset 0 1px 0 #FFFFFF;backdrop-filter:none;-webkit-backdrop-filter:none;}
+[data-theme="winter"] .tab-bubble {background:linear-gradient(120deg,#FFF2CDEB,#F8E3BCEB,#F8DCD0ED);border-color:#DFC18BBB;box-shadow:0 2px 8px #D9B66C30,inset 0 1px 1px #FFFFFF;}
+[data-theme="winter"] nav a[href="/"] {color:#92703B;}
+[data-theme="winter"] nav a[href="/history"] {color:#95763D;}
+[data-theme="winter"] nav a[href="/stats"] {color:#997541;}
+[data-theme="winter"] .pb-navigation-icon[data-icon="book"] {color:#C6A155!important;}
+[data-theme="winter"] .pb-navigation-icon[data-icon="history"] {color:#C09B50!important;}
+[data-theme="winter"] .pb-navigation-icon[data-icon="bar_chart"] {color:#D2AF5F!important;}
+[data-theme="winter"] .pb-navigation-icon {--pb-icon-accent:#F3D69D!important;--pb-icon-paper:#FFFBF3!important;filter:none!important;}
+[data-theme="winter"] [data-app-header] button .material-symbols-outlined {color:#BD9545;}
+[data-theme="winter"] [data-app-header] a[href="/account"] {color:#B28B3D;background:linear-gradient(135deg,#FFF2CFB3,#F9E7D3B3,#F9DCD7B3);box-shadow:0 0 0 1px #E7CE9E,0 0 0 5px #FFFFFF73;}
+[data-theme="winter"] [data-date-range-bar] .material-symbols-outlined {color:#BD9545;}
+[data-theme="winter"] .stamp-shadow {background:linear-gradient(115deg,#F6DFA6 0%,#F7DFC0 50%,#F3CDCD 100%);color:#8B672C;border-color:#FFFDF6;box-shadow:var(--shadow-main-fab);}
+[data-theme="winter"] .stamp-shadow .material-symbols-outlined {color:#8B672C;}
+[data-theme="winter"] .bg-surface-container-highest.rounded-lg {background:linear-gradient(110deg,#FBEDCEE8,#FBECDDE0,#F9DFD5E8);}
+[data-theme="winter"] .bg-surface-container-highest.rounded-lg button {color:#836942;}
+[data-theme="winter"] .bg-surface-container-highest.rounded-lg button.bg-surface {background:linear-gradient(112deg,#F3DDB0,#F8E1C8,#F4D4C8);color:#705331;}
+[data-theme="winter"] main .bg-primary-container.rounded-full {background:linear-gradient(115deg,#F5DCA3 0%,#F7DEBC 50%,#F3D0CC 100%);}
+[data-theme="winter"] main .w-full.bg-surface-container.rounded-full {background:linear-gradient(110deg,#FFF5E4DA,#FFF1E8D6,#FFF4E7DA);border-color:#E5CAA088;}
+
+[data-theme="winter"] :is(.ledger-card,.bg-surface-container-lowest) {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF33 0%,#FFFFFFB8 27%,#FFFFFFD1 44%,#FFFFFFD1 56%,#FFFFFFB8 73%,#FFFFFF33 100%);
+ backdrop-filter:none;-webkit-backdrop-filter:none;border-color:#DCC4BBA6;
+}
+[data-theme="winter"] [data-date-range-bar] {background-color:#FFFFFF6B;border-color:#DCC4BBA6;}
+[data-theme="winter"] [data-month-nav] {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF33 0%,#FFFFFFB8 27%,#FFFFFFD1 44%,#FFFFFFD1 56%,#FFFFFFB8 73%,#FFFFFF33 100%);
+}
+
+/* Readability only. Approved artwork and light-gold control fills stay intact. */
+:root[data-theme="winter"] {
+ --color-on-surface:#483C35;
+ --color-on-background:#483C35;
+ --color-on-surface-variant:#66574F;
+ --color-outline-variant:#D0B58A;
+}
+[data-theme="winter"] :is(.ledger-card,.bg-surface-container-lowest) {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF5C 0%,#FFFFFFC2 22%,#FFFFFFF2 40%,#FFFFFFF2 60%,#FFFFFFC2 78%,#FFFFFF5C 100%);
+ border-color:#BEA06A;
+ box-shadow:0 4px 15px #C5A57417,inset 0 0 0 1px #FFFFFFE6;
+}
+[data-theme="winter"] [data-date-range-bar] {
+ background-color:#FFFFFFB0;
+ border-color:#BEA06A;
+ box-shadow:inset 0 0 0 1px #FFFFFFE6;
+}
+[data-theme="winter"] [data-month-nav] {
+ background-color:transparent;
+ background-image:linear-gradient(90deg,#FFFFFF5C 0%,#FFFFFFC2 22%,#FFFFFFF2 40%,#FFFFFFF2 60%,#FFFFFFC2 78%,#FFFFFF5C 100%);
+ border-color:#BEA06A;
+ box-shadow:inset 0 0 0 1px #FFFFFFE6;
+}
+[data-theme="winter"] main section > .flex.border-b > button.text-primary {color:#87672E;}
+[data-theme="winter"] main section > .flex.border-b > button {border-bottom-color:#CBB18A;}
+[data-theme="winter"] main section > .flex.border-b > button.border-primary {border-bottom-color:#A88442;}
+[data-theme="winter"] main section > .flex.border-b > button.border-transparent {border-bottom-color:transparent;}
+
+/* Opaque base minus the union of the two padded snowflake envelopes. */
+[data-theme="winter"] .winter-background::before {
+ -webkit-mask-image:linear-gradient(#000,#000),url('../assets/themes/winter/snowflake-clearance.svg'),url('../assets/themes/winter/snowflake-clearance.svg');
+ mask-image:linear-gradient(#000,#000),url('../assets/themes/winter/snowflake-clearance.svg'),url('../assets/themes/winter/snowflake-clearance.svg');
+ -webkit-mask-size:100% 100%,340px 340px,300px 300px;
+ mask-size:100% 100%,340px 340px,300px 300px;
+ -webkit-mask-position:0 0,right -115px top -82px,left -145px bottom -100px;
+ mask-position:0 0,right -115px top -82px,left -145px bottom -100px;
+ -webkit-mask-repeat:no-repeat;
+ mask-repeat:no-repeat;
+ -webkit-mask-composite:source-out,source-over;
+ mask-composite:subtract,add;
+ mask-mode:alpha;
+}
+
+:root[data-theme="winter"] {
+ --winter-snowflake-image:url('../assets/themes/winter/warm-snowflake.png');
+ --winter-ink-image:url('../assets/themes/winter/warm-ink.webp');
+}
+[data-theme="winter"] .app-shell {isolation:isolate;background:transparent;}
+[data-theme="winter"] .app-shell header {background:transparent;border-bottom-color:transparent;}
+[data-theme="winter"] .winter-background {
+ position:fixed;inset:0;max-width:480px;margin:0 auto;pointer-events:none;overflow:hidden;z-index:0;contain:paint;isolation:isolate;background:#FFFFFF;
+}
+[data-theme="winter"] .winter-background::before {
+ content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+ background:var(--winter-ink-image) center/100% auto no-repeat;opacity:.62;
+}
+[data-theme="winter"] .winter-background::after {
+ content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+ background:var(--winter-snowflake-image) right -115px top -82px/340px auto no-repeat,var(--winter-snowflake-image) left -145px bottom -100px/300px auto no-repeat;
+ opacity:1;filter:none;mix-blend-mode:normal;
+}
+[data-theme="winter"] .winter-fall-layer {position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2;contain:layout paint;}
+[data-theme="winter"] .winter-flake {
+ position:absolute;top:-32px;left:var(--snow-x);width:var(--snow-size);height:var(--snow-size);
+ background:var(--winter-snowflake-image) center/contain no-repeat;opacity:0;
+ animation:winter-snowfall var(--snow-duration) linear infinite;animation-delay:var(--snow-delay);animation-play-state:var(--snow-play-state,running);will-change:transform;
+}
+@keyframes winter-snowfall {
+ 0%{opacity:0;transform:translate3d(0,-25px,0) rotate(0deg);}
+ 12%,86%{opacity:1;}
+ 100%{opacity:0;transform:translate3d(var(--snow-drift),calc(100dvh + 64px),0) rotate(105deg);}
+}
+@media(prefers-reduced-motion:reduce){[data-theme="winter"] .winter-fall-layer {display:none;}}
+[data-theme="winter"] .autumn-drawer {background:linear-gradient(#FFFFFFED,#FFFFFFED),var(--winter-ink-image) center/cover #FFFFFF;border-color:#BEA06A;}
+.winter-theme-preview--warm {
+ --winter-preview-snowflake:url('../assets/themes/winter/warm-snowflake.png');
+ --winter-preview-ink:url('../assets/themes/winter/warm-ink.webp');
+}
+.winter-theme-preview {position:relative;background:var(--winter-preview-snowflake) right -20px top -14px/100px auto no-repeat,var(--winter-preview-ink) center/100% 100% no-repeat,#FFFFFF;}

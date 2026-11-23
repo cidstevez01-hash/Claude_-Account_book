@@ -294,5 +294,17 @@
     "The two original snowflake PNGs are immutable. No runtime recoloring.",
     "SVG icons retain existing geometry; only their palette changes.",
     "Previous design iterations remain in history."
-  ]
+  ],
+  "thumbnailUpdate": {
+    "date": "2026-11-23",
+    "source": "history/20261123-26-clean-thumbnails",
+    "emptyFramesRemoved": true,
+    "approved": true,
+    "checked": true
+  },
+  "pendingSnowfallSizePreview": {
+    "source": "history/20261123-27-snowfall-80px",
+    "size": 80,
+    "integrated": false
+  }
 }

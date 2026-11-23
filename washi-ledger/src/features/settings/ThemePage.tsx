@@ -112,10 +112,7 @@ export function ThemePage() {
                 }`}
               >
                 <div className={`${isWinterTheme(skin) ? `winter-theme-preview winter-theme-preview--${skin === 'winter' ? 'warm' : 'silver'} ` : ''}w-full aspect-[9/16] rounded-lg overflow-hidden border border-outline-variant shadow-inner flex flex-col gap-1`}>
-                  {isWinterTheme(skin) ? <>
-                    <div className="winter-theme-preview-card" />
-                    <div className="winter-theme-preview-nav" />
-                  </> : <>
+                  {!isWinterTheme(skin) && <>
                   <div className="h-1/2 w-full" style={{ background: preview.primary }} />
                   <div className="h-1/2 w-full flex">
                     <div className="h-full w-1/2" style={{ background: preview.surface }} />
