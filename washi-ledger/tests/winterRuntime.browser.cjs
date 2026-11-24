@@ -14,7 +14,8 @@ const categories=[{id:'food',code:'food',type:'expense',zh:'食费',ja:'食費',
 const catalog={expenseCategories:[categories[0]],incomeCategories:[categories[1]],paymentMethods:[{id:'cash',code:'cash',zh:'现金',ja:'現金',pointRate:null}],expenseTags:[],incomeTags:[],pointRules:[]};
 const row=e=>({id:e.id,user_id:uid,type:e.type,amount:e.amount,currency:e.currency,cat_code:e.catCode,sub_code:e.subCode,payment_method:e.paymentMethod,tag_code:e.tagCode,note:e.note,points:e.points,entry_date:e.date,recurring_id:null,created_at:new Date(e.createdAt).toISOString(),receipt_path:null});
 const results=[];let browser,server;
-async function setup({theme=activeTheme,lang='zh',entries=[],remote=false,missingColumn=false}={}){
+async function setup({theme=activeTheme,lang='zh',entries=[],remote=false,missingColumn=false,nativeTransitions=false,fixture}={}){
+ const activeCatalog=fixture?.catalog??catalog,activeCategories=fixture?.categories??categories;
  const ctx=await browser.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Tokyo',reducedMotion:'no-preference'});
  const state={writes:[],assets:[],pageErrors:[]};
  await ctx.routeWebSocket('**/*',ws=>ws.close());
@@ -32,22 +33,24 @@ async function setup({theme=activeTheme,lang='zh',entries=[],remote=false,missin
    }
   }
   if(req.method()==='GET'&&url.pathname.startsWith('/rest/v1/')){
-   if(url.pathname.endsWith('/categories'))return reply(categories.map(x=>({...x,sort_order:0})));
-   if(url.pathname.endsWith('/payment_methods'))return reply([{id:'cash',code:'cash',zh:'现金',ja:'現金',sort_order:0}]);
+   if(url.pathname.endsWith('/categories'))return reply(activeCategories.map(x=>({...x,sort_order:0})));
+   if(url.pathname.endsWith('/payment_methods'))return reply(activeCatalog.paymentMethods.map((p,i)=>({...p,sort_order:i,default_point_rate:null,badge_bg:null,badge_text:null})));
+   if(url.pathname.endsWith('/subcategories'))return reply(activeCategories.flatMap(c=>c.subs.map(s=>({...s,cat_code:c.code,is_preset:true}))));
+   if(url.pathname.endsWith('/tags'))return reply(['expense','income'].flatMap(type=>activeCatalog[type+'Tags'].map((t,i)=>({...t,type,is_preset:true,sort_order:i}))));
    return reply([]);
   }
   if(url.pathname.endsWith('/recurring-rules'))return reply({rules:[]});
   return r.abort();
  });
- await ctx.addInitScript(({uid,ref,token,catalog,theme,lang,entries,remote})=>{
-  document.startViewTransition=undefined;
+ await ctx.addInitScript(({uid,ref,token,catalog,theme,lang,entries,remote,nativeTransitions})=>{
+  if(!nativeTransitions)document.startViewTransition=undefined;
   if(localStorage.getItem('winter-test-seeded'))return;localStorage.setItem('winter-test-seeded','yes');
   localStorage.setItem('washi_ledger_settings_cache_v1',JSON.stringify({lang,currency:'JPY',themeSkin:theme}));
   localStorage.setItem('washi_ledger_settings_last_synced_user_v1',remote?'previous-account':uid);
   localStorage.setItem('sb-'+ref+'-auth-token',JSON.stringify({access_token:token,refresh_token:'isolated-winter',expires_at:Math.floor(Date.now()/1000)+86400,expires_in:86400,token_type:'bearer',user:{id:uid,aud:'authenticated',role:'authenticated',is_anonymous:true,app_metadata:{},user_metadata:{},created_at:'2026-11-01T00:00:00Z'}}));
   localStorage.setItem('washi_ledger_catalog_cache_v2:'+uid,JSON.stringify(catalog));
   localStorage.setItem('washi_ledger_entries_cache_v2:'+uid,JSON.stringify(entries));
- },{uid,ref,token,catalog,theme,lang,entries,remote});
+ },{uid,ref,token,catalog:activeCatalog,theme,lang,entries,remote,nativeTransitions});
  const page=await ctx.newPage();page.setDefaultTimeout(7000);page.on('pageerror',e=>state.pageErrors.push(e.message));
  await page.clock.setFixedTime(new Date('2026-11-22T00:41:00Z'));
  return{ctx,page,state};

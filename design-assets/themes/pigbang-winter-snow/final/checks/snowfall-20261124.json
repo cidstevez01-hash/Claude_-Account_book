@@ -1,0 +1,38 @@
+[
+  {
+    "name": "native random snowfall: warm 320x568",
+    "result": "passed"
+  },
+  {
+    "name": "native random snowfall: warm 390x844",
+    "result": "passed"
+  },
+  {
+    "name": "native random snowfall: warm 430x932",
+    "result": "passed"
+  },
+  {
+    "name": "native random snowfall: warm 1280x844",
+    "result": "passed"
+  },
+  {
+    "name": "native random snowfall: silver 320x568",
+    "result": "passed"
+  },
+  {
+    "name": "native random snowfall: silver 390x844",
+    "result": "passed"
+  },
+  {
+    "name": "native random snowfall: silver 430x932",
+    "result": "passed"
+  },
+  {
+    "name": "native random snowfall: silver 1280x844",
+    "result": "passed"
+  },
+  {
+    "name": "final actual pages with native random snowfall and selected theme labels",
+    "result": "passed"
+  }
+]

@@ -410,7 +410,7 @@ export function RatePage() {
                   type="button"
                   onClick={handleResetAmounts}
                   aria-label={t('rateResetAria')}
-                  className="stamp-shadow shrink-0 w-8 h-8 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-primary hover:-translate-y-0.5 active:scale-90 transition-transform"
+                  className="stamp-shadow shrink-0 w-8 h-8 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-action-ink hover:-translate-y-0.5 active:scale-90 transition-transform"
                   style={{ boxShadow: '0 2px 0 var(--color-surface-variant)' }}
                 >
                   <ThemeIcon icon="restart_alt" effect="bare" size={18} className="text-[18px]" />
@@ -422,7 +422,7 @@ export function RatePage() {
                 value={displayAmount}
                 onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-transparent border-none outline-none px-0 py-1 font-serif text-[42px] leading-[48px] font-bold text-primary text-right focus:ring-0"
+                className="w-full bg-transparent border-none outline-none px-0 py-1 font-serif text-[42px] leading-[48px] font-bold text-action-ink text-right focus:ring-0"
               />
             </div>
 
@@ -431,7 +431,7 @@ export function RatePage() {
               type="button"
               onClick={handleSwap}
               aria-label={t('swapCurrencyAria')}
-              className="stamp-shadow absolute left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-surface-container-lowest border-[1.5px] border-outline-variant flex items-center justify-center text-primary"
+              className="stamp-shadow absolute left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-surface-container-lowest border-[1.5px] border-outline-variant flex items-center justify-center text-action-ink"
               style={{ boxShadow: '0 3px 0 var(--color-surface-variant)' }}
             >
               <ThemeIcon className="material-symbols-outlined text-[24px]" icon="swap_vert" />
@@ -478,7 +478,7 @@ export function RatePage() {
                 ? `${snapshot?.date ? `${snapshot.date} · ` : ''}1 ${fromCode} = ${unitRate.toFixed(4)} ${toCode}`
                 : t('rateNeverFetched')}
           </div>
-          {error && <p className="mt-2 text-body-md text-primary break-all">{error}</p>}
+          {error && <p className="mt-2 text-body-md text-action-ink break-all">{error}</p>}
         </div>
 
         {/* 走势图(R-13：时间范围去掉1D、剩下三档用翻译文案；加纵坐标网格线+更密的
@@ -516,7 +516,7 @@ export function RatePage() {
                   onClick={() => setTimeframe(tf.key)}
                   className={`px-3 py-1.5 rounded-full text-label-caps whitespace-nowrap transition-colors ${
                     timeframe === tf.key
-                      ? 'bg-primary text-on-primary shadow-sm'
+                      ? 'bg-action text-on-action shadow-sm'
                       : 'text-on-surface-variant'
                   }`}
                 >
@@ -532,7 +532,7 @@ export function RatePage() {
               tooltip贴近图表左右边缘时被裁切的问题，这版先用更简单可靠的固定位置实现 */}
           {chartGeometry && activePoint && (
             <div className="self-center px-3 py-1 rounded-full bg-surface-container text-label-caps font-sans text-on-surface-variant shadow-sm">
-              {activePoint.date} · <span className="text-primary font-semibold">{formatAxisValue(activePoint.rate)} {toCode}</span>
+              {activePoint.date} · <span className="text-action-ink font-semibold">{formatAxisValue(activePoint.rate)} {toCode}</span>
             </div>
           )}
 
@@ -544,7 +544,7 @@ export function RatePage() {
             {historyLoading ? (
               <p className="w-full h-full flex items-center justify-center text-body-md text-on-surface-variant">{t('rateLoading')}</p>
             ) : historyError ? (
-              <p className="w-full h-full flex items-center justify-center text-body-md text-primary text-center break-all px-2">
+              <p className="w-full h-full flex items-center justify-center text-body-md text-action-ink text-center break-all px-2">
                 {historyError}
               </p>
             ) : !chartGeometry ? (
@@ -663,11 +663,11 @@ export function RatePage() {
           {historyStats && historyStats.high != null && historyStats.low != null && (
             <div className="grid grid-cols-[1fr_1fr_1.3fr] gap-2 pt-2 border-t border-dashed border-outline-variant/50">
               <div className="flex flex-col gap-0.5 pr-2 border-r border-dashed border-outline-variant/50">
-                <span className="flex items-center gap-1 text-[10px] font-sans text-primary">
+                <span className="flex items-center gap-1 text-[10px] font-sans text-action-ink">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
                   {t(statsPrefixKey)}{t('rateStatHighSuffix')}
                 </span>
-                <span className="text-body-lg font-serif font-semibold text-primary">{formatAxisValue(historyStats.high)}</span>
+                <span className="text-body-lg font-serif font-semibold text-action-ink">{formatAxisValue(historyStats.high)}</span>
                 <span className="text-[10px] font-sans text-on-surface-variant">
                   {t(statsPrefixKey)}{t('rateStatHighCaptionSuffix')}
                 </span>

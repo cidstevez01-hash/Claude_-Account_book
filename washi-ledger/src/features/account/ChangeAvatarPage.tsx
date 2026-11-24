@@ -83,7 +83,7 @@ export function ChangeAvatarPage() {
           type="button"
           onClick={handleSave}
           disabled={selectedId === initialId}
-          className="w-full h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
+          className="w-full h-[58px] bg-action text-on-action rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
         >
           {t('saveEntry')}
         </button>

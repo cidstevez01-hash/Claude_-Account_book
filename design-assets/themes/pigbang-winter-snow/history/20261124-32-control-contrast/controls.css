@@ -1,0 +1,69 @@
+/* B-93: functional ink is independent of the approved artwork/accent palette. */
+:root[data-theme="winter"] {
+  --color-action: #F4DBAE;
+  --color-on-action: #705331;
+  --color-action-ink: #705331;
+  --color-choice-fill: #F6DCA6;
+  --color-choice-border: #8B672C;
+  --color-choice-ink: #705331;
+  --color-range-day-ink: #705331;
+  --color-selected-day-ink: #21180F;
+}
+
+:root[data-theme="winter-silver"] {
+  --color-action: #E2E8F2;
+  --color-on-action: #4D607A;
+  --color-action-ink: #4D607A;
+  --color-choice-fill: #DCE5F3;
+  --color-choice-border: #596F8E;
+  --color-choice-ink: #4D607A;
+  --color-range-day-ink: #4D607A;
+  --color-selected-day-ink: #0B1522;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control {
+  position: relative;
+  padding-inline-end: 28px;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control--tile {
+  padding-inline-end: 4px;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control[aria-pressed="true"] {
+  background-color: var(--color-choice-fill);
+  border-color: var(--color-choice-border);
+  color: var(--color-choice-ink);
+  box-shadow: inset 0 0 0 1px var(--color-choice-border);
+}
+
+/* A persistent shape identifies selection even when the two light fills look alike. */
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 6px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-65%) rotate(45deg);
+  color: var(--color-choice-ink);
+  pointer-events: none;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control--tile[aria-pressed="true"]::after {
+  top: 5px;
+  right: 7px;
+  transform: rotate(45deg);
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control:focus-visible {
+  outline: 2px solid var(--color-choice-border);
+  outline-offset: 2px;
+}
+
+/* Adjacent years are still clickable, so they need readable text too. */
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-calendar-adjacent] {
+  color: var(--color-on-surface-variant);
+}

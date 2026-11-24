@@ -90,12 +90,12 @@ export function SignInPage() {
           </div>
         </div>
 
-        {error && <p className="text-body-md text-primary">{error}</p>}
+        {error && <p className="text-body-md text-action-ink">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif disabled:opacity-50"
+          className="w-full h-[52px] bg-action text-on-action rounded-xl text-headline-md font-serif disabled:opacity-50"
         >
           {loading ? t('signInSubmitLoading') : t('signInBtn')}
         </button>
@@ -103,7 +103,7 @@ export function SignInPage() {
 
       <p className="text-center text-body-md text-on-surface-variant mt-md">
         {t('noAccountText')}{' '}
-        <Link to="/register" onClick={(e) => viewTransitionLinkClick(e, navigate, '/register')} className="text-primary font-medium">
+        <Link to="/register" onClick={(e) => viewTransitionLinkClick(e, navigate, '/register')} className="text-action-ink font-medium">
           {t('goToSignUpLink')}
         </Link>
       </p>

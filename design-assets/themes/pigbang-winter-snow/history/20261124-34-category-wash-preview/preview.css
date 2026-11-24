@@ -1,0 +1,63 @@
+/* Preview only. Use the existing ink alpha as a small watercolor texture. */
+:root[data-theme="winter"] [data-category-redesign] {
+  --category-idle-fill: linear-gradient(140deg, #F8EFE3, #F8ECE8);
+  --category-selected-fill: #FCF0D9;
+  --category-idle-edge: #D9C7B4;
+  --category-selected-edge: #997744;
+  --category-selected-ink: #6D4E2E;
+  --category-idle-ink: #66574F;
+  --category-wash-colors: linear-gradient(130deg, #DFB367 5%, #EDC28A 40%, #F0B9B1 74%, #ECC6D3);
+  --category-glow: #D7B57825;
+  --color-choice-ink: #6D4E2E;
+}
+:root[data-theme="winter-silver"] [data-category-redesign] {
+  --category-idle-fill: linear-gradient(140deg, #EDF2F8, #F1EDF7);
+  --category-selected-fill: #E5EDF8;
+  --category-idle-edge: #C2CDDE;
+  --category-selected-edge: #6F84A0;
+  --category-selected-ink: #405675;
+  --category-idle-ink: #575B5F;
+  --category-wash-colors: linear-gradient(130deg, #9DCBE5 5%, #B4CEEB 38%, #C6BAE6 72%, #E9C5D5);
+  --category-glow: #B4C8E730;
+  --color-choice-ink: #405675;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--category-idle-fill) !important;
+  border: 1px solid var(--category-idle-edge) !important;
+  box-shadow: inset 0 1px 0 #FFFFFF80;
+  color: var(--category-idle-ink);
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control > span {
+  position: relative;
+  z-index: 1;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control[aria-pressed="true"] {
+  background: var(--category-selected-fill) !important;
+  border-color: var(--category-selected-edge) !important;
+  box-shadow: 0 0 0 .5px var(--category-selected-edge), 0 3px 12px var(--category-glow), inset 0 1px 0 #FFFFFF90;
+  color: var(--category-selected-ink);
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control[aria-pressed="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--category-wash-colors);
+  -webkit-mask: var(--winter-ink-image) left -6px top -38px / 255px 382.5px no-repeat;
+  mask: var(--winter-ink-image) left -6px top -38px / 255px 382.5px no-repeat;
+  mask-mode: alpha;
+  opacity: .55;
+  pointer-events: none;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control--tile[aria-pressed="true"]::before {
+  -webkit-mask-position: left -4px top -32px;
+  mask-position: left -4px top -32px;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control[aria-pressed="true"]::after {
+  z-index: 2;
+  color: var(--category-selected-ink);
+}

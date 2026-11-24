@@ -1,0 +1,128 @@
+[
+  {
+    "theme": "winter",
+    "previewOnly": true,
+    "widths": [
+      320,
+      390
+    ],
+    "selectedTextAndBorder": "passed",
+    "selectedWatercolorMask": "passed",
+    "unselectedWithoutWash": "passed",
+    "overflow": "none",
+    "remoteWrites": 0,
+    "washSamples": [
+      {
+        "width": 320,
+        "name": "食费",
+        "fill": "rgb(247, 222, 172)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/warm-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(217, 170, 89) 0%, rgb(227, 183, 124) 35%, rgb(229, 170, 169) 70%, rgb(217, 179, 203) 100%)"
+      },
+      {
+        "width": 320,
+        "name": "日用品",
+        "fill": "rgb(247, 222, 172)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/warm-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(217, 170, 89) 0%, rgb(227, 183, 124) 35%, rgb(229, 170, 169) 70%, rgb(217, 179, 203) 100%)"
+      },
+      {
+        "width": 320,
+        "name": "食费",
+        "fill": "rgb(247, 222, 172)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/warm-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(217, 170, 89) 0%, rgb(227, 183, 124) 35%, rgb(229, 170, 169) 70%, rgb(217, 179, 203) 100%)"
+      },
+      {
+        "width": 390,
+        "name": "食费",
+        "fill": "rgb(247, 222, 172)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/warm-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(217, 170, 89) 0%, rgb(227, 183, 124) 35%, rgb(229, 170, 169) 70%, rgb(217, 179, 203) 100%)"
+      },
+      {
+        "width": 390,
+        "name": "日用品",
+        "fill": "rgb(247, 222, 172)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/warm-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(217, 170, 89) 0%, rgb(227, 183, 124) 35%, rgb(229, 170, 169) 70%, rgb(217, 179, 203) 100%)"
+      },
+      {
+        "width": 390,
+        "name": "食费",
+        "fill": "rgb(247, 222, 172)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/warm-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(217, 170, 89) 0%, rgb(227, 183, 124) 35%, rgb(229, 170, 169) 70%, rgb(217, 179, 203) 100%)"
+      }
+    ]
+  },
+  {
+    "theme": "winter-silver",
+    "previewOnly": true,
+    "widths": [
+      320,
+      390
+    ],
+    "selectedTextAndBorder": "passed",
+    "selectedWatercolorMask": "passed",
+    "unselectedWithoutWash": "passed",
+    "overflow": "none",
+    "remoteWrites": 0,
+    "washSamples": [
+      {
+        "width": 320,
+        "name": "食费",
+        "fill": "rgb(213, 232, 246)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/silver-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(168, 199, 228) 0%, rgb(184, 200, 235) 35%, rgb(196, 180, 222) 70%, rgb(223, 189, 213) 100%)"
+      },
+      {
+        "width": 320,
+        "name": "日用品",
+        "fill": "rgb(213, 232, 246)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/silver-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(168, 199, 228) 0%, rgb(184, 200, 235) 35%, rgb(196, 180, 222) 70%, rgb(223, 189, 213) 100%)"
+      },
+      {
+        "width": 320,
+        "name": "食费",
+        "fill": "rgb(213, 232, 246)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/silver-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(168, 199, 228) 0%, rgb(184, 200, 235) 35%, rgb(196, 180, 222) 70%, rgb(223, 189, 213) 100%)"
+      },
+      {
+        "width": 390,
+        "name": "食费",
+        "fill": "rgb(213, 232, 246)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/silver-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(168, 199, 228) 0%, rgb(184, 200, 235) 35%, rgb(196, 180, 222) 70%, rgb(223, 189, 213) 100%)"
+      },
+      {
+        "width": 390,
+        "name": "日用品",
+        "fill": "rgb(213, 232, 246)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/silver-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(168, 199, 228) 0%, rgb(184, 200, 235) 35%, rgb(196, 180, 222) 70%, rgb(223, 189, 213) 100%)"
+      },
+      {
+        "width": 390,
+        "name": "食费",
+        "fill": "rgb(213, 232, 246)",
+        "opacity": "0.42",
+        "mask": "linear-gradient(rgba(0, 0, 0, 0.533), rgba(0, 0, 0, 0.533)), url(\"http://127.0.0.1:5275/src/assets/themes/winter/silver-ink.webp\")",
+        "image": "linear-gradient(120deg, rgb(168, 199, 228) 0%, rgb(184, 200, 235) 35%, rgb(196, 180, 222) 70%, rgb(223, 189, 213) 100%)"
+      }
+    ]
+  }
+]

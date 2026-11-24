@@ -47,7 +47,7 @@ function dayKey(ms: number): string {
 const LEVEL_BADGE: Record<LogLevel, string> = {
   info: 'bg-surface-container-high text-on-surface-variant',
   warn: 'bg-tertiary-fixed text-tertiary',
-  error: 'bg-primary-fixed text-primary',
+  error: 'bg-primary-fixed text-action-ink',
 }
 
 // 模块配色：固定收支用墨绿字、小票用琥珀底、其他用纸墨灰，一眼能区分来源
@@ -347,7 +347,7 @@ export function DebugLogPage() {
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="self-start min-h-9 px-3 rounded-full text-sm font-semibold text-primary bg-primary-fixed active:opacity-80"
+                  className="self-start min-h-9 px-3 rounded-full text-sm font-semibold text-action-ink bg-primary-fixed active:opacity-80"
                 >
                   {t('debugLogResetFilters')}
                 </button>
@@ -365,7 +365,7 @@ export function DebugLogPage() {
                   {t('debugLogCountLabel').replace('{n}', String(entries.length))}
                 </p>
               </div>
-              {copyToast && <span className="text-xs font-semibold text-primary">{t('debugLogCopiedToast')}</span>}
+              {copyToast && <span className="text-xs font-semibold text-action-ink">{t('debugLogCopiedToast')}</span>}
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -373,7 +373,7 @@ export function DebugLogPage() {
                 type="button"
                 onClick={handleCopy}
                 disabled={filtered.length === 0}
-                className="min-h-11 flex items-center justify-center gap-2 rounded-xl bg-primary text-on-primary text-sm font-semibold disabled:opacity-40 active:opacity-80"
+                className="min-h-11 flex items-center justify-center gap-2 rounded-xl bg-action text-on-action text-sm font-semibold disabled:opacity-40 active:opacity-80"
               >
                 <ThemeIcon className="material-symbols-outlined text-[18px]" icon="content_copy" />
                 {t('debugLogCopyLabel')}
@@ -399,7 +399,7 @@ export function DebugLogPage() {
                 type="button"
                 onClick={() => setClearOpen(true)}
                 disabled={entries.length === 0}
-                className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary-fixed text-primary text-sm font-semibold disabled:opacity-40 active:opacity-80"
+                className="min-h-11 flex items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary-fixed text-action-ink text-sm font-semibold disabled:opacity-40 active:opacity-80"
               >
                 <ThemeIcon className="material-symbols-outlined text-[18px]" icon="delete_sweep" />
                 {t('debugLogClearLabel')}

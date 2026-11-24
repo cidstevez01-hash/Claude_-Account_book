@@ -1,7 +1,7 @@
 {
-  "date": "2026-11-23",
+  "date": "2026-11-24",
   "product": "PigBang",
-  "status": "Random snowfall and settings label fix integrated",
+  "status": "Approved category ink and B-93 readability integrated with persistent live snowfall",
   "approvedBy": "全都可以接入了",
   "runtimeBackground": {
     "file": "washi-ledger/src/design-system/components/WinterBackground.tsx",
@@ -34,6 +34,10 @@
         48
       ],
       "browserNativeAnimation": true,
+      "excludedFromRootTransitionSnapshot": true,
+      "preserveProgressAcrossRoutesAndResume": true,
+      "nativeAppStateRecovery": true,
+      "observePersistentBackgroundSize": true,
       "jsPerFrame": false,
       "pauseWhenHidden": true,
       "reducedMotion": true
@@ -312,8 +316,8 @@
     "approved": true,
     "checked": true
   },
-  "version": "1.0.0-20261123-dev.2",
-  "latestIntegration": "history/20261123-30-snowfall-random-free-paths",
+  "version": "1.0.0-20261124-dev.1",
+  "latestIntegration": "history/20261124-36-category-enlarged-ink-preview",
   "validation": {
     "productionBuild": "passed",
     "lint": {
@@ -327,6 +331,36 @@
     "scheduleUnitTests": 3,
     "randomSimulationScenarios": 256,
     "randomSimulationSecondsPerScenario": 300,
-    "nativeDeviceVerification": "user"
+    "nativeDeviceVerification": "user",
+    "controlBrowserScenarios": 8,
+    "controlBrowserResult": "passed"
+  },
+  "controls": {
+    "bug": "B-93",
+    "scope": "Both winter themes; date ranges, category/subcategory/payment selection and functional text/buttons",
+    "approvedCategoryInk": true,
+    "originalInkNotReencoded": true,
+    "sourceSize": [
+      1024,
+      1536
+    ],
+    "inkDisplaySizeCss": [
+      340,
+      510
+    ],
+    "quality": [
+      {
+        "theme": "winter",
+        "deviceScaleFactor": 3,
+        "minimumActualPaintedLabelContrast": 5.72,
+        "sourcePixelsPerDisplayedPixel": 1.003921568627451
+      },
+      {
+        "theme": "winter-silver",
+        "deviceScaleFactor": 3,
+        "minimumActualPaintedLabelContrast": 5.57,
+        "sourcePixelsPerDisplayedPixel": 1.003921568627451
+      }
+    ]
   }
 }

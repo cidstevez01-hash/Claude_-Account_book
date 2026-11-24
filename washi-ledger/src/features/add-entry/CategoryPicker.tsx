@@ -163,7 +163,7 @@ export function CategoryPicker({
   }
 
   return (
-    <div className="py-md">
+    <div className="py-md" data-category-picker>
       <div className="flex items-center justify-between px-md mb-sm">
         <h2 className="text-label-caps font-sans text-on-surface-variant tracking-widest uppercase">{t('categoryLabel')}</h2>
       </div>
@@ -174,11 +174,12 @@ export function CategoryPicker({
             <button
               key={cat.code}
               type="button"
+              aria-pressed={active}
               onClick={() => onSelectCat(cat.code)}
-              className="flex flex-col items-center justify-center gap-1 py-2.5 px-1 rounded-2xl border-2 text-center transition-colors"
+              className="choice-control choice-control--tile flex flex-col items-center justify-center gap-1 py-2.5 px-1 rounded-2xl border-2 text-center transition-colors"
               style={
                 active
-                  ? { background: 'var(--color-primary-fixed)', borderColor: 'var(--color-primary)' }
+                  ? { background: 'var(--color-choice-fill)', borderColor: 'var(--color-choice-border)' }
                   : { background: 'var(--color-surface-container)', borderColor: 'var(--color-outline-variant)' }
               }
             >
@@ -193,7 +194,7 @@ export function CategoryPicker({
               </span>
               <span
                 className="text-[11px] font-sans truncate w-full"
-                style={{ color: active ? 'var(--color-primary)' : 'var(--color-on-surface-variant)', fontWeight: active ? 600 : 400 }}
+                style={{ color: active ? 'var(--color-choice-ink)' : 'var(--color-on-surface-variant)', fontWeight: active ? 600 : 400 }}
               >
                 {catLabel(cat, lang)}
               </span>
@@ -245,10 +246,11 @@ export function CategoryPicker({
             const pill = (
               <button
                 type="button"
+                aria-pressed={active}
                 onClick={() => onSelectSub(active ? null : sub.code)}
-                className={`py-2 px-3.5 rounded-full text-[13px] font-sans text-center transition-colors border ${
+                className={`choice-control py-2 px-3.5 rounded-full text-[13px] font-sans text-center transition-colors border ${
                   active
-                    ? 'border-primary bg-primary-fixed text-primary font-semibold'
+                    ? 'border-primary bg-primary-fixed text-action-ink font-semibold'
                     : 'border-outline-variant bg-surface-container text-on-surface-variant'
                 }`}
               >
@@ -284,7 +286,7 @@ export function CategoryPicker({
                     <button
                       type="button"
                       onClick={() => handleDelete(sub.id, sub.code)}
-                      className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-primary whitespace-nowrap w-full"
+                      className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-action-ink whitespace-nowrap w-full"
                     >
                       <ThemeIcon className="material-symbols-outlined text-[14px]" icon="delete" />
                       {t('deleteLabel')}

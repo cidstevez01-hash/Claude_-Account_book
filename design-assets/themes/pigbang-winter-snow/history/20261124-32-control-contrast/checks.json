@@ -1,0 +1,34 @@
+[
+  {
+    "name": "winter control readability and selection: winter zh",
+    "result": "passed"
+  },
+  {
+    "name": "winter control readability and selection: winter ja",
+    "result": "passed"
+  },
+  {
+    "name": "winter control readability and selection: winter-silver zh",
+    "result": "passed"
+  },
+  {
+    "name": "winter control readability and selection: winter-silver ja",
+    "result": "passed"
+  },
+  {
+    "name": "other themes retain control palette: default",
+    "result": "passed"
+  },
+  {
+    "name": "other themes retain control palette: nostalgia",
+    "result": "passed"
+  },
+  {
+    "name": "other themes retain control palette: summer",
+    "result": "passed"
+  },
+  {
+    "name": "other themes retain control palette: autumn",
+    "result": "passed"
+  }
+]

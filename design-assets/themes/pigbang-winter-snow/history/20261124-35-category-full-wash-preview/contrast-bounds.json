@@ -1,0 +1,14 @@
+[
+  {
+    "theme": "winter",
+    "minimumSelectedTextContrast": 5.23,
+    "maxWashOpacity": 0.42,
+    "samples": 20402
+  },
+  {
+    "theme": "winter-silver",
+    "minimumSelectedTextContrast": 4.9,
+    "maxWashOpacity": 0.42,
+    "samples": 20402
+  }
+]

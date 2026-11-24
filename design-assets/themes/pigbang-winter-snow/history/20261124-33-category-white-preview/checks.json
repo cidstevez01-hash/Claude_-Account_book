@@ -1,0 +1,26 @@
+[
+  {
+    "theme": "winter",
+    "previewOnly": true,
+    "widths": [
+      320,
+      390
+    ],
+    "selectedTextContrast": "passed",
+    "selectionMarker": "passed",
+    "overflow": "none",
+    "remoteWrites": 0
+  },
+  {
+    "theme": "winter-silver",
+    "previewOnly": true,
+    "widths": [
+      320,
+      390
+    ],
+    "selectedTextContrast": "passed",
+    "selectionMarker": "passed",
+    "overflow": "none",
+    "remoteWrites": 0
+  }
+]

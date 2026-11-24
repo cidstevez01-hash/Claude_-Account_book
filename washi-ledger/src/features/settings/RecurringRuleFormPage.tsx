@@ -185,7 +185,7 @@ export function RecurringRuleFormPage() {
                       type="button"
                       onClick={() => setType(key)}
                       className={`flex-1 py-2 text-center rounded-lg text-label-caps font-sans font-normal transition-colors ${
-                        type === key ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant'
+                        type === key ? 'bg-surface text-action-ink shadow-sm' : 'text-on-surface-variant'
                       }`}
                     >
                       {key === 'expense' ? t('typeExpense').toUpperCase() : t('typeIncome').toUpperCase()}
@@ -196,7 +196,7 @@ export function RecurringRuleFormPage() {
 
               <div className="px-md pb-8 flex flex-col items-center">
                 <div className="flex items-baseline justify-center border-b-2 border-primary pb-2 w-3/4 max-w-[240px]">
-                  <span className="font-serif text-hero-balance text-primary mr-2">
+                  <span className="font-serif text-hero-balance text-action-ink mr-2">
                     {symbolFor(sourceRule?.currency ?? settings.currency)}
                   </span>
                   <input
@@ -243,7 +243,7 @@ export function RecurringRuleFormPage() {
                       type="button"
                       onClick={() => setRuleKind(key)}
                       className={`flex-1 py-2 text-center rounded-lg text-body-sm font-sans transition-colors ${
-                        ruleKind === key ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant'
+                        ruleKind === key ? 'bg-surface text-action-ink shadow-sm' : 'text-on-surface-variant'
                       }`}
                     >
                       {key === 'dayOfMonth' ? t('recurringRuleKindDayOfMonth') : t('recurringRuleKindIntervalDays')}
@@ -282,10 +282,11 @@ export function RecurringRuleFormPage() {
                           <button
                             key={opt}
                             type="button"
+                            aria-pressed={bizDayAdjust === opt}
                             onClick={() => setBizDayAdjust(opt)}
-                            className={`py-2 px-3.5 rounded-full border text-[13px] font-sans transition-colors ${
+                            className={`choice-control py-2 px-3.5 rounded-full border text-[13px] font-sans transition-colors ${
                               bizDayAdjust === opt
-                                ? 'border-primary bg-primary-fixed text-primary font-semibold'
+                                ? 'border-primary bg-primary-fixed text-action-ink font-semibold'
                                 : 'border-outline-variant bg-surface-container text-on-surface-variant'
                             }`}
                           >
@@ -345,10 +346,11 @@ export function RecurringRuleFormPage() {
                       <button
                         key={pm.code}
                         type="button"
+                        aria-pressed={active}
                         onClick={() => setPayCode(active ? null : pm.code)}
-                        className={`flex items-center gap-1.5 py-2 px-3.5 rounded-full border text-[13px] font-sans transition-colors ${
+                        className={`choice-control flex items-center gap-1.5 py-2 px-3.5 rounded-full border text-[13px] font-sans transition-colors ${
                           active
-                            ? 'border-primary bg-primary-fixed text-primary font-semibold'
+                            ? 'border-primary bg-primary-fixed text-action-ink font-semibold'
                             : 'border-outline-variant bg-surface-container text-on-surface-variant'
                         }`}
                       >
@@ -404,7 +406,7 @@ export function RecurringRuleFormPage() {
             className="fixed bottom-0 inset-x-0 mx-auto max-w-[480px] p-md bg-surface border-t-[1.5px] border-dashed border-outline-variant flex flex-wrap gap-2"
             style={{ paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))' }}
           >
-            {saveFailed && <p className="basis-full text-xs text-primary text-center">{t('entrySaveFailed')}</p>}
+            {saveFailed && <p className="basis-full text-xs text-action-ink text-center">{t('entrySaveFailed')}</p>}
             {sourceRule && (
               <button
                 type="button"
@@ -419,7 +421,7 @@ export function RecurringRuleFormPage() {
               type="button"
               onClick={handleSave}
               disabled={!amount || parseFloat(amount) <= 0 || !catCode || saving}
-              className="flex-1 h-[58px] bg-primary text-on-primary rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 h-[58px] bg-action text-on-action rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >
               <ThemeIcon className="material-symbols-outlined" icon="how_to_reg" />

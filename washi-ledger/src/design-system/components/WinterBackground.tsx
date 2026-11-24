@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { App } from '@capacitor/app'
 import { useSettings } from '../../hooks/useSettings'
 import { isWinterTheme } from '../../lib/themeSkin'
 import { WinterSnowfallSchedule } from '../../lib/winterSnowfall'
@@ -15,13 +16,15 @@ export function WinterBackground() {
     const layer = layerRef.current
     if (!active || !background || !layer) return
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const initial = layer.getBoundingClientRect()
+    const initial = background.getBoundingClientRect()
     let schedule = new WinterSnowfallSchedule(initial.width, initial.height)
     const particles = new Map<number, { element: HTMLSpanElement; animation: Animation }>()
     let elapsed = 0
     let origin = performance.now()
     let running = false
-    let pageActive = true
+    let nativeActive = true
+    let nativeRevision = 0
+    let appStateListener: { remove: () => Promise<void> } | undefined
     let disposed = false
     let timer: number | undefined
 
@@ -83,20 +86,52 @@ export function WinterBackground() {
     }
     const sync = () => {
       if (disposed) return
-      if (!pageActive || document.hidden || reducedMotion.matches) {
+      if (!nativeActive || document.hidden || reducedMotion.matches) {
         pause()
-      } else if (!running) {
-        origin = performance.now()
-        running = true
-        for (const { animation } of particles.values()) animation.play()
+      } else {
+        const resuming = !running
+        if (resuming) {
+          origin = performance.now()
+          running = true
+        }
+        let recovered = false
+        for (const [id, { animation }] of particles) {
+          if (resuming || animation.playState === 'paused') {
+            // A native pause can outlive the DOM lifecycle event. Preserve the
+            // rendered progress and reserve its corridor until the real exit.
+            const flake = schedule.active.get(id)
+            const duration = animation.effect?.getTiming().duration
+            if (flake && typeof animation.currentTime === 'number' && typeof duration === 'number' && duration > 0) {
+              const now = time()
+              const progress = Math.max(0, Math.min(1, animation.currentTime / duration))
+              flake.bornAt = now - progress * flake.duration
+              flake.endAt = flake.bornAt + flake.duration
+            }
+            animation.play()
+            recovered = true
+          }
+        }
         background.style.setProperty('--snow-play-state', 'running')
-        tick()
+        if (resuming || recovered || timer === undefined) tick()
       }
     }
-    const hide = () => { pageActive = false; sync() }
-    const show = () => { pageActive = true; sync() }
+    // pagehide pauses immediately, but does not leave a latch that only a
+    // matching pageshow can clear. Visibility, focus and native resume recover.
+    const hide = () => { pause() }
+    const readNativeState = () => {
+      const revision = nativeRevision
+      void App.getState().then(({ isActive }) => {
+        if (disposed || nativeRevision !== revision) return
+        nativeActive = isActive
+        sync()
+      }).catch(() => { /* Preserve the visible-document fallback. */ })
+    }
+    const recover = () => {
+      sync()
+      if (!document.hidden) readNativeState()
+    }
     const observer = new ResizeObserver(() => {
-      const rect = layer.getBoundingClientRect()
+      const rect = background.getBoundingClientRect()
       if (Math.abs(rect.width - schedule.width) < .5 && Math.abs(rect.height - schedule.height) < .5) return
       pause()
       clearParticles()
@@ -104,20 +139,33 @@ export function WinterBackground() {
       elapsed = 0
       sync()
     })
-    observer.observe(layer)
-    document.addEventListener('visibilitychange', sync)
+    observer.observe(background)
+    document.addEventListener('visibilitychange', recover)
     window.addEventListener('pagehide', hide)
-    window.addEventListener('pageshow', show)
+    window.addEventListener('pageshow', recover)
+    window.addEventListener('focus', recover)
     reducedMotion.addEventListener('change', sync)
+    void App.addListener('appStateChange', ({ isActive }) => {
+      if (disposed) return
+      nativeRevision++
+      nativeActive = isActive
+      sync()
+    }).then((listener) => {
+      if (disposed) void listener.remove()
+      else appStateListener = listener
+    }).catch(() => { /* DOM lifecycle remains available if the bridge fails. */ })
+    readNativeState()
     sync()
     return () => {
       pause()
       disposed = true
       observer.disconnect()
-      document.removeEventListener('visibilitychange', sync)
+      document.removeEventListener('visibilitychange', recover)
       window.removeEventListener('pagehide', hide)
-      window.removeEventListener('pageshow', show)
+      window.removeEventListener('pageshow', recover)
+      window.removeEventListener('focus', recover)
       reducedMotion.removeEventListener('change', sync)
+      void appStateListener?.remove()
       clearParticles()
     }
   }, [active])

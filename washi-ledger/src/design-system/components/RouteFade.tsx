@@ -24,10 +24,10 @@ const supportsViewTransition = typeof document !== 'undefined' && typeof documen
 export function RouteFade({ children, className }: { children: ReactNode; className?: string }) {
   const location = useLocation()
   if (supportsViewTransition) {
-    return <div className={className}>{children}</div>
+    return <div data-route-transition-content className={className}>{children}</div>
   }
   return (
-    <div key={location.pathname} className={`route-fade ${className ?? ''}`}>
+    <div data-route-transition-content key={location.pathname} className={`route-fade ${className ?? ''}`}>
       {children}
     </div>
   )

@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-24",
+  "status": "approved and integrated",
+  "approval": "可以，就这样把",
+  "version": "1.0.0-20261124-dev.1",
+  "source": "history34 palette and original ink enlarged; history35 gradient rejected",
+  "quality": [
+    {
+      "theme": "winter",
+      "deviceScaleFactor": 3,
+      "minimumActualPaintedLabelContrast": 5.72,
+      "sourcePixelsPerDisplayedPixel": 1.003921568627451
+    },
+    {
+      "theme": "winter-silver",
+      "deviceScaleFactor": 3,
+      "minimumActualPaintedLabelContrast": 5.57,
+      "sourcePixelsPerDisplayedPixel": 1.003921568627451
+    }
+  ],
+  "artworkHashes": {
+    "warm-snowflake.png": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+    "silver-snowflake.png": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+    "warm-ink.webp": "4871536d10e18cefc40956e68343a8dd65decf4bce5f23be7d578de91e045740",
+    "silver-ink.webp": "5f31eecd2dcf08c3b44061f9e2edc64a2e3fa2cdb827bafd0375833e7ae210b2"
+  }
+}

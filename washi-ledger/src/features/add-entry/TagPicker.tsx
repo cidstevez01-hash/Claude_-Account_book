@@ -205,7 +205,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
                   <button
                     type="button"
                     onClick={() => handleDelete(tag.id, tag.code)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-primary whitespace-nowrap w-full"
+                    className="flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] text-action-ink whitespace-nowrap w-full"
                   >
                     <ThemeIcon className="material-symbols-outlined text-[14px]" icon="delete" />
                     {t('deleteLabel')}
@@ -259,7 +259,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
           <button
             type="button"
             onClick={startAdd}
-            className="py-1.5 px-2.5 rounded-lg border border-dashed border-primary text-primary text-tab-label font-sans flex items-center gap-1"
+            className="py-1.5 px-2.5 rounded-lg border border-dashed border-primary text-action-ink text-tab-label font-sans flex items-center gap-1"
           >
             <ThemeIcon className="material-symbols-outlined text-[14px]" icon="add" />
             {t('tagsLabel')}

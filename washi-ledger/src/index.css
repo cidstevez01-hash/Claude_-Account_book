@@ -8,6 +8,7 @@
 @import "./themes/autumn.css";
 @import "./themes/winter.css";
 @import "./themes/winter-silver.css";
+@import "./themes/winter-controls.css";
 
 @font-face {
   font-family: "Material Symbols Outlined";
@@ -91,6 +92,15 @@
      夏·花火共用这个近黑暖棕色(约5:1+)，怀旧主题的--color-on-primary本身已经是深棕
      (#6a2f14，4.74:1)够用，不用单独覆盖 */
   --color-selected-day-ink: #241209;
+
+  /* Functional controls can use readable ink without darkening decorative accents. */
+  --color-action: var(--color-primary);
+  --color-on-action: var(--color-on-primary);
+  --color-action-ink: var(--color-primary);
+  --color-choice-fill: var(--color-primary-fixed);
+  --color-choice-border: var(--color-primary);
+  --color-choice-ink: var(--color-primary);
+  --color-range-day-ink: var(--color-selected-day-ink);
 
   /* B-62→B-63续：日历页月历格子"热力图"背景专用色——B-59~B-61来回折腾了好几轮
      (同色系撞色→改中性on-surface丢了红/绿区分→改--color-outline中性灰，用户反馈
@@ -434,6 +444,20 @@
 }
 .rate-fab-shell {
   view-transition-name: rate-fab-vt;
+}
+
+/* Winter snowfall is a persistent live sibling, never an old page snapshot.
+   Capture only page content so the transparent artwork keeps moving beneath it. */
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) {
+  view-transition-name: none;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-route-transition-content] {
+  view-transition-name: winter-page-content;
+}
+::view-transition-old(winter-page-content),
+::view-transition-new(winter-page-content) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* B-XX："夏 · 花火"图标光效——图标形状(lib/iconGlyphs.ts)、颜色(IconGradientDefs.tsx

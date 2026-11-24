@@ -1,0 +1,138 @@
+/* B-93: functional ink is independent of the approved artwork/accent palette. */
+:root[data-theme="winter"] {
+  --color-action: #F4DBAE;
+  --color-on-action: #705331;
+  --color-action-ink: #705331;
+  --color-choice-fill: #F6DCA6;
+  --color-choice-border: #8B672C;
+  --color-choice-ink: #705331;
+  --color-range-day-ink: #705331;
+  --color-selected-day-ink: #21180F;
+}
+
+:root[data-theme="winter-silver"] {
+  --color-action: #E2E8F2;
+  --color-on-action: #4D607A;
+  --color-action-ink: #4D607A;
+  --color-choice-fill: #DCE5F3;
+  --color-choice-border: #596F8E;
+  --color-choice-ink: #4D607A;
+  --color-range-day-ink: #4D607A;
+  --color-selected-day-ink: #0B1522;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control {
+  position: relative;
+  padding-inline-end: 28px;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control--tile {
+  padding-inline-end: 4px;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control[aria-pressed="true"] {
+  background-color: var(--color-choice-fill);
+  border-color: var(--color-choice-border);
+  color: var(--color-choice-ink);
+  box-shadow: inset 0 0 0 1px var(--color-choice-border);
+}
+
+/* A persistent shape identifies selection even when the two light fills look alike. */
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 6px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-65%) rotate(45deg);
+  color: var(--color-choice-ink);
+  pointer-events: none;
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control--tile[aria-pressed="true"]::after {
+  top: 5px;
+  right: 7px;
+  transform: rotate(45deg);
+}
+
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) .choice-control:focus-visible {
+  outline: 2px solid var(--color-choice-border);
+  outline-offset: 2px;
+}
+
+/* Adjacent years are still clickable, so they need readable text too. */
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-calendar-adjacent] {
+  color: var(--color-on-surface-variant);
+}
+
+/* Approved category ink: history/20261124-36-category-enlarged-ink-preview. */
+/* Enlarge history34 ink. Preserve its palette and use the original RGB pigment texture. */
+:root[data-theme="winter"] [data-category-picker] {
+  --category-idle-fill: linear-gradient(140deg, #F8EFE3, #F8ECE8);
+  --category-selected-fill: #FCF0D9;
+  --category-idle-edge: #D9C7B4;
+  --category-selected-edge: #997744;
+  --category-selected-ink: #6D4E2E;
+  --category-idle-ink: #66574F;
+  --category-wash-colors: linear-gradient(130deg, #DFB367 5%, #EDC28A 40%, #F0B9B1 74%, #ECC6D3);
+  --category-glow: #D7B57825;
+  --color-choice-ink: #6D4E2E;
+}
+:root[data-theme="winter-silver"] [data-category-picker] {
+  --category-idle-fill: linear-gradient(140deg, #EDF2F8, #F1EDF7);
+  --category-selected-fill: #E5EDF8;
+  --category-idle-edge: #C2CDDE;
+  --category-selected-edge: #6F84A0;
+  --category-selected-ink: #405675;
+  --category-idle-ink: #575B5F;
+  --category-wash-colors: linear-gradient(130deg, #9DCBE5 5%, #B4CEEB 38%, #C6BAE6 72%, #E9C5D5);
+  --category-glow: #B4C8E730;
+  --color-choice-ink: #405675;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--category-idle-fill) !important;
+  border: 1px solid var(--category-idle-edge) !important;
+  box-shadow: inset 0 1px 0 #FFFFFF80;
+  color: var(--category-idle-ink);
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control > span {
+  position: relative;
+  z-index: 1;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control[aria-pressed="true"] {
+  background: var(--category-selected-fill) !important;
+  border-color: var(--category-selected-edge) !important;
+  box-shadow: 0 0 0 .5px var(--category-selected-edge), 0 3px 12px var(--category-glow), inset 0 1px 0 #FFFFFF90;
+  color: var(--category-selected-ink);
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control[aria-pressed="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: var(--category-wash-colors), var(--winter-ink-image);
+  background-size: 100% 100%, 340px 510px;
+  background-position: 0 0, left -10px top -60px;
+  background-repeat: no-repeat;
+  background-blend-mode: screen, normal;
+  -webkit-mask: var(--winter-ink-image) left -10px top -60px / 340px 510px no-repeat;
+  mask: var(--winter-ink-image) left -10px top -60px / 340px 510px no-repeat;
+  mask-mode: alpha;
+  opacity: .55;
+  pointer-events: none;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control--tile[aria-pressed="true"]::before {
+  -webkit-mask-position: left -10px top -60px;
+  mask-position: left -10px top -60px;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control[aria-pressed="true"]::after {
+  z-index: 2;
+  color: var(--category-selected-ink);
+}

@@ -17,7 +17,7 @@ export function TrendControls({ dim, onDimChange }: TrendControlsProps) {
             type="button"
             onClick={() => onDimChange(key)}
             className={`px-2.5 py-1 rounded text-tab-label font-sans ${
-              dim === key ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant'
+              dim === key ? 'bg-surface text-action-ink shadow-sm' : 'text-on-surface-variant'
             }`}
           >
             {key === 'day' ? t('pointsDimDay') : t('pointsDimMonth')}

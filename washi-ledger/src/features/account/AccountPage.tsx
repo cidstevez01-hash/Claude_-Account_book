@@ -48,14 +48,14 @@ export function AccountPage() {
             <Link
               to="/signin"
               onClick={(e) => viewTransitionLinkClick(e, navigate, '/signin')}
-              className="flex-1 h-11 flex items-center justify-center rounded-xl border border-primary text-primary text-body-lg"
+              className="flex-1 h-11 flex items-center justify-center rounded-xl border border-primary text-action-ink text-body-lg"
             >
               {t('signInBtn')}
             </Link>
             <Link
               to="/register"
               onClick={(e) => viewTransitionLinkClick(e, navigate, '/register')}
-              className="flex-1 h-11 flex items-center justify-center rounded-xl bg-primary text-on-primary text-body-lg"
+              className="flex-1 h-11 flex items-center justify-center rounded-xl bg-action text-on-action text-body-lg"
             >
               {t('signUpBtn')}
             </Link>
@@ -93,7 +93,7 @@ export function AccountPage() {
         <button
           type="button"
           onClick={() => setConfirmSignOut(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-primary/40 text-primary text-body-md active:opacity-60 transition-opacity"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-primary/40 text-action-ink text-body-md active:opacity-60 transition-opacity"
         >
           <ThemeIcon className="material-symbols-outlined text-[18px]" icon="logout" />
           {t('signOutBtn')}

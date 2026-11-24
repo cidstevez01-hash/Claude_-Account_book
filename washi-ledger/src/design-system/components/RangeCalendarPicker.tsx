@@ -267,7 +267,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
           <button
             type="button"
             onClick={openMonthPage}
-            className="px-2.5 py-1 rounded-lg bg-primary-fixed font-serif text-body-lg text-primary"
+            className="px-2.5 py-1 rounded-lg bg-primary-fixed font-serif text-body-lg text-action-ink"
           >
             {viewYear}年{viewMonth + 1}月
           </button>
@@ -296,6 +296,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
               <button
                 key={dateStr}
                 type="button"
+                aria-pressed={isBoundary || inRange}
                 onClick={() => tapDay(dateStr)}
                 className="relative h-9 flex items-center justify-center"
               >
@@ -308,7 +309,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
                 )}
                 <span
                   className={`relative z-[1] w-7 h-7 flex items-center justify-center rounded-full font-serif text-body-md ${
-                    isBoundary || inRange ? 'text-[var(--color-selected-day-ink)]' : 'text-on-surface'
+                    isBoundary ? 'text-[var(--color-selected-day-ink)]' : inRange ? 'text-range-day-ink' : 'text-on-surface'
                   } ${isBoundary ? 'bg-primary' : ''}`}
                 >
                   {date.getDate()}
@@ -326,7 +327,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
             type="button"
             onClick={handleConfirm}
             disabled={!complete}
-            className="font-sans font-bold px-4 py-1.5 rounded-lg disabled:text-on-surface-variant/50 text-primary"
+            className="font-sans font-bold px-4 py-1.5 rounded-lg disabled:text-on-surface-variant/50 text-action-ink"
           >
             {t('confirmLabel')}
           </button>
@@ -342,8 +343,9 @@ function PresetChip({ label, active, onClick }: { label: string; active: boolean
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
-      className={`px-2.5 py-1 rounded-full border-[1.5px] font-sans text-[11.5px] transition-colors ${
+      className={`choice-control px-2.5 py-1 rounded-full border-[1.5px] font-sans text-[11.5px] transition-colors ${
         active
           ? 'border-primary bg-primary-container text-on-primary-container'
           : 'border-outline-variant text-on-surface active:bg-surface-variant/50'
@@ -393,6 +395,8 @@ function YearPage({
             <button
               key={y}
               type="button"
+              aria-pressed={y === activeYear}
+              data-calendar-adjacent={!inDecade || undefined}
               onClick={() => onPick(y)}
               className={`py-3.5 text-center font-sans text-body-md rounded-lg ${
                 y === activeYear
@@ -444,7 +448,7 @@ function MonthPage({
         <button
           type="button"
           onClick={onOpenYearPage}
-          className="px-2.5 py-1 rounded-lg bg-primary-fixed font-serif text-body-lg text-primary min-w-[110px] text-center"
+          className="px-2.5 py-1 rounded-lg bg-primary-fixed font-serif text-body-lg text-action-ink min-w-[110px] text-center"
         >
           {year}年
         </button>
@@ -462,12 +466,13 @@ function MonthPage({
             <button
               key={m}
               type="button"
+              aria-pressed={isActive}
               onClick={() => onPick(m)}
               className={`py-3.5 text-center font-sans text-body-md rounded-lg ${
                 isActive
                   ? 'bg-primary text-[var(--color-selected-day-ink)] font-bold'
                   : inRange
-                    ? 'bg-primary-fixed text-primary font-semibold'
+                    ? 'bg-primary-fixed text-action-ink font-semibold'
                     : 'text-on-surface'
               }`}
             >

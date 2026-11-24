@@ -22,7 +22,7 @@ export function TrendLegend({
   aggregate,
   selectedBucket,
   valuePrefix = '¥',
-  valueColorClass = 'text-primary',
+  valueColorClass = 'text-action-ink',
   onSelectCategory,
   onClosePoint,
   resetKey,

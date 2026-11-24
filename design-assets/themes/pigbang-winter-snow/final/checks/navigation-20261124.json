@@ -1,0 +1,10 @@
+[
+  {
+    "name": "live snowfall through native transitions and missed lifecycle events: winter",
+    "result": "passed"
+  },
+  {
+    "name": "live snowfall through native transitions and missed lifecycle events: winter-silver",
+    "result": "passed"
+  }
+]

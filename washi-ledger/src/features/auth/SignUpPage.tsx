@@ -165,12 +165,12 @@ export function SignUpPage() {
             />
           </div>
 
-          {error && <p className="text-body-md text-primary">{error}</p>}
+          {error && <p className="text-body-md text-action-ink">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif disabled:opacity-50"
+            className="w-full h-[52px] bg-action text-on-action rounded-xl text-headline-md font-serif disabled:opacity-50"
           >
             {loading ? t('signUpSubmitLoading') : t('signUpSubmitBtn')}
           </button>
@@ -189,11 +189,11 @@ export function SignUpPage() {
             placeholder={t('verifyCodePlaceholder')}
             className="bg-transparent border-0 border-b-2 border-outline-variant focus:border-primary outline-none py-1 text-body-lg text-on-surface focus:ring-0 tracking-widest text-center"
           />
-          {error && <p className="text-body-md text-primary">{error}</p>}
+          {error && <p className="text-body-md text-action-ink">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif disabled:opacity-50"
+            className="w-full h-[52px] bg-action text-on-action rounded-xl text-headline-md font-serif disabled:opacity-50"
           >
             {loading ? t('verifySubmitLoading') : t('verifySubmitBtn')}
           </button>
@@ -203,7 +203,7 @@ export function SignUpPage() {
       {mode === 'signup' && (
         <p className="text-center text-body-md text-on-surface-variant mt-md">
           {t('alreadyHaveAccountText')}{' '}
-          <Link to="/signin" onClick={(e) => viewTransitionLinkClick(e, navigate, '/signin')} className="text-primary font-medium">
+          <Link to="/signin" onClick={(e) => viewTransitionLinkClick(e, navigate, '/signin')} className="text-action-ink font-medium">
             {t('goToSignInLink')}
           </Link>
         </p>

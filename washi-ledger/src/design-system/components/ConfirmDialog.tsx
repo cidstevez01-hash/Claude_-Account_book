@@ -44,7 +44,7 @@ export function ConfirmDialog({
       <div className="relative z-10 w-full max-w-[360px] bg-surface rounded-[20px] shadow-xl flex flex-col items-center p-lg">
         <div
           className={`w-16 h-16 rounded-full flex items-center justify-center mb-md ${
-            tone === 'error' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-primary'
+            tone === 'error' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-action-ink'
           }`}
         >
           <ThemeIcon className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }} icon={icon} />
@@ -63,7 +63,7 @@ export function ConfirmDialog({
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 py-2.5 rounded-lg bg-primary text-on-primary text-body-lg active:scale-95 transition-transform"
+            className="flex-1 py-2.5 rounded-lg bg-action text-on-action text-body-lg active:scale-95 transition-transform"
             style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
           >
             {finalConfirmLabel}

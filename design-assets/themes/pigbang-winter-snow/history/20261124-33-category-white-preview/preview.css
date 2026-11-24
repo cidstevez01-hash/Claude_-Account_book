@@ -1,0 +1,41 @@
+/* Preview overlay only: apply to CategoryPicker's wrapper, not the app background. */
+:root[data-theme="winter"] [data-category-redesign] {
+  --category-white: #FFFFFFE8;
+  --category-edge: #D8CBBF;
+  --category-selected-edge: #92723C;
+  --category-selected-ink: #705331;
+  --category-glow: #D7B57830;
+  --category-badge: #F7EBD3;
+}
+:root[data-theme="winter-silver"] [data-category-redesign] {
+  --category-white: #FFFFFFE8;
+  --category-edge: #CBD4E1;
+  --category-selected-edge: #6A809F;
+  --category-selected-ink: #4D607A;
+  --category-glow: #B4C8E738;
+  --category-badge: #E6ECF7;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control {
+  background: var(--category-white) !important;
+  border: 1px solid var(--category-edge) !important;
+  box-shadow: inset 0 1px 0 #FFFFFF;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control[aria-pressed="true"] {
+  background: #FFFFFFF5 !important;
+  border-color: var(--category-selected-edge) !important;
+  box-shadow: 0 0 0 1px var(--category-selected-edge), 0 3px 12px var(--category-glow), inset 0 1px 0 #FFFFFF;
+  color: var(--category-selected-ink);
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control--tile[aria-pressed="true"]::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  right: 3px;
+  top: 3px;
+  background: var(--category-badge);
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-redesign] .choice-control[aria-pressed="true"]::after {
+  color: var(--category-selected-ink);
+}

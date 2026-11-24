@@ -287,7 +287,7 @@ export function StatsPage() {
                     type="button"
                     onClick={() => changeTrendType(key)}
                     className={`px-2.5 py-1 rounded text-tab-label font-sans ${
-                      trendType === key ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant'
+                      trendType === key ? 'bg-surface text-action-ink shadow-sm' : 'text-on-surface-variant'
                     }`}
                   >
                     {key === 'expense' ? t('typeExpense') : t('typeIncome')}

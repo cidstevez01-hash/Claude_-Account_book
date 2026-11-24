@@ -29,7 +29,7 @@ export function CatalogLoadState({ loading, onRetry }: CatalogLoadStateProps) {
       <button
         type="button"
         onClick={onRetry}
-        className="mt-1 px-4 py-2 rounded-full border border-primary text-primary text-body-md active:opacity-60 transition-opacity"
+        className="mt-1 px-4 py-2 rounded-full border border-primary text-action-ink text-body-md active:opacity-60 transition-opacity"
       >
         {t('retryLabel')}
       </button>

@@ -217,7 +217,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
             <div className="flex flex-col items-center gap-md py-12 px-md text-center">
               <ThemeIcon className="material-symbols-outlined text-4xl text-primary" icon="error" />
               <p className="text-body-md text-on-surface">{t('receiptFailedError')}</p>
-              {errorMsg && <p className="text-xs text-primary break-all">⚠ {errorMsg}</p>}
+              {errorMsg && <p className="text-xs text-action-ink break-all">⚠ {errorMsg}</p>}
               <div className="flex items-center gap-2 mt-sm">
                 <button
                   type="button"
@@ -229,7 +229,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                 <button
                   type="button"
                   onClick={handlePickGallery}
-                  className="px-5 py-2.5 rounded-lg bg-primary text-on-primary text-body-md active:scale-95 transition-transform"
+                  className="px-5 py-2.5 rounded-lg bg-action text-on-action text-body-md active:scale-95 transition-transform"
                 >
                   {t('receiptUseGalleryInstead')}
                 </button>
@@ -248,7 +248,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                   type="button"
                   aria-label={t('receiptRetakeAria')}
                   onClick={startScan}
-                  className="absolute right-2 bottom-2 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-sm border border-outline-variant flex items-center justify-center text-primary shadow-sm active:scale-90 transition-transform"
+                  className="absolute right-2 bottom-2 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-sm border border-outline-variant flex items-center justify-center text-action-ink shadow-sm active:scale-90 transition-transform"
                 >
                   <ThemeIcon className="material-symbols-outlined text-[18px]" icon="photo_camera" />
                 </button>
@@ -264,16 +264,16 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
         {stage === 'review' && (
           <div className="p-md shrink-0 border-t-[1.5px] border-dashed border-outline-variant">
-            {saveFailed && <p className="text-xs text-primary text-center mb-2">{t('receiptSaveFailed')}</p>}
+            {saveFailed && <p className="text-xs text-action-ink text-center mb-2">{t('receiptSaveFailed')}</p>}
             <button
               type="button"
               onClick={handleConfirm}
               disabled={saving}
-              className="w-full h-[52px] bg-primary text-on-primary rounded-xl text-headline-md font-serif flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform disabled:opacity-70"
+              className="w-full h-[52px] bg-action text-on-action rounded-xl text-headline-md font-serif flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform disabled:opacity-70"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >
               {saving ? (
-                <span className="ios-spinner text-on-primary">
+                <span className="ios-spinner text-on-action">
                   {Array.from({ length: 8 }, (_, i) => (
                     <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
                   ))}

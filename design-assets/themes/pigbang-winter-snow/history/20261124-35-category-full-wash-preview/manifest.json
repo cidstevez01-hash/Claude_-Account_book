@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-24",
+  "status": "preview-only; awaiting approval",
+  "selected": "full-frame theme gradient plus original-ink alpha texture",
+  "unselected": "light theme gradient without watercolor",
+  "scope": "CategoryPicker category tiles and subcategory pills only",
+  "sourceInk": [
+    "../../final/layers/warm-ink.webp",
+    "../../final/layers/silver-ink.webp"
+  ],
+  "applicationCodeChanged": false,
+  "fullFrameCoverage": true
+}
