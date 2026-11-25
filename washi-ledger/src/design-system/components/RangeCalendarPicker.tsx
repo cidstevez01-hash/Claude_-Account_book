@@ -54,7 +54,7 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
   // 那一头)，起始月对长区间来说反而是相对不重要的边界
   const [viewYear, setViewYear] = useState(() => Number(endDate.split('-')[0]))
   const [viewMonth, setViewMonth] = useState(() => Number(endDate.split('-')[1]) - 1)
-  // 年/月快速跳转(两个独立页面，不是混一起滚动)——page切换视图，decadeStart只在
+  // 年/月快速选择(两个独立页面，不是混一起滚动)——page切换视图，decadeStart只在
   // 年份页用，翻页时按10年一段前后移动
   const [page, setPage] = useState<PickerPage>('calendar')
   const [decadeStart, setDecadeStart] = useState(() => Math.floor(Number(endDate.split('-')[0]) / 10) * 10)
@@ -144,15 +144,15 @@ export function RangeCalendarPicker({ open, startDate, endDate, onConfirm, onClo
     setTransitionDir('out')
     setPage('year')
   }
-  // 选年份/选月份都是往下钻回更具体的视图，过渡方向是'in'(放大到位)：年份页选完
-  // 年份退回月份页(停在选好的年份，继续选月)，月份页选完月份退回日历页
+  // 选年份退回月份页，选月份则按R-58填入该月首尾日期后退回日历页。
+  // 整月范围仍是草稿，只有“确定”才写回；浏览年份、滑动切月不改区间。
   function pickYear(y: number) {
     setViewYear(y)
     setTransitionDir('in')
     setPage('month')
   }
   function pickMonth(m: number) {
-    setViewMonth(m)
+    applyPreset(ymd(new Date(viewYear, m, 1)), ymd(new Date(viewYear, m + 1, 0)))
     setTransitionDir('in')
     setPage('calendar')
   }
@@ -415,7 +415,7 @@ function YearPage({
   )
 }
 
-/** 月份快速跳转页(mock-v8确认版)——选完年份后进这一页，独立页面。‹›直接翻上一年/
+/** 整月范围快速选择页——选完年份后进这一页，独立页面。‹›直接翻上一年/
  * 下一年(留在月份页不用回年份页)；点顶部"YYYY年"标题才跳回年份页做大跨度年份跳转。
  * 落在当前草稿区间内的月份(pendingStart~pendingEnd跨月时)用主色浅底标出，跟当前
  * 选中月份(实心)区分开 */

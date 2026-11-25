@@ -1,3 +1,102 @@
+diff --git a/node_modules/@capacitor-community/image-to-text/CapacitorCommunityImageToText.podspec b/node_modules/@capacitor-community/image-to-text/CapacitorCommunityImageToText.podspec
+index e22e6d3..39f0af1 100644
+--- a/node_modules/@capacitor-community/image-to-text/CapacitorCommunityImageToText.podspec
++++ b/node_modules/@capacitor-community/image-to-text/CapacitorCommunityImageToText.podspec
+@@ -11,6 +11,7 @@ Pod::Spec.new do |s|
+     s.author = package['author']
+     s.source = { :git => 'git@github.com:capacitor-community/image-to-text', :tag => s.version.to_s }
+     s.source_files = 'ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
+-    s.ios.deployment_target = '14.0'
++    s.ios.deployment_target = '15.5'
+     s.dependency 'Capacitor'
++    s.dependency 'GoogleMLKit/TextRecognitionJapanese', '8.0.0'
+ end
+diff --git a/node_modules/@capacitor-community/image-to-text/ios/Plugin/MlkitTextDetector.swift b/node_modules/@capacitor-community/image-to-text/ios/Plugin/MlkitTextDetector.swift
+new file mode 100644
+--- /dev/null
++++ b/node_modules/@capacitor-community/image-to-text/ios/Plugin/MlkitTextDetector.swift
+@@ -0,0 +1,71 @@
++import UIKit
++import Capacitor
++import MLKitVision
++import MLKitTextRecognitionCommon
++import MLKitTextRecognitionJapanese
++
++// Primary on-device Japanese OCR; the existing Vision method remains a fallback.
++extension CapacitorOcr {
++    @objc func detectTextMlkit(_ call: CAPPluginCall) {
++        guard var base64 = call.getString("base64") else {
++            call.reject("MLKIT_INVALID_IMAGE")
++            return
++        }
++        if let prefix = base64.range(of: "base64,") {
++            base64 = String(base64[prefix.upperBound...])
++        }
++        guard let data = Data(base64Encoded: base64), let image = UIImage(data: data),
++              image.size.width > 0, image.size.height > 0 else {
++            call.reject("MLKIT_INVALID_IMAGE")
++            return
++        }
++        MlkitReceiptDetector(call: call, image: image).recognize()
++    }
++}
++
++private final class MlkitReceiptDetector {
++    private let call: CAPPluginCall
++    private let image: UIImage
++    private let recognizer = TextRecognizer.textRecognizer(options: JapaneseTextRecognizerOptions())
++
++    init(call: CAPPluginCall, image: UIImage) {
++        self.call = call
++        self.image = image
++    }
++
++    func recognize() {
++        let input = VisionImage(image: image)
++        input.orientation = image.imageOrientation
++        recognizer.process(input) { [self] result, error in
++            guard error == nil, let result = result else {
++                call.reject("MLKIT_RECOGNITION_FAILED")
++                return
++            }
++            // Preserve text-line positions for the shared receipt-field parser.
++            // ML Kit uses top-left image coordinates; Vision uses normalized Y-up.
++            // Keep complete lines so currency and thousands separators are not
++            // broken apart by joining individual word/character elements.
++            var detections: [[String: Any]] = []
++            for block in result.blocks {
++                for line in block.lines {
++                    detections.append(box(line.text, line.frame, line.cornerPoints))
++                }
++            }
++            call.resolve(["textDetections": detections])
++        }
++    }
++
++    private func box(_ text: String, _ frame: CGRect, _ corners: [NSValue]) -> [String: Any] {
++        let points = corners.count == 4 ? corners.map { $0.cgPointValue } : [
++            CGPoint(x: frame.minX, y: frame.minY), CGPoint(x: frame.maxX, y: frame.minY),
++            CGPoint(x: frame.maxX, y: frame.maxY), CGPoint(x: frame.minX, y: frame.maxY)
++        ]
++        func normalized(_ point: CGPoint) -> [Double] {
++            [Double(max(0, min(1, point.x / image.size.width))),
++             Double(max(0, min(1, 1 - point.y / image.size.height)))]
++        }
++        // The iOS ML Kit API exposes no per-element confidence or alternatives.
++        return ["text": text, "topLeft": normalized(points[0]), "topRight": normalized(points[1]),
++                "bottomRight": normalized(points[2]), "bottomLeft": normalized(points[3])]
++    }
++}
+diff --git a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.m b/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.m
+index 30d7beb..b84e959 100644
+--- a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.m
++++ b/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.m
+@@ -5,4 +5,5 @@
+ // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
+ CAP_PLUGIN(CapacitorOcr, "CapacitorOcr",
+            CAP_PLUGIN_METHOD(detectText, CAPPluginReturnPromise);
++           CAP_PLUGIN_METHOD(detectTextMlkit, CAPPluginReturnPromise);
+ )
 diff --git a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift b/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift
 index 7c707e9..3187dc2 100644
 --- a/node_modules/@capacitor-community/image-to-text/ios/Plugin/Plugin.swift

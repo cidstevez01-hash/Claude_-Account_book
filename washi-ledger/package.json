@@ -1,14 +1,15 @@
 {
   "name": "pigbang",
   "private": true,
-  "version": "1.0.0-20261125-dev.1",
+  "version": "1.0.0-20261125-dev.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "capacitor:sync:before": "node scripts/configure-receipt-ios.cjs"
   },
   "dependencies": {
     "@capacitor-community/image-to-text": "^7.0.0",

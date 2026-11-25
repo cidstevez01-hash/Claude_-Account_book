@@ -3,8 +3,8 @@ import { logModule } from './appLog'
 import { isReceiptTotalHint, selectReceiptTotal, type ReceiptTextRow, type ReceiptTotalResult } from './receiptTotal'
 import { selectReceiptDate } from './receiptDate'
 
-/** 扫描小票后自动填金额/备注——免费方案，用iOS Vision框架(通过
- * @capacitor-community/image-to-text，纯本地识别不联网不花钱)。跟Claude视觉API
+/** 扫描小票后自动填金额/备注——默认使用 Google ML Kit 日文模型，无法确认金额时
+ * 回退 Apple Vision。两种文字识别均在设备上执行，不调用云端收费接口。跟Claude视觉API
  * 那种"直接看懂这是金额/店名/商品"完全不是一回事：这个插件只负责把图片里的文字
  * 识别出来(每条文本自带四角坐标)，金额/店名/购入明细这三项要靠这个文件自己写规则
  * 从这堆文本框里按版面结构拆出来，不是关键词瞎猜——按Y坐标把文本框聚类成"行"，
@@ -27,6 +27,35 @@ export interface RecognizedReceiptFields {
   date: string | null
   storeName: string | null
   items: string[]
+}
+
+export type ReceiptOcrEngine = 'mlkit' | 'vision'
+interface ReceiptOcrOptions {
+  engine?: ReceiptOcrEngine
+  signal?: AbortSignal
+}
+
+// 同一原生插件扩展方法，继续兼容项目的 Capacitor 7，不升级整个原生框架。
+const mlkitOcr = Ocr as typeof Ocr & {
+  detectTextMlkit(options: { base64: string }): Promise<{ textDetections: TextDetection[] }>
+}
+
+function cancelled(signal?: AbortSignal) {
+  if (signal?.aborted) throw new Error('RECEIPT_SCAN_CANCELLED')
+}
+
+// 关闭/重扫后立即释放 JS 等待；原生完成的旧结果不会继续解析或回填。
+function abortable<T>(pending: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return pending
+  return new Promise((resolve, reject) => {
+    const abort = () => reject(new Error('RECEIPT_SCAN_CANCELLED'))
+    signal.addEventListener('abort', abort, { once: true })
+    pending.then(
+      value => { signal.removeEventListener('abort', abort); resolve(value) },
+      error => { signal.removeEventListener('abort', abort); reject(error) },
+    )
+    if (signal.aborted) abort()
+  })
 }
 
 // 店名/金额行之间夹的不只是"找不到合計时的兜底"这一种情况——真机实测过一张小票
@@ -203,8 +232,11 @@ function findTotalBand(rows: ReceiptTextRow[], total: ReceiptTotalResult): Recei
   return top - bottom <= 0.55 ? { bottom, top } : null
 }
 
-async function detectRows(base64: string, band?: ReceiptScanBand): Promise<ReceiptTextRow[]> {
-  const result = await Ocr.detectText({ base64 })
+async function detectRows(base64: string, band: ReceiptScanBand | undefined, engine: ReceiptOcrEngine, signal?: AbortSignal): Promise<ReceiptTextRow[]> {
+  cancelled(signal)
+  const result = await abortable(engine === 'mlkit'
+    ? mlkitOcr.detectTextMlkit({ base64 }) : Ocr.detectText({ base64 }), signal)
+  cancelled(signal)
   const detections: ReceiptTextDetection[] = result.textDetections
   const boxes = band ? detections.map((box) => {
     const project = ([x, y]: [number, number]): [number, number] => [x, band.bottom + y * (band.top - band.bottom)]
@@ -221,13 +253,15 @@ async function retryTotal(
   initial: ReceiptTotalResult,
   crop: (band: ReceiptScanBand) => { imageDataUrl: string; band: ReceiptScanBand },
   receiptId: string,
+  engine: ReceiptOcrEngine,
+  signal?: AbortSignal,
 ): Promise<ReceiptTotalResult> {
   const uncertain = initial.amount == null ? initial : { ...initial, amount: null, reason: '合计候选不确定，需要确认' }
   const region = findTotalBand(rows, initial)
   if (!region) return uncertain
   try {
     const { imageDataUrl, band } = crop(region)
-    const reread = await detectRows(imageDataUrl, band)
+    const reread = await detectRows(imageDataUrl, band, engine, signal)
     const rereadCandidates = selectReceiptTotal(reread).candidates
     if (!rereadCandidates.length) return uncertain
     const merged = [...rows.filter(({ y }) => y < band.bottom || y > band.top), ...reread].sort((a, b) => b.y - a.y)
@@ -259,23 +293,44 @@ export async function recognizeReceiptFields(
   receiptId: string,
   crop?: (band: ReceiptScanBand) => { imageDataUrl: string; band: ReceiptScanBand },
   onRetry?: (fields: RecognizedReceiptFields) => void,
+  { engine = 'mlkit', signal }: ReceiptOcrOptions = {},
+): Promise<RecognizedReceiptFields> {
+  const primary = await recognizeWithEngine(imageDataUrl, receiptId, crop, onRetry, engine, signal)
+  if (engine === 'vision' || primary.amount != null || signal?.aborted) return primary
+  // 仅对同一张原图重试，每个引擎各自解析，不拼接两套 OCR 行或跨小票求合计。
+  onRetry?.(primary)
+  logModule('receipt', `ML Kit 未确认合计，回退 Vision receiptId=${receiptId}`)
+  const fallback = await recognizeWithEngine(imageDataUrl, receiptId, crop, onRetry, 'vision', signal)
+  return fallback.amount != null || primary.ocrRows.length === 0 ? fallback : primary
+}
+
+async function recognizeWithEngine(
+  imageDataUrl: string,
+  receiptId: string,
+  crop: ((band: ReceiptScanBand) => { imageDataUrl: string; band: ReceiptScanBand }) | undefined,
+  onRetry: ((fields: RecognizedReceiptFields) => void) | undefined,
+  engine: ReceiptOcrEngine,
+  signal?: AbortSignal,
 ): Promise<RecognizedReceiptFields> {
   try {
-    logModule('receipt', '调用Ocr.detectText()识别小票文字')
-    const rows = await detectRows(imageDataUrl)
-    logModule('receipt', `OCR原始行 receiptId=${receiptId} (${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
+    cancelled(signal)
+    const started = performance.now()
+    logModule('receipt', `调用本地 OCR engine=${engine} receiptId=${receiptId}`)
+    const rows = await detectRows(imageDataUrl, undefined, engine, signal)
+    logModule('receipt', `OCR原始行 receiptId=${receiptId} engine=${engine} (${rows.length}行): ${rows.map((r) => r.text).join(' | ')}`)
     const initial = selectReceiptTotal(rows)
     let fields = extractReceiptFields(rows, receiptId, initial)
     if (crop && needsTotalRetry(initial)) {
       onRetry?.({ ...fields, amount: null })
-      fields = extractReceiptFields(rows, receiptId, await retryTotal(rows, initial, crop, receiptId))
+      fields = extractReceiptFields(rows, receiptId, await retryTotal(rows, initial, crop, receiptId, engine, signal))
     }
+    cancelled(signal)
     logModule('receipt',
-      `OCR解析 receiptId=${receiptId}: 金额=${fields.amount}, 日期=${fields.date}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
+      `OCR解析 receiptId=${receiptId} engine=${engine} elapsedMs=${Math.round(performance.now() - started)}: 金额=${fields.amount}, 日期=${fields.date}, 店名=${fields.storeName}, 明细${fields.items.length}件`,
     )
     return fields
   } catch (e) {
-    logModule('receipt', `OCR失败 receiptId=${receiptId} (web端预期内会走到这里): ${e instanceof Error ? e.message : String(e)}`, 'error')
+    if (!signal?.aborted) logModule('receipt', `OCR失败 receiptId=${receiptId} engine=${engine}: ${e instanceof Error ? e.message : String(e)}`, 'warn')
     return { receiptId, ocrRows: [], amount: null, date: null, storeName: null, items: [] }
   }
 }

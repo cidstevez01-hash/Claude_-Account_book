@@ -6,6 +6,7 @@ import { blobToImage } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
 import { recognizeReceiptFields, type ReceiptScanBand, type RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import { logModule } from '../../lib/appLog'
+import { waitForReceiptFields } from '../../lib/receiptOcrWait'
 
 // R-32三期：拍照页面改成调用系统原生扫描能力(见lib/receiptCamera.ts)，取代之前
 // 自建webcam取景界面+OpenCV.js边缘检测那整套——原生扫描器自己就是一个完整的
@@ -20,7 +21,6 @@ interface ReceiptScanSheetProps {
   onConfirm: (pdf: Blob, fields: RecognizedReceiptFields) => Promise<boolean>
 }
 
-const OCR_WAIT_MS = 5000
 function emptyFields(receiptId: string): RecognizedReceiptFields {
   return { receiptId, ocrRows: [], amount: null, date: null, storeName: null, items: [] }
 }
@@ -39,27 +39,6 @@ function cropReceiptBand(canvas: HTMLCanvasElement, { bottom, top }: ReceiptScan
     imageDataUrl: crop.toDataURL('image/png'),
     band: { bottom: 1 - end / canvas.height, top: 1 - start / canvas.height },
   }
-}
-
-// 局部重读超时时保留首轮日期和备注，未确认的金额留空。
-function waitForFields(
-  pending: Promise<RecognizedReceiptFields> | null,
-  fallback: () => RecognizedReceiptFields,
-): Promise<RecognizedReceiptFields> {
-  if (!pending) return Promise.resolve(fallback())
-  return new Promise((resolve) => {
-    const timer = window.setTimeout(() => resolve(fallback()), OCR_WAIT_MS)
-    pending.then(
-      (fields) => {
-        window.clearTimeout(timer)
-        resolve(fields)
-      },
-      () => {
-        window.clearTimeout(timer)
-        resolve(fallback())
-      },
-    )
-  })
 }
 
 function createReceiptId(): string {
@@ -86,20 +65,42 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   // 时间，识别早就跑完了，真等到的时候也就是极快的一下
   const recognizeResultRef = useRef<Promise<RecognizedReceiptFields> | null>(null)
   const partialFieldsRef = useRef<RecognizedReceiptFields | null>(null)
+  const scanGenerationRef = useRef(0)
+  const ocrControllerRef = useRef<AbortController | null>(null)
   // 保存中状态：savingRef是真正的防重入开关(state更新是异步的，快速连点时挡不住)，
   // saving只负责界面上禁用按钮、显示转圈
   const savingRef = useRef(false)
   const [saving, setSaving] = useState(false)
+  const [waitingForOcr, setWaitingForOcr] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
 
   function errText(e: unknown): string {
     return e instanceof Error ? e.message : String(e)
   }
 
-  async function setResultFromBlob(blob: Blob) {
+  function invalidateScan() {
+    scanGenerationRef.current++
+    ocrControllerRef.current?.abort()
+    ocrControllerRef.current = null
+    recognizeResultRef.current = null
+    partialFieldsRef.current = null
+    receiptIdRef.current = null
+    resultCanvasRef.current = null
+    return scanGenerationRef.current
+  }
+
+  function close() {
+    if (savingRef.current) return
+    invalidateScan()
+    onClose()
+  }
+
+  async function setResultFromBlob(blob: Blob, generation: number) {
+    if (scanGenerationRef.current !== generation) return
     const receiptId = createReceiptId()
     receiptIdRef.current = receiptId
     const imgEl = await blobToImage(blob)
+    if (scanGenerationRef.current !== generation) return
     const canvas = document.createElement('canvas')
     canvas.width = imgEl.naturalWidth
     canvas.height = imgEl.naturalHeight
@@ -108,28 +109,35 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
     setPreviewUrl(dataUrl)
     setStage('review')
+    const controller = new AbortController()
+    ocrControllerRef.current = controller
     recognizeResultRef.current = recognizeReceiptFields(
       dataUrl, receiptId, (band) => cropReceiptBand(canvas, band),
       (fields) => {
-        if (receiptIdRef.current === receiptId) partialFieldsRef.current = fields
+        if (!controller.signal.aborted && receiptIdRef.current === receiptId) partialFieldsRef.current = fields
       },
+      { signal: controller.signal },
     )
   }
 
   async function startScan() {
+    if (savingRef.current) return
+    const generation = invalidateScan()
     setStage('scanning')
     setErrorMsg(null)
     logModule('receipt', '=== ReceiptScanSheet.startScan 开始(原生扫描) ===')
     try {
       const blob = await scanDocumentNative()
+      if (scanGenerationRef.current !== generation) return
       if (!blob) {
         logModule('receipt', '用户取消了原生扫描，关闭弹层')
         onClose()
         return
       }
       logModule('receipt', `原生扫描完成，blob.size=${blob.size}字节`)
-      await setResultFromBlob(blob)
+      await setResultFromBlob(blob, generation)
     } catch (e) {
+      if (scanGenerationRef.current !== generation) return
       // Web端(沙盒/浏览器预览)本来就没有原生扫描能力，插件会直接抛
       // "not supported on the web"——这不是异常情况，是预期内会走到的分支，
       // 兜底改用相册选图；真机上权限被拒绝/用户手动取消系统弹窗也会走到这里
@@ -141,16 +149,20 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   }
 
   async function handlePickGallery() {
+    if (savingRef.current) return
+    const generation = invalidateScan()
     logModule('receipt', '用户选择从相册选取')
     try {
       const blob = await pickFromGallery()
+      if (scanGenerationRef.current !== generation) return
       if (!blob) {
         logModule('receipt', '用户取消了相册选图，关闭弹层')
         onClose()
         return
       }
-      await setResultFromBlob(blob)
+      await setResultFromBlob(blob, generation)
     } catch (e) {
+      if (scanGenerationRef.current !== generation) return
       console.error('相册选图失败', e)
       logModule('receipt', `pickFromGallery()抛错: ${errText(e)}`, 'error')
       setErrorMsg(errText(e))
@@ -166,6 +178,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     partialFieldsRef.current = null
     receiptIdRef.current = null
     startScan()
+    return () => { invalidateScan() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -179,25 +192,38 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     try {
       const pdf = buildReceiptPdf(resultCanvasRef.current, { entryDate })
       const receiptId = receiptIdRef.current ?? createReceiptId()
-      const fields = await waitForFields(recognizeResultRef.current, () => {
+      const generation = scanGenerationRef.current
+      const controller = ocrControllerRef.current
+      setWaitingForOcr(true)
+      const fields = await waitForReceiptFields(recognizeResultRef.current, () => {
         const partial = partialFieldsRef.current
         return partial?.receiptId === receiptId ? partial : emptyFields(receiptId)
+      }, {
+        signal: controller?.signal,
+        onTimeout: () => {
+          logModule('receipt', `识别等待超时，保留已确认字段 receiptId=${receiptId}`, 'warn')
+          controller?.abort()
+        },
       })
+      setWaitingForOcr(false)
+      if (scanGenerationRef.current !== generation || receiptIdRef.current !== receiptId) return
+      if (fields.receiptId !== receiptId) return
       const ok = await onConfirm(pdf, fields)
       if (!ok) setSaveFailed(true)
     } finally {
       savingRef.current = false
       setSaving(false)
+      setWaitingForOcr(false)
     }
   }
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
-      <div className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px]" onClick={onClose} />
+      <div className="absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px]" onClick={close} />
       <div className="relative z-10 w-full max-w-[480px] max-h-[90vh] bg-surface rounded-t-[24px] shadow-xl flex flex-col overflow-hidden">
         <header className="flex items-center justify-between px-md h-16 border-b-[1.5px] border-dashed border-outline-variant shrink-0">
           <h2 className="font-serif text-headline-md text-on-surface">{t('receiptScanTitle')}</h2>
-          <button type="button" aria-label={t('closeAria')} onClick={onClose} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
+          <button type="button" aria-label={t('closeAria')} onClick={close} disabled={saving} className="w-8 h-8 flex items-center justify-center text-on-surface-variant">
             <ThemeIcon className="material-symbols-outlined" icon="close" />
           </button>
         </header>
@@ -222,6 +248,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                 <button
                   type="button"
                   onClick={startScan}
+                  disabled={saving}
                   className="px-5 py-2.5 rounded-lg border-[1.5px] border-outline-variant text-on-surface-variant text-body-md active:scale-95 transition-transform"
                 >
                   {t('receiptReplace')}
@@ -248,6 +275,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                   type="button"
                   aria-label={t('receiptRetakeAria')}
                   onClick={startScan}
+                  disabled={saving}
                   className="absolute right-2 bottom-2 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-sm border border-outline-variant flex items-center justify-center text-action-ink shadow-sm active:scale-90 transition-transform"
                 >
                   <ThemeIcon className="material-symbols-outlined text-[18px]" icon="photo_camera" />
@@ -281,7 +309,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
               ) : (
                 <ThemeIcon className="material-symbols-outlined" icon="picture_as_pdf" />
               )}
-              {t('receiptSaveAsPdf')}
+              {t(waitingForOcr ? 'receiptRecognizing' : 'receiptSaveAsPdf')}
             </button>
           </div>
         )}

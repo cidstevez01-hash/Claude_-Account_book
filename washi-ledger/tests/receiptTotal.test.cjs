@@ -12,7 +12,7 @@ function loadTs(name, dependencies = {}) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2023 },
   }).outputText
   const exports = {}
-  vm.runInNewContext(code, { exports, console, require(id) {
+  vm.runInNewContext(code, { exports, console, performance, require(id) {
     if (Object.hasOwn(dependencies, id)) return dependencies[id]
     throw new Error(`Unexpected dependency: ${id}`)
   } }, { filename: file })
@@ -21,17 +21,30 @@ function loadTs(name, dependencies = {}) {
 const totals = loadTs('receiptTotal.ts')
 const dates = loadTs('receiptDate.ts', { './date': loadTs('date.ts') })
 const detectionsByImage = new Map()
-const receipt = loadTs('receiptFieldExtract.ts', {
+const mlkitDetectionsByImage = new Map()
+const ocrCalls = []
+const extraction = loadTs('receiptFieldExtract.ts', {
   './receiptTotal': totals,
   './receiptDate': dates,
   './appLog': { logModule() {} },
-  '@capacitor-community/image-to-text': { Ocr: { async detectText({ base64 }) {
+  '@capacitor-community/image-to-text': { Ocr: { async detectTextMlkit({ base64 }) {
+    ocrCalls.push(['mlkit', base64])
+    assert.ok(mlkitDetectionsByImage.has(base64), `Unexpected ML Kit scan of ${base64}`)
+    const result = await mlkitDetectionsByImage.get(base64)
+    if (result instanceof Error) throw result
+    return { textDetections: result }
+  }, async detectText({ base64 }) {
+    ocrCalls.push(['vision', base64])
     assert.ok(detectionsByImage.has(base64), `Unexpected scan of ${base64}`)
     const result = detectionsByImage.get(base64)
     if (result instanceof Error) throw result
     return { textDetections: result }
   } } },
 })
+// 既有置信度/候选测试明确验证 Vision 路径；新增测试验证真实默认的 ML Kit 路径。
+const receipt = { ...extraction, recognizeReceiptFields(image, id, crop, onRetry) {
+  return extraction.recognizeReceiptFields(image, id, crop, onRetry, { engine: 'vision' })
+} }
 const rows = lines => lines.map((text, index) => ({ text, y: 1 - index * 0.02 }))
 const check = (name, lines, expected) => test(name, () => {
   const result = receipt.extractReceiptFields(rows(['店舗', ...lines]), name)
@@ -236,4 +249,87 @@ test('残缺标签也能定位局部重读，两轮相同金额且标签修正�
   })
   assert.equal(attempts, 1)
   assert.equal(result.amount, 537)
+})
+
+function mlkitLines(lines) {
+  return lines.map((text, i) => ({ text,
+    topLeft: [0.1, 0.9 - i * 0.045], topRight: [0.9, 0.9 - i * 0.045],
+    bottomLeft: [0.1, 0.88 - i * 0.045], bottomRight: [0.9, 0.88 - i * 0.045],
+  }))
+}
+
+test('默认走 ML Kit，完整合计可回填且促销5000不会覆盖2112', async () => {
+  const image = 'mlkit-primary-2112'
+  mlkitDetectionsByImage.set(image, mlkitLines(['店舗', '2026年11月7日(土)11:08', '小計 ¥1,956',
+    '外8% ¥156', '合計 ¥2,112', 'オンラインストア', '合計5,000円以上のご購入で']))
+  const fields = await extraction.recognizeReceiptFields(image, 'mlkit-primary')
+  assert.equal(fields.amount, 2112)
+  assert.equal(fields.date, '2026-11-07')
+  assert.deepEqual(ocrCalls.filter(([, key]) => key === image), [['mlkit', image]])
+})
+
+test('ML Kit 没有置信度仍能按保留的坐标关联不同字号的标签和金额', async () => {
+  const image = 'mlkit-spatial'
+  mlkitDetectionsByImage.set(image, [
+    { ...nativeBox(block('合計', 0.1, 0.25, 0.6, 0.58)), candidates: undefined },
+    { ...nativeBox(block('¥1,204', 0.7, 0.9, 0.65, 0.57)), candidates: undefined },
+  ])
+  const fields = await extraction.recognizeReceiptFields(image, 'mlkit-spatial-id')
+  assert.equal(fields.amount, 1204)
+  assert.deepEqual(ocrCalls.filter(([, key]) => key === image), [['mlkit', image]])
+})
+
+test('ML Kit 插件报错时用同一原图回退 Vision，保持独立小票ID', async () => {
+  const image = 'mlkit-error-fallback'
+  mlkitDetectionsByImage.set(image, new Error('native unavailable'))
+  detectionsByImage.set(image, mlkitLines(['店舗', '小計 ¥1,115', '外税額 8% ¥89', '合計 ¥1,204']))
+  const fields = await extraction.recognizeReceiptFields(image, 'fallback-id')
+  assert.equal(fields.amount, 1204)
+  assert.equal(fields.receiptId, 'fallback-id')
+  assert.deepEqual(ocrCalls.filter(([, key]) => key === image), [['mlkit', image], ['vision', image]])
+})
+
+test('ML Kit 无合计时回退并整套采用 Vision 结果，不混入其他引擎的行', async () => {
+  const image = 'mlkit-null-fallback'
+  mlkitDetectionsByImage.set(image, mlkitLines(['MLKit店舗', '合計5,000円以上のご購入で']))
+  detectionsByImage.set(image, mlkitLines(['Vision店舗', '小計 ¥498', '外税額 8% ¥39', '合計士 ¥537']))
+  const fields = await extraction.recognizeReceiptFields(image, 'fallback-null-id')
+  assert.equal(fields.amount, 537)
+  assert.equal(fields.storeName, 'Vision店舗')
+  assert(!fields.ocrRows.some(text => text.includes('MLKit店舗')))
+})
+
+test('两个引擎都不能确认时不选最大数，保留 ML Kit 日期和备注', async () => {
+  const image = 'mlkit-both-unconfirmed'
+  mlkitDetectionsByImage.set(image, mlkitLines(['店舗', '2026/11/17 19:51', '小計 ¥100', '合計5000円以上のご購入で']))
+  detectionsByImage.set(image, mlkitLines(['別店舗', '合計 ¥200', '合計 ¥300']))
+  const fields = await extraction.recognizeReceiptFields(image, 'both-unconfirmed')
+  assert.equal(fields.amount, null)
+  assert.equal(fields.date, '2026-11-17')
+  assert.equal(fields.storeName, '店舗')
+})
+
+test('关闭或重扫会中断旧识别等待，不启动回退和后续回填回调', async () => {
+  const image = 'mlkit-cancelled'
+  let complete
+  mlkitDetectionsByImage.set(image, new Promise(resolve => { complete = resolve }))
+  const controller = new AbortController()
+  let callbacks = 0
+  const pending = extraction.recognizeReceiptFields(image, 'cancelled-id', undefined,
+    () => { callbacks++ }, { signal: controller.signal })
+  controller.abort()
+  const fields = await pending
+  complete(mlkitLines(['合計 ¥5,000']))
+  assert.equal(fields.amount, null)
+  assert.equal(callbacks, 0)
+  assert.deepEqual(ocrCalls.filter(([, key]) => key === image), [['mlkit', image]])
+})
+
+test('已经取消的扫描不调用任何原生引擎', async () => {
+  const controller = new AbortController()
+  controller.abort()
+  const fields = await extraction.recognizeReceiptFields('cancelled-before-start', 'before-start', undefined, undefined,
+    { signal: controller.signal })
+  assert.equal(fields.amount, null)
+  assert.equal(ocrCalls.some(([, key]) => key === 'cancelled-before-start'), false)
 })
