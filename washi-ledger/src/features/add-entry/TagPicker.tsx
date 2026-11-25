@@ -132,7 +132,7 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
   }
 
   return (
-    <div className="flex flex-wrap gap-2" ref={tagListRef}>
+    <div className="flex flex-wrap gap-2" ref={tagListRef} data-tag-picker>
       {tags.map((tag) => {
         if (editingCode === tag.id) {
           return (
@@ -173,6 +173,8 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
             <span key={tag.id} className="relative inline-flex">
               <button
                 type="button"
+                data-tag-choice
+                aria-pressed={active}
                 onClick={() => onSelectTag(active ? null : tag.code)}
                 className={`py-1.5 px-2.5 rounded-lg text-tab-label font-sans border transition-colors ${
                   active
@@ -219,6 +221,8 @@ export function TagPicker({ tags: rawTags, type, selectedTagCode, onSelectTag, u
           <button
             key={tag.id}
             type="button"
+            data-tag-choice
+            aria-pressed={active}
             onClick={() => onSelectTag(active ? null : tag.code)}
             className={`py-1.5 px-2.5 rounded-lg text-tab-label font-sans border transition-colors ${
               active

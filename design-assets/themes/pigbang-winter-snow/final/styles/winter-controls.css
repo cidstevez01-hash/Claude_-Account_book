@@ -70,7 +70,7 @@
 
 /* Approved category ink: history/20261124-36-category-enlarged-ink-preview. */
 /* Enlarge history34 ink. Preserve its palette and use the original RGB pigment texture. */
-:root[data-theme="winter"] [data-category-picker] {
+:root[data-theme="winter"] :is([data-category-picker], [data-payment-picker]) {
   --category-idle-fill: linear-gradient(140deg, #F8EFE3, #F8ECE8);
   --category-selected-fill: #FCF0D9;
   --category-idle-edge: #D9C7B4;
@@ -81,7 +81,7 @@
   --category-glow: #D7B57825;
   --color-choice-ink: #6D4E2E;
 }
-:root[data-theme="winter-silver"] [data-category-picker] {
+:root[data-theme="winter-silver"] :is([data-category-picker], [data-payment-picker]) {
   --category-idle-fill: linear-gradient(140deg, #EDF2F8, #F1EDF7);
   --category-selected-fill: #E5EDF8;
   --category-idle-edge: #C2CDDE;
@@ -92,7 +92,7 @@
   --category-glow: #B4C8E730;
   --color-choice-ink: #405675;
 }
-:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control {
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) :is([data-category-picker], [data-payment-picker]) .choice-control {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -101,17 +101,17 @@
   box-shadow: inset 0 1px 0 #FFFFFF80;
   color: var(--category-idle-ink);
 }
-:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control > span {
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) :is([data-category-picker], [data-payment-picker]) .choice-control > span {
   position: relative;
   z-index: 1;
 }
-:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control[aria-pressed="true"] {
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) :is([data-category-picker], [data-payment-picker]) .choice-control[aria-pressed="true"] {
   background: var(--category-selected-fill) !important;
   border-color: var(--category-selected-edge) !important;
   box-shadow: 0 0 0 .5px var(--category-selected-edge), 0 3px 12px var(--category-glow), inset 0 1px 0 #FFFFFF90;
   color: var(--category-selected-ink);
 }
-:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control[aria-pressed="true"]::before {
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) :is([data-category-picker], [data-payment-picker]) .choice-control[aria-pressed="true"]::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -128,11 +128,51 @@
   opacity: .55;
   pointer-events: none;
 }
-:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control--tile[aria-pressed="true"]::before {
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) :is([data-category-picker], [data-payment-picker]) .choice-control--tile[aria-pressed="true"]::before {
   -webkit-mask-position: left -10px top -60px;
   mask-position: left -10px top -60px;
 }
-:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-category-picker] .choice-control[aria-pressed="true"]::after {
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) :is([data-category-picker], [data-payment-picker]) .choice-control[aria-pressed="true"]::after {
   z-index: 2;
   color: var(--category-selected-ink);
+}
+
+/* B-94: wide payment pills use overlapping original ink samples, without stretching. */
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-payment-picker] .choice-control[aria-pressed="true"]::before {
+  background-image: var(--category-wash-colors), var(--winter-ink-image), var(--winter-ink-image), var(--winter-ink-image);
+  background-size: 100% 100%, 340px 510px, 340px 510px, 340px 510px;
+  background-position: 0 0, -10px -60px, calc(50% + 117px) -60px, calc(100% + 260px) -60px;
+  background-blend-mode: screen, normal, normal, normal;
+  -webkit-mask-image: var(--winter-ink-image), var(--winter-ink-image), var(--winter-ink-image);
+  mask-image: var(--winter-ink-image), var(--winter-ink-image), var(--winter-ink-image);
+  -webkit-mask-size: 340px 510px;
+  mask-size: 340px 510px;
+  -webkit-mask-position: -10px -60px, calc(50% + 117px) -60px, calc(100% + 260px) -60px;
+  mask-position: -10px -60px, calc(50% + 117px) -60px, calc(100% + 260px) -60px;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
+}
+
+/* Tags keep every existing fill/text/border color. Only selected tags receive grain. */
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-tag-choice] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+:root:is([data-theme="winter"], [data-theme="winter-silver"]) [data-tag-choice][aria-pressed="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: var(--winter-ink-image), var(--winter-ink-image), var(--winter-ink-image);
+  background-size: 340px 510px;
+  background-position: -10px -60px, calc(50% + 117px) -60px, calc(100% + 260px) -60px;
+  background-repeat: no-repeat;
+  filter: grayscale(1);
+  mix-blend-mode: luminosity;
+  opacity: .16;
+  pointer-events: none;
 }

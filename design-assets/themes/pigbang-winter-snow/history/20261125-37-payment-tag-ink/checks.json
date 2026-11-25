@@ -1,0 +1,141 @@
+{
+  "results": [
+    {
+      "name": "payment ink and unchanged tag palette: winter zh",
+      "result": "passed"
+    },
+    {
+      "name": "payment ink and unchanged tag palette: winter ja",
+      "result": "passed"
+    },
+    {
+      "name": "payment ink and unchanged tag palette: winter-silver zh",
+      "result": "passed"
+    },
+    {
+      "name": "payment ink and unchanged tag palette: winter-silver ja",
+      "result": "passed"
+    },
+    {
+      "name": "other themes do not acquire winter textures: default",
+      "result": "passed"
+    },
+    {
+      "name": "other themes do not acquire winter textures: nostalgia",
+      "result": "passed"
+    },
+    {
+      "name": "other themes do not acquire winter textures: summer",
+      "result": "passed"
+    },
+    {
+      "name": "other themes do not acquire winter textures: autumn",
+      "result": "passed"
+    }
+  ],
+  "evidence": [
+    {
+      "theme": "winter",
+      "lang": "zh",
+      "routes": [
+        "/add",
+        "/add?editId=b93-entry",
+        "/add?copyId=b93-entry",
+        "/settings/recurring-rules/form"
+      ],
+      "remoteWrites": 0
+    },
+    {
+      "theme": "winter",
+      "lang": "ja",
+      "routes": [
+        "/add",
+        "/add?editId=b93-entry",
+        "/add?copyId=b93-entry",
+        "/settings/recurring-rules/form"
+      ],
+      "remoteWrites": 0
+    },
+    {
+      "theme": "winter-silver",
+      "lang": "zh",
+      "routes": [
+        "/add",
+        "/add?editId=b93-entry",
+        "/add?copyId=b93-entry",
+        "/settings/recurring-rules/form"
+      ],
+      "remoteWrites": 0
+    },
+    {
+      "theme": "winter-silver",
+      "lang": "ja",
+      "routes": [
+        "/add",
+        "/add?editId=b93-entry",
+        "/add?copyId=b93-entry",
+        "/settings/recurring-rules/form"
+      ],
+      "remoteWrites": 0
+    }
+  ],
+  "pixelChecks": [
+    {
+      "name": "payment ink and unchanged tag palette: winter ja",
+      "result": "passed"
+    },
+    {
+      "name": "payment ink and unchanged tag palette: winter-silver ja",
+      "result": "passed"
+    }
+  ],
+  "pixelEvidence": [
+    {
+      "theme": "winter",
+      "tagPalette": {
+        "bg": "rgb(226, 240, 233)",
+        "ink": "rgb(36, 82, 63)",
+        "border": "oklab(0.520428 -0.0794137 0.0184427 / 0.4)",
+        "expectedBg": "rgb(226, 240, 233)",
+        "expectedInk": "rgb(36, 82, 63)"
+      },
+      "widePaymentTexturePixels": [
+        5543,
+        10802,
+        11516
+      ]
+    },
+    {
+      "theme": "winter",
+      "lang": "ja",
+      "routes": [
+        "/add"
+      ],
+      "remoteWrites": 0
+    },
+    {
+      "theme": "winter-silver",
+      "tagPalette": {
+        "bg": "rgb(226, 240, 233)",
+        "ink": "rgb(36, 82, 63)",
+        "border": "oklab(0.520428 -0.0794137 0.0184427 / 0.4)",
+        "expectedBg": "rgb(226, 240, 233)",
+        "expectedInk": "rgb(36, 82, 63)"
+      },
+      "widePaymentTexturePixels": [
+        10598,
+        11212,
+        10149
+      ]
+    },
+    {
+      "theme": "winter-silver",
+      "lang": "ja",
+      "routes": [
+        "/add"
+      ],
+      "remoteWrites": 0
+    }
+  ],
+  "verificationNote": "8 functional scenarios passed before the final CSS position compatibility correction; 2 focused texture checks passed on the final CSS. Fresh pixel evidence supersedes earlier coverage samples."
+}

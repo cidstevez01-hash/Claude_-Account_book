@@ -339,7 +339,7 @@ export function RecurringRuleFormPage() {
                 <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm tracking-widest uppercase">
                   {t('methodLabel')}
                 </h2>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2" data-payment-picker>
                   {paymentMethods.map((pm) => {
                     const active = pm.code === payCode
                     return (

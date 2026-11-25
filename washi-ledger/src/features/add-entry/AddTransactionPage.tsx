@@ -570,7 +570,7 @@ export function AddTransactionPage() {
               截断——改回照旧App`.sub-wrap`(flex flex-wrap)+`.sub-pill`真实值，每个胶囊按
               文字内容自身宽度撑开、自动换行，短的名字自然一行能排下3个左右，长的也能完整
               显示，不强制等宽三列 */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" data-payment-picker>
             {paymentMethods.map((pm) => {
               const active = pm.code === payCode
               return (

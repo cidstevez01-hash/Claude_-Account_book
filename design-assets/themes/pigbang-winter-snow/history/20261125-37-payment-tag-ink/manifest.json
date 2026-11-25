@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-25",
+  "version": "1.0.0-20261125-dev.1",
+  "status": "integrated locally; awaiting release",
+  "bug": "B-94",
+  "approval": "做吧",
+  "paymentTagUpdate": {
+    "bug": "B-94",
+    "payment": "Shared approved category ink; overlapping native-size samples cover wide controls; valid two-value CSS positions",
+    "tags": "Texture only; original fill/text/border colors unchanged",
+    "themes": [
+      "winter",
+      "winter-silver"
+    ],
+    "routes": [
+      "new",
+      "edit",
+      "copy",
+      "recurring-rule"
+    ],
+    "scenarios": 8,
+    "pixelScenarios": 2,
+    "brands": 9,
+    "validation": "passed",
+    "nativeDevice": "pending"
+  },
+  "artworkHashes": {
+    "warm-snowflake.png": "d44afcfff7dd032ded8822841d2c5816e91757be1974ba222b6a7cd3da3420b1",
+    "silver-snowflake.png": "8a5263338bc586cd18227b843459c89d6d4d9cd7be444eced455eef6b3cbbb67",
+    "warm-ink.webp": "4871536d10e18cefc40956e68343a8dd65decf4bce5f23be7d578de91e045740",
+    "silver-ink.webp": "5f31eecd2dcf08c3b44061f9e2edc64a2e3fa2cdb827bafd0375833e7ae210b2"
+  }
+}

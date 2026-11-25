@@ -1,7 +1,7 @@
 {
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "product": "PigBang",
-  "status": "Approved category ink and B-93 readability integrated with persistent live snowfall",
+  "status": "Payment selection ink and tag texture integrated; tag colors preserved",
   "approvedBy": "全都可以接入了",
   "runtimeBackground": {
     "file": "washi-ledger/src/design-system/components/WinterBackground.tsx",
@@ -316,8 +316,8 @@
     "approved": true,
     "checked": true
   },
-  "version": "1.0.0-20261124-dev.1",
-  "latestIntegration": "history/20261124-36-category-enlarged-ink-preview",
+  "version": "1.0.0-20261125-dev.1",
+  "latestIntegration": "history/20261125-37-payment-tag-ink",
   "validation": {
     "productionBuild": "passed",
     "lint": {
@@ -362,5 +362,25 @@
         "sourcePixelsPerDisplayedPixel": 1.003921568627451
       }
     ]
+  },
+  "paymentTagUpdate": {
+    "bug": "B-94",
+    "payment": "Shared approved category ink; overlapping native-size samples cover wide controls; valid two-value CSS positions",
+    "tags": "Texture only; original fill/text/border colors unchanged",
+    "themes": [
+      "winter",
+      "winter-silver"
+    ],
+    "routes": [
+      "new",
+      "edit",
+      "copy",
+      "recurring-rule"
+    ],
+    "scenarios": 8,
+    "pixelScenarios": 2,
+    "brands": 9,
+    "validation": "passed",
+    "nativeDevice": "pending"
   }
 }

@@ -36,7 +36,7 @@ async function setup({theme=activeTheme,lang='zh',entries=[],remote=false,missin
    if(url.pathname.endsWith('/categories'))return reply(activeCategories.map(x=>({...x,sort_order:0})));
    if(url.pathname.endsWith('/payment_methods'))return reply(activeCatalog.paymentMethods.map((p,i)=>({...p,sort_order:i,default_point_rate:null,badge_bg:null,badge_text:null})));
    if(url.pathname.endsWith('/subcategories'))return reply(activeCategories.flatMap(c=>c.subs.map(s=>({...s,cat_code:c.code,is_preset:true}))));
-   if(url.pathname.endsWith('/tags'))return reply(['expense','income'].flatMap(type=>activeCatalog[type+'Tags'].map((t,i)=>({...t,type,is_preset:true,sort_order:i}))));
+   if(url.pathname.endsWith('/tags'))return reply(['expense','income'].flatMap(type=>activeCatalog[type+'Tags'].map((t,i)=>({...t,type,is_preset:!t.custom,sort_order:i}))));
    return reply([]);
   }
   if(url.pathname.endsWith('/recurring-rules'))return reply({rules:[]});
