@@ -1,6 +1,6 @@
 # 小票识别：ML Kit 日文模型
 
-2026-11-25：用户放弃 Azure，确认采用本地 ML Kit 方案。当前是本地实现与隔离测试完成阶段，尚未推送、编译 IPA 或验证真机识别准确率。
+2026-11-25：用户放弃 Azure，确认采用本地 ML Kit 方案。1.0.0-20261125-dev.2 已推送并启动 IPA 构建；首次原生链接失败，静态 framework 配置修复等待重新构建验证。真机识别准确率尚未验证。
 
 ## 扫描与回填
 
@@ -15,6 +15,7 @@
 
 - 继续使用 Capacitor 7。通过现有 `patch-package` 补丁给 `@capacitor-community/image-to-text@7.0.0` 增加 `detectTextMlkit`，原 Vision 方法保留。
 - 只引入 `GoogleMLKit/TextRecognitionJapanese` **8.0.0**，不接入 Firebase 或 Google Cloud，不需要云账号或 API Key。
+- 插件本身按静态 framework 集成 ML Kit；默认动态 framework 会在链接时找不到 `MLKTextRecognizer`、`MLKJapaneseTextRecognizerOptions` 等类。构建123首轮已复现该链接错误，补齐此配置后须重新构建验证。
 - 最低 iOS **15.5**，Google ML Kit 8 要求 Xcode **16**以上。现有测试工作流使用 macOS 15；实际 CocoaPods 解析与 Swift 编译仍须在 IPA 工作流验证。
 - `capacitor:sync:before` 在首次 `cap add ios` 内部同步、安装 Pods 前，调整 Podfile 与 App 工程目标版本；不覆盖更高版本。使用真实 Capacitor iOS 模板验证过此配置路径。
 - 官方说明的包体增量约38MB/文字模型，实际安装包变化以产物为准。

@@ -2,7 +2,7 @@ diff --git a/node_modules/@capacitor-community/image-to-text/CapacitorCommunityI
 index e22e6d3..39f0af1 100644
 --- a/node_modules/@capacitor-community/image-to-text/CapacitorCommunityImageToText.podspec
 +++ b/node_modules/@capacitor-community/image-to-text/CapacitorCommunityImageToText.podspec
-@@ -11,6 +11,7 @@ Pod::Spec.new do |s|
+@@ -11,6 +11,8 @@ Pod::Spec.new do |s|
      s.author = package['author']
      s.source = { :git => 'git@github.com:capacitor-community/image-to-text', :tag => s.version.to_s }
      s.source_files = 'ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
@@ -10,6 +10,7 @@ index e22e6d3..39f0af1 100644
 +    s.ios.deployment_target = '15.5'
      s.dependency 'Capacitor'
 +    s.dependency 'GoogleMLKit/TextRecognitionJapanese', '8.0.0'
++    s.static_framework = true
  end
 diff --git a/node_modules/@capacitor-community/image-to-text/ios/Plugin/MlkitTextDetector.swift b/node_modules/@capacitor-community/image-to-text/ios/Plugin/MlkitTextDetector.swift
 new file mode 100644
