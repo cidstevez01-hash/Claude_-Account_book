@@ -76,9 +76,9 @@ washi-ledger/
 
 ## 版本号/分支/CI
 
-### OpenAI 可选识别 · 2026-11-26 本地待发布
+### OpenAI 可选识别 · 2026-11-26 已推送，待配置
 
-用户已确认实现。准备 `1.0.0-20261126-dev.1`：默认本地OCR不变，预览按钮手动请求现有Worker的`/receipts/recognize`，带费用/图片发送说明；后端Key、模型及授权User UUID必须配置。独立副本不改PDF保存画质。101项Node测试、9项新增及8项原有页面隔离测试及前后端构建检查通过；没有真实API、Key或生产部署。配置见`washi-ledger/worker/OPENAI_RECEIPTS_SETUP.md`。尚未推送；发布前必须报版本并获用户明确推送指令。
+用户已确认实现及推送。`1.0.0-20261126-dev.1`已从本机推送到pigbang_20261031，功能提交d2fe249。默认本地OCR不变，预览按钮手动请求现有Worker的`/receipts/recognize`，带费用/图片发送说明；后端Key、模型及授权User UUID必须配置。独立副本不改PDF保存画质。101项Node测试、9项新增及8项原有页面隔离测试及前后端构建检查已在本机复核通过；没有真实API、Key或生产部署，当前不宣称真实识别已改善。Cloudflare已有登录，Worker密钥列表为空；本机tmp/configure-openai-receipts.ps1等待用户安全输入Key，先核对模型访问，再设置三个Secret、保留现有vars部署、最后启动IPA。不能让用户把Key发到聊天。原免费路径FamilyMart258误拒绝未修改。完整恢复文件与校验记录在tmp/cloud-handoff-20261126/，用户原本未提交的.gitignore和SMARTSHEET-STATUS-FLOW.md未纳入提交。上版dev.2的IPA125已成功，run45640015052/artifact15034384176。
 
 
 ### 冬雪主题 · 2026-11-25 最新确认
