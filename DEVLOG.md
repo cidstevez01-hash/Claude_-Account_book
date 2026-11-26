@@ -1,12 +1,13 @@
 # 开发记录
 
-## PigBang 重写版 · 2026-11-26 · 可选 OpenAI 小票识别（已推送，待配置）
+## PigBang 重写版 · 2026-11-26 · 可选 OpenAI 小票识别（已部署并交付IPA126）
 
 - 用户确认接入，默认保留本地 ML Kit/Vision；预览增加手动 AI 重新识别及中日文图片发送/费用说明，成功摘要供核对，失败保留已有结果。独立 JPEG 副本不会改动 PDF 源画布或保存参数。
 - 复用 Worker 与现有用户校验，增加授权账号列表、每用户限流、请求大小/类型校验、40秒上游超时、结构化结果验证。Key/模型在服务端配置；非JPY、冲突及不确定金额留空。关闭、重扫丢弃迟到结果，防重复请求并保留手填保护。
 - 本地准备版本 `1.0.0-20261126-dev.1`；101项 Node 测试、9项新增及8项原有真实页面隔离回归、前端构建/lint、Worker类型检查与部署dry-run通过。所有 OpenAI 返回和原生相机均隔离模拟，没有真实 Key、付费 API 调用、生产部署或 IPA 验证。配置见 `washi-ledger/worker/OPENAI_RECEIPTS_SETUP.md`。
 - 云端会话已获用户明确推送授权；本机从云端执行记录完整恢复19个改动文件，保留本地交接规则，提交d2fe24991107f8beff076a946141bfff7d336986已推送到pigbang_20261031。101项测试、17项页面隔离回归、构建/lint及Worker打包已在本机复核。Cloudflare已登录、现有Worker密钥列表为空；待用户在本机隐藏输入Key，配置后部署并启动IPA，未发起真实付费识别。原免费路径的FamilyMart258置信度误拒绝没有在本次可选AI提交中修改。
 - 补回上版结果：1.0.0-20261125-dev.2的静态链接修复2c3bd49经IPA构建125成功验证（run45640015052，artifact15034384176）。构建124持续无runner时取消并改为同提交全新dispatch；没有证据证明排队的具体平台根因，不能解释为本项目任务占用。
+- 配置与交付续记：用户按Git Bash逐条配置三个Worker Secret，并使用keep-vars部署成功。已只读核对OPENAI_API_KEY、OPENAI_RECEIPT_MODEL、OPENAI_RECEIPT_USER_IDS三个名称存在，未读取密钥值。https://washi-ledger-api.pigbang.workers.dev/receipts/recognize 的无凭据请求返回401，未调用付费识别。IPA126已成功（run45821535703，源码3a32cd2，artifact15116799261，约24.6MB），没有排队停滞。真实小票、模型响应及费用仍待安装后验证，R-59继续处理中，测试结果不填passed。上面的待配置描述为本轮部署前记录。
 
 ## PigBang 重写版 · 2026-11-25 · R-59本地ML Kit与R-58待发版（1.0.0-20261125-dev.2）
 

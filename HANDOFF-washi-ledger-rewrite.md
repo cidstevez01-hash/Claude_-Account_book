@@ -76,9 +76,11 @@ washi-ledger/
 
 ## 版本号/分支/CI
 
-### OpenAI 可选识别 · 2026-11-26 已推送，待配置
+### OpenAI 可选识别 · 2026-11-26 已部署并交付IPA126
 
 用户已确认实现及推送。`1.0.0-20261126-dev.1`已从本机推送到pigbang_20261031，功能提交d2fe249。默认本地OCR不变，预览按钮手动请求现有Worker的`/receipts/recognize`，带费用/图片发送说明；后端Key、模型及授权User UUID必须配置。独立副本不改PDF保存画质。101项Node测试、9项新增及8项原有页面隔离测试及前后端构建检查已在本机复核通过；没有真实API、Key或生产部署，当前不宣称真实识别已改善。Cloudflare已有登录，Worker密钥列表为空；本机tmp/configure-openai-receipts.ps1等待用户安全输入Key，先核对模型访问，再设置三个Secret、保留现有vars部署、最后启动IPA。不能让用户把Key发到聊天。原免费路径FamilyMart258误拒绝未修改。完整恢复文件与校验记录在tmp/cloud-handoff-20261126/，用户原本未提交的.gitignore和SMARTSHEET-STATUS-FLOW.md未纳入提交。上版dev.2的IPA125已成功，run45640015052/artifact15034384176。
+
+最新交付状态取代上段待配置阶段：用户已在本机Git Bash逐条配置OPENAI_API_KEY、OPENAI_RECEIPT_MODEL、OPENAI_RECEIPT_USER_IDS，并执行wrangler deploy --keep-vars成功。三个Secret名称已核对，密钥值没有进入聊天或代码。接口https://washi-ledger-api.pigbang.workers.dev/receipts/recognize无凭据访问返回401。测试IPA126成功，源码3a32cd2cf6b7f97e6e0ed583ed6727375045d44f，run45821535703，下载artifact15116799261。尚未使用真实小票调用模型，R-59仍处理中；待用户安装后点击AI重新识别验证效果与费用。用户要求终端指导使用Git Bash，一次只发一条命令，等回报再继续；不要再让用户执行整套配置脚本。
 
 
 ### 冬雪主题 · 2026-11-25 最新确认
