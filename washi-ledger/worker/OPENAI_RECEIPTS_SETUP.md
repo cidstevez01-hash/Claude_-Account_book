@@ -1,0 +1,47 @@
+# OpenAI 小票识别配置与验证
+
+当前改动为本地待发布功能。必须先部署新 Worker、配置服务端参数，再安装包含新按钮的 App；未部署/未配置时，本地 OCR 与 PDF 保存继续可用。
+
+## 工作流程
+
+- 拍照或相册选图仍默认使用本机 ML Kit / Vision，不会自动调用付费 API。
+- 扫描预览新增「AI 重新识别」。按钮旁说明图片将发送给 OpenAI 并产生 API 费用。
+- 前端从扫描画布生成独立的 JPEG 副本：最长边不超过 3200px、最多约 3MB。原画布、现有 PDF 尺寸及 JPEG 0.85 保存逻辑不变。
+- 前端携带当前 Supabase 会话访问 `POST /receipts/recognize`。Worker 复用现有 `getVerifiedUserId` 校验真实身份，并要求该 ID 在管理员配置的授权列表中。
+- Worker 调用 OpenAI Responses API，使用图片输入、严格 JSON Schema、`store: false`、最多 4000 输出 token，不启用工具或任意 URL 抓取。模型名称只从服务端配置读取。
+- 返回店名、日期、商品、总额、支付额、税额及票面证据。总额不确定、与支付额冲突、无合计证据或非 JPY 时金额留空，不将支付额、找零或广告阈值当合计。积分/混合支付导致差额时也保守留空，需人工确认。
+- AI 成功后展示摘要；保存 PDF 后沿用原表单确认入账，手填金额/日期优先。失败保留原有结果；关闭/重扫丢弃迟到响应。客户端取消不保证已经发出的供应商请求停止计费。
+
+## 管理员配置
+
+在 OpenAI API 平台为本 App 创建独立项目与 API Key，并开通 API 计费。不要粘贴 Key 到聊天、GitHub 或任何 `VITE_*` 配置。
+
+在 Cloudflare Dashboard 中打开 **Workers & Pages → washi-ledger-api → Settings → Variables and Secrets**：
+
+| 名称 | 类型 | 内容 |
+|---|---|---|
+| `OPENAI_API_KEY` | Secret | OpenAI 项目专用 Key |
+| `OPENAI_RECEIPT_MODEL` | Variable 或 Secret | 有图片输入和 Structured Outputs 权限的模型 ID；初始候选 `gpt-6.2-sol`，需真实测试确认项目可用性 |
+| `OPENAI_RECEIPT_USER_IDS` | Secret | 允许使用付费识别的 Supabase Auth User UUID，多账号用逗号分隔；从 Supabase Authentication → Users 核对当前 App 会话对应的用户，不能填写邮箱或聊天账号 ID |
+
+三个值缺失时不开放付费调用。现有 Supabase 配置不变，不新增表或更改 RLS。
+
+`wrangler.toml` 随本改动配置 `RECEIPT_AI_RATE_LIMIT`：每位用户每个 Cloudflare 地点 60 秒最多 5 次。授权列表外的账号（包括另行注册的匿名账号）不能调用。此限流不是全球调用总量或月度账单硬上限；不要把 OpenAI 项目预算提醒当作硬性停用开关。可删除授权 ID 或 Key 来关闭付费调用。
+
+本地调试可以复制 `.dev.vars.example` 为 `.dev.vars`（已忽略），只在本地填写 Key，不能提交。生产部署必须使用 Worker 的 Secret。部署时保留 Dashboard 上三个参数。
+
+前端继续使用现有 `VITE_API_BASE_URL`，不新增前端 Key。Worker 可用后再构建/安装 App，避免用户先看到未配置按钮。遵守仓库的版本号和推送确认流程。
+
+## 数据边界
+
+应用后端不把识别副本额外写入数据库/对象存储，也不记录图片、完整模型回答或密钥。`store: false` 关闭 Responses 的响应存储，不等同于供应商零保留；其他保留规则以 OpenAI 项目设置及数据政策为准。原有用户确认 PDF 后上传凭证的流程独立保留。
+
+## 发布前真实验证（尚未执行）
+
+1. 配置 Key、模型 ID 和本人授权 UUID，部署 Worker。
+2. 用本人授权的完整小票原图测试：全家 258、超市含税/外税、促销阈值、积分扣减、多个合计和模糊票据。
+3. 核对总额、日期、店名与商品；记录延迟和 OpenAI 实际 usage/费用。模拟响应测试不能证明模型准确率。
+4. 检查无网络、未配置、未授权、限流、失败后本地保存、重扫取消和手填保护。
+5. 实际 iOS 相机、IPA 编译与安装验证单独执行。
+
+参考：[OpenAI 图片输入](https://developers.openai.com/api/docs/guides/images-vision)、[结构化输出](https://developers.openai.com/api/docs/guides/structured-outputs)、[Cloudflare 限流](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)。

@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import type { Bindings } from './_shared/supabaseClient'
 import { ALLOWED_ORIGINS } from './_shared/cors'
 import { HttpError } from './_shared/errors'
+import receiptsRouter from './receipts/router'
 import entriesRouter from './entries/router'
 import rateRouter from './rate/router'
 import recurringRulesRouter from './recurring-rules/router'
@@ -21,6 +22,7 @@ app.use(
   }),
 )
 
+app.route('/receipts', receiptsRouter)
 app.route('/entries', entriesRouter)
 app.route('/rate', rateRouter)
 app.route('/recurring-rules', recurringRulesRouter)

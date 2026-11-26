@@ -6,6 +6,8 @@ import { blobToImage } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
 import { recognizeReceiptFields, type ReceiptScanBand, type RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import { logModule } from '../../lib/appLog'
+import { recognizeReceiptAi, receiptAiErrorKey } from '../../lib/receiptAi'
+import type { ReceiptAiResult } from '../../../shared/receiptAi'
 import { waitForReceiptFields } from '../../lib/receiptOcrWait'
 
 // R-32三期：拍照页面改成调用系统原生扫描能力(见lib/receiptCamera.ts)，取代之前
@@ -73,6 +75,12 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   const [saving, setSaving] = useState(false)
   const [waitingForOcr, setWaitingForOcr] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
+  const aiControllerRef = useRef<AbortController | null>(null)
+  const aiBusyRef = useRef(false)
+  const aiResultRef = useRef<ReceiptAiResult | null>(null)
+  const [aiBusy, setAiBusy] = useState(false)
+  const [aiResult, setAiResult] = useState<ReceiptAiResult | null>(null)
+  const [aiError, setAiError] = useState<string | null>(null)
 
   function errText(e: unknown): string {
     return e instanceof Error ? e.message : String(e)
@@ -80,6 +88,13 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
   function invalidateScan() {
     scanGenerationRef.current++
+    aiControllerRef.current?.abort()
+    aiControllerRef.current = null
+    aiBusyRef.current = false
+    aiResultRef.current = null
+    setAiBusy(false)
+    setAiResult(null)
+    setAiError(null)
     ocrControllerRef.current?.abort()
     ocrControllerRef.current = null
     recognizeResultRef.current = null
@@ -114,7 +129,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     recognizeResultRef.current = recognizeReceiptFields(
       dataUrl, receiptId, (band) => cropReceiptBand(canvas, band),
       (fields) => {
-        if (!controller.signal.aborted && receiptIdRef.current === receiptId) partialFieldsRef.current = fields
+        if (!controller.signal.aborted && !aiResultRef.current && receiptIdRef.current === receiptId) partialFieldsRef.current = fields
       },
       { signal: controller.signal },
     )
@@ -184,8 +199,40 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
   if (!open) return null
 
+  async function handleAiRecognize() {
+    const canvas = resultCanvasRef.current
+    const receiptId = receiptIdRef.current
+    if (!canvas || !receiptId || savingRef.current || aiBusyRef.current) return
+    const generation = scanGenerationRef.current
+    const controller = new AbortController()
+    aiControllerRef.current = controller
+    aiBusyRef.current = true
+    setAiBusy(true)
+    setAiError(null)
+    const timer = window.setTimeout(() => controller.abort(), 45_000)
+    try {
+      const { result, fields } = await recognizeReceiptAi(canvas, receiptId, controller.signal)
+      if (controller.signal.aborted || scanGenerationRef.current !== generation) return
+      aiResultRef.current = result
+      setAiResult(result)
+      partialFieldsRef.current = fields
+      recognizeResultRef.current = Promise.resolve(fields)
+      logModule('receipt', `AI识别完成 receiptId=${receiptId}: 金额=${fields.amount ?? '未确认'}`)
+    } catch (error) {
+      if (scanGenerationRef.current !== generation) return
+      setAiError(t(controller.signal.aborted ? 'receiptAiTimeout' : receiptAiErrorKey(error)))
+    } finally {
+      window.clearTimeout(timer)
+      if (scanGenerationRef.current === generation) {
+        aiBusyRef.current = false
+        setAiBusy(false)
+        aiControllerRef.current = null
+      }
+    }
+  }
+
   async function handleConfirm() {
-    if (savingRef.current || !resultCanvasRef.current) return
+    if (aiBusyRef.current || savingRef.current || !resultCanvasRef.current) return
     savingRef.current = true
     setSaving(true)
     setSaveFailed(false)
@@ -282,6 +329,22 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                 </button>
               </div>
 
+              <div className="mb-md space-y-2">
+                <p className="text-xs text-on-surface-variant">{t('receiptAiNotice')}</p>
+                <button type="button" onClick={handleAiRecognize} disabled={saving || aiBusy}
+                  className="w-full px-4 py-3 rounded-xl border-[1.5px] border-outline-variant text-action-ink text-body-md active:scale-95 transition-transform disabled:opacity-60">
+                  {t(aiBusy ? 'receiptAiRecognizing' : 'receiptAiRetry')}
+                </button>
+                {aiError && <p role="alert" className="text-xs text-action-ink">{aiError}</p>}
+                {aiResult && <div role="status" className="rounded-xl border border-outline-variant p-3 text-body-md text-on-surface break-words">
+                  <p className="font-medium">{t('receiptAiResult')}</p>
+                  <p>{t('amountLabel')}: {aiResult.amount == null ? t('receiptAiUnconfirmed') : `¥${aiResult.amount.toLocaleString()}`}</p>
+                  <p>{t('dateLabel')}: {aiResult.date ?? t('receiptAiUnconfirmed')}</p>
+                  <p>{aiResult.storeName}</p>
+                  <p className="text-xs text-on-surface-variant mt-2">{t(aiResult.uncertain ? 'receiptAiCheckAmount' : 'receiptAiReviewNote')}</p>
+                </div>}
+              </div>
+
               <div className="flex items-start gap-2 p-3 rounded-xl bg-surface-container border border-outline-variant/50">
                 <ThemeIcon className="material-symbols-outlined text-primary text-[18px] shrink-0" icon="info" />
                 <p className="text-xs text-on-surface-variant">{t('receiptPrivacyNote')}</p>
@@ -296,7 +359,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
             <button
               type="button"
               onClick={handleConfirm}
-              disabled={saving}
+              disabled={saving || aiBusy}
               className="w-full h-[52px] bg-action text-on-action rounded-xl text-headline-md font-serif flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform disabled:opacity-70"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >

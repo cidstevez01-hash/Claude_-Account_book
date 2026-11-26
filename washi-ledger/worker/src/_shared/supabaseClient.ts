@@ -4,6 +4,10 @@ import { HttpError } from './errors'
 /** wrangler.toml [vars]里声明的环境变量，Hono用这个类型做c.env的类型标注 */
 export interface Bindings {
   SUPABASE_URL: string
+  OPENAI_API_KEY?: string
+  OPENAI_RECEIPT_MODEL?: string
+  OPENAI_RECEIPT_USER_IDS?: string
+  RECEIPT_AI_RATE_LIMIT?: { limit(options: { key: string }): Promise<{ success: boolean }> }
   SUPABASE_ANON_KEY: string
 }
 

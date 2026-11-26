@@ -4,3 +4,8 @@
 # 只是给"想覆盖成别的Supabase项目做隔离测试"这种场景留的口子，日常开发不需要单独建.dev.vars。
 SUPABASE_URL=https://echqjmtouxvwybxdfcqk.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjaHFqbXRvdXh2d3lieGRmY3FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0OTE0MzYsImV4cCI6MjEwMTA2NzQzNn0.WQcSC7WcA0yNp43l8EQLYr7-NmxEyuDjvwoUtDYPPTI
+
+# Optional AI receipt recognition. Production uses worker secrets, never VITE_*.
+# OPENAI_API_KEY=replace-with-project-key
+# OPENAI_RECEIPT_MODEL=gpt-6.2-sol
+# OPENAI_RECEIPT_USER_IDS=verified-supabase-user-uuid
