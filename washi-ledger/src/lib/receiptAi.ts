@@ -1,3 +1,4 @@
+import { tSync } from './i18nSync'
 import { apiClient } from './apiClient'
 import { MAX_AI_IMAGE_BYTES, parseReceiptAiResult, type ReceiptAiResult } from '../../shared/receiptAi'
 import type { RecognizedReceiptFields } from './receiptFieldExtract'
@@ -28,7 +29,7 @@ export async function recognizeReceiptAi(canvas: HTMLCanvasElement, receiptId: s
   const result = parseReceiptAiResult(response.fields)
   return { result, fields: {
     receiptId, amount: result.amount, date: result.date, storeName: result.storeName,
-    items: result.items, ocrRows: [result.totalEvidence, result.paymentEvidence].filter((x): x is string => !!x),
+    items: receiptAiNoteLines(result), ocrRows: [result.totalEvidence, result.paymentEvidence].filter((x): x is string => !!x),
   } }
 }
 
@@ -41,4 +42,29 @@ export function receiptAiErrorKey(error: unknown) {
     case 'RECEIPT_AI_IMAGE_TOO_LARGE': return 'receiptAiImageTooLarge' as const
     default: return 'receiptAiFailed' as const
   }
+}
+
+/** Merge only fields for the same scan. An empty AI field must not erase a confirmed value. */
+export function mergeReceiptFields(previous: RecognizedReceiptFields | null, incoming: RecognizedReceiptFields): RecognizedReceiptFields {
+  if (!previous) return incoming
+  if (previous.receiptId !== incoming.receiptId) throw new Error('RECEIPT_AI_INVALID_RESULT')
+  return {
+    receiptId: incoming.receiptId,
+    amount: incoming.amount ?? previous.amount,
+    date: incoming.date ?? previous.date,
+    storeName: incoming.storeName?.trim() ? incoming.storeName : previous.storeName,
+    items: incoming.items.length ? incoming.items : previous.items,
+    ocrRows: incoming.ocrRows.length ? incoming.ocrRows : previous.ocrRows,
+  }
+}
+
+/** Only purchase details and relevant adjustments enter notes, never cash tender/change. */
+export function receiptAiNoteLines(result: ReceiptAiResult): string[] {
+  const lines = [...result.items]
+  const money = (amount: number) => `${result.currency === 'JPY' ? '¥' : (result.currency ?? '')}${amount.toLocaleString()}`
+  if (result.discountAmount != null && result.discountAmount > 0) lines.push(`${tSync('receiptAiDiscount')}: ${money(result.discountAmount)}`)
+  if (result.taxAmount != null) lines.push(`${tSync('receiptAiTax')}: ${money(result.taxAmount)}`)
+  if (result.pointsUsedAmount != null && result.pointsUsedAmount > 0) lines.push(`${tSync('receiptAiPoints')}: ${money(result.pointsUsedAmount)}`)
+  if (result.paymentMethod?.trim()) lines.push(`${tSync('receiptAiPayment')}: ${result.paymentMethod}`)
+  return lines
 }

@@ -20,8 +20,8 @@ const provider = (fetch, extra) => load('worker/src/receipts/openai.ts', deps, {
 const json = data => new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
 const envelope = data => ({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify(data) }] }] })
 test('FamilyMart total 258 with payment evidence is accepted', () => assert.equal(contract.parseReceiptAiResult(fields()).amount, 258))
-test('uncertain, conflicting, foreign-currency and unevidenced amounts remain empty', () => {
-  for (const overrides of [{ uncertain: true }, { paymentAmount: 200 }, { currency: 'USD' }, { totalEvidence: null }, { amount: 258.5 }]) {
+test('uncertain, foreign-currency and unevidenced amounts remain empty', () => {
+  for (const overrides of [{ uncertain: true }, { currency: 'USD' }, { totalEvidence: null }, { amount: 258.5 }]) {
     const result = contract.parseReceiptAiResult(fields(overrides))
     assert.equal(result.amount, null); assert.equal(result.uncertain, true)
   }
@@ -101,7 +101,7 @@ test('success binds fields to receipt ID with no-store response', async () => {
   const data = await res.json(); assert.equal(data.receiptId, 'receipt-id'); assert.equal(data.fields.amount, 258)
 })
 const clientFor = (post, document) => load('src/lib/receiptAi.ts', {
-  './apiClient': { apiClient: { post } }, '../../shared/receiptAi': contract,
+  './apiClient': { apiClient: { post } }, '../../shared/receiptAi': contract, './i18nSync': { tSync: key => key },
 }, { document })
 test('AI image uses a separate resized canvas and never changes PDF source dimensions', () => {
   const source = { width: 4000, height: 8000 }, draws = [], qualities = []
@@ -121,4 +121,42 @@ test('client refuses wrong receipt IDs and aborted responses', async () => {
   const controller = new AbortController()
   await assert.rejects(clientFor(async () => { controller.abort(); return { receiptId: 'current', fields: fields() } }, document)
     .recognizeReceiptAi(canvas, 'current', controller.signal), /RECEIPT_AI_INVALID_RESULT/)
+})
+
+test('OK receipt: total 1531, tendered 2031 and change 500 preserve the clear total', () => {
+  const result = contract.parseReceiptAiResult(fields({ amount:1531, paymentAmount:null,
+    cashTenderedAmount:2031, changeAmount:500, totalEvidence:'合計/ 5点 ¥1,531' }))
+  assert.equal(result.amount,1531); assert.equal(result.rawAmount,1531)
+  assert(result.settlementChecks.includes('CASH_TENDER_MINUS_CHANGE_MATCHES_TOTAL'))
+  assert.equal(result.validationReasons.length,0)
+})
+test('different payment from points, mixed tender or legacy tendered value cannot erase explicit total', () => {
+  for (const paymentAmount of [2031, 1000, 1504]) {
+    const result=contract.parseReceiptAiResult(fields({amount:1531,paymentAmount}))
+    assert.equal(result.amount,1531);assert.equal(result.uncertain,false)
+    assert(result.settlementChecks.includes('PAYMENT_DIFFERS_FROM_TOTAL'))
+  }
+})
+test('rejected totals retain raw numeric diagnostics across server and client validation', () => {
+  const result=contract.parseReceiptAiResult(fields({amount:1531,uncertain:true}))
+  const again=contract.parseReceiptAiResult(result)
+  assert.equal(again.amount,null);assert.equal(again.rawAmount,1531)
+  assert(again.validationReasons.includes('TOTAL_UNCERTAIN'))
+})
+test('AI empty fields preserve earlier confirmed fields, valid AI fields can improve them', () => {
+  const client=clientFor(()=>{}, {})
+  const before={receiptId:'same',amount:1531,date:'2026-11-27',storeName:'old',items:['item'],ocrRows:['old']}
+  const after={receiptId:'same',amount:null,date:null,storeName:'OK',items:[],ocrRows:[]}
+  const merged=client.mergeReceiptFields(before,after)
+  assert.equal(merged.amount,1531);assert.equal(merged.date,'2026-11-27');assert.equal(merged.storeName,'OK')
+  assert.equal(merged.items[0],'item')
+  assert.throws(()=>client.mergeReceiptFields(before,{...after,receiptId:'different'}),/INVALID_RESULT/)
+})
+test('notes include purchase adjustments and payment method, exclude tendered cash and change', () => {
+  const client=clientFor(()=>{}, {})
+  const lines=client.receiptAiNoteLines(fields({amount:1531,paymentAmount:null,cashTenderedAmount:2031,changeAmount:500,
+    taxAmount:113,discountAmount:39,pointsUsedAmount:10,paymentMethod:'cash'}))
+  const note=lines.join(' | ')
+  assert(note.includes('113'));assert(note.includes('39'));assert(note.includes('10'));assert(note.includes('cash'))
+  assert(!note.includes('2,031'));assert(!note.includes('500'))
 })

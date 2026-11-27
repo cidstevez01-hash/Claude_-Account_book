@@ -76,6 +76,11 @@ washi-ledger/
 
 ## 版本号/分支/CI
 
+### 2026-11-27 AI识别修复 · 本地待发布
+
+基于cd0612e准备1.0.0-20261127-dev.1。用户要求首次扫描自动使用OpenAI、按整票语义而非固定字符解析；支付额差异不再拒绝明确总额，预收/找零/积分/折扣分开；AI空字段保留已确认金额/日期。金额、日期、备注按新规则分别回填。补原始/最终金额和处理原因数值日志。106项Node测试、11项AI与8项原有页面场景最终通过；首次冷加载超时的场景复查通过。构建/lint、Worker类型检查与dry-run通过。必须同时更新Worker和App；尚未推送/部署、真实模型及iOS效果未验证。详见worker/OPENAI_RECEIPTS_SETUP.md。
+
+
 ### OpenAI 可选识别 · 2026-11-26 已部署并交付IPA126
 
 用户已确认实现及推送。`1.0.0-20261126-dev.1`已从本机推送到pigbang_20261031，功能提交d2fe249。默认本地OCR不变，预览按钮手动请求现有Worker的`/receipts/recognize`，带费用/图片发送说明；后端Key、模型及授权User UUID必须配置。独立副本不改PDF保存画质。101项Node测试、9项新增及8项原有页面隔离测试及前后端构建检查已在本机复核通过；没有真实API、Key或生产部署，当前不宣称真实识别已改善。Cloudflare已有登录，Worker密钥列表为空；本机tmp/configure-openai-receipts.ps1等待用户安全输入Key，先核对模型访问，再设置三个Secret、保留现有vars部署、最后启动IPA。不能让用户把Key发到聊天。原免费路径FamilyMart258误拒绝未修改。完整恢复文件与校验记录在tmp/cloud-handoff-20261126/，用户原本未提交的.gitignore和SMARTSHEET-STATUS-FLOW.md未纳入提交。上版dev.2的IPA125已成功，run45640015052/artifact15034384176。

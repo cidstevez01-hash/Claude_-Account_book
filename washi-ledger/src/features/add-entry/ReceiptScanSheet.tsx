@@ -6,7 +6,7 @@ import { blobToImage } from '../../lib/receiptEdgeDetect'
 import { buildReceiptPdf } from '../../lib/receiptPdf'
 import { recognizeReceiptFields, type ReceiptScanBand, type RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
 import { logModule } from '../../lib/appLog'
-import { recognizeReceiptAi, receiptAiErrorKey } from '../../lib/receiptAi'
+import { recognizeReceiptAi, receiptAiErrorKey, mergeReceiptFields } from '../../lib/receiptAi'
 import type { ReceiptAiResult } from '../../../shared/receiptAi'
 import { waitForReceiptFields } from '../../lib/receiptOcrWait'
 
@@ -81,6 +81,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   const [aiBusy, setAiBusy] = useState(false)
   const [aiResult, setAiResult] = useState<ReceiptAiResult | null>(null)
   const [aiError, setAiError] = useState<string | null>(null)
+  const [resolvedFields, setResolvedFields] = useState<RecognizedReceiptFields | null>(null)
 
   function errText(e: unknown): string {
     return e instanceof Error ? e.message : String(e)
@@ -94,6 +95,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     aiResultRef.current = null
     setAiBusy(false)
     setAiResult(null)
+    setResolvedFields(null)
     setAiError(null)
     ocrControllerRef.current?.abort()
     ocrControllerRef.current = null
@@ -126,13 +128,21 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     setStage('review')
     const controller = new AbortController()
     ocrControllerRef.current = controller
-    recognizeResultRef.current = recognizeReceiptFields(
+    const local = recognizeReceiptFields(
       dataUrl, receiptId, (band) => cropReceiptBand(canvas, band),
       (fields) => {
         if (!controller.signal.aborted && !aiResultRef.current && receiptIdRef.current === receiptId) partialFieldsRef.current = fields
       },
       { signal: controller.signal },
-    )
+    ).then(fields => {
+      if (!controller.signal.aborted && !aiResultRef.current && receiptIdRef.current === receiptId) partialFieldsRef.current = fields
+      return fields
+    })
+    recognizeResultRef.current = waitForReceiptFields(local, () => partialFieldsRef.current ?? emptyFields(receiptId), {
+      signal: controller.signal, onTimeout: () => controller.abort(),
+    })
+    // The scan itself starts AI recognition. The button only retries this same image.
+    void handleAiRecognize()
   }
 
   async function startScan() {
@@ -204,31 +214,48 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     const receiptId = receiptIdRef.current
     if (!canvas || !receiptId || savingRef.current || aiBusyRef.current) return
     const generation = scanGenerationRef.current
+    const previous = recognizeResultRef.current
+    const fallback = () => partialFieldsRef.current?.receiptId === receiptId
+      ? partialFieldsRef.current : emptyFields(receiptId)
     const controller = new AbortController()
     aiControllerRef.current = controller
     aiBusyRef.current = true
     setAiBusy(true)
     setAiError(null)
     const timer = window.setTimeout(() => controller.abort(), 45_000)
-    try {
-      const { result, fields } = await recognizeReceiptAi(canvas, receiptId, controller.signal)
-      if (controller.signal.aborted || scanGenerationRef.current !== generation) return
-      aiResultRef.current = result
-      setAiResult(result)
-      partialFieldsRef.current = fields
-      recognizeResultRef.current = Promise.resolve(fields)
-      logModule('receipt', `AI识别完成 receiptId=${receiptId}: 金额=${fields.amount ?? '未确认'}`)
-    } catch (error) {
-      if (scanGenerationRef.current !== generation) return
-      setAiError(t(controller.signal.aborted ? 'receiptAiTimeout' : receiptAiErrorKey(error)))
-    } finally {
-      window.clearTimeout(timer)
-      if (scanGenerationRef.current === generation) {
-        aiBusyRef.current = false
-        setAiBusy(false)
-        aiControllerRef.current = null
+    const task = (async (): Promise<RecognizedReceiptFields> => {
+      try {
+        const { result, fields } = await recognizeReceiptAi(canvas, receiptId, controller.signal)
+        if (controller.signal.aborted || scanGenerationRef.current !== generation) return emptyFields(receiptId)
+        const previousFields = fields.amount != null ? fallback()
+          : await waitForReceiptFields(previous, fallback, { signal: controller.signal })
+        if (controller.signal.aborted || scanGenerationRef.current !== generation) return emptyFields(receiptId)
+        const merged = mergeReceiptFields(previousFields, fields)
+        aiResultRef.current = result
+        setAiResult(result)
+        setResolvedFields(merged)
+        partialFieldsRef.current = merged
+        logModule('receipt', `AI识别完成 receiptId=${receiptId}: 原始金额=${result.rawAmount ?? '未确认'}, AI金额=${fields.amount ?? '未确认'}, 最终金额=${merged.amount ?? '未确认'}`, 'info', {
+          reasons: JSON.stringify(result.validationReasons), checks: JSON.stringify(result.settlementChecks),
+          paymentAmount: result.paymentAmount ?? 'null', cashTenderedAmount: result.cashTenderedAmount ?? 'null',
+          changeAmount: result.changeAmount ?? 'null',
+        })
+        return merged
+      } catch (error) {
+        if (scanGenerationRef.current !== generation) return emptyFields(receiptId)
+        setAiError(t(controller.signal.aborted ? 'receiptAiTimeout' : receiptAiErrorKey(error)))
+        return waitForReceiptFields(previous, fallback, { signal: controller.signal })
+      } finally {
+        window.clearTimeout(timer)
+        if (scanGenerationRef.current === generation) {
+          aiBusyRef.current = false
+          setAiBusy(false)
+          aiControllerRef.current = null
+        }
       }
-    }
+    })()
+    recognizeResultRef.current = task
+    await task
   }
 
   async function handleConfirm() {
@@ -338,10 +365,10 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                 {aiError && <p role="alert" className="text-xs text-action-ink">{aiError}</p>}
                 {aiResult && <div role="status" className="rounded-xl border border-outline-variant p-3 text-body-md text-on-surface break-words">
                   <p className="font-medium">{t('receiptAiResult')}</p>
-                  <p>{t('amountLabel')}: {aiResult.amount == null ? t('receiptAiUnconfirmed') : `¥${aiResult.amount.toLocaleString()}`}</p>
-                  <p>{t('dateLabel')}: {aiResult.date ?? t('receiptAiUnconfirmed')}</p>
-                  <p>{aiResult.storeName}</p>
-                  <p className="text-xs text-on-surface-variant mt-2">{t(aiResult.uncertain ? 'receiptAiCheckAmount' : 'receiptAiReviewNote')}</p>
+                  <p>{t('amountLabel')}: {resolvedFields?.amount == null ? t('receiptAiUnconfirmed') : `¥${resolvedFields.amount.toLocaleString()}`}</p>
+                  <p>{t('dateLabel')}: {resolvedFields?.date ?? t('receiptAiUnconfirmed')}</p>
+                  <p>{resolvedFields?.storeName}</p>
+                  <p className="text-xs text-on-surface-variant mt-2">{t(aiResult.amount == null && resolvedFields?.amount != null ? 'receiptAiKeptLocal' : aiResult.uncertain ? 'receiptAiCheckAmount' : 'receiptAiReviewNote')}</p>
                 </div>}
               </div>
 

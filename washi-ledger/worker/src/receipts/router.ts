@@ -27,6 +27,13 @@ router.post('/recognize', bodyLimit({ maxSize: 4_100_000,
   const limit = await c.env.RECEIPT_AI_RATE_LIMIT.limit({ key: userId })
   if (!limit.success) throw new HttpError(429, 'RECEIPT_AI_RATE_LIMITED')
   const fields = await recognizeWithOpenAi(body.image, c.env.OPENAI_API_KEY, c.env.OPENAI_RECEIPT_MODEL)
+  // Numeric diagnostics only: no receipt image, item text, account identity or API key.
+  console.info('[receipt-ai]', JSON.stringify({ receiptId: body.receiptId, model: c.env.OPENAI_RECEIPT_MODEL,
+    rawAmount: fields.rawAmount, amount: fields.amount, currency: fields.currency,
+    paymentAmount: fields.paymentAmount, cashTenderedAmount: fields.cashTenderedAmount,
+    changeAmount: fields.changeAmount, validationReasons: fields.validationReasons,
+    settlementChecks: fields.settlementChecks,
+  }))
   return c.json({ receiptId: body.receiptId, fields })
 })
 export default router
