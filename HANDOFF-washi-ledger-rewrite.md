@@ -78,7 +78,7 @@ washi-ledger/
 
 ### 2026-11-27 AI识别修复 · 已推送，待部署
 
-基于cd0612e准备1.0.0-20261127-dev.1。用户要求首次扫描自动使用OpenAI、按整票语义而非固定字符解析；支付额差异不再拒绝明确总额，预收/找零/积分/折扣分开；AI空字段保留已确认金额/日期。金额、日期、备注按新规则分别回填。补原始/最终金额和处理原因数值日志。106项Node测试、11项AI与8项原有页面场景最终通过；首次冷加载超时的场景复查通过。构建/lint、Worker类型检查与dry-run通过。必须同时更新Worker和App；950cf34已推送，云端has_push_permission=true并实际push成功。新Worker未部署、真实模型及iOS效果未验证。详见worker/OPENAI_RECEIPTS_SETUP.md。
+基于cd0612e准备1.0.0-20261127-dev.1。用户要求首次扫描自动使用OpenAI、按整票语义而非固定字符解析；支付额差异不再拒绝明确总额，预收/找零/积分/折扣分开；AI空字段保留已确认金额/日期。金额、日期、备注按新规则分别回填。补原始/最终金额和处理原因数值日志。106项Node测试、11项AI与8项原有页面场景最终通过；首次冷加载超时的场景复查通过。构建/lint、Worker类型检查与dry-run通过。必须同时更新Worker和App；950cf34已推送，云端has_push_permission=true并实际push成功。IPA127构建成功（run46005579448，artifact15200868373），构建来源02b82f7。新Worker未部署，真实模型与iOS真机效果未验证。详见worker/OPENAI_RECEIPTS_SETUP.md。
 
 
 ### OpenAI 可选识别 · 2026-11-26 已部署并交付IPA126
