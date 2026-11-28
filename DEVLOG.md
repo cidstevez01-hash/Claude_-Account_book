@@ -1,5 +1,12 @@
 # 开发记录
 
+## PigBang 重写版 · 2026-11-28 · 1.0.0-20261128-dev.2 已推送，Worker/IPA129成功
+
+- 用户在报告dev.2后明确授权“推呀”。核对远端未推进后提交并推送e71ec493ce3fab0a2f93dd8e55862db74fb1c0f8至pigbang_20261031，远端SHA已核对；个人配置和无关.gitignore/SMARTSHEET-STATUS-FLOW.md未提交。
+- Worker使用deploy --keep-vars同步部署，沿用现有Secret、模型与授权账号，版本ID 4e405101-deb9-4c52-973b-f29f51ad714c。/receipts/recognize无凭据POST返回401，没有发起真实模型调用。
+- IPA129首轮成功，run46131746928，源码e71ec49。artifact15258112907，名称pigbang-unsigned-ipa-v1.0.0-20261128-dev.2-129，25325255字节。下载：https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46131746928/artifacts/15258112907
+- R-60按当前需求表回填已处理/1.0.0-20261128-dev.2，真机结果不填passed。历史01/02设计快照不覆盖，发布信息单独存design-assets/receipt-review/releases/。124项Node、38项隔离页面检查已通过，真实小票单价/积分识别效果与iOS操作待用户验证。下方“本地完成、未发布”为此前阶段记录。
+
 ## PigBang 重写版 · 2026-11-28 · R-60 小票价格、编辑与积分（本地完成，未发布）
 
 - 用户确认保留单价、完整备注预览与可编辑回填，追加本次获得/使用积分、实际抵扣与支付规则相加，排除正文之外的キャンペーン/广告和余额；已按要求合并补录需求R-60（需求表A60:H60，处理中，更新版本/测试结果留空并回读核对）。

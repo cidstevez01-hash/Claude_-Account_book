@@ -1,5 +1,7 @@
 # 小票价格、编辑与积分
 
+最新交付：1.0.0-20261128-dev.2已推送e71ec49，Worker已同步，IPA129成功。下载：https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46131746928/artifacts/15258112907 。R-60已处理，真机结果待验证。下方final/history状态描述保留其产出时原样；当前发布记录见releases/1.0.0-20261128-dev.2.json，不覆盖已发布图稿。
+
 - 当前本地实际页面与源码：[final/index.html](final/index.html)。准备版本1.0.0-20261128-dev.2，尚未发布。
 - 历史02：[20261128-02/index.html](history/20261128-02/index.html)，包含积分核对及完整可编辑备注、按张持久化规则与检查。
 - 历史01：最初单价/可编辑备注的实际页面截图，保留在history/20261128-01。

@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-28",
+  "timezone": "Asia/Tokyo",
+  "version": "1.0.0-20261128-dev.2",
+  "branch": "pigbang_20261031",
+  "codeCommit": "e71ec493ce3fab0a2f93dd8e55862db74fb1c0f8",
+  "pushed": true,
+  "worker": {
+    "deployed": true,
+    "versionId": "4e405101-deb9-4c52-973b-f29f51ad714c",
+    "keepVars": true,
+    "unauthenticatedReceiptPost": 401
+  },
+  "ipa": {
+    "runId": 46131746928,
+    "number": 129,
+    "attempt": 1,
+    "conclusion": "success",
+    "artifactId": 15258112907,
+    "artifactBytes": 25325255,
+    "download": "https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46131746928/artifacts/15258112907"
+  },
+  "requirement": "R-60",
+  "requirementStatus": "已处理",
+  "nodePassed": 124,
+  "isolatedBrowserPassed": 38,
+  "realModelCalls": 0,
+  "deviceValidation": "pending"
+}

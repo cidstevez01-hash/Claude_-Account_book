@@ -1,5 +1,7 @@
 # 交接说明：PigBang 重写版
 
+**最新交付 · 2026-11-28**：1.0.0-20261128-dev.2已按用户“推呀”指令推送至pigbang_20261031，源码e71ec493ce3fab0a2f93dd8e55862db74fb1c0f8。Worker已deploy --keep-vars成功，版本4e405101-deb9-4c52-973b-f29f51ad714c，无凭据POST401；未调用真实模型。IPA129成功（run46131746928），下载artifact15258112907：https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46131746928/artifacts/15258112907 。R-60回填已处理/1.0.0-20261128-dev.2，真机测试结果留空。实际代码含单价、可编辑完整备注、净额抵扣与小票积分叠加付款规则；124项Node及38项页面隔离测试通过。设计历史不覆盖，交付JSON单独存receipt-review/releases。下方“未发布”均为当时状态，不应重复部署/dispatch或要求重新配置密钥。
+
 **最新本地工作 · 2026-11-28 · R-60（未发布）**：用户确认小票单价/数量/行金额保留、完整备注可编辑、金额/日期/积分可修改；本次小票获得积分加付款规则积分，使用积分按实际货币抵扣一次，已净额不再扣，广告/キャンペーン/余额排除。App与Worker实现已完成，124项Node与38项真实React页面隔离场景通过，构建/lint/Worker类型检查及dry-run通过；未调用真实模型/写真实账目。需求R-60已写入当前共享表“需求”A60:H60，处理中，版本与真机结果未回填。package/lock准备为1.0.0-20261128-dev.2，尚未提交、推送、部署或调度新IPA，须先报告版本后获明确推送授权；一次连续完成远端核对/推送/Worker同步与IPA，不重新询问已有密钥。按张净额/积分/自动备注标记保存在现有receipt_path文本JSON元数据，旧路径字符串仍兼容，旧版重存会丢元数据。图稿与实际源码在design-assets/receipt-review/history/20261128-02和final；01历史截图保留。具体规则见RECEIPT_OCR.md。下方dev.1/IPA128为此前日历/图标版，不含此项。
 
 <!-- CALENDAR RELEASE -->
