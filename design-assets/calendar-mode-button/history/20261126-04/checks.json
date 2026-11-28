@@ -1,0 +1,18 @@
+{
+  "sourceSha256": "52d32aadebcefe185520357937dbda9ba0ca2f3bb8022210a99340e79d702650",
+  "scope": "Preview only; original React handler/poses and source unchanged. No real account writes.",
+  "results": [
+    {
+      "name": "new artwork on original React exchange: warm",
+      "result": "passed"
+    },
+    {
+      "name": "new artwork on original React exchange: silver",
+      "result": "passed"
+    },
+    {
+      "name": "live preview: new SVGs, 300ms exchange, theme switch, narrow screen and no JS errors",
+      "result": "passed"
+    }
+  ]
+}

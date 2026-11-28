@@ -1,0 +1,140 @@
+[
+  {
+    "theme": "default",
+    "colors": [
+      "#AA5B52",
+      "#B96D60",
+      "#CE8D7D",
+      "#E0ADA0",
+      "#EAC6BA",
+      "#F5DFD3"
+    ],
+    "originalPath": "M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z",
+    "originalPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "glossPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "coinSha256": "d9daf47bd291abbe9bb47bf6b8c0de80c56214ca68972d9f54f5b0d26841469e",
+    "lightDirection": "top left",
+    "shadow": {
+      "dx": 10,
+      "dy": 15,
+      "stdDeviation": 11,
+      "opacity": 0.24
+    },
+    "viewBox": "0 -960 960 960"
+  },
+  {
+    "theme": "nostalgia",
+    "colors": [
+      "#A37140",
+      "#BC884E",
+      "#D39D65",
+      "#DFBA8A",
+      "#E8D4B1",
+      "#F3E8CF"
+    ],
+    "originalPath": "M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z",
+    "originalPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "glossPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "coinSha256": "7de37ed7234adbb154395ee666558cd98f9cac7619582bb69de502d166ed4614",
+    "lightDirection": "top left",
+    "shadow": {
+      "dx": 10,
+      "dy": 15,
+      "stdDeviation": 11,
+      "opacity": 0.24
+    },
+    "viewBox": "0 -960 960 960"
+  },
+  {
+    "theme": "summer",
+    "colors": [
+      "#B45947",
+      "#C47052",
+      "#D88D64",
+      "#E7AC7C",
+      "#F0C89B",
+      "#F9E5C5"
+    ],
+    "originalPath": "M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z",
+    "originalPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "glossPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "coinSha256": "1915078dc2c1429a3ab0b917d8912e87ad9bafce31bc75c48f0c718d39dce225",
+    "lightDirection": "top left",
+    "shadow": {
+      "dx": 10,
+      "dy": 15,
+      "stdDeviation": 11,
+      "opacity": 0.24
+    },
+    "viewBox": "0 -960 960 960"
+  },
+  {
+    "theme": "autumn",
+    "colors": [
+      "#A4432C",
+      "#B85632",
+      "#CC783E",
+      "#DA9B52",
+      "#E9BC7C",
+      "#F4D6A7"
+    ],
+    "originalPath": "M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z",
+    "originalPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "glossPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "coinSha256": "ef2eddebd02ebf8f3aef5d2422c14ae123de14faa667c144535c5159a349a99b",
+    "lightDirection": "top left",
+    "shadow": {
+      "dx": 10,
+      "dy": 15,
+      "stdDeviation": 11,
+      "opacity": 0.24
+    },
+    "viewBox": "0 -960 960 960"
+  },
+  {
+    "theme": "winter",
+    "colors": [
+      "#987138",
+      "#A98345",
+      "#C5A472",
+      "#DBC29D",
+      "#E4C8B0",
+      "#EFDEC6"
+    ],
+    "originalPath": "M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z",
+    "originalPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "glossPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "coinSha256": "e06875597c38fc63456225024fbe8c21c7893eb62d5c44e34331b6f53f35c32b",
+    "lightDirection": "top left",
+    "shadow": {
+      "dx": 10,
+      "dy": 15,
+      "stdDeviation": 11,
+      "opacity": 0.24
+    },
+    "viewBox": "0 -960 960 960"
+  },
+  {
+    "theme": "winter-silver",
+    "colors": [
+      "#5F7693",
+      "#8498B3",
+      "#AFBFD2",
+      "#CBD6E4",
+      "#DAD1E2",
+      "#ECEEF5"
+    ],
+    "originalPath": "M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z",
+    "originalPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "glossPathSha256": "803682119b66c3ab6bee2baad5ff601892b0491efb9faa32adba6bf04d8c6734",
+    "coinSha256": "1405e0f982d968640bd925e96fdd5991679e1b224b7a1c765da8576a519ca463",
+    "lightDirection": "top left",
+    "shadow": {
+      "dx": 10,
+      "dy": 15,
+      "stdDeviation": 11,
+      "opacity": 0.24
+    },
+    "viewBox": "0 -960 960 960"
+  }
+]

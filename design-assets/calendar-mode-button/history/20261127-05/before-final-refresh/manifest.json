@@ -1,0 +1,10 @@
+{
+  "status": "Calendar quick actions integrated. App still uses original toggle. Current draft adapts selected reference 37 clover coin to the actual current cash glyph; both themes and original exchange verified; visual approval pending.",
+  "modeComponentSha256": "52d32aadebcefe185520357937dbda9ba0ca2f3bb8022210a99340e79d702650",
+  "quickActionPages": [
+    "/",
+    "/history",
+    "/stats"
+  ],
+  "draft": "../history/20261127-01/index.html"
+}

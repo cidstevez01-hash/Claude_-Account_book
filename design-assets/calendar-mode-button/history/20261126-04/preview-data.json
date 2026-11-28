@@ -1,0 +1,122 @@
+{
+  "cashSvg": "<svg viewBox=\"0 -960 960 960\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"/></svg>",
+  "themes": {
+    "warm": {
+      "tokens": {
+        "--color-primary": "#A17E3C",
+        "--color-outline": "#AB8A81",
+        "--color-action": "#F4DBAE",
+        "--color-action-ink": "#705331"
+      },
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "2",
+            "opacity": "1",
+            "color": "var(--color-primary)"
+          },
+          "coin": {
+            "left": "14.375px",
+            "top": "7.5px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "color": "var(--color-outline)"
+          },
+          "coin": {
+            "left": "6.25px",
+            "top": "14.1667px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none"
+          }
+        }
+      }
+    },
+    "silver": {
+      "tokens": {
+        "--color-primary": "#7086A0",
+        "--color-outline": "#8D9195",
+        "--color-action": "#E2E8F2",
+        "--color-action-ink": "#4D607A"
+      },
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "2",
+            "opacity": "1",
+            "color": "var(--color-primary)"
+          },
+          "coin": {
+            "left": "14.375px",
+            "top": "7.5px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "color": "var(--color-outline)"
+          },
+          "coin": {
+            "left": "6.25px",
+            "top": "14.1667px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none"
+          }
+        }
+      }
+    }
+  },
+  "sourceSha256": "52d32aadebcefe185520357937dbda9ba0ca2f3bb8022210a99340e79d702650",
+  "cashSvgs": {
+    "warm": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 122 86\"><defs><linearGradient id=\"paper\" x2=\"1\" y2=\"1\"><stop stop-color=\"#FFF8DD\"/><stop offset=\".65\" stop-color=\"#F8E9BD\"/><stop offset=\"1\" stop-color=\"#EDC8BA\"/></linearGradient></defs><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"6\" y=\"24\" width=\"103\" height=\"56\" rx=\"8\" fill=\"#F8E9BD\" stroke=\"currentColor\" stroke-width=\"4\"/><path d=\"M13 70h88\" stroke=\"#C6A05E\" stroke-width=\"2\"/><rect x=\"15\" y=\"9\" width=\"103\" height=\"57\" rx=\"8\" fill=\"url(#paper)\" stroke=\"currentColor\" stroke-width=\"4\"/><path d=\"M34 17h65q0 10 11 10v21q-11 0-11 10H34q0-10-11-10V27q11 0 11-10Z\" fill=\"none\" stroke=\"#C6A05E\" stroke-width=\"2\"/><ellipse cx=\"66.5\" cy=\"37.5\" rx=\"17\" ry=\"20\" fill=\"#FFF8DD\" stroke=\"#C6A05E\" stroke-width=\"2\"/><path d=\"m58 27 8.5 10 8.5-10M66.5 37v13M58.5 38h16M58.5 44h16\" stroke=\"currentColor\" stroke-width=\"3.5\" fill=\"none\"/><path d=\"M34 35h7M34 41h7M93 35h7M93 41h7\" stroke=\"#987339\" stroke-width=\"2.5\"/></g></svg>",
+    "silver": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 122 86\"><defs><linearGradient id=\"paper\" x2=\"1\" y2=\"1\"><stop stop-color=\"#FFFFFF\"/><stop offset=\".65\" stop-color=\"#E3EDF9\"/><stop offset=\"1\" stop-color=\"#E7D8EE\"/></linearGradient></defs><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"6\" y=\"24\" width=\"103\" height=\"56\" rx=\"8\" fill=\"#E3EDF9\" stroke=\"currentColor\" stroke-width=\"4\"/><path d=\"M13 70h88\" stroke=\"#9CAFC8\" stroke-width=\"2\"/><rect x=\"15\" y=\"9\" width=\"103\" height=\"57\" rx=\"8\" fill=\"url(#paper)\" stroke=\"currentColor\" stroke-width=\"4\"/><path d=\"M34 17h65q0 10 11 10v21q-11 0-11 10H34q0-10-11-10V27q11 0 11-10Z\" fill=\"none\" stroke=\"#9CAFC8\" stroke-width=\"2\"/><ellipse cx=\"66.5\" cy=\"37.5\" rx=\"17\" ry=\"20\" fill=\"#FFFFFF\" stroke=\"#9CAFC8\" stroke-width=\"2\"/><path d=\"m58 27 8.5 10 8.5-10M66.5 37v13M58.5 38h16M58.5 44h16\" stroke=\"currentColor\" stroke-width=\"3.5\" fill=\"none\"/><path d=\"M34 35h7M34 41h7M93 35h7M93 41h7\" stroke=\"#687F9A\" stroke-width=\"2.5\"/></g></svg>"
+  }
+}

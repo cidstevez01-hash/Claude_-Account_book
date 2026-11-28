@@ -1,0 +1,468 @@
+{
+  "sourceSha256": "d281d4a8a9825c510ac3838c1f82f037d78ace20df2f5b1a2bdbc176c080e705",
+  "sourceImageSha256": "9d3864b34ebb7b1a3cd60d834ac77f2753188712a8122175a48bc402db68246f",
+  "items": [
+    {
+      "key": "default",
+      "zh": "PigBang",
+      "old": "PigBang",
+      "name": "PigBang",
+      "direction": "珊瑚粉 · 奶杏高光",
+      "colors": [
+        "#AA5B52",
+        "#B96D60",
+        "#CE8D7D",
+        "#E0ADA0",
+        "#EAC6BA",
+        "#F5DFD3"
+      ]
+    },
+    {
+      "key": "nostalgia",
+      "zh": "怀旧",
+      "old": "ノスタルジー",
+      "name": "レトロ",
+      "direction": "浅琥珀 · 奶油金",
+      "colors": [
+        "#A37140",
+        "#BC884E",
+        "#D39D65",
+        "#DFBA8A",
+        "#E8D4B1",
+        "#F3E8CF"
+      ]
+    },
+    {
+      "key": "summer",
+      "zh": "夏 · 花火",
+      "old": "夏・花火",
+      "name": "夏の花火",
+      "direction": "珊瑚金 · 暖光",
+      "colors": [
+        "#B45947",
+        "#C47052",
+        "#D88D64",
+        "#E7AC7C",
+        "#F0C89B",
+        "#F9E5C5"
+      ]
+    },
+    {
+      "key": "autumn",
+      "zh": "红叶 · 丹枫金秋",
+      "old": "紅葉・丹楓の秋",
+      "name": "秋のもみじ",
+      "direction": "枫叶红 · 秋金",
+      "colors": [
+        "#A4432C",
+        "#B85632",
+        "#CC783E",
+        "#DA9B52",
+        "#E9BC7C",
+        "#F4D6A7"
+      ]
+    },
+    {
+      "key": "winter",
+      "zh": "冬雪 · 暖金",
+      "old": "冬雪・ウォームゴールド",
+      "name": "雪あかり・金",
+      "direction": "已确认暖金 · 保留",
+      "approved": true
+    },
+    {
+      "key": "winter-silver",
+      "zh": "冬雪 · 银灰",
+      "old": "冬雪・シルバー",
+      "name": "雪あかり・銀",
+      "direction": "已确认银灰 · 保留",
+      "approved": true
+    }
+  ],
+  "themes": {
+    "default": {
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "tokens": {
+        "--color-primary": "#d1665a",
+        "--color-outline": "#85736d",
+        "--color-on-surface": "#231a13",
+        "--color-surface": "#fff8f5",
+        "--color-surface-container-highest": "#f2dfd4",
+        "--color-secondary": "#7a9b6e",
+        "--color-tertiary": "#8b6b00"
+      },
+      "cashSvg": "<svg viewBox=\"0 -960 960 960\" class=\"w-full h-full block\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"></path></svg>",
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(209, 102, 90)"
+          },
+          "coin": {
+            "left": "13.6042px",
+            "top": "7.35417px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)",
+            "color": "rgb(35, 26, 19)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "filter": "none",
+            "color": "rgb(133, 115, 109)"
+          },
+          "coin": {
+            "left": "5.47917px",
+            "top": "14.0208px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(35, 26, 19)"
+          }
+        }
+      }
+    },
+    "nostalgia": {
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "tokens": {
+        "--color-primary": "#ff9459",
+        "--color-outline": "#a99c86",
+        "--color-on-surface": "#3a2f28",
+        "--color-surface": "#f7f1e7",
+        "--color-surface-container-highest": "#e3e7dd",
+        "--color-secondary": "#7a9b6e",
+        "--color-tertiary": "#8b6b00"
+      },
+      "cashSvg": "<svg viewBox=\"0 -960 960 960\" class=\"w-full h-full block\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"></path></svg>",
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(255, 148, 89)"
+          },
+          "coin": {
+            "left": "13.6042px",
+            "top": "7.35417px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)",
+            "color": "rgb(58, 47, 40)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "filter": "none",
+            "color": "rgb(169, 156, 134)"
+          },
+          "coin": {
+            "left": "5.47917px",
+            "top": "14.0208px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(58, 47, 40)"
+          }
+        }
+      }
+    },
+    "summer": {
+      "button": {
+        "x": 327.609375,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "tokens": {
+        "--color-primary": "#e85d4a",
+        "--color-outline": "#93a6c4",
+        "--color-on-surface": "#f0e9d8",
+        "--color-surface": "#101b33",
+        "--color-surface-container-highest": "#1f3155",
+        "--color-secondary": "#4fd1a5",
+        "--color-tertiary": "#f2c94c"
+      },
+      "cashSvg": "<svg viewBox=\"0 -960 960 960\" class=\"w-full h-full block\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"></path></svg>",
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(232, 93, 74)"
+          },
+          "coin": {
+            "left": "13.6042px",
+            "top": "7.35417px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)",
+            "color": "rgb(240, 233, 216)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "filter": "none",
+            "color": "rgb(147, 166, 196)"
+          },
+          "coin": {
+            "left": "5.47917px",
+            "top": "14.0208px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(240, 233, 216)"
+          }
+        }
+      }
+    },
+    "autumn": {
+      "button": {
+        "x": 327.609375,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "tokens": {
+        "--color-primary": "#c62818",
+        "--color-outline": "#957961",
+        "--color-on-surface": "#241d17",
+        "--color-surface": "#faf6ee",
+        "--color-surface-container-highest": "#f6e2cc",
+        "--color-secondary": "#2a7e4b",
+        "--color-tertiary": "#a66508"
+      },
+      "cashSvg": "<svg viewBox=\"0 -960 960 960\" class=\"w-full h-full block\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"></path></svg>",
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(198, 40, 24)"
+          },
+          "coin": {
+            "left": "13.6042px",
+            "top": "7.35417px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)",
+            "color": "rgb(36, 29, 23)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "filter": "none",
+            "color": "rgb(149, 121, 97)"
+          },
+          "coin": {
+            "left": "5.47917px",
+            "top": "14.0208px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(36, 29, 23)"
+          }
+        }
+      }
+    },
+    "winter": {
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "tokens": {
+        "--color-primary": "#A17E3C",
+        "--color-outline": "#AB8A81",
+        "--color-on-surface": "#483C35",
+        "--color-surface": "#FFF9F5",
+        "--color-surface-container-highest": "#F9E8C9",
+        "--color-secondary": "#32785f",
+        "--color-tertiary": "#8b6c35"
+      },
+      "cashSvg": "<svg viewBox=\"0 -960 960 960\" class=\"w-full h-full block\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"></path></svg>",
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(161, 126, 60)"
+          },
+          "coin": {
+            "left": "13.6042px",
+            "top": "7.35417px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)",
+            "color": "rgb(72, 60, 53)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "filter": "none",
+            "color": "rgb(171, 138, 129)"
+          },
+          "coin": {
+            "left": "5.47917px",
+            "top": "14.0208px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(72, 60, 53)"
+          }
+        }
+      }
+    },
+    "winter-silver": {
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "tokens": {
+        "--color-primary": "#7086A0",
+        "--color-outline": "#8D9195",
+        "--color-on-surface": "#3B3F43",
+        "--color-surface": "#F7FBFF",
+        "--color-surface-container-highest": "#E6EAF4",
+        "--color-secondary": "#32785f",
+        "--color-tertiary": "#6C7074"
+      },
+      "cashSvg": "<svg viewBox=\"0 -960 960 960\" class=\"w-full h-full block\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"></path></svg>",
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(112, 134, 160)"
+          },
+          "coin": {
+            "left": "13.6042px",
+            "top": "7.35417px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)",
+            "color": "rgb(59, 63, 67)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4062px",
+            "height": "17.9062px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "filter": "none",
+            "color": "rgb(141, 145, 149)"
+          },
+          "coin": {
+            "left": "5.47917px",
+            "top": "14.0208px",
+            "width": "18px",
+            "height": "18px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none",
+            "color": "rgb(59, 63, 67)"
+          }
+        }
+      }
+    }
+  }
+}

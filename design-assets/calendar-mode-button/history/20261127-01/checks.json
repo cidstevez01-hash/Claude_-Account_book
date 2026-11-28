@@ -1,0 +1,18 @@
+{
+  "sourceSha256": "52d32aadebcefe185520357937dbda9ba0ca2f3bb8022210a99340e79d702650",
+  "scope": "Preview only; original cash artwork, button background, poses and handler unchanged; no real account writes",
+  "results": [
+    {
+      "name": "37 clover with unchanged current cash, background and exchange: warm",
+      "result": "passed"
+    },
+    {
+      "name": "37 clover with unchanged current cash, background and exchange: silver",
+      "result": "passed"
+    },
+    {
+      "name": "live preview: warm/silver PNG, current cash, 300ms animation and mobile width",
+      "result": "passed"
+    }
+  ]
+}

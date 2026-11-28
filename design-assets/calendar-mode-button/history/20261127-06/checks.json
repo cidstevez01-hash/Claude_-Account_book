@@ -1,0 +1,35 @@
+{
+  "head": "bf9f68d",
+  "assetSha256": "9d3864b34ebb7b1a3cd60d834ac77f2753188712a8122175a48bc402db68246f",
+  "scope": "Actual React component with approved winter palettes at18px; exact approved PNG bytes; centers/cash/animation preserved; six themes; no real account writes",
+  "results": [
+    {
+      "name": "integrated approved palette at18px and original exchange: default",
+      "result": "passed"
+    },
+    {
+      "name": "integrated approved palette at18px and original exchange: nostalgia",
+      "result": "passed"
+    },
+    {
+      "name": "integrated approved palette at18px and original exchange: summer",
+      "result": "passed"
+    },
+    {
+      "name": "integrated approved palette at18px and original exchange: autumn",
+      "result": "passed"
+    },
+    {
+      "name": "integrated approved palette at18px and original exchange: winter",
+      "result": "passed"
+    },
+    {
+      "name": "integrated approved palette at18px and original exchange: winter-silver",
+      "result": "passed"
+    },
+    {
+      "name": "published preview shows18px versus20px and both approved themes, mobile width",
+      "result": "passed"
+    }
+  ]
+}

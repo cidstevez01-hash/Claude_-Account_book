@@ -1,0 +1,62 @@
+[
+  {
+    "theme": "default",
+    "colors": 1041,
+    "changedOpaquePixels": 22133,
+    "haloPixels": 9815,
+    "holeAlpha": [
+      0,
+      0
+    ]
+  },
+  {
+    "theme": "nostalgia",
+    "colors": 1292,
+    "changedOpaquePixels": 22133,
+    "haloPixels": 9815,
+    "holeAlpha": [
+      0,
+      0
+    ]
+  },
+  {
+    "theme": "summer",
+    "colors": 1555,
+    "changedOpaquePixels": 22133,
+    "haloPixels": 9815,
+    "holeAlpha": [
+      0,
+      0
+    ]
+  },
+  {
+    "theme": "autumn",
+    "colors": 1720,
+    "changedOpaquePixels": 22133,
+    "haloPixels": 9815,
+    "holeAlpha": [
+      0,
+      0
+    ]
+  },
+  {
+    "theme": "winter",
+    "colors": 1341,
+    "changedOpaquePixels": 21119,
+    "haloPixels": 9815,
+    "holeAlpha": [
+      0,
+      0
+    ]
+  },
+  {
+    "theme": "winter-silver",
+    "colors": 1376,
+    "changedOpaquePixels": 21568,
+    "haloPixels": 9815,
+    "holeAlpha": [
+      0,
+      0
+    ]
+  }
+]

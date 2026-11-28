@@ -1,0 +1,39 @@
+{
+  "componentSha256": "d281d4a8a9825c510ac3838c1f82f037d78ace20df2f5b1a2bdbc176c080e705",
+  "dictSha256": "d7779119bf1f6d16ff2520cf6a06655ea50affb84d3fd2b1de10a9b52c7bc679",
+  "scope": "Preview only: four palette variants and six Japanese name proposals. Production component and dictionary unchanged; isolated account fixtures; no live writes.",
+  "results": [
+    {
+      "name": "18px theme preview and original React exchange: default",
+      "result": "passed"
+    },
+    {
+      "name": "18px theme preview and original React exchange: nostalgia",
+      "result": "passed"
+    },
+    {
+      "name": "18px theme preview and original React exchange: summer",
+      "result": "passed"
+    },
+    {
+      "name": "18px theme preview and original React exchange: autumn",
+      "result": "passed"
+    },
+    {
+      "name": "18px theme preview and original React exchange: winter",
+      "result": "passed"
+    },
+    {
+      "name": "18px theme preview and original React exchange: winter-silver",
+      "result": "passed"
+    },
+    {
+      "name": "Japanese name draft on real theme chooser: six cards and no overflow",
+      "result": "passed"
+    },
+    {
+      "name": "Interactive six-theme preview: original positions, 18px, desktop and 320px layout",
+      "result": "passed"
+    }
+  ]
+}

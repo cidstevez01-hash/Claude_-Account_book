@@ -1,0 +1,31 @@
+{
+  "head": "bf9f68d",
+  "assetSha256": "9d3864b34ebb7b1a3cd60d834ac77f2753188712a8122175a48bc402db68246f",
+  "scope": "Actual production React component with source23; no DOM artwork or size injection; all six themes; no real account writes",
+  "results": [
+    {
+      "name": "integrated reference23 current cash and exchange: default",
+      "result": "passed"
+    },
+    {
+      "name": "integrated reference23 current cash and exchange: nostalgia",
+      "result": "passed"
+    },
+    {
+      "name": "integrated reference23 current cash and exchange: summer",
+      "result": "passed"
+    },
+    {
+      "name": "integrated reference23 current cash and exchange: autumn",
+      "result": "passed"
+    },
+    {
+      "name": "integrated reference23 current cash and exchange: winter",
+      "result": "passed"
+    },
+    {
+      "name": "integrated reference23 current cash and exchange: winter-silver",
+      "result": "passed"
+    }
+  ]
+}

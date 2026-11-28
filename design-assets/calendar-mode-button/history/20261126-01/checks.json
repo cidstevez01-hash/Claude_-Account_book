@@ -1,0 +1,53 @@
+{
+  "scope": "Actual React UI; isolated empty account/data; proposed visual markup only injected into test browser. Original mode component unchanged.",
+  "results": [
+    {
+      "name": "calendar quick action and back: winter /",
+      "result": "passed"
+    },
+    {
+      "name": "calendar quick action and back: winter /history",
+      "result": "passed"
+    },
+    {
+      "name": "calendar quick action and back: winter /stats",
+      "result": "passed"
+    },
+    {
+      "name": "calendar quick action and back: winter-silver /",
+      "result": "passed"
+    },
+    {
+      "name": "calendar quick action and back: winter-silver /history",
+      "result": "passed"
+    },
+    {
+      "name": "calendar quick action and back: winter-silver /stats",
+      "result": "passed"
+    },
+    {
+      "name": "calendar shortcut follows theme default",
+      "result": "passed"
+    },
+    {
+      "name": "calendar shortcut follows theme nostalgia",
+      "result": "passed"
+    },
+    {
+      "name": "calendar shortcut follows theme summer",
+      "result": "passed"
+    },
+    {
+      "name": "calendar shortcut follows theme autumn",
+      "result": "passed"
+    },
+    {
+      "name": "style-only previews retain actual mode handler warm",
+      "result": "passed"
+    },
+    {
+      "name": "style-only previews retain actual mode handler silver",
+      "result": "passed"
+    }
+  ]
+}

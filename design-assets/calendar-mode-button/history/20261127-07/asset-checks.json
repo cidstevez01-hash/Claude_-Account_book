@@ -1,0 +1,44 @@
+[
+  {
+    "theme": "default",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minLuminance": 107.0734,
+    "maxLuminance": 226.81079999999997
+  },
+  {
+    "theme": "nostalgia",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minLuminance": 119.8074,
+    "maxLuminance": 232.5336
+  },
+  {
+    "theme": "summer",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minLuminance": 107.04699999999998,
+    "maxLuminance": 229.94159999999997
+  },
+  {
+    "theme": "autumn",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minLuminance": 85.2464,
+    "maxLuminance": 216.9846
+  },
+  {
+    "theme": "winter",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minLuminance": 116.24819999999998,
+    "maxLuminance": 223.16619999999998
+  },
+  {
+    "theme": "winter-silver",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minLuminance": 114.2762,
+    "maxLuminance": 237.08020000000002
+  }
+]

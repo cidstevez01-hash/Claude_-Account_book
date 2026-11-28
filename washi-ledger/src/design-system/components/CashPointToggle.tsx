@@ -1,12 +1,30 @@
 import type { CSSProperties } from 'react'
-import pointCoinIcon from '../../icons/assets/point-coin.png'
+import type { ThemeSkin } from '../../types'
+import pointCoinIcon from '../../icons/assets/point-gift-23.png'
+import pointCoinNostalgiaIcon from '../../icons/assets/point-gift-23-nostalgia.png'
+import pointCoinSummerIcon from '../../icons/assets/point-gift-23-summer.png'
+import pointCoinAutumnIcon from '../../icons/assets/point-gift-23-autumn.png'
+import pointCoinWarmIcon from '../../icons/assets/point-gift-23-warm.png'
+import pointCoinSilverIcon from '../../icons/assets/point-gift-23-silver.png'
+import cashDefaultIcon from '../../icons/assets/cash-gloss-default.png'
+import cashNostalgiaIcon from '../../icons/assets/cash-gloss-nostalgia.png'
+import cashSummerIcon from '../../icons/assets/cash-gloss-summer.png'
+import cashAutumnIcon from '../../icons/assets/cash-gloss-autumn.png'
+import cashWarmIcon from '../../icons/assets/cash-gloss-winter.png'
+import cashSilverIcon from '../../icons/assets/cash-gloss-winter-silver.png'
 import { useSettings } from '../../hooks/useSettings'
 
-/** 現金图标——Material Symbols真实"payments"字形的SVG path，不是自己画的近似图形
- * (来源：fonts.gstatic.com短期release版，跟项目里.material-symbols-outlined字体
- * 渲染出来的payments字形逐像素比对过完全一致) */
-const CASH_PATH =
-  'M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z'
+/** 已确认的256px透明素材直接使用原字节，避免运行时滤镜改变稿件颜色。
+ * 纸币源SVG仍是原payments字形，仅增加受光和浅投影；源稿存design-assets。
+ * 两类素材按同一主题配对，切换主题时保持纸币/硬币色阶一致。 */
+const THEME_ICONS = {
+  default: { cash: cashDefaultIcon, coin: pointCoinIcon },
+  nostalgia: { cash: cashNostalgiaIcon, coin: pointCoinNostalgiaIcon },
+  summer: { cash: cashSummerIcon, coin: pointCoinSummerIcon },
+  autumn: { cash: cashAutumnIcon, coin: pointCoinAutumnIcon },
+  winter: { cash: cashWarmIcon, coin: pointCoinWarmIcon },
+  'winter-silver': { cash: cashSilverIcon, coin: pointCoinSilverIcon },
+} satisfies Record<ThemeSkin, { cash: string; coin: string }>
 
 interface Pos {
   left: number
@@ -22,11 +40,11 @@ interface Pos {
 const STAGE = 192
 const CASH_BOTTOM_LEFT: { cash: Pos; coin: Pos } = {
   cash: { left: 23, top: 63, width: 122, height: 86 },
-  coin: { left: 69, top: 36, width: 79, height: 85 },
+  coin: { left: 70.1, top: 40.1, width: 76.8, height: 76.8 },
 }
 const POINT_BOTTOM_LEFT: { cash: Pos; coin: Pos } = {
   cash: { left: 44, top: 40, width: 122, height: 86 },
-  coin: { left: 30, top: 68, width: 79, height: 85 },
+  coin: { left: 31.1, top: 72.1, width: 76.8, height: 76.8 },
 }
 
 interface CashPointToggleProps {
@@ -38,13 +56,14 @@ interface CashPointToggleProps {
 /** 日历页"現金/積分"切换徽章——40px圆形按钮，底色用当前主题surface-container-highest。
  * 两个图标(现金/积分)叠压摆放，哪个位置在左下角哪个就固定是前层+高亮，跟模式名没有
  * 直接绑定关系(是用户明确纠正过的规则：不是"现金模式=现金亮"，是"左下角那个亮")。
- * 现金用真实payments图标(currentColor描边，能跟随主题色)；积分用去背景光晕/阴影后的
- * 硬币堆叠图(栅格图没法用currentColor，用filter:grayscale做未激活态) */
+ * 纸币保留真实payments镂空与确认稿光泽；积分采用23号礼物币，六主题配色成对。
+ * 积分显示16px，两模式中心与原18px稿一致；原层级/透明度与灰度切换保持。 */
 export function CashPointToggle({ mode, onToggle, ariaLabel }: CashPointToggleProps) {
   const { settings } = useSettings()
   const isSummer = settings.themeSkin === 'summer' || settings.themeSkin === 'autumn'
   const pos = mode === 'cash' ? CASH_BOTTOM_LEFT : POINT_BOTTOM_LEFT
   const isCashActive = mode === 'cash'
+  const { cash: cashIcon, coin: coinIcon } = THEME_ICONS[settings.themeSkin]
   const scale = (v: number) => (v / STAGE) * 40
 
   const cashStyle = {
@@ -105,12 +124,10 @@ export function CashPointToggle({ mode, onToggle, ariaLabel }: CashPointTogglePr
         style={{ background: 'var(--color-surface-container-highest)' }}
       >
         <span className="absolute transition-[left,top,width,height,opacity,color] duration-300 ease-out" style={cashStyle}>
-          <svg viewBox="0 -960 960 960" className="w-full h-full block">
-            <path fill="currentColor" d={CASH_PATH} />
-          </svg>
+          <img src={cashIcon} alt="" className="w-full h-full object-contain block" />
         </span>
         <img
-          src={pointCoinIcon}
+          src={coinIcon}
           alt=""
           className="absolute object-contain block transition-[left,top,width,height,opacity,filter] duration-300 ease-out"
           style={coinStyle}

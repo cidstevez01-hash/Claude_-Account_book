@@ -1,0 +1,13 @@
+{
+  "status": "Local integration: selected source23 original PNG at20px with current cash and exchange. Color/gloss adaptation05 is preview only, pending review. No push.",
+  "baseRemoteCommit": "bf9f68de4ac9a082e1c38135ffab31e8139ed46c",
+  "modeComponentSha256": "88a7d223f5aecea37408952826dd12becd0751b4de12d425d95042c342012d71",
+  "quickActionPages": [
+    "/",
+    "/history",
+    "/stats"
+  ],
+  "selectedMaterial": 23,
+  "localRuntimePalette": "original source23",
+  "draft": "../history/20261127-05/index.html"
+}

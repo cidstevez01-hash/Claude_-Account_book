@@ -1,0 +1,20 @@
+[
+  {
+    "tag": "warm",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minRaw": 28.9008,
+    "maxRaw": 253.2018,
+    "minTone": 116.24819999999998,
+    "maxTone": 223.16619999999998
+  },
+  {
+    "tag": "silver",
+    "maxAlphaDiff": 0,
+    "maskMismatch": 0,
+    "minRaw": 28.9008,
+    "maxRaw": 253.2018,
+    "minTone": 114.2762,
+    "maxTone": 237.08020000000002
+  }
+]

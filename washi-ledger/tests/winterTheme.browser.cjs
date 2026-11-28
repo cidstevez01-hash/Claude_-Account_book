@@ -4,7 +4,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const app=path.resolve(__dirname,'..'),origin='http://127.0.0.1:5275';
 const activeTheme=process.env.WINTER_SKIN||'winter';
 assert(['winter','winter-silver'].includes(activeTheme));
-const variant=activeTheme==='winter'?{kind:'warm',zh:'冬雪 · 暖金',ja:'冬雪・ウォームゴールド',other:'冬雪 · 银灰',otherSkin:'winter-silver'}:{kind:'silver',zh:'冬雪 · 银灰',ja:'冬雪・シルバー',other:'冬雪 · 暖金',otherSkin:'winter'};
+const variant=activeTheme==='winter'?{kind:'warm',zh:'冬雪 · 暖金',ja:'雪あかり・金',other:'冬雪 · 银灰',otherSkin:'winter-silver'}:{kind:'silver',zh:'冬雪 · 银灰',ja:'雪あかり・銀',other:'冬雪 · 暖金',otherSkin:'winter'};
 const out=path.resolve(process.env.WINTER_TEST_OUTPUT||path.resolve(app,'../tmp/winter-app-validation'));
 const env=fs.readFileSync(path.join(app,'.env'),'utf8');
 const ref=new URL(env.match(/VITE_SUPABASE_URL\s*=\s*["']?([^\s"']+)/)[1]).hostname.split('.')[0];

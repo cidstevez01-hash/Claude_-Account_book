@@ -1,0 +1,41 @@
+{
+  "scope": "Preview only: native SVG cash highlights, inset bevel and shallow shadow; original cash path and viewport, coin PNG bytes, sizes, poses, timings and existing glow preserved.",
+  "sourceHashes": {
+    "washi-ledger/src/design-system/components/CashPointToggle.tsx": "d281d4a8a9825c510ac3838c1f82f037d78ace20df2f5b1a2bdbc176c080e705",
+    "washi-ledger/src/lib/i18n/dict.ts": "d7779119bf1f6d16ff2520cf6a06655ea50affb84d3fd2b1de10a9b52c7bc679"
+  },
+  "results": [
+    {
+      "name": "Six original cash paths, viewports, poses and coin bytes preserved",
+      "result": "passed"
+    },
+    {
+      "name": "default: hollow cash relief, modes and 300ms exchange; flat/gloss comparison",
+      "result": "passed"
+    },
+    {
+      "name": "nostalgia: hollow cash relief, modes and 300ms exchange; flat/gloss comparison",
+      "result": "passed"
+    },
+    {
+      "name": "summer: hollow cash relief, modes and 300ms exchange; flat/gloss comparison",
+      "result": "passed"
+    },
+    {
+      "name": "autumn: hollow cash relief, modes and 300ms exchange; flat/gloss comparison",
+      "result": "passed"
+    },
+    {
+      "name": "winter: hollow cash relief, modes and 300ms exchange; flat/gloss comparison",
+      "result": "passed"
+    },
+    {
+      "name": "winter-silver: hollow cash relief, modes and 300ms exchange; flat/gloss comparison",
+      "result": "passed"
+    },
+    {
+      "name": "390/320px layouts, reduced motion, no browser errors; production component/dictionary unchanged",
+      "result": "passed"
+    }
+  ]
+}

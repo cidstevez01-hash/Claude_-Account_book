@@ -1,0 +1,37 @@
+{
+  "status": "User approved20261128-02; integrated locally at16px with paired cash gloss and six theme palettes. Japanese names integrated. Not pushed.",
+  "baseRemoteCommit": "bf9f68de4ac9a082e1c38135ffab31e8139ed46c",
+  "modeComponentSha256": "7c339bcbc2188b61de922de2dc346bee14aed0a775409e982d3064b2a732c8f7",
+  "quickActionPages": [
+    "/",
+    "/history",
+    "/stats"
+  ],
+  "selectedMaterial": 23,
+  "iconSizePx": 16,
+  "assetHashes": {
+    "point-gift-23.png": "d9daf47bd291abbe9bb47bf6b8c0de80c56214ca68972d9f54f5b0d26841469e",
+    "cash-gloss-default.png": "bee22a82908366488766e7d77a5bb46833bdf760cfcb22c147a8e4227bdef25b",
+    "point-gift-23-nostalgia.png": "7de37ed7234adbb154395ee666558cd98f9cac7619582bb69de502d166ed4614",
+    "cash-gloss-nostalgia.png": "4621ada0eb43d92a32c2351642fee6f7e41ffd61442aad4f3f73b0bf3ccc8a2d",
+    "point-gift-23-summer.png": "1915078dc2c1429a3ab0b917d8912e87ad9bafce31bc75c48f0c718d39dce225",
+    "cash-gloss-summer.png": "becdca4489aff754db2c328aebca6221c86d0a655a1f9caa6eb431c2b3f463a4",
+    "point-gift-23-autumn.png": "ef2eddebd02ebf8f3aef5d2422c14ae123de14faa667c144535c5159a349a99b",
+    "cash-gloss-autumn.png": "34da1a4906d7b17d43a3087925b80dc5bcd470ffdbe7b768227f16f51fc994b0",
+    "point-gift-23-warm.png": "e06875597c38fc63456225024fbe8c21c7893eb62d5c44e34331b6f53f35c32b",
+    "cash-gloss-winter.png": "8d7247462693c4d8008a723d708cdbdc3a71e4c5d0cfe55ac0ad53bdb197064f",
+    "point-gift-23-silver.png": "1405e0f982d968640bd925e96fdd5991679e1b224b7a1c765da8576a519ca463",
+    "cash-gloss-winter-silver.png": "30375d0b7bb6239e3ec946ea97ec70218d01630d7b99b59047995b082bbe2cad"
+  },
+  "localRuntimePalette": {
+    "default": "approved20261128-02 original bytes",
+    "nostalgia": "approved20261128-02 original bytes",
+    "summer": "approved20261128-02 original bytes",
+    "autumn": "approved20261128-02 original bytes",
+    "winter": "approved20261128-02 original bytes",
+    "winter-silver": "approved20261128-02 original bytes"
+  },
+  "approvedReference": "../history/20261128-02/index.html",
+  "actualIntegration": "../history/20261128-03/index.html",
+  "draft": null
+}

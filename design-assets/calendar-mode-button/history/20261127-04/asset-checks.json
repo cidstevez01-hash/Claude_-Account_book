@@ -1,0 +1,15 @@
+{
+  "sourceWidth": 1024,
+  "sourceHeight": 1024,
+  "transparentBounds": {
+    "left": 146,
+    "top": 106,
+    "width": 719,
+    "height": 766
+  },
+  "outputWidth": 256,
+  "outputHeight": 256,
+  "alphaMin": 0,
+  "alphaMax": 255,
+  "changes": "Only transparent padding removed and size reduced; visible colors, shapes and original shading retained"
+}

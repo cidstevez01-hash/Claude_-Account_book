@@ -1,0 +1,32 @@
+[
+  {
+    "key": "default",
+    "zh": "PigBang",
+    "ja": "PigBang"
+  },
+  {
+    "key": "nostalgia",
+    "zh": "怀旧",
+    "ja": "レトロ"
+  },
+  {
+    "key": "summer",
+    "zh": "夏 · 花火",
+    "ja": "夏の花火"
+  },
+  {
+    "key": "autumn",
+    "zh": "红叶 · 丹枫金秋",
+    "ja": "秋のもみじ"
+  },
+  {
+    "key": "winter",
+    "zh": "冬雪 · 暖金",
+    "ja": "雪あかり・金"
+  },
+  {
+    "key": "winter-silver",
+    "zh": "冬雪 · 银灰",
+    "ja": "雪あかり・銀"
+  }
+]

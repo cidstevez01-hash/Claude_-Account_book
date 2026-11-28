@@ -4,7 +4,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const app=path.resolve(__dirname,'..'),origin='http://127.0.0.1:5275';
 const activeTheme=process.env.WINTER_SKIN||'winter';
 assert(['winter','winter-silver'].includes(activeTheme));
-const variant=activeTheme==='winter'?{kind:'warm',zh:'冬雪 · 暖金',ja:'冬雪・ウォームゴールド',other:'冬雪 · 银灰',otherSkin:'winter-silver'}:{kind:'silver',zh:'冬雪 · 银灰',ja:'冬雪・シルバー',other:'冬雪 · 暖金',otherSkin:'winter'};
+const variant=activeTheme==='winter'?{kind:'warm',zh:'冬雪 · 暖金',ja:'雪あかり・金',other:'冬雪 · 银灰',otherSkin:'winter-silver'}:{kind:'silver',zh:'冬雪 · 银灰',ja:'雪あかり・銀',other:'冬雪 · 暖金',otherSkin:'winter'};
 const out=path.resolve(app,'../tmp/winter-release-check');
 const env=fs.readFileSync(path.join(app,'.env'),'utf8');
 const ref=new URL(env.match(/VITE_SUPABASE_URL\s*=\s*["']?([^\s"']+)/)[1]).hostname.split('.')[0];
@@ -63,7 +63,7 @@ async function photo(page,name){
  await page.evaluate(()=>document.fonts.ready);if(name==='theme')await page.getByRole('button',{name:variant.zh,exact:true}).scrollIntoViewIfNeeded();await page.waitForTimeout(450);
  await page.screenshot({path:path.join(out,name+'.png'),scale:'css'});
 }
-const themes=[['default','PigBang','PigBang'],['nostalgia','怀旧','ノスタルジー'],['summer','夏 · 花火','夏・花火'],['autumn','红叶 · 丹枫金秋','紅葉・丹楓の秋'],['winter','冬雪 · 暖金','冬雪・ウォームゴールド'],['winter-silver','冬雪 · 银灰','冬雪・シルバー']];
+const themes=[['default','PigBang','PigBang'],['nostalgia','怀旧','レトロ'],['summer','夏 · 花火','夏の花火'],['autumn','红叶 · 丹枫金秋','秋のもみじ'],['winter','冬雪 · 暖金','雪あかり・金'],['winter-silver','冬雪 · 银灰','雪あかり・銀']];
 (async()=>{
  fs.mkdirSync(out,{recursive:true});
  try{

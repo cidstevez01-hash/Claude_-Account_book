@@ -1,0 +1,41 @@
+{
+  "scope": "Preview only: coin size18px to16px; center unchanged in both modes. Coin PNG bytes, cash SVG, cash poses, button size, original300ms exchange and theme glow unchanged.",
+  "sourceHashes": {
+    "washi-ledger/src/design-system/components/CashPointToggle.tsx": "d281d4a8a9825c510ac3838c1f82f037d78ace20df2f5b1a2bdbc176c080e705",
+    "washi-ledger/src/lib/i18n/dict.ts": "d7779119bf1f6d16ff2520cf6a06655ea50affb84d3fd2b1de10a9b52c7bc679"
+  },
+  "results": [
+    {
+      "name": "Six themes: coin centers unchanged; source image bytes, cash SVGs and cash poses identical",
+      "result": "passed"
+    },
+    {
+      "name": "default:16px, two modes, 18px comparison and original exchange",
+      "result": "passed"
+    },
+    {
+      "name": "nostalgia:16px, two modes, 18px comparison and original exchange",
+      "result": "passed"
+    },
+    {
+      "name": "summer:16px, two modes, 18px comparison and original exchange",
+      "result": "passed"
+    },
+    {
+      "name": "autumn:16px, two modes, 18px comparison and original exchange",
+      "result": "passed"
+    },
+    {
+      "name": "winter:16px, two modes, 18px comparison and original exchange",
+      "result": "passed"
+    },
+    {
+      "name": "winter-silver:16px, two modes, 18px comparison and original exchange",
+      "result": "passed"
+    },
+    {
+      "name": "18/16px comparison,390/320px layout and reduced motion; runtime source unchanged",
+      "result": "passed"
+    }
+  ]
+}

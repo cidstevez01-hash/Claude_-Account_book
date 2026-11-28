@@ -215,6 +215,7 @@ export function StatsPage() {
           actions={[
             { key: 'add', icon: APP_ICONS.addTransaction, ariaLabel: t('addTitle'), onActivate: () => goToAdd('/add') },
             { key: 'rate', icon: 'currency_exchange', ariaLabel: t('rateShortcutAria'), onActivate: () => navigate('/rate') },
+            { key: 'calendar', icon: APP_ICONS.calendar, ariaLabel: t('historyCalendarEntryAria'), onActivate: () => navigate('/calendar') },
           ]}
         />
       }

@@ -1,0 +1,18 @@
+{
+  "sourceSha256": "88a7d223f5aecea37408952826dd12becd0751b4de12d425d95042c342012d71",
+  "scope": "Preview only; UI theme color mapping of unchanged source23 PNG; current component, cash,20px,poses and mode handler unchanged; no real account writes",
+  "results": [
+    {
+      "name": "theme tone preview, actual React exchange unchanged: warm",
+      "result": "passed"
+    },
+    {
+      "name": "theme tone preview, actual React exchange unchanged: silver",
+      "result": "passed"
+    },
+    {
+      "name": "theme SVGs preserve exact source alpha and geometry, reduce light-dark contrast; interactive preview and mobile width",
+      "result": "passed"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "scope": "Original React state handler, exact original poses/duration, both icons visible, no real account writes. Proposals have not been applied to App.",
+  "sourceSha256": "52d32aadebcefe185520357937dbda9ba0ca2f3bb8022210a99340e79d702650",
+  "results": [
+    {
+      "name": "original front/back exchange retained with two new coin drawings: warm",
+      "result": "passed"
+    },
+    {
+      "name": "original front/back exchange retained with two new coin drawings: silver",
+      "result": "passed"
+    },
+    {
+      "name": "live enlarged and actual-size preview uses original 300ms exchange and supports theme/mobile",
+      "result": "passed"
+    }
+  ]
+}

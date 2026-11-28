@@ -1,0 +1,24 @@
+[
+  {
+    "theme": "warm",
+    "width": 256,
+    "height": 256,
+    "centerAlpha": 0,
+    "faceAlpha": 0,
+    "rimAlpha": 255,
+    "cornerAlpha": 0,
+    "noGradient": true,
+    "noFilter": true
+  },
+  {
+    "theme": "silver",
+    "width": 256,
+    "height": 256,
+    "centerAlpha": 0,
+    "faceAlpha": 0,
+    "rimAlpha": 255,
+    "cornerAlpha": 0,
+    "noGradient": true,
+    "noFilter": true
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "theme": "warm",
+    "width": 256,
+    "height": 256,
+    "channels": 4,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "bytes": 66187
+  },
+  {
+    "theme": "silver",
+    "width": 256,
+    "height": 256,
+    "channels": 4,
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "bytes": 56644
+  }
+]

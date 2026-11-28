@@ -1,0 +1,120 @@
+{
+  "cashSvg": "<svg viewBox=\"0 -960 960 960\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z\"/></svg>",
+  "themes": {
+    "warm": {
+      "tokens": {
+        "--color-primary": "#A17E3C",
+        "--color-outline": "#AB8A81",
+        "--color-action": "#F4DBAE",
+        "--color-action-ink": "#705331",
+        "--color-surface-container-highest": "#F9E8C9"
+      },
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "2",
+            "opacity": "1",
+            "color": "var(--color-primary)"
+          },
+          "coin": {
+            "left": "14.375px",
+            "top": "7.5px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "color": "var(--color-outline)"
+          },
+          "coin": {
+            "left": "6.25px",
+            "top": "14.1667px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none"
+          }
+        }
+      }
+    },
+    "silver": {
+      "tokens": {
+        "--color-primary": "#7086A0",
+        "--color-outline": "#8D9195",
+        "--color-action": "#E2E8F2",
+        "--color-action-ink": "#4D607A",
+        "--color-surface-container-highest": "#E6EAF4"
+      },
+      "button": {
+        "x": 342,
+        "y": 65.5,
+        "width": 40,
+        "height": 40
+      },
+      "poses": {
+        "cash": {
+          "cash": {
+            "left": "4.79167px",
+            "top": "13.125px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "2",
+            "opacity": "1",
+            "color": "var(--color-primary)"
+          },
+          "coin": {
+            "left": "14.375px",
+            "top": "7.5px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "1",
+            "opacity": "0.45",
+            "filter": "grayscale(1)"
+          }
+        },
+        "point": {
+          "cash": {
+            "left": "9.16667px",
+            "top": "8.33333px",
+            "width": "25.4167px",
+            "height": "17.9167px",
+            "zIndex": "1",
+            "opacity": "0.55",
+            "color": "var(--color-outline)"
+          },
+          "coin": {
+            "left": "6.25px",
+            "top": "14.1667px",
+            "width": "16.4583px",
+            "height": "17.7083px",
+            "zIndex": "2",
+            "opacity": "1",
+            "filter": "none"
+          }
+        }
+      }
+    }
+  },
+  "sourceSha256": "52d32aadebcefe185520357937dbda9ba0ca2f3bb8022210a99340e79d702650"
+}

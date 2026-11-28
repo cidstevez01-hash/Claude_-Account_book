@@ -1,0 +1,49 @@
+.icon-ring-glow {
+  
+  --icon-size: 40px;
+  position: absolute;
+  inset: -13px;
+  border-radius: 50%;
+  
+  background: radial-gradient(
+    circle closest-side,
+    rgba(232, 93, 74, 0) 0%,
+    rgba(232, 93, 74, 0.95) 55%,
+    rgba(232, 93, 74, 0) 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle,
+    transparent 0,
+    transparent calc(var(--icon-size) / 2),
+    white calc(var(--icon-size) / 2 + 0.2px),
+    white 100%
+  );
+  mask-image: radial-gradient(
+    circle,
+    transparent 0,
+    transparent calc(var(--icon-size) / 2),
+    white calc(var(--icon-size) / 2 + 0.2px),
+    white 100%
+  );
+  filter: blur(3px);
+  z-index: 0;
+  pointer-events: none;
+  animation: icon-glow-breathe 5.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes icon-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+[data-theme='autumn'] .icon-ring-glow {
+  inset: -8px; filter: blur(2.5px);
+  background: radial-gradient(circle closest-side,#ff5a4300 35%,#ff5a43a6 63%,#e58e2644 78%,#e58e2600 100%);
+  animation: autumn-icon-breathe 5.5s ease-in-out infinite;
+}
+@keyframes autumn-icon-breathe { 0%,100% { opacity: .45; transform: scale(.97); } 50% { opacity: .9; transform: scale(1.05); } }

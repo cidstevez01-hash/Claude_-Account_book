@@ -1,0 +1,19 @@
+{
+  "status": "Approved reference23 winter palettes integrated locally; size reduced20px to18px with original center path, cash and exchange preserved. Not pushed.",
+  "baseRemoteCommit": "bf9f68de4ac9a082e1c38135ffab31e8139ed46c",
+  "modeComponentSha256": "d281d4a8a9825c510ac3838c1f82f037d78ace20df2f5b1a2bdbc176c080e705",
+  "quickActionPages": [
+    "/",
+    "/history",
+    "/stats"
+  ],
+  "selectedMaterial": 23,
+  "iconSizePx": 18,
+  "localRuntimePalette": {
+    "winter": "approved warm05",
+    "winter-silver": "approved silver05",
+    "otherThemes": "original source23"
+  },
+  "draft": "../history/20261128-02/index.html",
+  "draftStatus": "Coin16px preview, center and cash gloss unchanged; awaiting visual approval/integration. Actual runtime remains18px06."
+}

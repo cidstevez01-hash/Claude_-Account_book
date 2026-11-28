@@ -1,0 +1,18 @@
+{
+  "sourceSha256": "52d32aadebcefe185520357937dbda9ba0ca2f3bb8022210a99340e79d702650",
+  "scope": "Preview only; 20px clover centered on original path, transparent interior, no fill/gradient/shadow; current cash/background/handler unchanged; no real account writes",
+  "results": [
+    {
+      "name": "hollow 20px clover, no shadow and unchanged cash/exchange: warm",
+      "result": "passed"
+    },
+    {
+      "name": "hollow 20px clover, no shadow and unchanged cash/exchange: silver",
+      "result": "passed"
+    },
+    {
+      "name": "live preview: hollow SVG, 20px, warm/silver, 300ms animation and mobile width",
+      "result": "passed"
+    }
+  ]
+}

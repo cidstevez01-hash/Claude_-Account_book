@@ -1,0 +1,78 @@
+[
+  {
+    "key": "default",
+    "zh": "PigBang",
+    "old": "PigBang",
+    "name": "PigBang",
+    "direction": "珊瑚粉 · 奶杏高光",
+    "colors": [
+      "#AA5B52",
+      "#B96D60",
+      "#CE8D7D",
+      "#E0ADA0",
+      "#EAC6BA",
+      "#F5DFD3"
+    ]
+  },
+  {
+    "key": "nostalgia",
+    "zh": "怀旧",
+    "old": "ノスタルジー",
+    "name": "レトロ",
+    "direction": "浅琥珀 · 奶油金",
+    "colors": [
+      "#A37140",
+      "#BC884E",
+      "#D39D65",
+      "#DFBA8A",
+      "#E8D4B1",
+      "#F3E8CF"
+    ]
+  },
+  {
+    "key": "summer",
+    "zh": "夏 · 花火",
+    "old": "夏・花火",
+    "name": "夏の花火",
+    "direction": "珊瑚金 · 暖光",
+    "colors": [
+      "#B45947",
+      "#C47052",
+      "#D88D64",
+      "#E7AC7C",
+      "#F0C89B",
+      "#F9E5C5"
+    ]
+  },
+  {
+    "key": "autumn",
+    "zh": "红叶 · 丹枫金秋",
+    "old": "紅葉・丹楓の秋",
+    "name": "秋のもみじ",
+    "direction": "枫叶红 · 秋金",
+    "colors": [
+      "#A4432C",
+      "#B85632",
+      "#CC783E",
+      "#DA9B52",
+      "#E9BC7C",
+      "#F4D6A7"
+    ]
+  },
+  {
+    "key": "winter",
+    "zh": "冬雪 · 暖金",
+    "old": "冬雪・ウォームゴールド",
+    "name": "雪あかり・金",
+    "direction": "已确认暖金 · 保留",
+    "approved": true
+  },
+  {
+    "key": "winter-silver",
+    "zh": "冬雪 · 银灰",
+    "old": "冬雪・シルバー",
+    "name": "雪あかり・銀",
+    "direction": "已确认银灰 · 保留",
+    "approved": true
+  }
+]

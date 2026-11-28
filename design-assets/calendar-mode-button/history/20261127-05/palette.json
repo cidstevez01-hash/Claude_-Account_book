@@ -1,0 +1,23 @@
+{
+  "sourceSha256": "9d3864b34ebb7b1a3cd60d834ac77f2753188712a8122175a48bc402db68246f",
+  "palettes": {
+    "warm": [
+      "#987138",
+      "#A98345",
+      "#C5A472",
+      "#DBC29D",
+      "#E4C8B0",
+      "#EFDEC6"
+    ],
+    "silver": [
+      "#5F7693",
+      "#8498B3",
+      "#AFBFD2",
+      "#CBD6E4",
+      "#DAD1E2",
+      "#ECEEF5"
+    ]
+  },
+  "alpha": "identity",
+  "intent": "Compress highlights and shadows into each theme palette; preserve source pixel geometry"
+}
