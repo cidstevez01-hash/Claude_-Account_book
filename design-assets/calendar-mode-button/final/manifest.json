@@ -1,5 +1,5 @@
 {
-  "status": "User approved20261128-02; integrated locally at16px with paired cash gloss and six theme palettes. Japanese names integrated. Not pushed.",
+  "status": "Published 1.0.0-20261128-dev.1 at b77fdf110de6d7b78effdae78dd081f8a279300c; IPA128 success.",
   "baseRemoteCommit": "bf9f68de4ac9a082e1c38135ffab31e8139ed46c",
   "modeComponentSha256": "7c339bcbc2188b61de922de2dc346bee14aed0a775409e982d3064b2a732c8f7",
   "quickActionPages": [
@@ -33,5 +33,21 @@
   },
   "approvedReference": "../history/20261128-02/index.html",
   "actualIntegration": "../history/20261128-03/index.html",
-  "draft": null
+  "draft": null,
+  "publishedVersion": "1.0.0-20261128-dev.1",
+  "publishedCommit": "b77fdf110de6d7b78effdae78dd081f8a279300c",
+  "ipa": {
+    "run": 128,
+    "runId": 46107956998,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46107956998",
+    "artifact": {
+      "id": 15247559879,
+      "name": "pigbang-unsigned-ipa-v1.0.0-20261128-dev.1-128",
+      "size": 25321257,
+      "expired": false,
+      "url": "https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46107956998/artifacts/15247559879"
+    }
+  }
 }

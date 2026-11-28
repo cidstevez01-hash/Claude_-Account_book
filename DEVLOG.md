@@ -1,5 +1,15 @@
 # 开发记录
 
+<!-- CALENDAR RELEASE -->
+
+## PigBang 重写版 · 2026-11-28 · 1.0.0-20261128-dev.1 推送与IPA结果
+
+- 按用户明确指令推送b77fdf1到pigbang_20261031，远端提交核对一致。工作流为washi-ledger-ios-test-build.yml，IPA128：成功；run 46107956998，源码b77fdf1。产物15247559879（25321257字节），下载：https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46107956998/artifacts/15247559879
+- 本次含日历快捷入口、六主题16px硬币与纸币光泽、自然日语名称。8项最终页面检查及版本构建/lint通过。真机显示与操作仍待安装验证；没有部署Worker或改动数据库。
+- 版本记录已回填；个人配置与用户无关的.gitignore/SMARTSHEET-STATUS-FLOW.md改动保留。
+<!-- END CALENDAR RELEASE -->
+
+
 ## PigBang 重写版 · 2026-11-28 · 1.0.0-20261128-dev.1 发版准备
 
 - package.json及锁文件已同步至1.0.0-20261128-dev.1（main数字基线1.0.0）。内容为三页快捷菜单日历入口、23号硬币16px、六主题纸币光泽/浅阴影与配色、自然日语主题名称；保留原模式交换与业务逻辑。

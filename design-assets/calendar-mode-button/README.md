@@ -1,5 +1,11 @@
 # 日历入口与右上角按钮预览
 
+<!-- CALENDAR RELEASE -->
+
+**已发版本：1.0.0-20261128-dev.1**，代码b77fdf1；测试IPA128 成功。[下载IPA](https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46107956998/artifacts/15247559879)。final同步当前实际实现；历史草稿中的“未推送”描述保持当时记录。
+<!-- END CALENDAR RELEASE -->
+
+
 **当前实际接入：确认稿16px、六主题纸币/硬币及自然日语名称**。用户已确认02，实际组件与8项页面检查见 `history/20261128-03/index.html`。final现同步此实现，旧final整份保存在03/before-final-refresh；未推送。下方“候选/实际18px”为当时记录。
 
 

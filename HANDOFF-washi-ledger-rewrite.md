@@ -1,5 +1,11 @@
 # 交接说明：PigBang 重写版
 
+<!-- CALENDAR RELEASE -->
+
+**最新发版结果 · 2026-11-28**：1.0.0-20261128-dev.1已推送，代码b77fdf1。测试IPA128构建成功（run46107956998），artifact15247559879，https://github.com/cidstevez01-hash/Claude_-Account_book/actions/runs/46107956998/artifacts/15247559879。源码为六主题16px纸币/硬币与自然日语名称、三页日历快捷入口。真机待验证；下文“未推送”为当时状态。
+<!-- END CALENDAR RELEASE -->
+
+
 **发版准备 · 2026-11-28**：当前package与锁文件改为1.0.0-20261128-dev.1，准备打包本轮日历入口/六主题16px图标与纸币光泽/日语名称。用户已要求推送IPA；按规则待报此版本后的一次明确推送确认。此前“未改版本”为当时状态；尚未推送或调度，后续同版本连续fetch/push/dispatch，不重复询问。
 
 
