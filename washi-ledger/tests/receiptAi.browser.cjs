@@ -31,7 +31,7 @@ async function start(test,route='/add',ja=false){await instrument(test);await vi
    const {page,state}=test;await mockAi(test);await start(test,route);
    // First scan must call AI automatically, without clicking a retry button.
    await page.getByRole('status').filter({hasText:'AI 识别结果'}).waitFor();
-   assert((await page.getByRole('status').filter({hasText:'AI 识别结果'}).textContent()).includes('258'));
+   assert.equal(await page.getByRole('textbox',{name:'本张记账金额',exact:true}).inputValue(),'258');
    assert.equal(state.aiCalls.length,1);
    // Native OCR finishing late must not replace AI fields.
    await complete(page,0,lines(9999));await confirm(page,state,1);
@@ -60,7 +60,7 @@ async function start(test,route='/add',ja=false){await instrument(test);await vi
    await begin(page);await page.waitForTimeout(80);
    await page.getByRole('button',{name:'重新拍摄',exact:true}).click();await page.waitForTimeout(700);
    await page.getByRole('status').filter({hasText:'AI 识别结果'}).waitFor();
-   assert((await page.getByRole('status').filter({hasText:'AI 识别结果'}).textContent()).includes('430'));
+   assert.equal(await page.getByRole('textbox',{name:'本张记账金额',exact:true}).inputValue(),'430');
    await complete(page,2,lines(430));await confirm(page,state,1);
    assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'430');
   });

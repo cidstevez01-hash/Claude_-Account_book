@@ -12,7 +12,7 @@ const uid='00000000-0000-4000-8000-000000000093',encode=x=>Buffer.from(JSON.stri
 const token=encode({alg:'HS256',typ:'JWT'})+'.'+encode({sub:uid,exp:Math.floor(Date.now()/1000)+86400,role:'authenticated',is_anonymous:true})+'.isolated-winter';
 const categories=[{id:'food',code:'food',type:'expense',zh:'食费',ja:'食費',icon:'restaurant',color:'#cc7111',subs:[]},{id:'salary',code:'salary',type:'income',zh:'工资',ja:'給与',icon:'work',color:'#32785f',subs:[]}];
 const catalog={expenseCategories:[categories[0]],incomeCategories:[categories[1]],paymentMethods:[{id:'cash',code:'cash',zh:'现金',ja:'現金',pointRate:null}],expenseTags:[],incomeTags:[],pointRules:[]};
-const row=e=>({id:e.id,user_id:uid,type:e.type,amount:e.amount,currency:e.currency,cat_code:e.catCode,sub_code:e.subCode,payment_method:e.paymentMethod,tag_code:e.tagCode,note:e.note,points:e.points,entry_date:e.date,recurring_id:null,created_at:new Date(e.createdAt).toISOString(),receipt_path:null});
+const row=e=>({id:e.id,user_id:uid,type:e.type,amount:e.amount,currency:e.currency,cat_code:e.catCode,sub_code:e.subCode,payment_method:e.paymentMethod,tag_code:e.tagCode,note:e.note,points:e.points,entry_date:e.date,recurring_id:null,created_at:new Date(e.createdAt).toISOString(),receipt_path:e.receiptRow??null});
 const results=[];let browser,server;
 async function setup({theme=activeTheme,lang='zh',entries=[],remote=false,missingColumn=false,nativeTransitions=false,fixture}={}){
  const activeCatalog=fixture?.catalog??catalog,activeCategories=fixture?.categories??categories;
@@ -34,7 +34,8 @@ async function setup({theme=activeTheme,lang='zh',entries=[],remote=false,missin
   }
   if(req.method()==='GET'&&url.pathname.startsWith('/rest/v1/')){
    if(url.pathname.endsWith('/categories'))return reply(activeCategories.map(x=>({...x,sort_order:0})));
-   if(url.pathname.endsWith('/payment_methods'))return reply(activeCatalog.paymentMethods.map((p,i)=>({...p,sort_order:i,default_point_rate:null,badge_bg:null,badge_text:null})));
+   if(url.pathname.endsWith('/payment_methods'))return reply(activeCatalog.paymentMethods.map((p,i)=>({...p,sort_order:i,default_point_rate:p.pointRate??null,badge_bg:null,badge_text:null})));
+   if(url.pathname.endsWith('/payment_method_point_rules'))return reply(activeCatalog.pointRules);
    if(url.pathname.endsWith('/subcategories'))return reply(activeCategories.flatMap(c=>c.subs.map(s=>({...s,cat_code:c.code,is_preset:true}))));
    if(url.pathname.endsWith('/tags'))return reply(['expense','income'].flatMap(type=>activeCatalog[type+'Tags'].map((t,i)=>({...t,type,is_preset:!t.custom,sort_order:i}))));
    return reply([]);

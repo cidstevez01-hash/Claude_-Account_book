@@ -1,0 +1,117 @@
+{
+  "amount": 3844,
+  "currency": "JPY",
+  "date": "2026-11-28",
+  "storeName": "ライフ 笹塚店",
+  "items": [
+    "豪州産牛こま切れ200g",
+    "若どりもも肉",
+    "ヤクルト糖質カロリーオフ",
+    "毎日の食卓白たまご10個",
+    "エノキ茸（J）",
+    "ブナピー",
+    "ごはんかけちりめん",
+    "有機ホワイトマッシュ",
+    "豚挽肉",
+    "いさき",
+    "ピーマン大容量（400g）",
+    "ワンタンの皮",
+    "スマイルライフ きぬ豆腐"
+  ],
+  "itemDetails": [
+    {
+      "name": "豪州産牛こま切れ200g",
+      "unitPrice": 580,
+      "quantity": null,
+      "lineAmount": 580
+    },
+    {
+      "name": "若どりもも肉",
+      "unitPrice": 416,
+      "quantity": null,
+      "lineAmount": 416
+    },
+    {
+      "name": "ヤクルト糖質カロリーオフ",
+      "unitPrice": 239,
+      "quantity": null,
+      "lineAmount": 239
+    },
+    {
+      "name": "毎日の食卓白たまご10個",
+      "unitPrice": 299,
+      "quantity": null,
+      "lineAmount": 299
+    },
+    {
+      "name": "エノキ茸（J）",
+      "unitPrice": 138,
+      "quantity": null,
+      "lineAmount": 138
+    },
+    {
+      "name": "ブナピー",
+      "unitPrice": 148,
+      "quantity": null,
+      "lineAmount": 148
+    },
+    {
+      "name": "ごはんかけちりめん",
+      "unitPrice": 184,
+      "quantity": null,
+      "lineAmount": 184
+    },
+    {
+      "name": "有機ホワイトマッシュ",
+      "unitPrice": 198,
+      "quantity": null,
+      "lineAmount": 198
+    },
+    {
+      "name": "豚挽肉",
+      "unitPrice": 361,
+      "quantity": null,
+      "lineAmount": 361
+    },
+    {
+      "name": "いさき",
+      "unitPrice": 398,
+      "quantity": null,
+      "lineAmount": 398
+    },
+    {
+      "name": "ピーマン大容量（400g）",
+      "unitPrice": 358,
+      "quantity": null,
+      "lineAmount": 358
+    },
+    {
+      "name": "ワンタンの皮",
+      "unitPrice": 138,
+      "quantity": 2,
+      "lineAmount": 276
+    },
+    {
+      "name": "スマイルライフ きぬ豆腐",
+      "unitPrice": 69,
+      "quantity": null,
+      "lineAmount": 69
+    }
+  ],
+  "paymentAmount": 3844,
+  "taxAmount": 284,
+  "subtotalAmount": 3560,
+  "discountAmount": 104,
+  "paymentMethod": "メルペイ",
+  "totalEvidence": "合計 ¥3,844",
+  "paymentEvidence": "メルペイ ¥3,844",
+  "uncertain": false,
+  "amountBasis": "before_points",
+  "pointsEarned": 17,
+  "pointsEarnedContext": "transaction",
+  "pointsEarnedEvidence": "基本ポイント数17P",
+  "pointsUsed": null,
+  "pointsUsedAmount": null,
+  "pointsUsedContext": "unknown",
+  "pointsUsedEvidence": null
+}

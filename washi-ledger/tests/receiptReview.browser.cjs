@@ -1,0 +1,45 @@
+// Actual scan review and add/edit/copy forms, with isolated camera/OCR/API/storage.
+const fs=require('node:fs'),path=require('node:path'),Module=require('node:module');
+const file=path.join(__dirname,'winterRuntime.browser.cjs');
+const prefix=fs.readFileSync(file,'utf8').split('(async()=>{')[0].replace('http://127.0.0.1:5275','http://127.0.0.1:5301').replace("const out=path.resolve(app,'../tmp/winter-release-check');","const out=path.resolve(app,process.env.RECEIPT_REVIEW_OUT||'../tmp/receipt-review-check');");
+const helpers=fs.readFileSync(path.join(__dirname,'receiptAutofill.browser.cjs'),'utf8').split('const body=String.raw`')[1].split('(async()=>{')[0];
+const aiHelpers=fs.readFileSync(path.join(__dirname,'receiptAi.browser.cjs'),'utf8').split('\nconst body=String.raw`')[1].split('(async()=>{')[0];
+const body=String.raw`
+const life=JSON.parse(fs.readFileSync(path.join(app,'tests/fixtures/receipt-life-prices.json'),'utf8'));
+const amountBox=(page,ja=false)=>page.getByRole('textbox',{name:ja?'記帳する金額':'本张记账金额',exact:true});
+const dateBox=(page,ja=false)=>page.getByLabel(ja?'購入日':'本张交易日期',{exact:true});
+const noteBox=(page,ja=false)=>page.getByRole('textbox',{name:ja?'メモに追加する内容':'将写入备注的内容',exact:true});
+const aiDone=(page,ja=false)=>page.getByRole('status').filter({hasText:ja?'AI読み取り結果':'AI 识别结果'}).waitFor();
+async function showReview(page,ja=false){await noteBox(page,ja).scrollIntoViewIfNeeded();await page.waitForTimeout(100);}
+(async()=>{fs.mkdirSync(out,{recursive:true});try{
+ server=spawn(process.execPath,[path.join(app,'node_modules/vite/bin/vite.js'),'--host','127.0.0.1','--port','5301','--strictPort'],{cwd:app,windowsHide:true,stdio:['ignore','pipe','pipe']});await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('Vite timeout')),20000);server.stdout.on('data',d=>{if(d.toString().includes('Local:')){clearTimeout(t);resolve();}});server.on('error',reject);});browser=await chromium.launch({executablePath:process.env.BROWSER_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+ for(const route of['/add','/add?editId=receipt-source','/add?copyId=receipt-source'])await scenario('priced full note preview and editable confirmation: '+route,async test=>{
+  const {page,state}=test;await mockAi(test,{fields:life});await start(test,route);await aiDone(page);
+  const preview=await noteBox(page).inputValue();assert(preview.startsWith('ライフ 笹塚店\n'));assert(preview.includes('ワンタンの皮 · 单价 ¥138 × 2 · 金额 ¥276'));assert(preview.includes('折扣: ¥104'));assert(preview.includes('税额: ¥284'));assert(preview.includes('支付方式: メルペイ'));
+  for(const item of life.itemDetails){const line=preview.split('\n').find(s=>s.startsWith('・'+item.name));assert(line,item.name);assert(line.includes('¥'+item.unitPrice));}
+  if(route==='/add'){await showReview(page);await page.screenshot({path:path.join(out,'warm-review-zh.png')});await confirm(page,state,1);assert.equal(await page.locator('textarea').inputValue(),preview);}
+  else{const edited='手动修正店名\n・ワンタンの皮 · 单价 ¥139 × 2 · 金额 ¥278\n请报销';await noteBox(page).fill(edited);await amountBox(page).fill('3800');await dateBox(page).fill('2026-11-27');await confirm(page,state,1);assert.equal(await page.locator('textarea').inputValue(),'original-note\n\n'+edited);assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'3800');assert.equal(await page.locator('input[type=date]').inputValue(),'2026-11-27');}
+  assert.equal(state.writes.length,0);
+ },{theme:'winter',entries:[entry]});
+ await scenario('edits during AI survive late AI, local OCR, and same-image retry',async test=>{
+  const {page,state}=test;await mockAi(test,{fields:n=>n===1?life:{...life,amount:430,totalEvidence:'合計 ¥430'},delay:1800});await start(test);await complete(page,0,lines(1204));await noteBox(page).waitFor();await amountBox(page).fill('777');await dateBox(page).fill('2026-11-01');await noteBox(page).fill('先に手入力したメモ');await aiDone(page);assert.equal(await amountBox(page).inputValue(),'777');assert.equal(await noteBox(page).inputValue(),'先に手入力したメモ');await page.getByRole('button',{name:'AI 重新识别',exact:true}).click();await page.getByRole('button',{name:'AI 正在识别…',exact:true}).waitFor();await page.getByRole('button',{name:'AI 重新识别',exact:true}).waitFor({state:'visible'});assert.equal(await amountBox(page).inputValue(),'777');await confirm(page,state,1);assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'777');assert.equal(await page.locator('input[type=date]').inputValue(),'2026-11-01');assert.equal(await page.locator('textarea').inputValue(),'先に手入力したメモ');assert.equal(state.aiCalls.length,2);
+ });
+ await scenario('retry updates untouched amount while preserving edited note',async test=>{
+  const {page,state}=test;await mockAi(test,{fields:n=>n===1?life:{...life,amount:430,totalEvidence:'合計 ¥430'},delay:100});await start(test);await aiDone(page);await noteBox(page).fill('私の修正');await page.getByRole('button',{name:'AI 重新识别',exact:true}).click();await page.waitForFunction(()=>document.querySelector('input[placeholder="未确认"]')?.value==='430');assert.equal(await noteBox(page).inputValue(),'私の修正');await confirm(page,state,1);assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'430');assert.equal(await page.locator('textarea').inputValue(),'私の修正');
+ });
+ await scenario('manual clear stays empty and explicit review edit outranks earlier main-form input',async test=>{
+  const {page,state}=test;await mockAi(test,{fields:life});await instrument(test);await visit(page,'/add');await page.locator('input[inputmode="decimal"]').fill('999');await page.locator('input[type=date]').fill('2026-11-01');await begin(page);await aiDone(page);await amountBox(page).fill('1234');await dateBox(page).fill('2026-11-27');await noteBox(page).fill('');await confirm(page,state,1);assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'1234');assert.equal(await page.locator('input[type=date]').inputValue(),'2026-11-27');assert.equal(await page.locator('textarea').inputValue(),'');
+ });
+ await scenario('invalid draft blocks save; upload failure retains edits for retry',async test=>{
+  const {page,state}=test;await mockAi(test,{fields:life});await start(test);await aiDone(page);await amountBox(page).fill('oops');assert.equal(await page.getByRole('button',{name:'存为PDF',exact:true}).isDisabled(),true);await page.getByRole('alert').filter({hasText:'有效的金额'}).waitFor();assert.equal(state.uploads.length,0);await amountBox(page).fill('3,844');await noteBox(page).fill('初回修正');state.failUpload=true;await page.getByRole('button',{name:'存为PDF',exact:true}).click();await page.getByText('保存失败，请重试',{exact:true}).waitFor();assert.equal(await noteBox(page).inputValue(),'初回修正');await noteBox(page).fill('再修正したメモ');state.failUpload=false;await confirm(page,state,2);assert.equal(await page.locator('textarea').inputValue(),'再修正したメモ');assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'3844');
+ });
+ await scenario('AI failure exposes editable native fallback and retake resets previous edits',async test=>{
+  const {page,state}=test;await mockAi(test,{status:503});await start(test);await complete(page,0,lines(1204));await noteBox(page).waitFor();await noteBox(page).fill('次のスキャンに持ち越さない');await amountBox(page).fill('9999');await page.getByRole('button',{name:'重新拍摄',exact:true}).click();await complete(page,1,lines(430));await noteBox(page).waitFor();assert.equal(await amountBox(page).inputValue(),'430');assert(!(await noteBox(page).inputValue()).includes('持ち越さない'));await noteBox(page).fill('端末結果を手で修正');await confirm(page,state,1);assert.equal(await page.locator('textarea').inputValue(),'端末結果を手で修正');
+ });
+ await scenario('Japanese editable preview remains readable at320/390px',async test=>{
+  const {page,state}=test;await mockAi(test,{fields:life});await start(test,'/add',true);await aiDone(page,true);assert((await noteBox(page,true).inputValue()).includes('単価 ¥138 × 2 · 金額 ¥276'));for(const width of[390,320]){await page.setViewportSize({width,height:844});await showReview(page,true);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.screenshot({path:path.join(out,'silver-review-ja-'+width+'.png')});}const edited=(await noteBox(page,true).inputValue()).replace('¥138 × 2','¥139 × 2');await noteBox(page,true).fill(edited);await confirm(page,state,1,true);assert.equal(await page.locator('textarea').inputValue(),edited);assert.equal(state.writes.length,0);
+ },{theme:'winter-silver',lang:'ja'});
+}finally{fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({scope:'Actual React UI with isolated camera/OCR/AI/storage; synthetic typed response based on supplied receipt text, no real model or live account writes.',results},null,2));await browser?.close();server?.kill();}console.log(JSON.stringify(results));if(results.some(r=>r.result!=='passed'))process.exitCode=1;
+})().catch(e=>{console.error(e);process.exitCode=1;});
+`;
+const m=new Module(file,module);m.filename=file;m.paths=module.paths;m._compile(prefix+helpers+aiHelpers+body,file);

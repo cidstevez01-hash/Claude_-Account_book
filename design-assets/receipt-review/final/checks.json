@@ -1,0 +1,41 @@
+{
+  "scope": "Actual React UI with isolated camera/OCR/AI/storage; synthetic typed response based on supplied receipt text, no real model or live account writes.",
+  "results": [
+    {
+      "name": "priced full note preview and editable confirmation: /add",
+      "result": "passed"
+    },
+    {
+      "name": "priced full note preview and editable confirmation: /add?editId=receipt-source",
+      "result": "passed"
+    },
+    {
+      "name": "priced full note preview and editable confirmation: /add?copyId=receipt-source",
+      "result": "passed"
+    },
+    {
+      "name": "edits during AI survive late AI, local OCR, and same-image retry",
+      "result": "passed"
+    },
+    {
+      "name": "retry updates untouched amount while preserving edited note",
+      "result": "passed"
+    },
+    {
+      "name": "manual clear stays empty and explicit review edit outranks earlier main-form input",
+      "result": "passed"
+    },
+    {
+      "name": "invalid draft blocks save; upload failure retains edits for retry",
+      "result": "passed"
+    },
+    {
+      "name": "AI failure exposes editable native fallback and retake resets previous edits",
+      "result": "passed"
+    },
+    {
+      "name": "Japanese editable preview remains readable at320/390px",
+      "result": "passed"
+    }
+  ]
+}

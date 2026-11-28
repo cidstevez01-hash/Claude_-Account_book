@@ -27,6 +27,19 @@ export interface RecognizedReceiptFields {
   date: string | null
   storeName: string | null
   items: string[]
+  printedAmount?: number | null
+  amountBasis?: 'before_points' | 'after_points' | 'unknown'
+  pointsEarned?: number | null
+  pointsUsed?: number | null
+  pointsUsedAmount?: number | null
+  pointsEarnedContext?: 'transaction' | 'promotion' | 'balance' | 'unknown'
+  pointsUsedContext?: 'transaction' | 'promotion' | 'balance' | 'unknown'
+  amountNeedsReview?: boolean
+  /** Exact reviewed note block; undefined uses storeName/items, empty string means add no note. */
+  noteText?: string
+  /** Explicit edits in the scan review outrank earlier form defaults; automatic results do not. */
+  reviewEdits?: { amount: boolean; date: boolean; note?: boolean }
+  receiptPointsNote?: string | null
 }
 
 export type ReceiptOcrEngine = 'mlkit' | 'vision'

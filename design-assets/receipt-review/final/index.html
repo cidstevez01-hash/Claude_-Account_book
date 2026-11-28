@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小票价格、编辑与积分 · R-60</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#373a42;background:#f5f6f8;font:15px/1.7 system-ui,sans-serif}main{max-width:1120px;margin:auto;padding:32px 22px 56px}h1{font-size:27px;margin:0 0 10px}h2{font-size:19px;margin:0 0 10px}p{margin:8px 0 18px}.muted{color:#626973}.tag{display:inline-block;background:#e9edf4;border-radius:20px;padding:4px 12px;font-size:13px;margin-bottom:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.panel{background:#fff;border:1px solid #d9dde5;border-radius:16px;padding:20px;min-width:0}.shots{display:grid;grid-template-columns:1fr 1fr;gap:16px}.shots img{display:block;width:100%;height:auto;border:1px solid #d9dde5;border-radius:18px}.shots figcaption{font-size:13px;color:#626973;margin-top:10px}figure{margin:0}pre{white-space:pre-wrap;font:14px/1.8 system-ui;background:#faf8f4;border-radius:10px;padding:18px;border:1px solid #e7dfd3}ul{padding-left:22px}code{background:#eef1f6;padding:2px 5px;border-radius:4px}a{color:#315c84}details{margin-top:22px}summary{cursor:pointer;font-weight:600}section{margin:22px 0}.equation{font-size:22px;letter-spacing:.02em}.good{color:#346e59}footer{border-top:1px solid #d9dde5;margin-top:28px;padding-top:18px;font-size:13px;color:#626973}@media(max-width:760px){.grid{grid-template-columns:1fr}main{padding:20px 14px}h1{font-size:23px}.panel{padding:16px}}@media(max-width:440px){.shots{gap:9px}}
+</style><main>
+<span class="tag">R-60 · 本地实现 · 1.0.0-20261128-dev.2 · 尚未发布</span>
+<h1>小票价格、可编辑结果与积分</h1>
+<p class="muted">2026年11月28日。以下为当前 React App 的实际页面截图，使用隔离相机、OCR、AI、账目与存储响应；黑色图片是测试相机占位。未上传真实小票、调用付费模型或写入真实账目。</p>
+<section class="grid">
+<div class="panel"><h2>积分与实际记账金额</h2><p class="equation">¥1,000 − ¥100 = <strong>¥900</strong></p><p class="equation">17P + 9P = <strong class="good">26P</strong></p><p>示例：本次小票获得17P，使用积分实际抵扣¥100。付款规则为1%，按净额¥900再加9P；改选2%时为17+18=35P。</p><ul><li>票面已扣积分时保留净额，避免再次扣除。</li><li>抵扣价值不明确时留待核对，不假定1P等于1円。</li><li>广告、キャンペーン、累计及可用余额不计入。</li></ul></div>
+<div class="panel"><h2>预览即将写入的完整内容</h2><pre>ライフ 笹塚店
+・豪州産牛こま切れ200g · 单价 ¥580
+・ワンタンの皮 · 单价 ¥138 × 2 · 金额 ¥276
+…其余商品按票面逐项保留…
+・折扣: ¥104
+・税额: ¥284
+・支付方式: メルペイ
+・小票获得积分: 17P</pre><p class="muted">上述为用户所给商品文本的格式摘录；实际预览包含完整清单。金额、日期、积分和备注都可编辑。手动修改或清空在重新识别、迟到OCR和上传重试后保留。</p></div>
+</section>
+<section class="panel"><h2>积分核对与备注：同一实际页面</h2><div class="shots"><figure><a href="points-review-zh.png"><img src="points-review-zh.png" alt="小票抵扣前总额1000、记账金额900与积分编辑栏"></a><figcaption>金额、获得积分、使用积分和实际抵扣金额。</figcaption></figure><figure><a href="points-memo-zh.png"><img src="points-memo-zh.png" alt="可直接编辑的完整备注，包含本次积分和规则加算"></a><figcaption>向下滚动后可编辑完整备注，确认后按相同内容回填。</figcaption></figure></div></section>
+<section class="panel"><h2>原单价保留 · 中日文与两套冬雪主题</h2><div class="shots"><figure><a href="warm-review-zh.png"><img src="warm-review-zh.png" alt="暖金中文小票备注中的商品单价"></a><figcaption>暖金 · 中文 · 390px。</figcaption></figure><figure><a href="silver-review-ja-390.png"><img src="silver-review-ja-390.png" alt="银灰日文小票单价和可编辑备注"></a><figcaption>银灰 · 日文 · 390px。另存有<a href="silver-review-ja-320.png">320px窄屏截图</a>。</figcaption></figure></div></section>
+<details class="panel"><summary>实现与检查边界</summary><ul><li>新建、编辑、复制共用草稿；确认时才应用最新修改。</li><li>多张按receiptId计入一次，删除后重算；保存和刷新后仍保留积分组件，避免换支付方式丢失小票积分。</li><li>自动付款积分备注随规则更新，仅替换原样保留的自动段；用户修改或删除后的文字不覆盖。</li><li>沿用现有receipt_path文本列存储路径与元数据，无数据库迁移。旧客户端仍能读路径，但用旧版重新保存会丢弃新增元数据。</li><li>124项Node、38项实际React页面隔离检查通过，App构建/lint、Worker类型检查和dry-run通过。真实模型准确率、费用及iOS真机效果仍待部署后验证。</li></ul><p><a href="validation.json">验证记录</a> · <a href="checks.json">编辑场景</a> · <a href="points-checks.json">积分场景</a></p></details>
+<footer>本稿为独立历史版本02；01保留。当前代码及截图同步到 receipt-review/final。共享需求R-60为“处理中”，发布后再填更新版本与真机测试结果。</footer>
+</main></html>

@@ -8,6 +8,7 @@ const body=String.raw`
 const entry={id:'receipt-source',type:'expense',amount:2112,currency:'JPY',catCode:'food',subCode:null,paymentMethod:'cash',tagCode:null,note:'original-note',points:0,date:'2026-11-22',recurringId:null,createdAt:1795300000000,receiptPaths:[]};
 async function instrument({ctx,state}) {
  state.uploads=[];state.failUpload=false;
+ await ctx.route('**/storage/v1/object/receipts',r=>r.fulfill({status:200,contentType:'application/json',body:'[]'}));
  await ctx.route('**/src/lib/receiptCamera.ts*',r=>r.fulfill({contentType:'application/javascript',body:
   'async function image(){const c=document.createElement("canvas");c.width=300+(window.__scanNumber=(window.__scanNumber||0)+1);c.height=600;c.getContext("2d").fillRect(0,0,c.width,c.height);return new Promise(resolve=>c.toBlob(resolve,"image/jpeg"));}export const scanDocumentNative=image,pickFromGallery=image;'}));
  await ctx.route('**/node_modules/.vite/deps/*image-to-text*',r=>r.fulfill({contentType:'application/javascript',body:
@@ -89,7 +90,7 @@ async function visit(page,route) {await page.goto(origin+route,{waitUntil:'netwo
   await scenario('upload failure keeps preview and retry adds receipt only once (Japanese)',async(test)=>{
    const {page,state}=test;await instrument(test);await visit(page,'/add');await begin(page,false,true);await complete(page,0,lines(1880));
    state.failUpload=true;await page.getByRole('button',{name:'PDFとして保存',exact:true}).click();await page.getByText('保存に失敗しました。もう一度お試しください',{exact:true}).waitFor();
-   assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'');
+   assert.equal(await page.locator('input[type="number"][inputmode="decimal"]').inputValue(),'');
    state.failUpload=false;await confirm(page,state,2,true);assert.equal(await page.locator('input[inputmode="decimal"]').inputValue(),'1880');
    await page.setViewportSize({width:320,height:700});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   },{theme:'winter-silver',lang:'ja'});

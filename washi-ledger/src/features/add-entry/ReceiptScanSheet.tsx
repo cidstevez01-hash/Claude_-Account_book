@@ -9,6 +9,7 @@ import { logModule } from '../../lib/appLog'
 import { recognizeReceiptAi, receiptAiErrorKey, mergeReceiptFields } from '../../lib/receiptAi'
 import type { ReceiptAiResult } from '../../../shared/receiptAi'
 import { waitForReceiptFields } from '../../lib/receiptOcrWait'
+import { applyReceiptReviewEdits, receiptReviewError, receiptReviewValues, withReceiptPointsNote, type ReceiptReviewEdits } from '../../lib/receiptReview'
 
 // R-32三期：拍照页面改成调用系统原生扫描能力(见lib/receiptCamera.ts)，取代之前
 // 自建webcam取景界面+OpenCV.js边缘检测那整套——原生扫描器自己就是一个完整的
@@ -21,6 +22,7 @@ interface ReceiptScanSheetProps {
   entryDate: string
   onClose: () => void
   onConfirm: (pdf: Blob, fields: RecognizedReceiptFields) => Promise<boolean>
+  pointsNote?: (fields: RecognizedReceiptFields) => string | null
 }
 
 function emptyFields(receiptId: string): RecognizedReceiptFields {
@@ -55,7 +57,7 @@ function createReceiptId(): string {
  * 原图兜底"这种中间状态了。
  *
  * 跟CategoryDetailSheet.tsx同一套底部弹层视觉规范(遮罩+从底部滑入的rounded-t卡片) */
-export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: ReceiptScanSheetProps) {
+export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm, pointsNote }: ReceiptScanSheetProps) {
   const { t } = useI18n()
   const [stage, setStage] = useState<Stage>('scanning')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -82,6 +84,19 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
   const [aiResult, setAiResult] = useState<ReceiptAiResult | null>(null)
   const [aiError, setAiError] = useState<string | null>(null)
   const [resolvedFields, setResolvedFields] = useState<RecognizedReceiptFields | null>(null)
+  const reviewEditsRef = useRef<ReceiptReviewEdits>({})
+  const [reviewEdits, setReviewEdits] = useState<ReceiptReviewEdits>({})
+
+  function publishFields(fields: RecognizedReceiptFields) {
+    partialFieldsRef.current = fields
+    setResolvedFields(fields)
+  }
+
+  function editReview(field: keyof ReceiptReviewEdits, value: string) {
+    const next = { ...reviewEditsRef.current, [field]: value }
+    reviewEditsRef.current = next
+    setReviewEdits(next)
+  }
 
   function errText(e: unknown): string {
     return e instanceof Error ? e.message : String(e)
@@ -96,6 +111,8 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     setAiBusy(false)
     setAiResult(null)
     setResolvedFields(null)
+    reviewEditsRef.current = {}
+    setReviewEdits({})
     setAiError(null)
     ocrControllerRef.current?.abort()
     ocrControllerRef.current = null
@@ -131,11 +148,11 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
     const local = recognizeReceiptFields(
       dataUrl, receiptId, (band) => cropReceiptBand(canvas, band),
       (fields) => {
-        if (!controller.signal.aborted && !aiResultRef.current && receiptIdRef.current === receiptId) partialFieldsRef.current = fields
+        if (!controller.signal.aborted && !aiResultRef.current && receiptIdRef.current === receiptId) publishFields(fields)
       },
       { signal: controller.signal },
     ).then(fields => {
-      if (!controller.signal.aborted && !aiResultRef.current && receiptIdRef.current === receiptId) partialFieldsRef.current = fields
+      if (!controller.signal.aborted && !aiResultRef.current && receiptIdRef.current === receiptId) publishFields(fields)
       return fields
     })
     recognizeResultRef.current = waitForReceiptFields(local, () => partialFieldsRef.current ?? emptyFields(receiptId), {
@@ -209,6 +226,11 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
   if (!open) return null
 
+  const review = resolvedFields ? receiptReviewValues(resolvedFields, reviewEdits) : null
+  const reviewError = receiptReviewError(reviewEdits)
+  const previewNote = resolvedFields && !reviewError
+    ? withReceiptPointsNote(applyReceiptReviewEdits(resolvedFields, reviewEdits), pointsNote).noteText : review?.note
+
   async function handleAiRecognize() {
     const canvas = resultCanvasRef.current
     const receiptId = receiptIdRef.current
@@ -227,14 +249,15 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
       try {
         const { result, fields } = await recognizeReceiptAi(canvas, receiptId, controller.signal)
         if (controller.signal.aborted || scanGenerationRef.current !== generation) return emptyFields(receiptId)
-        const previousFields = fields.amount != null ? fallback()
+        // A confirmed printed total with unresolved point redemption is already useful
+        // to review. Do not hide it while waiting for the native OCR fallback.
+        const previousFields = fields.amount != null || fields.printedAmount != null ? fallback()
           : await waitForReceiptFields(previous, fallback, { signal: controller.signal })
         if (controller.signal.aborted || scanGenerationRef.current !== generation) return emptyFields(receiptId)
         const merged = mergeReceiptFields(previousFields, fields)
         aiResultRef.current = result
         setAiResult(result)
-        setResolvedFields(merged)
-        partialFieldsRef.current = merged
+        publishFields(merged)
         logModule('receipt', `AI识别完成 receiptId=${receiptId}: 原始金额=${result.rawAmount ?? '未确认'}, AI金额=${fields.amount ?? '未确认'}, 最终金额=${merged.amount ?? '未确认'}`, 'info', {
           reasons: JSON.stringify(result.validationReasons), checks: JSON.stringify(result.settlementChecks),
           paymentAmount: result.paymentAmount ?? 'null', cashTenderedAmount: result.cashTenderedAmount ?? 'null',
@@ -244,10 +267,19 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
       } catch (error) {
         if (scanGenerationRef.current !== generation) return emptyFields(receiptId)
         setAiError(t(controller.signal.aborted ? 'receiptAiTimeout' : receiptAiErrorKey(error)))
-        return waitForReceiptFields(previous, fallback, { signal: controller.signal })
+        // AI is finished even if the native fallback is still reading. Allow editing,
+        // retry and PDF waiting; this older fallback must not clear a newer AI task.
+        if (aiControllerRef.current === controller) {
+          aiBusyRef.current = false
+          setAiBusy(false)
+        }
+        const retained = await waitForReceiptFields(previous, fallback, { signal: controller.signal })
+        if (scanGenerationRef.current === generation && receiptIdRef.current === receiptId
+          && aiControllerRef.current === controller) publishFields(retained)
+        return retained
       } finally {
         window.clearTimeout(timer)
-        if (scanGenerationRef.current === generation) {
+        if (scanGenerationRef.current === generation && aiControllerRef.current === controller) {
           aiBusyRef.current = false
           setAiBusy(false)
           aiControllerRef.current = null
@@ -260,6 +292,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
 
   async function handleConfirm() {
     if (aiBusyRef.current || savingRef.current || !resultCanvasRef.current) return
+    if (receiptReviewError(reviewEditsRef.current)) return
     savingRef.current = true
     setSaving(true)
     setSaveFailed(false)
@@ -282,7 +315,8 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
       setWaitingForOcr(false)
       if (scanGenerationRef.current !== generation || receiptIdRef.current !== receiptId) return
       if (fields.receiptId !== receiptId) return
-      const ok = await onConfirm(pdf, fields)
+      const reviewed = withReceiptPointsNote(applyReceiptReviewEdits(fields, reviewEditsRef.current), pointsNote)
+      const ok = await onConfirm(pdf, reviewed)
       if (!ok) setSaveFailed(true)
     } finally {
       savingRef.current = false
@@ -363,13 +397,43 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
                   {t(aiBusy ? 'receiptAiRecognizing' : 'receiptAiRetry')}
                 </button>
                 {aiError && <p role="alert" className="text-xs text-action-ink">{aiError}</p>}
-                {aiResult && <div role="status" className="rounded-xl border border-outline-variant p-3 text-body-md text-on-surface break-words">
-                  <p className="font-medium">{t('receiptAiResult')}</p>
-                  <p>{t('amountLabel')}: {resolvedFields?.amount == null ? t('receiptAiUnconfirmed') : `¥${resolvedFields.amount.toLocaleString()}`}</p>
-                  <p>{t('dateLabel')}: {resolvedFields?.date ?? t('receiptAiUnconfirmed')}</p>
-                  <p>{resolvedFields?.storeName}</p>
-                  <p className="text-xs text-on-surface-variant mt-2">{t(aiResult.amount == null && resolvedFields?.amount != null ? 'receiptAiKeptLocal' : aiResult.uncertain ? 'receiptAiCheckAmount' : 'receiptAiReviewNote')}</p>
-                </div>}
+                {review && <section aria-label={t('receiptReviewRegion')} className="rounded-xl border border-outline-variant p-3 text-body-md text-on-surface space-y-3 min-w-0">
+                  <p role="status" className="font-medium">{t(aiResult ? 'receiptAiResult' : 'receiptLocalResult')}</p>
+                  {resolvedFields?.printedAmount != null && <p className="text-xs text-on-surface-variant">
+                    {t(resolvedFields.amountBasis === 'after_points' ? 'receiptPrintedNet' : 'receiptPrintedTotal')}: ¥{resolvedFields.printedAmount.toLocaleString()}
+                  </p>}
+                  <label className="block min-w-0">
+                    <span className="block font-medium mb-1">{t('receiptReviewAmount')}</span>
+                    <input type="text" inputMode="decimal" value={review.amount} disabled={saving}
+                      onChange={e => editReview('amount', e.target.value)} placeholder={t('receiptAiUnconfirmed')}
+                      aria-invalid={reviewError === 'amount'}
+                      className="w-full min-w-0 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-on-surface" />
+                  </label>
+                  <div className="grid grid-cols-2 gap-3 min-w-0">
+                    {([['pointsEarned', 'receiptPointsEarned'], ['pointsUsed', 'receiptPointsUsed'], ['pointsUsedAmount', 'receiptPointsDeduction']] as const).map(([field, label]) => (
+                      <label key={field} className={`block min-w-0 ${field === 'pointsUsedAmount' ? 'col-span-2' : ''}`}>
+                        <span className="block font-medium mb-1">{t(label)}</span>
+                        <input type="text" inputMode={field === 'pointsUsedAmount' ? 'decimal' : 'numeric'} value={review[field]} disabled={saving}
+                          onChange={e => editReview(field, e.target.value)} placeholder={t('receiptAiUnconfirmed')} aria-invalid={reviewError === field}
+                          className="w-full min-w-0 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-on-surface" />
+                      </label>
+                    ))}
+                  </div>
+                  {review.amountNeedsReview && <p className="text-xs text-error">{t('receiptPointsNeedReview')}</p>}
+                  <label className="block min-w-0">
+                    <span className="block font-medium mb-1">{t('receiptReviewDate')}</span>
+                    <input type="date" value={review.date} disabled={saving} onChange={e => editReview('date', e.target.value)}
+                      aria-invalid={reviewError === 'date'}
+                      className="w-full min-w-0 max-w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-on-surface" />
+                  </label>
+                  <label className="block min-w-0">
+                    <span className="block font-medium mb-1">{t('receiptNotePreview')}</span>
+                    <textarea value={previewNote ?? ''} rows={8} disabled={saving} onChange={e => editReview('note', e.target.value)}
+                      className="w-full min-w-0 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-on-surface leading-relaxed resize-y" />
+                  </label>
+                  {reviewError && <p role="alert" className="text-xs text-error">{t(reviewError === 'amount' || reviewError === 'pointsUsedAmount' ? 'receiptReviewInvalidAmount' : reviewError === 'date' ? 'receiptReviewInvalidDate' : 'receiptReviewInvalidPoints')}</p>}
+                  <p className="text-xs text-on-surface-variant">{t(reviewEdits.amount !== undefined ? 'receiptAiReviewNote' : aiResult && aiResult.amount == null && resolvedFields?.amount != null ? 'receiptAiKeptLocal' : aiResult?.uncertain ? 'receiptAiCheckAmount' : 'receiptAiReviewNote')}</p>
+                </section>}
               </div>
 
               <div className="flex items-start gap-2 p-3 rounded-xl bg-surface-container border border-outline-variant/50">
@@ -386,7 +450,7 @@ export function ReceiptScanSheet({ open, entryDate, onClose, onConfirm }: Receip
             <button
               type="button"
               onClick={handleConfirm}
-              disabled={saving || aiBusy}
+              disabled={saving || aiBusy || !!reviewError}
               className="w-full h-[52px] bg-action text-on-action rounded-xl text-headline-md font-serif flex items-center justify-center gap-2 active:translate-y-0.5 transition-transform disabled:opacity-70"
               style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
             >

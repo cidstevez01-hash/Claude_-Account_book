@@ -1,0 +1,45 @@
+{
+  "scope": "Actual UI, isolated camera/OCR/AI/API/storage; no paid or live account writes. Includes an isolated upsert/list roundtrip.",
+  "results": [
+    {
+      "name": "1000-100=900,17+9=26; payment and date switches: /add",
+      "result": "passed"
+    },
+    {
+      "name": "1000-100=900,17+9=26; payment and date switches: /add?editId=receipt-source",
+      "result": "passed"
+    },
+    {
+      "name": "1000-100=900,17+9=26; payment and date switches: /add?copyId=receipt-source",
+      "result": "passed"
+    },
+    {
+      "name": "already-net amount900 is not reduced to800",
+      "result": "passed"
+    },
+    {
+      "name": "campaign and balance points never count or reduce the charge",
+      "result": "passed"
+    },
+    {
+      "name": "editable receipt points update net amount and survive AI retry",
+      "result": "passed"
+    },
+    {
+      "name": "multiple receipts sum once; deleting one recomputes amount and earned points",
+      "result": "passed"
+    },
+    {
+      "name": "save and reopen preserves receipt17 separately from payment9",
+      "result": "passed"
+    },
+    {
+      "name": "unknown redemption value stays unconfirmed until manually corrected",
+      "result": "passed"
+    },
+    {
+      "name": "user can detach a generated payment note without losing numeric point calculation",
+      "result": "passed"
+    }
+  ]
+}

@@ -12,6 +12,7 @@ function load(file, deps = {}, extra = {}) {
   return exports
 }
 const contract = load('shared/receiptAi.ts'), { HttpError } = load('worker/src/_shared/errors.ts')
+const pointUtils = load('src/lib/receiptPoints.ts')
 const fields = overrides => ({ amount: 258, currency: 'JPY', date: '2026-11-26', storeName: 'FamilyMart',
   items: ['グリルチキンスモーク ¥258'], paymentAmount: 258, taxAmount: 19,
   totalEvidence: '合計 ¥258', paymentEvidence: 'メルペイ支払 ¥258', uncertain: false, ...overrides })
@@ -102,6 +103,7 @@ test('success binds fields to receipt ID with no-store response', async () => {
 })
 const clientFor = (post, document) => load('src/lib/receiptAi.ts', {
   './apiClient': { apiClient: { post } }, '../../shared/receiptAi': contract, './i18nSync': { tSync: key => key },
+  './receiptPoints': pointUtils,
 }, { document })
 test('AI image uses a separate resized canvas and never changes PDF source dimensions', () => {
   const source = { width: 4000, height: 8000 }, draws = [], qualities = []
@@ -152,6 +154,14 @@ test('AI empty fields preserve earlier confirmed fields, valid AI fields can imp
   assert.equal(merged.items[0],'item')
   assert.throws(()=>client.mergeReceiptFields(before,{...after,receiptId:'different'}),/INVALID_RESULT/)
 })
+
+test('retry reclassified as advertising or balance clears previously automatic point values', () => {
+  const client=clientFor(()=>{}, {}), before={receiptId:'same',amount:900,printedAmount:1000,amountBasis:'before_points',date:null,storeName:'store',items:[],ocrRows:[],pointsEarned:17,pointsUsed:100,pointsUsedAmount:100}
+  for(const context of ['promotion','balance']) {
+    const merged=client.mergeReceiptFields(before,{...before,amount:1000,pointsEarned:null,pointsUsed:null,pointsUsedAmount:null,pointsEarnedContext:context,pointsUsedContext:context})
+    assert.equal(merged.amount,1000);assert.equal(merged.pointsEarned,null);assert.equal(merged.pointsUsed,null);assert.equal(merged.pointsUsedAmount,null)
+  }
+})
 test('notes include purchase adjustments and payment method, exclude tendered cash and change', () => {
   const client=clientFor(()=>{}, {})
   const lines=client.receiptAiNoteLines(fields({amount:1531,paymentAmount:null,cashTenderedAmount:2031,changeAmount:500,
@@ -160,3 +170,23 @@ test('notes include purchase adjustments and payment method, exclude tendered ca
   assert(note.includes('113'));assert(note.includes('39'));assert(note.includes('10'));assert(note.includes('cash'))
   assert(!note.includes('2,031'));assert(!note.includes('500'))
 })
+
+test('Life receipt keeps all13 product prices, multi-unit price138 and amount276',()=>{
+  const fixture=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/receipt-life-prices.json'),'utf8'));
+  const result=contract.parseReceiptAiResult(fixture),lines=clientFor(()=>{},{}).receiptAiNoteLines(result);
+  assert.equal(result.amount,3844);assert.equal(result.itemDetails.length,13);
+  for(const item of result.itemDetails){const line=lines.find(s=>s.startsWith(item.name));assert(line,item.name);assert(line.includes('¥'+item.unitPrice),line);}
+  const wonton=lines.find(s=>s.startsWith('ワンタンの皮'));assert(wonton.includes('receiptAiUnitPrice ¥138 × 2'));assert(wonton.includes('receiptAiLineAmount ¥276'));
+  assert.equal(lines.filter(s=>s.startsWith('ワンタンの皮')).length,1);
+});
+test('missing unit prices stay unknown rather than being divided from line amount',()=>{
+  const result=contract.parseReceiptAiResult(fields({itemDetails:[{name:'商品',unitPrice:null,quantity:2,lineAmount:276}]}));
+  const note=clientFor(()=>{},{}).receiptAiNoteLines(result)[0];assert(note.includes('276'));assert(note.includes('receiptAiQuantity 2'));assert(!note.includes('138'));assert(!note.includes('receiptAiUnitPrice'));
+});
+test('legacy Workers remain compatible without structured products',()=>{const result=contract.parseReceiptAiResult(fields());assert.equal(result.itemDetails.length,0);assert.equal(clientFor(()=>{},{}).receiptAiNoteLines(result)[0],'グリルチキンスモーク ¥258');});
+test('partial structured products cannot discard other purchases or duplicate priced legacy lines',()=>{const result=contract.parseReceiptAiResult(fields({items:['ワンタンの皮 ¥276','別の商品 ¥100'],itemDetails:[{name:'ワンタンの皮',unitPrice:138,quantity:2,lineAmount:276}]}));const lines=clientFor(()=>{},{}).receiptAiNoteLines(result);assert.equal(lines.filter(s=>s.startsWith('ワンタンの皮')).length,1);assert(lines.includes('別の商品 ¥100'));});
+test('malformed structured product values are rejected',()=>{for(const change of[{unitPrice:'138'},{quantity:0},{quantity:-1},{lineAmount:Infinity},{name:''},{unitPrice:1_000_000_001}])assert.throws(()=>contract.parseReceiptAiResult(fields({itemDetails:[{name:'商品',unitPrice:138,quantity:2,lineAmount:276,...change}]})),/INVALID_RESULT/);});
+test('strict product schema and provider prompt distinguish unit price, quantity and line amount',async()=>{
+ let body;await provider(async(url,init)=>{body=JSON.parse(init.body);return json(envelope(fields()));})('image','key','model');
+ const schema=body.text.format.schema;assert(schema.required.includes('itemDetails'));assert.equal(schema.properties.itemDetails.items.additionalProperties,false);assert(schema.properties.itemDetails.items.required.includes('unitPrice'));assert(body.instructions.includes('2コ×単138'));assert(body.instructions.includes('never divide'));
+});

@@ -54,6 +54,18 @@ export interface Tag {
   custom: boolean
 }
 
+export interface ReceiptDetails {
+  receiptId: string
+  path: string
+  amount: number | null
+  printedAmount: number | null
+  amountBasis: 'before_points' | 'after_points' | 'unknown'
+  pointsEarned: number | null
+  pointsUsed: number | null
+  pointsUsedAmount: number | null
+  noteText?: string
+}
+
 export interface Entry {
   id: string
   type: EntryType
@@ -76,6 +88,10 @@ export interface Entry {
    * (见data/catalog.ts的fromRow/toRow)，省掉一次要求用户手动跑Supabase迁移SQL的
    * 操作(旧版本单路径数据读取时做兼容，见fromRow里的说明) */
   receiptPaths: string[]
+  /** Persisted inside the existing receipt_path JSON, alongside its path strings. */
+  receiptDetails?: ReceiptDetails[]
+  /** Last generated payment-points note; null means the user detached it. */
+  receiptPointsNote?: string | null
 }
 
 /** R-44：固定收支规则——App启动时/服务器pg_cron按这些规则自动生成记账记录，

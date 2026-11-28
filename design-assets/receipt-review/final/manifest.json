@@ -1,0 +1,56 @@
+{
+  "sources": [
+    {
+      "sha256": "9ade924556b5b31cad2adeb8d008dadc22615360f455ff509c05e6ed1efb578b",
+      "path": "washi-ledger/src/features/add-entry/ReceiptScanSheet.tsx"
+    },
+    {
+      "sha256": "764c071a8053c64049ab6b99f2423747470fe34a6817f11a0dd186a25203ef6b",
+      "path": "washi-ledger/src/features/add-entry/AddTransactionPage.tsx"
+    },
+    {
+      "sha256": "48679077c8156d3d12208722da3d78bb4fd111cc894a7187d56ab6ab824ea823",
+      "path": "washi-ledger/src/lib/receiptReview.ts"
+    },
+    {
+      "sha256": "5adb39b90ad34665e0876a670f9612f35068e3d063706f964f519c5aa1681d88",
+      "path": "washi-ledger/src/lib/receiptPoints.ts"
+    },
+    {
+      "sha256": "7d991dc0dac0cc4b57a4b3a60078de6bd8f9db02cdfac4bb773ca3f49a63c7fa",
+      "path": "washi-ledger/src/lib/receiptManifest.ts"
+    },
+    {
+      "sha256": "591f66f2fc6cb72902deeac088c6774e4710a6b20884fec303711199dac3ad25",
+      "path": "washi-ledger/src/lib/receiptAi.ts"
+    },
+    {
+      "sha256": "6efab343520e1dc5e3d41005a159694c6ee7a3d6bd08f777de60cac6e82fead3",
+      "path": "washi-ledger/src/lib/receiptFieldExtract.ts"
+    },
+    {
+      "sha256": "437f9b8f1b766fa4cefe109540d7dcd826b8db6cab274be9733980b9025d56dc",
+      "path": "washi-ledger/src/lib/i18n/dict.ts"
+    },
+    {
+      "sha256": "0d455a17b89ca85717a9c35b99ab2fd3b5e00c800504c9b4a563ce3fc78bb144",
+      "path": "washi-ledger/src/data/catalog.ts"
+    },
+    {
+      "sha256": "5b80557d9cc278ad399807540956f3329fcbdf8c36fc21b376298e489978937b",
+      "path": "washi-ledger/src/types/index.ts"
+    },
+    {
+      "sha256": "9af15a7cd283f80d22cd768085f527c89db1868f4db0c8323b43ea7f06e00229",
+      "path": "washi-ledger/shared/receiptAi.ts"
+    },
+    {
+      "sha256": "fb65f4f988cd4f3e42e0080c6343a7d2266be8df9e11ff3fbd20adb77aa832b1",
+      "path": "washi-ledger/worker/src/receipts/openai.ts"
+    }
+  ],
+  "version": "1.0.0-20261128-dev.2",
+  "name": "小票价格、编辑与积分",
+  "entry": "index.html",
+  "history": "20261128-02"
+}

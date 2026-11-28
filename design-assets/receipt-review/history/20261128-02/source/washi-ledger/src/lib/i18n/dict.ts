@@ -1,0 +1,639 @@
+import { LEGACY_ZH, LEGACY_JA } from './legacy'
+
+/**
+ * 新App实际在用的词典——key名跟着新App组件里`t('xxx')`调用走(不是旧App的key命名)，
+ * 但值尽量从./legacy.ts(旧App完整词典)里取，两边概念对得上就直接复用旧App的翻译，
+ * 只有旧App没有对应概念的词条才用新App自己写的值(每条都在注释里写清楚来源，方便以后
+ * 核对/修正——旧App里没有的词条，先按当前这个值显示，以后再回头修)。
+ *
+ * 有几处key名字面看着像能对上、实际语义不同，踩过坑要注意别对错：
+ * - 新App的typeExpense/typeIncome是"记一笔"页面收支类型切换按钮的文字，对应旧App的
+ *   segExpense/segIncome(“支出/收入”分段按钮)，不是旧App里typeExpense/typeIncome
+ *   (那两个是分类构成图表的标题"支出构成/支出内訳"，语义完全不同)
+ */
+export const dict = {
+  zh: {
+    appTitle: 'PigBang',
+    tabDashboard: '概览', // 用户明确要求，旧App没有完全对应的词(旧App叫"记账")
+    tabHistory: LEGACY_ZH.ledgerSectionTitle, // 用户要求改成"出入金"，旧App正好有这个词
+    tabStats: LEGACY_ZH.tabStats,
+    // B-31：仪表盘顶部卡片这三个词条不能再叫"本月"——R-27放开自定义日期区间后，
+    // 卡片统计的是当前选中的任意区间(不一定是当月)，继续用旧App"本月"系列翻译会
+    // 跟实际区间对不上，改成"累计"措辞；旧App没有这个概念，不从legacy.ts取值。
+    // monthIncome/monthExpense这两个key本身仍保留旧App"本月"语义，是统计页
+    // (StatsPage.tsx，真正按月导航，不是自定义区间)在用，不能跟着改
+    balanceLabel: '累计结余',
+    rangeIncome: '累计收入',
+    rangeExpense: '累计支出',
+    monthIncome: LEGACY_ZH.monthIncome,
+    monthExpense: LEGACY_ZH.monthExpense,
+    recent: '最近记录', // 新App专属(旧App首页没有"最近记录"这个独立区块)
+    viewAll: '查看全部', // 新App专属
+    today: LEGACY_ZH.today,
+    yesterday: LEGACY_ZH.yesterday,
+    emptyLine1: LEGACY_ZH.emptyLine1,
+    emptyLine2: LEGACY_ZH.emptyLine2,
+    historySearchPlaceholder: LEGACY_ZH.detailSearchPlaceholder,
+    filterAll: '全部', // 新App专属(旧App明细搜索没有"全部/支出/收入"筛选chip)
+    filterExpense: LEGACY_ZH.expenseWord,
+    filterIncome: LEGACY_ZH.incomeWord,
+    startMonthLabel: '开始月份', // 新App专属，V3会重做成完整起止日期选择器
+    endMonthLabel: '结束月份', // 同上
+    historyNoResults: '没有符合条件的记录', // 新App专属
+    addTitle: LEGACY_ZH.sheetAddTitle,
+    editTitle: LEGACY_ZH.editEntryTitle,
+    copyTitle: LEGACY_ZH.copyEntryTitle,
+    typeExpense: LEGACY_ZH.segExpense, // 注意：对应旧App的segExpense，不是同名的typeExpense，见文件顶部说明
+    typeIncome: LEGACY_ZH.segIncome,
+    amountLabel: LEGACY_ZH.converterAmountFieldLabel,
+    categoryLabel: LEGACY_ZH.catFieldLabel,
+    subcategoryLabel: LEGACY_ZH.subFieldLabel, // 新App专属(R-09：子分类区块之前没有标题，照旧App补上)
+    methodLabel: LEGACY_ZH.payFieldLabel,
+    dateLabel: '日期', // 新App专属(旧App记账表单的日期字段没有单独的文字标签)
+    tagsLabel: LEGACY_ZH.tagFieldLabel,
+    pointsLabel: LEGACY_ZH.pointsFieldLabel,
+    memoLabel: '备注', // 新App专属(旧App只有输入框占位文字，没有单独的字段标签)
+    memoPlaceholder: LEGACY_ZH.notePlaceholder,
+    saveEntry: LEGACY_ZH.saveBtn,
+    // R-32：レシート扫描存档，新App专属(旧App没有这个功能，全部是新写的词条)
+    receiptScanEntry: '扫描小票',
+    receiptReplace: '重新扫描',
+    // R-41：多图上传——已有至少一张凭证时列表末尾的"继续追加"按钮，跟一张都没有时的
+    // receiptScanEntry文案区分开(那个是"从零开始扫"，这个是"已经有几张了继续加")
+    receiptScanMore: '继续扫描',
+    // 凭证列表每一行的显示文字——没有存真实文件名(扫描出来的是裁边PDF，不是用户
+    // 自己选的文件)，用"凭证1/凭证2..."这种按上传顺序编号的方式标识，够区分、
+    // 够点开预览是哪一张就行，不需要也没必要造一个假文件名
+    receiptItemLabel: '凭证',
+    receiptScanTitle: '确认扫描结果',
+    receiptCapturedLabel: '扫描结果',
+    receiptRetakeAria: '重新拍摄',
+    receiptPrivacyNote: '※ 拍摄的原始照片本身不会保存，仅裁边增强后的扫描版会生成PDF存档。',
+    receiptSaveAsPdf: '存为PDF',
+    receiptRecognizing: '正在识别小票…',
+    receiptAiDiscount: '折扣',
+    receiptAiTax: '税额',
+    receiptAiPoints: '积分抵扣',
+    receiptAiPayment: '支付方式',
+    receiptAiUnitPrice: '单价',
+    receiptAiQuantity: '数量',
+    receiptAiLineAmount: '金额',
+    receiptReviewRegion: '小票识别内容',
+    receiptLocalResult: '本地识别结果 · 请核对',
+    receiptReviewAmount: '本张记账金额',
+    receiptReviewDate: '本张交易日期',
+    receiptNotePreview: '将写入备注的内容',
+    receiptReviewInvalidAmount: '请输入有效的金额，最多保留两位小数。',
+    receiptReviewInvalidDate: '请输入有效的交易日期。',
+    receiptPointsEarned: '小票获得积分',
+    receiptPointsUsed: '本次使用积分',
+    receiptPointsDeduction: '积分抵扣金额',
+    receiptRulePoints: '支付方式加算积分',
+    receiptPointsTotal: '合计获得积分',
+    receiptPrintedTotal: '票面合计（抵扣前）',
+    receiptPrintedNet: '票面实付（已抵扣）',
+    receiptPointsNeedReview: '积分抵扣金额未能确认，请核对后填写记账金额。',
+    receiptReviewInvalidPoints: '请输入有效的整数积分数。',
+    receiptAiRetry: 'AI 重新识别',
+    receiptAiRecognizing: 'AI 正在识别…',
+    receiptAiNotice: '扫描后会自动发送此张小票图片给 OpenAI 识别，产生 API 费用。PDF 保存画质不变。',
+    receiptAiResult: 'AI 识别结果 · 请核对',
+    receiptAiKeptLocal: 'AI 未能确认金额，已保留本地识别金额，请核对。',
+    receiptAiUnconfirmed: '未确认',
+    receiptAiReviewNote: '可直接修改以上金额、日期和完整备注，保存PDF后按修改后的内容回填。重新识别会保留你的修改。',
+    receiptAiCheckAmount: '金额或币种未能确认，请核对并在上方填写正确金额。',
+    receiptAiNotAllowed: '此账号尚未开通 AI 识别，请联系管理员。',
+    receiptAiNotConfigured: 'AI 识别尚未配置，请联系管理员。',
+    receiptAiRateLimited: 'AI 调用过于频繁或额度不足，请稍后重试。',
+    receiptAiTimeout: 'AI 识别超时，保留原有结果。请稍后重试。',
+    receiptAiImageTooLarge: '图片过大，请裁剪后重试。',
+    receiptAiFailed: 'AI 识别失败，保留原有结果。请检查网络或稍后重试。',
+
+    receiptFailedError: '扫描失败，请重试',
+    receiptSaveFailed: '保存失败，请重试',
+    entrySaveFailed: '保存失败，请重试',
+    receiptImageLoadError: '图片加载失败',
+    receiptViewAria: '查看凭证',
+    receiptRemoveAria: '移除凭证',
+    receiptUseGalleryInstead: '改用相册选择',
+    receiptPreviewTitle: '凭证预览',
+    receiptOpenExternalLabel: '在浏览器中打开',
+    // R-43：账目卡片恢复小票角标，多张凭证时点角标先弹这个选择列表选哪一张，
+    // 选中后再走原生预览(跟详情弹层凭证列表同款样式，不是另起一套)
+    receiptPickerTitle: '选择凭证',
+    rateUpdatedLabel: LEGACY_ZH.rateUpdateLabel,
+    refreshRate: LEGACY_ZH.refreshRate,
+    rateNeverFetched: LEGACY_ZH.neverFetched,
+    rateLoading: LEGACY_ZH.loadingRate,
+    rateSearchPlaceholder: '搜索货币…', // 新App专属(旧App汇率页是固定人民币↔日元，没有货币搜索)
+    ratePopularTitle: '热门汇率', // 新App专属
+    rateTrendLabel: '走势', // 新App专属(R-04汇率页重设计新增的趋势图标题，旧App没有这个走势图功能)
+    rateNoHistory: '这段时间没有汇率数据', // 新App专属(周末/节假日frankfurter.dev没有发布数据时的真实提示，不补假数据)
+    rateTimeframe1W: '近1周', // 新App专属(R-13：时间范围按钮去掉1D后，剩下三档改用翻译文案，不再直接显示英文缩写)
+    rateTimeframe1M: '近1个月',
+    rateTimeframe1Y: '近1年',
+    // R-XX走势图重设计新增：涨跌幅/区间最高最低/波动区间这几项统计文案。
+    // 最高/最低标签带时间范围前缀(周/月内/年内)，跟当前选中的时间档对应，
+    // 不是死写"周最高"——具体前缀+"最高"/"最低"在RatePage.tsx里拼接
+    rateStatsPrefix1W: '周',
+    rateStatsPrefix1M: '月内',
+    rateStatsPrefix1Y: '年内',
+    rateStatHighSuffix: '最高',
+    rateStatLowSuffix: '最低',
+    // R-XX：底部第三项统计从"波动区间"(区间最高最低的差值百分比，跟顶部涨跌幅
+    // 徽标意思重复，用户反馈没意义)换成两国央行法定利率(base+target各一行)，
+    // 名称就叫"利率"，不重新造一个更长的词
+    rateStatRateLabel: '利率',
+    rateStatNoRateTarget: '无利率目标',
+    // R-XH：补全方案A设计稿里被漏掉的两处细节——数字下方的小字说明("本周峰值/谷值"，
+    // 用统一的时间范围前缀拼，不是写死"本周"，1月/1年档也要跟着变)，以及利率区块
+    // 标题旁的"政策利率"小标签
+    rateStatHighCaptionSuffix: '峰值',
+    rateStatLowCaptionSuffix: '谷值',
+    rateStatRateTag: '政策利率',
+    // B-10：仪表盘/统计页环状图中间的小字之前写死英文"Total Expenses"/"Total Income"，
+    // 不跟着语言切换。旧App对应的是typeExpense/typeIncome("支出构成"/"收入构成")这两个
+    // 词条——但新App自己的typeExpense/typeIncome已经被"记一笔"页面的收支切换按钮占用了
+    // (对应旧App的segExpense/segIncome，见文件顶部说明)，不能重名，这里另起donut专用的key
+    donutExpenseTitle: LEGACY_ZH.typeExpense,
+    donutIncomeTitle: LEGACY_ZH.typeIncome,
+
+    // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
+    menuAria: '菜单', // 新App专属(左上角抽屉导航按钮，旧App没有这个汉堡菜单)
+    backToDashboardAria: '返回仪表盘', // 新App专属(我的账户页左上角"小房子"按钮)
+    accountTitle: '我的账户', // 新App专属(旧App没有独立的"我的账户"页面，账户信息混在设置里)
+    rateNavLabel: '汇率换算', // 新App专属(旧App侧边栏/tab用词是"汇率"，新App这里是更完整的页面标题)
+    rateShortcutAria: '快捷跳转汇率换算', // 新App专属(R-20：仪表盘/明细/统计/我的账户页悬浮的汇率快捷入口按钮)
+    settingsTitle: LEGACY_ZH.settingsTitle,
+    aboutTitle: '关于', // 新App专属(旧App没有独立的"关于"页面)
+    calendarTitle: '日历', // 新App专属(R-34：抽屉入口标题+页面标题共用同一个key，跟settingsTitle/aboutTitle同样的模式)
+    historyCalendarEntryAria: '查看日历', // 新App专属(R-37：明细页顶部跳转日历页的入口按钮)
+    calendarModeToggleAria: '切换现金/积分显示模式', // 新App专属(日历页頭現金/積分切换按钮)
+    calendarTapHint: '点击上方日历格子可切换查看当日明细', // 新App专属(R-35)
+    calendarDailyDetailTitle: '当日明细', // 新App专属(R-35)
+    calendarEntryCountLabel: '{n}笔明细', // 新App专属(R-35，{n}用实际条数替换)
+    // R-34：日历格子空间很小，付与积分不能用pointsLabel(完整表单字段名"获得积分")拼在
+    // 数字后面，会溢出——照Stitch设计稿的"pt"短单位后缀，复用旧App本来就有的
+    // pointsBadgeUnit(legacy.ts)，之前没在dict.ts里暴露成TranslationKey
+    calendarPointsUnit: LEGACY_ZH.pointsBadgeUnit,
+    calendarHolidayLabel: '祝日', // 新App专属(R-38续：日历页节假日标红+详情卡片，沿用日语"祝日"这个词，不翻成"节假日"——这个App整体是日式记账本风格，zh/ja两个语言包里这个概念本来就统一用"祝日"这个词面，跟旧App闹钟功能"祝日不响"的用词一致)
+    // 诊断日志——为排查R-32真机扫描卡住问题新加，纯本地localStorage日志，方便
+    // 开发阶段真机排查用，不是给普通用户看的功能
+    debugLogRowLabel: '诊断日志',
+    debugLogTitle: '诊断日志',
+    debugLogEnableLabel: '记录日志',
+    debugLogActiveLabel: '实时捕获中',
+    debugLogPausedLabel: '已暂停',
+    debugLogCountLabel: '共{n}条',
+    debugLogClearLabel: '清空',
+    debugLogCopyLabel: '复制结果',
+    debugLogDownloadLabel: '下载',
+    debugLogEmptyHint: '暂无日志',
+    debugLogFilterAll: '全部',
+    debugLogFilter5m: '最近5分钟',
+    debugLogFilter30m: '最近30分钟',
+    debugLogFilter1h: '最近1小时',
+    debugLogFilterToday: '今天',
+    debugLogCopiedToast: '已复制到剪贴板',
+    debugLogRefreshAria: '刷新',
+    debugLogClearConfirm: '确定清空全部日志？此操作无法撤销。',
+    debugLogModuleAll: '全部',
+    debugLogModuleFilterLabel: '日志模块',
+    debugLogCaptureSettings: '记录设置',
+    debugLogCaptureSettingsHint: '选择需要记录的模块',
+    debugLogFilterSection: '筛选日志',
+    debugLogLevelFilterLabel: '日志级别',
+    debugLogTimeFilterLabel: '时间范围',
+    debugLogKeywordLabel: '关键词',
+    debugLogResultCount: '筛选结果 · {n} 条',
+    debugLogResetFilters: '重置筛选',
+    debugLogNoMatches: '没有符合条件的日志',
+    debugLogModuleRecurring: '固定收支',
+    debugLogModuleReceipt: '小票',
+    debugLogModuleOther: '其他',
+    debugLogLevelAll: '全部',
+    debugLogLevelInfo: '信息',
+    debugLogLevelWarn: '警告',
+    debugLogLevelError: '错误',
+    debugLogSearchPlaceholder: '搜索内容或字段',
+    debugLogClearModuleConfirm: '确定清空「{m}」的日志吗？此操作无法撤销。',
+    debugLogModuleSwitchAria: '{m}记录开关',
+    debugLogGroupCount: '{n}条',
+    // R-44：固定收支规则——设置页入口+规则列表/新建编辑表单
+    recurringRulesRowLabel: '固定收支',
+    recurringRulesTitle: '固定收支规则',
+    recurringRuleAddAria: '新建规则',
+    recurringRuleAddTitle: '新建规则',
+    recurringRuleEditTitle: '编辑规则',
+    recurringRuleEmptyState: '还没有固定收支规则，点右上角新建一条',
+    recurringRuleKindLabel: '重复方式',
+    recurringRuleKindDayOfMonth: '每月固定几号',
+    recurringRuleKindIntervalDays: '每隔N天',
+    recurringRuleDayOfMonthLabel: '每月几号',
+    recurringRuleLastDayOption: '月末最后一天',
+    recurringRuleBizDayAdjustLabel: '遇节假日',
+    recurringRuleBizDayAdjustNone: '不顺延',
+    recurringRuleBizDayAdjustBefore: '顺延到前一个工作日',
+    recurringRuleBizDayAdjustAfter: '顺延到后一个工作日',
+    recurringRuleAnchorDateLabel: '起始日期',
+    recurringRuleIntervalDaysLabel: '间隔天数',
+    recurringRuleIntervalDaysSuffix: '天一次',
+    recurringRuleEnabledLabel: '启用这条规则',
+    recurringRuleNextDateLabel: '下次预计',
+    recurringRuleSaveLabel: '保存规则',
+    recurringRuleDeleteConfirmTitle: '确定要删除这条规则吗？',
+    recurringRuleDeleteConfirmMessage: '删除后不会再按这条规则自动生成记录，已经生成过的历史记录不受影响。',
+    notSignedIn: '未登录', // 新App专属
+    swapCurrencyAria: '交换货币', // 新App专属(汇率换算页的"⇅"互换按钮)
+    rateResetAria: '清空金额并刷新汇率', // 新App专属，R-31(汇率换算页换算卡片右上角的重置按钮)
+    accountSignInHint: '登录后可以在多个设备间同步账本', // 新App专属，旧App对应的cloudSyncHelpText文案更长，这里是精简版
+    signInBtn: LEGACY_ZH.cloudSignInBtn,
+    signUpBtn: LEGACY_ZH.cloudSignUpBtn,
+    guestSignInWarning: '登录已有账号会切换到该账号，当前游客账本不会自动合并。需要保留游客账本时，请通过注册为它绑定邮箱。',
+    guestAccountUpgradeHint: '当前是游客账本。注册会为这份账本绑定邮箱，并保留原有数据。',
+    verifyGuestAccountSuffix: '，请输入验证码，完成游客账本的邮箱绑定',
+    signOutBtn: LEGACY_ZH.cloudSignOutBtn,
+    confirmSignOutTitle: '确定要退出登录吗？', // 新App专属(旧App退出登录没有二次确认弹窗)
+    confirmSignOutMessage: '退出登录后仍可以查看本机已缓存的账目，重新登录后会自动与云端同步。', // 新App专属
+    changeAvatarAria: '更换头像', // 新App专属(我的账户页头像右下角的编辑徽标)
+    changeAvatarTitle: '更换头像', // 新App专属，更换头像子页面标题
+    currentAvatarLabel: '当前使用', // 新App专属
+    choosePresetAvatarLabel: '选择一个预设头像', // 新App专属
+    chooseFromAlbumBtn: '从相册选择', // 新App专属(自定义头像上传，这一版先禁用占位)
+    chooseFromAlbumComingSoon: '即将推出', // 新App专属
+    cloudDisconnectBannerText: '登录已掉线，账目仍会正常保存', // 新App专属(照抄旧App B-02修复引入的掉线提示文案)
+    cloudReconnectBtn: '去登录', // 新App专属
+    cancelLabel: LEGACY_ZH.alarmTrimCancelBtn, // 通用"取消"，借用旧App裁剪铃声弹窗的取消按钮词条
+    deleteLabel: LEGACY_ZH.delete,
+    editLabel: LEGACY_ZH.edit,
+    copyLabel: LEGACY_ZH.copy,
+    // R-40：记账条目"查看详情"弹层——新App专属，旧App没有这个功能
+    entryDetailTitle: '详情',
+    entryDetailPaymentLabel: '支付方式',
+    entryDetailReceiptLabel: '凭证',
+    addLabel: '添加', // 新App专属(自定义细分/标签的新增按钮)
+    langLabel: LEGACY_ZH.langFieldLabel,
+    currencyRowLabel: '货币', // 新App专属，设置页这一行只放短标签(旧App对应的currencyFieldLabel是"本位货币（用于统计汇总）"这种带说明的长版本，跟这里单行列表的短标签风格不一致，没有直接复用)
+    themeLabel: LEGACY_ZH.themeSheetTitle,
+    aboutCopyright: '© 2026 PigBang', // 新App专属，关于页落款
+    confirmDeleteTitle: '确定要删除这条记录吗？', // 新App专属(旧App的deleteConfirm文案里带{info}记录摘要，这里是不带摘要的通用版)
+    confirmDeleteMessage: '删除后将无法恢复此条账单数据，您的账户余额将自动重新计算。', // 新App专属，比旧App的deleteConfirm多了"余额自动重新计算"这句提示
+    noRecordsThisMonth: '这个月还没有记录', // 新App专属(旧App对应的emptyChart文案是"这段时间还没有相关记录"，这里是仪表盘/统计页donut卡片用的月份限定版)
+    noPointsThisMonth: '这个月还没有积分记录', // 新App专属
+    noRecordsThisDay: '这天还没有记录', // 新App专属(趋势图点某天柱子后的明细区空状态)
+    prevMonthAria: '上个月', // 新App专属
+    nextMonthAria: '下个月', // 新App专属
+    prevPeriodAria: '上一段', // 新App专属(趋势图的上一段导航，"段"根据当前是按日/按月对应"上月/上年")
+    nextPeriodAria: '下一段', // 新App专属
+    closeAria: '关闭', // 新App专属(分类明细钻取sheet/趋势图明细面板的关闭按钮)
+    rangePickerTitle: '选择时间范围', // 新App专属(R-27自绘日历弹层标题)
+    rangePickerYearTitle: '选择年份', // 新App专属(R-27年份快速跳转页标题)
+    rangePickerMonthTitle: '选择年月', // 新App专属(R-27月份快速跳转页标题)
+    presetThisMonth: '本月', // 新App专属(R-27日历预设选项)
+    presetPastMonth: '过去一个月', // 新App专属(R-25要求的是"过去一个月"这种滚动30天区间，不是"上个月"整月)
+    presetPastYear: '过去一年', // 新App专属
+    confirmLabel: '确定', // 新App专属，通用"确定"按钮
+    statsTrendTitle: '收支趋势', // 新App专属(统计页收支栏趋势图标题，旧App没有单独抽出这个小标题)
+    statsTabMoney: LEGACY_ZH.statsTabMoney,
+    statsTabPoints: LEGACY_ZH.statsTabPoints,
+    pointsTrendTitle: LEGACY_ZH.pointsTrendTitle,
+    pointsDonutTitle: LEGACY_ZH.pointsDonutTitle,
+    pointsDimDay: LEGACY_ZH.pointsDimDay,
+    pointsDimMonth: LEGACY_ZH.pointsDimMonth,
+    newSubPlaceholder: LEGACY_ZH.newSubPlaceholder, // 概念对应(新增细分输入框占位文字)，措辞跟旧App"新中项目名称"沿用
+    newTagPlaceholder: LEGACY_ZH.newTagPlaceholder,
+    themeDefaultName: 'PigBang', // 新App专属(默认主题卡片名字，R-19：App名称确定沿用PigBang)
+    themeNostalgiaName: '怀旧', // 新App专属(R-14新增主题，颜色/背景改回旧App基本主题色调)
+    themeAutumnName: '红叶 · 丹枫金秋',
+    themeWinterName: '冬雪 · 暖金',
+    themeWinterSilverName: '冬雪 · 银灰',
+    themeSummerName: '夏 · 花火', // 旧App data-skin="summerB"同款名字直接搬(见index.html THEME_SKINS)
+    emailLabel: LEGACY_ZH.cloudEmailPlaceholder,
+    passwordLabel: LEGACY_ZH.cloudPasswordPlaceholder,
+    confirmPasswordLabel: '确认密码', // 新App专属(旧App注册没有"确认密码"这一栏，只有设置新密码一栏)
+    needEmailPasswordError: '请输入邮箱和密码', // 措辞跟旧App cloudNeedEmailPass的"请填写邮箱和密码"略有不同，同一概念
+    passwordMismatchError: '两次密码不一致', // 同旧App cloudPasswordMismatch概念("两次输入的密码不一致")，措辞更短
+    needVerifyCodeError: LEGACY_ZH.cloudVerifyNeedCode,
+    signInSubmitLoading: '登录中…', // 新App专属
+    noAccountText: '还没有账号？', // 呼应旧App goToSignUpBtn("没有账号？去注册")的前半句，新App拆成文字+独立链接两部分
+    goToSignUpLink: '去注册',
+    alreadyHaveAccountText: '已经有账号？', // 呼应旧App goToSignInBtn("已有账号？去登录")的前半句
+    goToSignInLink: '去登录',
+    backLabel: '返回', // 新App专属，通用"返回"文字按钮(主题子页面/注册验证码步骤)
+    signUpTagline: '开始记录你的生活', // 新App专属，注册页副标题
+    verifyTagline: '查收邮箱里的验证码', // 新App专属，验证码步骤副标题
+    signUpSubmitLoading: '注册中…', // 新App专属
+    signUpSubmitBtn: '创建账本', // 新App专属，比旧App的通用"注册"按钮更贴合"账本"这个概念
+    verifyEmailSentPrefix: '验证邮件已发送到', // 新App专属，和下面的verifyEmailSentSuffix中间插入{email}变量
+    verifyEmailSentSuffix: '，请输入验证码完成注册', // 新App专属
+    verifyCodePlaceholder: '验证码', // 新App专属，比旧App cloudVerifyCodePlaceholder的"6位验证码"更简短
+    verifySubmitLoading: '验证中…', // 新App专属
+    verifySubmitBtn: '验证并完成注册', // 新App专属(旧App cloudVerifyBtn是"验证并登录"，场景是登录不是注册，故未直接复用)
+    catalogLoadErrorHint: '分类数据加载失败，请检查网络后重试', // 新App专属(catalog请求失败时的兜底提示，避免转圈圈转个不停却没有任何反馈)
+    retryLabel: '重试', // 新App专属
+    dimCategoryOption: LEGACY_ZH.dimCategory,
+    tagOtherBucket: LEGACY_ZH.tagOtherBucket,
+    // R-XX：仪表盘"新建"+"汇率"合并成一个可拖拽的悬浮按钮，点开才展开成两个子按钮
+    mainFabAria: '快捷操作', // 收起态按钮本身的aria-label(展开后两个子按钮各自用
+    // addTitle/rateShortcutAria，不新造词)
+    historyClearSearchAria: '清空搜索', // 明细/出入金页面搜索框的清空按钮
+  },
+  ja: {
+    appTitle: 'PigBang',
+    tabDashboard: LEGACY_JA.tabLedger, // 用户明确要求用"家計簿"，正好是旧App记账tab的日文
+    tabHistory: LEGACY_JA.ledgerSectionTitle, // 旧App zh/ja都是"出入金"(中日通用汉字词，不是detailWord的"明細")
+    tabStats: LEGACY_JA.tabStats,
+    // B-31：同上zh块的说明——仪表盘卡片改用"累計"措辞，monthIncome/monthExpense
+    // 保留给统计页用，不能跟着改
+    balanceLabel: '累計残高',
+    rangeIncome: '累計収入',
+    rangeExpense: '累計支出',
+    monthIncome: LEGACY_JA.monthIncome,
+    monthExpense: LEGACY_JA.monthExpense,
+    recent: '最近の記録',
+    viewAll: 'すべて見る',
+    today: LEGACY_JA.today,
+    yesterday: LEGACY_JA.yesterday,
+    emptyLine1: LEGACY_JA.emptyLine1,
+    emptyLine2: LEGACY_JA.emptyLine2,
+    historySearchPlaceholder: LEGACY_JA.detailSearchPlaceholder,
+    filterAll: 'すべて',
+    filterExpense: LEGACY_JA.expenseWord,
+    filterIncome: LEGACY_JA.incomeWord,
+    startMonthLabel: '開始月',
+    endMonthLabel: '終了月',
+    historyNoResults: '条件に合う記録がありません',
+    addTitle: LEGACY_JA.sheetAddTitle,
+    editTitle: LEGACY_JA.editEntryTitle,
+    copyTitle: LEGACY_JA.copyEntryTitle,
+    typeExpense: LEGACY_JA.segExpense,
+    typeIncome: LEGACY_JA.segIncome,
+    amountLabel: LEGACY_JA.converterAmountFieldLabel,
+    categoryLabel: LEGACY_JA.catFieldLabel,
+    subcategoryLabel: LEGACY_JA.subFieldLabel,
+    methodLabel: LEGACY_JA.payFieldLabel,
+    dateLabel: '日付',
+    tagsLabel: LEGACY_JA.tagFieldLabel,
+    pointsLabel: LEGACY_JA.pointsFieldLabel,
+    memoLabel: 'メモ',
+    memoPlaceholder: LEGACY_JA.notePlaceholder,
+    saveEntry: LEGACY_JA.saveBtn,
+    // R-32：レシート扫描存档
+    receiptScanEntry: 'レシートをスキャン',
+    receiptReplace: '撮り直す',
+    receiptScanMore: '追加でスキャン',
+    receiptItemLabel: 'レシート',
+    receiptScanTitle: 'スキャン結果を確認',
+    receiptCapturedLabel: 'スキャン結果',
+    receiptRetakeAria: '撮り直す',
+    receiptPrivacyNote: '※ 撮影した元の写真自体は保存されません。トリミング・補正後のスキャン画像のみがPDFとして保存されます。',
+    receiptSaveAsPdf: 'PDFとして保存',
+    receiptRecognizing: 'レシートを読み取り中…',
+    receiptAiDiscount: '値引き',
+    receiptAiTax: '税額',
+    receiptAiPoints: '利用ポイント相当額',
+    receiptAiPayment: '支払方法',
+    receiptAiUnitPrice: '単価',
+    receiptAiQuantity: '数量',
+    receiptAiLineAmount: '金額',
+    receiptReviewRegion: 'レシートの読み取り内容',
+    receiptLocalResult: '端末の読み取り結果・要確認',
+    receiptReviewAmount: '記帳する金額',
+    receiptReviewDate: '購入日',
+    receiptNotePreview: 'メモに追加する内容',
+    receiptReviewInvalidAmount: '有効な金額を入力してください。小数点以下は2桁まで入力できます。',
+    receiptReviewInvalidDate: '有効な購入日を入力してください。',
+    receiptPointsEarned: '今回の獲得ポイント',
+    receiptPointsUsed: '利用ポイント',
+    receiptPointsDeduction: 'ポイント充当額',
+    receiptRulePoints: '支払方法による加算',
+    receiptPointsTotal: '獲得ポイント合計',
+    receiptPrintedTotal: 'レシートの合計（ポイント利用前）',
+    receiptPrintedNet: 'ポイント利用後の支払額',
+    receiptPointsNeedReview: 'ポイント充当額を確認できませんでした。レシートを確認し、記帳する金額を入力してください。',
+    receiptReviewInvalidPoints: '有効な整数のポイント数を入力してください。',
+    receiptAiRetry: 'AIで再読み取り',
+    receiptAiRecognizing: 'AIで読み取り中…',
+    receiptAiNotice: 'スキャン後、このレシート画像を自動でOpenAIへ送信して読み取ります。API料金が発生します。保存するPDFの画質は変わりません。',
+    receiptAiResult: 'AI読み取り結果・要確認',
+    receiptAiKeptLocal: 'AIで金額を確認できなかったため、端末で読み取った金額を保持しています。ご確認ください。',
+    receiptAiUnconfirmed: '未確認',
+    receiptAiReviewNote: '上の金額・購入日・メモを直接修正できます。PDF保存時に修正内容が反映され、再読み取りしても手入力した内容は保持されます。',
+    receiptAiCheckAmount: '金額または通貨を確認できませんでした。レシートを確認し、上の欄に正しい金額を入力してください。',
+    receiptAiNotAllowed: 'このアカウントではAI読み取りが有効になっていません。管理者にお問い合わせください。',
+    receiptAiNotConfigured: 'AI読み取りが未設定です。管理者にお問い合わせください。',
+    receiptAiRateLimited: 'AIの呼び出しが多すぎるか残高が不足しています。しばらくしてからお試しください。',
+    receiptAiTimeout: 'AI読み取りがタイムアウトしました。元の結果を保持しています。再度お試しください。',
+    receiptAiImageTooLarge: '画像が大きすぎます。トリミングして再度お試しください。',
+    receiptAiFailed: 'AI読み取りに失敗しました。元の結果を保持しています。通信状況をご確認のうえ再度お試しください。',
+
+    receiptFailedError: 'スキャンに失敗しました。もう一度お試しください',
+    receiptSaveFailed: '保存に失敗しました。もう一度お試しください',
+    entrySaveFailed: '保存に失敗しました。もう一度お試しください',
+    receiptImageLoadError: '画像の読み込みに失敗しました',
+    receiptViewAria: 'レシートを見る',
+    receiptRemoveAria: 'レシートを削除',
+    receiptUseGalleryInstead: 'アルバムから選択する',
+    receiptPreviewTitle: 'レシートプレビュー',
+    receiptOpenExternalLabel: 'ブラウザで開く',
+    receiptPickerTitle: 'レシートを選択',
+    rateUpdatedLabel: LEGACY_JA.rateUpdateLabel,
+    refreshRate: LEGACY_JA.refreshRate,
+    rateNeverFetched: LEGACY_JA.neverFetched,
+    rateLoading: LEGACY_JA.loadingRate,
+    rateSearchPlaceholder: '通貨を検索…',
+    ratePopularTitle: '人気の為替レート',
+    rateTrendLabel: '推移',
+    rateNoHistory: 'この期間のデータはありません',
+    rateTimeframe1W: '過去1週間',
+    rateTimeframe1M: '過去1か月',
+    rateTimeframe1Y: '過去1年',
+    rateStatsPrefix1W: '週間',
+    rateStatsPrefix1M: '月間',
+    rateStatsPrefix1Y: '年間',
+    rateStatHighSuffix: '最高値',
+    rateStatLowSuffix: '最安値',
+    rateStatRateLabel: '金利',
+    rateStatNoRateTarget: '金利目標なし',
+    rateStatHighCaptionSuffix: 'ピーク値',
+    rateStatLowCaptionSuffix: '底値',
+    rateStatRateTag: '政策金利',
+    donutExpenseTitle: LEGACY_JA.typeExpense,
+    donutIncomeTitle: LEGACY_JA.typeIncome,
+
+    // ↓↓↓ 下面是2026-08-18中日文混乱翻译校对新增的词条(见DEVLOG.md "翻译校对"一节)
+    menuAria: 'メニュー',
+    backToDashboardAria: 'ホームに戻る',
+    accountTitle: 'マイアカウント',
+    rateNavLabel: '為替換算',
+    rateShortcutAria: '為替換算へジャンプ',
+    settingsTitle: LEGACY_JA.settingsTitle,
+    aboutTitle: 'アプリについて',
+    calendarTitle: 'カレンダー',
+    historyCalendarEntryAria: 'カレンダーを見る',
+    calendarModeToggleAria: '現金/ポイント表示モードを切り替える',
+    calendarTapHint: '上のカレンダーをタップすると、その日の明細に切り替わります',
+    calendarDailyDetailTitle: '当日の明細',
+    calendarEntryCountLabel: '{n}件',
+    calendarPointsUnit: LEGACY_JA.pointsBadgeUnit,
+    calendarHolidayLabel: '祝日',
+    debugLogRowLabel: '診断ログ',
+    debugLogTitle: '診断ログ',
+    debugLogEnableLabel: 'ログを記録',
+    debugLogActiveLabel: '記録中',
+    debugLogPausedLabel: '一時停止中',
+    debugLogCountLabel: '計{n}件',
+    debugLogClearLabel: 'クリア',
+    debugLogCopyLabel: '結果をコピー',
+    debugLogDownloadLabel: 'ダウンロード',
+    debugLogEmptyHint: 'ログはまだありません',
+    debugLogFilterAll: 'すべて',
+    debugLogFilter5m: '直近5分',
+    debugLogFilter30m: '直近30分',
+    debugLogFilter1h: '直近1時間',
+    debugLogFilterToday: '今日',
+    debugLogCopiedToast: 'クリップボードにコピーしました',
+    debugLogRefreshAria: '更新',
+    debugLogClearConfirm: 'ログをすべてクリアしますか？元に戻せません。',
+    debugLogModuleAll: 'すべて',
+    debugLogModuleFilterLabel: 'ログモジュール',
+    debugLogCaptureSettings: '記録設定',
+    debugLogCaptureSettingsHint: '記録するモジュールを選択',
+    debugLogFilterSection: 'ログを絞り込む',
+    debugLogLevelFilterLabel: 'ログレベル',
+    debugLogTimeFilterLabel: '期間',
+    debugLogKeywordLabel: 'キーワード',
+    debugLogResultCount: '絞り込み結果 · {n}件',
+    debugLogResetFilters: '条件をリセット',
+    debugLogNoMatches: '条件に一致するログはありません',
+    debugLogModuleRecurring: '固定収支',
+    debugLogModuleReceipt: 'レシート',
+    debugLogModuleOther: 'その他',
+    debugLogLevelAll: 'すべて',
+    debugLogLevelInfo: '情報',
+    debugLogLevelWarn: '警告',
+    debugLogLevelError: 'エラー',
+    debugLogSearchPlaceholder: '内容・項目で検索',
+    debugLogClearModuleConfirm: '「{m}」のログを消去しますか？元に戻せません。',
+    debugLogModuleSwitchAria: '{m}の記録',
+    debugLogGroupCount: '{n}件',
+    // B-70続：「固定収支」「固定収支ルール」は直訳感が強いとユーザー指摘を受けて見直し
+    // ——マネーフォワードME公式ヘルプ(support.me.moneyforward.com)が同種機能を
+    // 「繰り返し入力」と呼んでいるのを確認、同じ語に揃えた(主要家計簿アプリの既存
+    // 用語に合わせる、独自に意訳しない)
+    recurringRulesRowLabel: '繰り返し入力',
+    recurringRulesTitle: '繰り返し入力',
+    recurringRuleAddAria: '繰り返し入力を追加',
+    recurringRuleAddTitle: '繰り返し入力を追加',
+    recurringRuleEditTitle: '繰り返し入力を編集',
+    recurringRuleEmptyState: '繰り返し入力はまだありません。右上の＋から追加できます',
+    recurringRuleKindLabel: '繰り返し方法',
+    recurringRuleKindDayOfMonth: '毎月指定日',
+    recurringRuleKindIntervalDays: 'N日ごと',
+    recurringRuleDayOfMonthLabel: '毎月の日付',
+    recurringRuleLastDayOption: '月末最終日',
+    recurringRuleBizDayAdjustLabel: '祝日の場合',
+    recurringRuleBizDayAdjustNone: 'そのまま',
+    recurringRuleBizDayAdjustBefore: '前営業日に繰上げ',
+    recurringRuleBizDayAdjustAfter: '翌営業日に繰下げ',
+    recurringRuleAnchorDateLabel: '起算日',
+    recurringRuleIntervalDaysLabel: '間隔日数',
+    recurringRuleIntervalDaysSuffix: '日ごと',
+    recurringRuleEnabledLabel: 'このルールを有効にする',
+    recurringRuleNextDateLabel: '次回予定',
+    recurringRuleSaveLabel: 'ルールを保存',
+    recurringRuleDeleteConfirmTitle: 'このルールを削除しますか？',
+    recurringRuleDeleteConfirmMessage: '削除後はこのルールによる自動記帳が行われなくなりますが、過去に生成された記録は削除されません。',
+    notSignedIn: '未ログイン',
+    swapCurrencyAria: '通貨を入れ替え',
+    rateResetAria: '金額をクリアしてレートを更新',
+    accountSignInHint: 'ログインすると複数の端末で家計簿を同期できます',
+    signInBtn: LEGACY_JA.cloudSignInBtn,
+    signUpBtn: LEGACY_JA.cloudSignUpBtn,
+    guestSignInWarning: '既存アカウントにログインするとアカウントが切り替わり、現在のゲスト家計簿は自動で統合されません。ゲスト家計簿を引き継ぐには、新規登録でメールアドレスを紐付けてください。',
+    guestAccountUpgradeHint: '現在はゲスト家計簿です。新規登録するとメールアドレスが紐付き、データもそのまま引き継がれます。',
+    verifyGuestAccountSuffix: ' 宛てに送信しました。確認コードを入力して、ゲスト家計簿へのメールアドレス紐付けを完了してください',
+    signOutBtn: LEGACY_JA.cloudSignOutBtn,
+    confirmSignOutTitle: 'ログアウトしますか？',
+    confirmSignOutMessage: 'ログアウト後もこの端末にキャッシュされた記録は引き続き閲覧できます。再ログインすると自動的にクラウドと同期されます。',
+    changeAvatarAria: 'アバターを変更',
+    changeAvatarTitle: 'アバターを変更',
+    currentAvatarLabel: '現在使用中',
+    choosePresetAvatarLabel: 'プリセットアバターを選択',
+    chooseFromAlbumBtn: 'アルバムから選択',
+    chooseFromAlbumComingSoon: '近日公開',
+    cloudDisconnectBannerText: 'ログインが切断されました。家計簿は引き続き保存されます',
+    cloudReconnectBtn: 'ログインへ',
+    cancelLabel: LEGACY_JA.alarmTrimCancelBtn,
+    deleteLabel: LEGACY_JA.delete,
+    editLabel: LEGACY_JA.edit,
+    copyLabel: LEGACY_JA.copy,
+    entryDetailTitle: '詳細',
+    entryDetailPaymentLabel: '支払い方法',
+    entryDetailReceiptLabel: 'レシート',
+    addLabel: '追加',
+    langLabel: LEGACY_JA.langFieldLabel,
+    currencyRowLabel: '通貨',
+    themeLabel: LEGACY_JA.themeSheetTitle,
+    aboutCopyright: '© 2026 PigBang',
+    confirmDeleteTitle: 'この記録を削除しますか？',
+    confirmDeleteMessage: '削除すると元に戻せません。アカウントの残高は自動的に再計算されます。',
+    noRecordsThisMonth: '今月はまだ記録がありません',
+    noPointsThisMonth: '今月はまだポイント記録がありません',
+    noRecordsThisDay: 'この日はまだ記録がありません',
+    prevMonthAria: '前の月',
+    nextMonthAria: '次の月',
+    prevPeriodAria: '前の期間',
+    nextPeriodAria: '次の期間',
+    closeAria: '閉じる',
+    rangePickerTitle: '期間を選択する',
+    rangePickerYearTitle: '年を選択',
+    rangePickerMonthTitle: '年月を選択',
+    presetThisMonth: '今月',
+    presetPastMonth: '過去1か月',
+    presetPastYear: '過去1年',
+    confirmLabel: '確定',
+    statsTrendTitle: '収支の推移',
+    statsTabMoney: LEGACY_JA.statsTabMoney,
+    statsTabPoints: LEGACY_JA.statsTabPoints,
+    pointsTrendTitle: LEGACY_JA.pointsTrendTitle,
+    pointsDonutTitle: LEGACY_JA.pointsDonutTitle,
+    pointsDimDay: LEGACY_JA.pointsDimDay,
+    pointsDimMonth: LEGACY_JA.pointsDimMonth,
+    newSubPlaceholder: LEGACY_JA.newSubPlaceholder,
+    newTagPlaceholder: LEGACY_JA.newTagPlaceholder,
+    themeDefaultName: 'PigBang',
+    themeNostalgiaName: 'レトロ',
+    themeAutumnName: '秋のもみじ',
+    themeWinterName: '雪あかり・金',
+    themeWinterSilverName: '雪あかり・銀',
+    themeSummerName: '夏の花火',
+    emailLabel: LEGACY_JA.cloudEmailPlaceholder,
+    passwordLabel: LEGACY_JA.cloudPasswordPlaceholder,
+    confirmPasswordLabel: 'パスワード（確認）',
+    needEmailPasswordError: LEGACY_JA.cloudNeedEmailPass,
+    passwordMismatchError: LEGACY_JA.cloudPasswordMismatch,
+    needVerifyCodeError: LEGACY_JA.cloudVerifyNeedCode,
+    signInSubmitLoading: 'ログイン中…',
+    noAccountText: 'アカウントをお持ちでないですか？',
+    goToSignUpLink: '新規登録',
+    alreadyHaveAccountText: 'すでにアカウントをお持ちですか？',
+    goToSignInLink: 'ログイン',
+    backLabel: '戻る',
+    signUpTagline: '毎日の暮らしを記録しよう',
+    verifyTagline: 'メールに届いた確認コードをご確認ください',
+    signUpSubmitLoading: '登録中…',
+    signUpSubmitBtn: 'アカウントを作成',
+    verifyEmailSentPrefix: '確認メールを',
+    verifyEmailSentSuffix: ' 宛てに送信しました。確認コードを入力して登録を完了してください',
+    verifyCodePlaceholder: '確認コード',
+    verifySubmitLoading: '確認中…',
+    verifySubmitBtn: '確認して登録を完了',
+    catalogLoadErrorHint: 'カテゴリデータの読み込みに失敗しました。ネットワークをご確認の上、再試行してください',
+    retryLabel: '再試行',
+    dimCategoryOption: LEGACY_JA.dimCategory,
+    tagOtherBucket: LEGACY_JA.tagOtherBucket,
+    mainFabAria: 'クイック操作',
+    historyClearSearchAria: '検索をクリア',
+  },
+} as const

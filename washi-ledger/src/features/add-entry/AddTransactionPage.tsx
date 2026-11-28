@@ -27,18 +27,11 @@ import { markStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
 import { consumeAddEntryOrigin } from '../../lib/addEntryOrigin'
 import { clearDetailSheetReturnMemory, updateDetailSheetReturnMemoryEntryId } from '../../lib/detailSheetReturnMemory'
 import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
+import { formatReceiptNote } from '../../lib/receiptReview'
+import { earnedPointsTotal, syncReceiptRuleNote } from '../../lib/receiptPoints'
 import { addToOutbox, flushOutbox, removeFromOutbox } from '../../lib/entryOutbox'
 import { logModule } from '../../lib/appLog'
-import type { Entry, EntryType } from '../../types'
-
-/** 扫描小票识别出的店名+购入明细拼成备注默认值——店名单独一行，商品列表每行前面
- * 加"・"项目符号，用户要求的"记得做排版"就是指这个，不是把识别出来的文本原样拼接 */
-function formatReceiptNote(fields: RecognizedReceiptFields): string {
-  const lines: string[] = []
-  if (fields.storeName) lines.push(fields.storeName)
-  for (const item of fields.items) lines.push(`・${item}`)
-  return lines.join('\n')
-}
+import type { Entry, EntryType, ReceiptDetails } from '../../types'
 
 function todayStr() {
   const d = new Date()
@@ -76,7 +69,9 @@ export function AddTransactionPage() {
   const [type, setType] = useState<EntryType>(() => initialSourceEntry?.type ?? 'expense')
   const [amount, setAmount] = useState(() => (initialSourceEntry ? String(initialSourceEntry.amount) : ''))
   // 每张小票按 ID 保存合计和凭证路径；删除凭证后用剩余小票重算。
-  const receiptsByIdRef = useRef(new Map<string, { path: string; amount: number | null }>())
+  const receiptsByIdRef = useRef(new Map<string, ReceiptDetails>(mode === 'edit' ? initialSourceEntry?.receiptDetails?.map(r => [r.receiptId, r]) : []))
+  const [receiptDetails, setReceiptDetails] = useState<ReceiptDetails[]>(() => mode === 'edit' ? initialSourceEntry?.receiptDetails ?? [] : [])
+  const receiptPointsNoteRef = useRef<string | null | undefined>(mode === 'edit' ? initialSourceEntry?.receiptPointsNote : undefined)
   // 用户触碰金额栏后重置自动汇总组；有手填内容时后续扫描不覆盖手填值。
   const amountWasManuallyEditedRef = useRef(false)
   const [catCode, setCatCode] = useState<string | null>(() => initialSourceEntry?.catCode ?? null)
@@ -150,6 +145,9 @@ export function AddTransactionPage() {
     setSourceEntry(src)
     setType(src.type)
     receiptsByIdRef.current.clear()
+    if (mode === 'edit') for (const receipt of src.receiptDetails ?? []) receiptsByIdRef.current.set(receipt.receiptId, receipt)
+    setReceiptDetails(mode === 'edit' ? src.receiptDetails ?? [] : [])
+    receiptPointsNoteRef.current = mode === 'edit' ? src.receiptPointsNote : undefined
     amountWasManuallyEditedRef.current = false
     setAmount(String(src.amount))
     setCatCode(src.catCode)
@@ -215,6 +213,7 @@ export function AddTransactionPage() {
     if (mode === 'add' && type !== 'expense' && receiptPaths.length > 0) {
       if (receiptsByIdRef.current.size && !amountWasManuallyEditedRef.current) setAmount('')
       receiptsByIdRef.current.clear()
+      setReceiptDetails([])
       setReceiptPaths([])
     }
   }, [type, mode, receiptPaths])
@@ -224,13 +223,17 @@ export function AddTransactionPage() {
     if (type !== 'expense' || !payCode || !catalog) return
     const amt = parseFloat(amount)
     const rate = resolvePointRate(catalog.pointRules, catalog.paymentMethods, payCode, date || todayStr())
-    if (rate == null || isNaN(amt) || amt <= 0) {
-      setPoints('')
-      return
-    }
-    setPoints(String(Math.floor(amt * rate)))
+    const receiptEarned = receiptDetails.reduce((sum, receipt) => sum + (receipt.pointsEarned ?? 0), 0)
+    const totals = earnedPointsTotal(receiptEarned, amt, rate)
+    setPoints(rate == null && !receiptEarned || !Number.isFinite(amt) && !receiptEarned ? '' : String(totals.total))
+    const hasPointInfo = receiptDetails.some(r => r.pointsEarned != null || r.pointsUsed != null || r.pointsUsedAmount != null)
+    const next = receiptDetails.length && (hasPointInfo || rate != null) ? `${t('receiptRulePoints')}: ${totals.payment}P\n${t('receiptPointsTotal')}: ${totals.total}P` : null
+    const previous = receiptPointsNoteRef.current
+    setNote(current => syncReceiptRuleNote(current, previous, next).note)
+    // Marker ownership is checked again on the next synchronization/save, so manual edits win.
+    if (previous !== null) receiptPointsNoteRef.current = next ?? undefined
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, payCode, date, type])
+  }, [amount, payCode, date, type, receiptDetails])
 
   function touchAmount(v: string) {
     pointsArmed.current = true
@@ -256,6 +259,22 @@ export function AddTransactionPage() {
   function touchPayCode(code: string) {
     pointsArmed.current = true
     setPayCode(code)
+  }
+
+  function previewReceiptPoints(fields: RecognizedReceiptFields): string | null {
+    if (!catalog || !payCode) return null
+    const existing = Array.from(receiptsByIdRef.current.values()).filter(r => r.receiptId !== fields.receiptId)
+    const earned = existing.reduce((sum, r) => sum + (r.pointsEarned ?? 0), 0) + (fields.pointsEarned ?? 0)
+    const hasInfo = [...existing, fields].some(r => r.pointsEarned != null || r.pointsUsed != null || r.pointsUsedAmount != null)
+    const effectiveDate = fields.reviewEdits?.date || !receiptDateLockedRef.current ? fields.date || date : date
+    const rate = resolvePointRate(catalog.pointRules, catalog.paymentMethods, payCode, effectiveDate || todayStr())
+    if (!hasInfo && rate == null) return null
+    const values = [...existing.map(r => r.amount), fields.amount]
+    const total = amountWasManuallyEditedRef.current && !fields.reviewEdits?.amount ? parseFloat(amount)
+      : values.every(v => v != null) ? values.reduce<number>((sum, v) => sum + (v ?? 0), 0)
+        : mode === 'edit' && !fields.amountNeedsReview && !fields.reviewEdits?.amount ? sourceEntry?.amount ?? NaN : NaN
+    const totals = earnedPointsTotal(earned, total, rate)
+    return `${t('receiptRulePoints')}: ${totals.payment}P\n${t('receiptPointsTotal')}: ${totals.total}P`
   }
   function touchDate(v: string) {
     pointsArmed.current = true
@@ -287,6 +306,8 @@ export function AddTransactionPage() {
       recurringId: base?.recurringId ?? null,
       createdAt: base?.createdAt ?? Date.now(),
       receiptPaths,
+      receiptDetails,
+      receiptPointsNote: receiptPointsNoteRef.current && !note.split('\n\n').includes(receiptPointsNoteRef.current) ? null : receiptPointsNoteRef.current,
     }
     if (savingRef.current) return
     savingRef.current = true
@@ -348,18 +369,32 @@ export function AddTransactionPage() {
       const path = await uploadReceiptPdf(user.id, entryId, pdf)
       setReceiptPaths((prev) => [...prev, path])
       setScanSheetOpen(false)
-      if (fields.date && !receiptDateLockedRef.current) {
+      if (fields.reviewEdits?.date || fields.date && !receiptDateLockedRef.current) {
         receiptDateLockedRef.current = true
-        setDate(fields.date)
+        setDate(fields.date ?? '')
       }
-      receiptsByIdRef.current.set(fields.receiptId, { path, amount: fields.amount })
-      updateReceiptAmount()
+      const formatted = formatReceiptNote(fields)
+      receiptsByIdRef.current.set(fields.receiptId, { receiptId: fields.receiptId, path, amount: fields.amount,
+        printedAmount: fields.printedAmount ?? fields.amount, amountBasis: fields.amountBasis ?? 'before_points',
+        pointsEarned: fields.pointsEarned ?? null, pointsUsed: fields.pointsUsed ?? null, pointsUsedAmount: fields.pointsUsedAmount ?? null,
+        noteText: fields.receiptPointsNote ? syncReceiptRuleNote(formatted, fields.receiptPointsNote, null).note : formatted })
+      pointsArmed.current = true
+      setReceiptDetails(Array.from(receiptsByIdRef.current.values()))
+      if (fields.reviewEdits?.amount) amountWasManuallyEditedRef.current = false
+      if ((fields.reviewEdits?.amount || fields.amountNeedsReview && !amountWasManuallyEditedRef.current) && fields.amount == null) setAmount('')
+      else updateReceiptAmount()
       logModule('receipt', `小票金额汇总 receiptId=${fields.receiptId}: 本张合計=${fields.amount ?? '未确认'}, 小票数=${receiptsByIdRef.current.size}`)
       // 备注按张追加到已有内容之后。
-      const formatted = formatReceiptNote(fields)
+      const previousRule = receiptPointsNoteRef.current
+      receiptPointsNoteRef.current = fields.receiptPointsNote
       if (formatted) {
-        setNote((prev) => (prev.trim() ? `${prev.trimEnd()}\n\n${formatted}` : formatted))
+        setNote(prev => {
+          const base = previousRule ? syncReceiptRuleNote(prev, previousRule, null).note : prev
+          return base.trim() ? `${base.trimEnd()}\n\n${formatted}` : formatted
+        })
         logModule('receipt', `小票备注追加: receiptId=${fields.receiptId}, ${formatted.split('\n').length}行`)
+      } else if (previousRule) {
+        setNote(prev => syncReceiptRuleNote(prev, previousRule, null).note)
       }
       return true
     } catch (e) {
@@ -380,6 +415,9 @@ export function AddTransactionPage() {
       for (const [id, receipt] of receiptsByIdRef.current) {
         if (receipt.path !== path) continue
         receiptsByIdRef.current.delete(id)
+        setReceiptDetails(Array.from(receiptsByIdRef.current.values()))
+        if (receipt.noteText) setNote(current => syncReceiptRuleNote(current, receipt.noteText, null).note)
+        pointsArmed.current = true
         updateReceiptAmount()
         break
       }
@@ -677,6 +715,7 @@ export function AddTransactionPage() {
         entryDate={date || todayStr()}
         onClose={() => setScanSheetOpen(false)}
         onConfirm={handleReceiptConfirm}
+        pointsNote={previewReceiptPoints}
       />
       <ReceiptPreviewSheet
         open={receiptPreviewOpen}

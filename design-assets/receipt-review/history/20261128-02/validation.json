@@ -1,0 +1,186 @@
+{
+  "date": "2026-11-28",
+  "timezone": "Asia/Tokyo",
+  "version": "1.0.0-20261128-dev.2",
+  "status": "local-complete-awaiting-release",
+  "node": {
+    "failed": 0,
+    "passed": 124
+  },
+  "browser": {
+    "passed": 38,
+    "failed": 0,
+    "results": [
+      {
+        "name": "priced full note preview and editable confirmation: /add",
+        "result": "passed"
+      },
+      {
+        "name": "priced full note preview and editable confirmation: /add?editId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "priced full note preview and editable confirmation: /add?copyId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "edits during AI survive late AI, local OCR, and same-image retry",
+        "result": "passed"
+      },
+      {
+        "name": "retry updates untouched amount while preserving edited note",
+        "result": "passed"
+      },
+      {
+        "name": "manual clear stays empty and explicit review edit outranks earlier main-form input",
+        "result": "passed"
+      },
+      {
+        "name": "invalid draft blocks save; upload failure retains edits for retry",
+        "result": "passed"
+      },
+      {
+        "name": "AI failure exposes editable native fallback and retake resets previous edits",
+        "result": "passed"
+      },
+      {
+        "name": "Japanese editable preview remains readable at320/390px",
+        "result": "passed"
+      },
+      {
+        "name": "1000-100=900,17+9=26; payment and date switches: /add",
+        "result": "passed"
+      },
+      {
+        "name": "1000-100=900,17+9=26; payment and date switches: /add?editId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "1000-100=900,17+9=26; payment and date switches: /add?copyId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "already-net amount900 is not reduced to800",
+        "result": "passed"
+      },
+      {
+        "name": "campaign and balance points never count or reduce the charge",
+        "result": "passed"
+      },
+      {
+        "name": "editable receipt points update net amount and survive AI retry",
+        "result": "passed"
+      },
+      {
+        "name": "multiple receipts sum once; deleting one recomputes amount and earned points",
+        "result": "passed"
+      },
+      {
+        "name": "save and reopen preserves receipt17 separately from payment9",
+        "result": "passed"
+      },
+      {
+        "name": "unknown redemption value stays unconfirmed until manually corrected",
+        "result": "passed"
+      },
+      {
+        "name": "user can detach a generated payment note without losing numeric point calculation",
+        "result": "passed"
+      },
+      {
+        "name": "AI 258 fills actual entry form: /add",
+        "result": "passed"
+      },
+      {
+        "name": "AI 258 fills actual entry form: /add?editId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "AI 258 fills actual entry form: /add?copyId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "AI error retains native fields and explains missing configuration",
+        "result": "passed"
+      },
+      {
+        "name": "double click makes one call and save waits while AI is running",
+        "result": "passed"
+      },
+      {
+        "name": "close and retake discard late AI responses",
+        "result": "passed"
+      },
+      {
+        "name": "Japanese AI UI, mobile width, and unchanged PDF canvas dimensions",
+        "result": "passed"
+      },
+      {
+        "name": "AI null cannot erase a confirmed local 1531 total",
+        "result": "passed"
+      },
+      {
+        "name": "response from different receipt ID is rejected and native result retained",
+        "result": "passed"
+      },
+      {
+        "name": "failed automatic attempt retries same image without deleting or rescanning",
+        "result": "passed"
+      },
+      {
+        "name": "automatic AI does not overwrite manually entered amount and date",
+        "result": "passed"
+      },
+      {
+        "name": "ML Kit autofill, manual values and multiple receipts: /add",
+        "result": "passed"
+      },
+      {
+        "name": "ML Kit autofill, manual values and multiple receipts: /add?editId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "ML Kit autofill, manual values and multiple receipts: /add?copyId=receipt-source",
+        "result": "passed"
+      },
+      {
+        "name": "ML Kit failure uses same image Vision fallback",
+        "result": "passed"
+      },
+      {
+        "name": "no confirmed total restores original edit amount",
+        "result": "passed"
+      },
+      {
+        "name": "saving waits past five seconds for OCR and disables retake",
+        "result": "passed"
+      },
+      {
+        "name": "close and retake discard late OCR from earlier scan",
+        "result": "passed"
+      },
+      {
+        "name": "upload failure keeps preview and retry adds receipt only once (Japanese)",
+        "result": "passed"
+      }
+    ]
+  },
+  "appBuild": "passed",
+  "lint": "passed with 6 existing warnings",
+  "workerTypecheck": "passed",
+  "workerDryRun": "passed",
+  "gitDiffCheck": "passed",
+  "realModelCalls": 0,
+  "liveAccountWrites": 0,
+  "deployed": false,
+  "pushed": false,
+  "newIpa": false,
+  "sheet": {
+    "requirement": "R-60",
+    "range": "需求!A60:H60",
+    "status": "处理中",
+    "nativeVisual": "unavailable: browser requires Google sign-in; values and format verified through connector",
+    "exactValuesReadBack": true,
+    "wrapVerified": true
+  }
+}

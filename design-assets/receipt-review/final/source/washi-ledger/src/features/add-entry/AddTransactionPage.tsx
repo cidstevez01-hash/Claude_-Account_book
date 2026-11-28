@@ -1,0 +1,749 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useAppNavigate } from '../../hooks/useAppNavigate'
+import { CategoryPicker } from './CategoryPicker'
+import { TagPicker } from './TagPicker'
+import { ReceiptScanSheet } from './ReceiptScanSheet'
+import { PaymentMethodIcon } from '../transactions/PaymentMethodIcon'
+import { CatalogLoadState } from '../../design-system/components/CatalogLoadState'
+import { ThemeIcon } from '../../design-system/components/ThemeIcon'
+import { RouteFade } from '../../design-system/components/RouteFade'
+import { AutumnLeaves } from '../../design-system/components/AutumnLeaves'
+import { useAuth } from '../auth/useAuth'
+import { useCatalog } from '../../hooks/useCatalog'
+import { useEntries } from '../../hooks/useEntries'
+import { useSettings } from '../../hooks/useSettings'
+import { upsertEntry, resolvePointRate } from '../../data/catalog'
+import { upsertCachedEntry } from '../../lib/entriesCache'
+import { uploadReceiptPdf, deleteReceiptPdf, getReceiptSignedUrl } from '../../data/receiptStorage'
+import { openReceiptDocumentNative } from '../../lib/receiptViewer'
+import { ReceiptPreviewSheet } from '../ledger/ReceiptPreviewSheet'
+import { symbolFor } from '../../data/currencyDisplay'
+import { useI18n } from '../../lib/i18n'
+import { payLabel } from '../../lib/catalogLabel'
+import { setDashboardFocusEntryId } from '../../lib/dashboardFocusMemory'
+import { setHistoryFocusEntryId } from '../../lib/historyFocusMemory'
+import { markStatsNeedsRefresh } from '../../lib/statsRefreshSignal'
+import { consumeAddEntryOrigin } from '../../lib/addEntryOrigin'
+import { clearDetailSheetReturnMemory, updateDetailSheetReturnMemoryEntryId } from '../../lib/detailSheetReturnMemory'
+import type { RecognizedReceiptFields } from '../../lib/receiptFieldExtract'
+import { formatReceiptNote } from '../../lib/receiptReview'
+import { earnedPointsTotal, syncReceiptRuleNote } from '../../lib/receiptPoints'
+import { addToOutbox, flushOutbox, removeFromOutbox } from '../../lib/entryOutbox'
+import { logModule } from '../../lib/appLog'
+import type { Entry, EntryType, ReceiptDetails } from '../../types'
+
+function todayStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/** 记一笔——照design-assets-v2/_21(功能全开版)做布局，表单字段的默认值/联动规则
+ * (积分自动计算、切收入清空积分、编辑复制锁定收支类型等)照旧仓库index.html里
+ * 记账表单的真实逻辑搬过来，不是照Stitch静态稿猜的。自定义细分(CategoryPicker)/
+ * 标签(TagPicker)的内联新增改名删除也已经接上了，逻辑照旧App renderSubGrid/
+ * renderTagGrid的"⋯"菜单搬。 */
+export function AddTransactionPage() {
+  const { t, lang } = useI18n()
+  const navigate = useAppNavigate()
+  const [searchParams] = useSearchParams()
+  const editId = searchParams.get('editId')
+  const copyId = searchParams.get('copyId')
+  const sourceId = editId || copyId
+  const mode: 'add' | 'edit' | 'copy' = editId ? 'edit' : copyId ? 'copy' : 'add'
+  const typeLocked = mode !== 'add' // 编辑/复制都锁定收支类型，照旧App的setTypeSegmentLocked(true)
+
+  const { user } = useAuth()
+  const { catalog, loading: catalogLoading, reload: reloadCatalog } = useCatalog()
+  const { entries } = useEntries(user?.id ?? null)
+  const { settings } = useSettings()
+
+  // entries的初始值来自useEntries里loadCachedEntries()的同步本地缓存读取，不是异步
+  // 请求——从列表页点编辑/复制进来时，这条记录早就在缓存里了，能在首次渲染就同步
+  // 找到，直接拿去给下面每个useState做初始值。不再是"先渲染一遍空表单，effect里
+  // 再补填"，避免用户看到表单先闪一下空白/默认值、再"跳"到真实内容这个可见跳变
+  // (2026-08-23真机反馈发现的——B-06那次只修了"填进去又被覆盖"，没解决"填之前
+  // 会先闪一下"这个更早的问题)
+  const initialSourceEntry = sourceId ? (entries.find((e) => e.id === sourceId) ?? null) : null
+
+  const [type, setType] = useState<EntryType>(() => initialSourceEntry?.type ?? 'expense')
+  const [amount, setAmount] = useState(() => (initialSourceEntry ? String(initialSourceEntry.amount) : ''))
+  // 每张小票按 ID 保存合计和凭证路径；删除凭证后用剩余小票重算。
+  const receiptsByIdRef = useRef(new Map<string, ReceiptDetails>(mode === 'edit' ? initialSourceEntry?.receiptDetails?.map(r => [r.receiptId, r]) : []))
+  const [receiptDetails, setReceiptDetails] = useState<ReceiptDetails[]>(() => mode === 'edit' ? initialSourceEntry?.receiptDetails ?? [] : [])
+  const receiptPointsNoteRef = useRef<string | null | undefined>(mode === 'edit' ? initialSourceEntry?.receiptPointsNote : undefined)
+  // 用户触碰金额栏后重置自动汇总组；有手填内容时后续扫描不覆盖手填值。
+  const amountWasManuallyEditedRef = useRef(false)
+  const [catCode, setCatCode] = useState<string | null>(() => initialSourceEntry?.catCode ?? null)
+  const [subCode, setSubCode] = useState<string | null>(() => initialSourceEntry?.subCode ?? null)
+  const [payCode, setPayCode] = useState<string | null>(() => initialSourceEntry?.paymentMethod ?? null)
+  const [date, setDate] = useState(() =>
+    initialSourceEntry ? (mode === 'copy' ? todayStr() : initialSourceEntry.date) : todayStr()
+  )
+  // 同一笔记录只自动采用第一个明确的票面日期，手选日期始终优先。
+  const receiptDateLockedRef = useRef(false)
+  const [tagCode, setTagCode] = useState<string | null>(() => initialSourceEntry?.tagCode ?? null)
+  const [points, setPoints] = useState(() => (initialSourceEntry?.points != null ? String(initialSourceEntry.points) : ''))
+  const [note, setNote] = useState(() => initialSourceEntry?.note ?? '')
+  const [sourceEntry, setSourceEntry] = useState<Entry | null>(() => initialSourceEntry)
+  const [prefilled, setPrefilled] = useState(() => mode === 'add' || initialSourceEntry != null)
+  // B-64：textarea本身不会跟着内容自动变高(min-height只是下限，不是自动增长)，
+  // 固定h-32装不下OCR识别出的多行小票备注；改成随内容实时测scrollHeight调整
+  // style.height，封顶MEMO_MAX_HEIGHT_PX，超过才在内部滚动，而不是让整页无限变高
+  const noteRef = useRef<HTMLTextAreaElement>(null)
+  const MEMO_MAX_HEIGHT_PX = 224
+  useEffect(() => {
+    const el = noteRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, MEMO_MAX_HEIGHT_PX)}px`
+  }, [note])
+
+  // R-32→R-41：レシート扫描存档——receiptPaths是Supabase Storage里的对象路径数组，
+  // 空数组表示这条记录还没有凭证。复制模式(copy)故意不继承来源记录的凭证
+  // (base?.receiptPaths)——复制出来的是一笔新的独立交易，原来那些レシート对应的是
+  // 被复制的那一笔，不该被两条记录共享同一份凭证；编辑模式(edit)才带出原有凭证，
+  // 允许查看/追加/移除。newEntryId：新建/复制模式下这条记录的id要在保存前就先确定
+  // 下来(不是等handleSave才生成)，因为上传凭证到Storage需要用entryId拼文件路径，
+  // 扫描这个动作在保存之前就可能发生
+  const [newEntryId] = useState(() => `${Date.now()}${Math.random().toString(16).slice(2)}`)
+  const entryId = mode === 'edit' && sourceEntry ? sourceEntry.id : newEntryId
+  const [receiptPaths, setReceiptPaths] = useState<string[]>(() =>
+    mode === 'edit' ? (initialSourceEntry?.receiptPaths ?? []) : []
+  )
+  const [scanSheetOpen, setScanSheetOpen] = useState(false)
+  const [receiptBusy, setReceiptBusy] = useState(false)
+  // 保存防重复：savingRef是真正的开关(快速连点时state还没更新，挡不住)，saving只负责禁用按钮和转圈
+  const savingRef = useRef(false)
+  const [saving, setSaving] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
+  // 小票删除同样用ref挡双击：receiptBusy是state，快速连点时还没更新
+  const receiptRemovingRef = useRef(false)
+  // 上次保存超时或页面被切走时，结果可能已经写进了服务器，这里把待确认的记录重新提交一次(同一个id，后端去重)
+  useEffect(() => {
+    if (user) void flushOutbox(user.id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
+  // B-XX：查看凭证之前直接window.open(url,'_blank')外跳系统浏览器，这个坑
+  // EntryCard.tsx早就踩过修过(原生优先调QuickLook，web端才兜底用这套HTML弹层)，
+  // 这个页面自己的查看按钮当时没跟着一起改，见下面handleReceiptView说明
+  const [receiptPreviewOpen, setReceiptPreviewOpen] = useState(false)
+  const [receiptPreviewUrl, setReceiptPreviewUrl] = useState<string | null>(null)
+
+  // 积分自动计算只在用户真正改过金额/支付方式/日期之后才触发，预填表单(编辑/复制)时
+  // 不能被这个effect覆盖掉原本保存的积分值——照旧App"程序赋值不触发input/change事件、
+  // 只有真实用户操作才会重算"的行为
+  const pointsArmed = useRef(mode === 'add')
+
+  // 兜底：极少数情况下(比如直接深链接打开编辑页，entries本地缓存还没来得及有这条数据)
+  // 首次渲染时在entries里找不到，等entries真正拉到之后再补填一次——正常"从列表页点
+  // 编辑/复制进来"这条最常见路径走的是上面的同步初始值，不会经过这个effect
+  useEffect(() => {
+    if (prefilled || !sourceId) return
+    const src = entries.find((e) => e.id === sourceId)
+    if (!src) return
+    setSourceEntry(src)
+    setType(src.type)
+    receiptsByIdRef.current.clear()
+    if (mode === 'edit') for (const receipt of src.receiptDetails ?? []) receiptsByIdRef.current.set(receipt.receiptId, receipt)
+    setReceiptDetails(mode === 'edit' ? src.receiptDetails ?? [] : [])
+    receiptPointsNoteRef.current = mode === 'edit' ? src.receiptPointsNote : undefined
+    amountWasManuallyEditedRef.current = false
+    setAmount(String(src.amount))
+    setCatCode(src.catCode)
+    setSubCode(src.subCode)
+    setPayCode(src.paymentMethod)
+    if (!receiptDateLockedRef.current) setDate(mode === 'copy' ? todayStr() : src.date)
+    setTagCode(src.tagCode)
+    setPoints(src.points != null ? String(src.points) : '')
+    setNote(src.note ?? '')
+    if (mode === 'edit') setReceiptPaths(src.receiptPaths)
+    setPrefilled(true)
+  }, [entries, sourceId, prefilled, mode])
+
+  const categories = useMemo(
+    () => (catalog ? (type === 'expense' ? catalog.expenseCategories : catalog.incomeCategories) : []),
+    [catalog, type]
+  )
+  const tags = useMemo(
+    () => (catalog ? (type === 'expense' ? catalog.expenseTags : catalog.incomeTags) : []),
+    [catalog, type]
+  )
+  const paymentMethods = catalog?.paymentMethods ?? []
+
+  // 分类默认值——新记录/切换收支类型后，若当前catCode不在新的分类列表里，兜底选第一个。
+  // !prefilled时直接跳过：编辑/复制模式下，这个effect和上面的预填effect在同一次
+  // commit里都会跑，但各自读到的还是没更新前的旧闭包值(setState要等下一轮渲染才生效)，
+  // 如果不加这个判断，这里会用"还没被预填更新"的catCode(还是初始的null)误判成
+  // "没选分类"，把预填的src.catCode又覆盖回categories[0]——这正是B-06的真实原因，
+  // 分类/子分类/支付方式编辑时都记不住就是被这几个"默认值兜底"effect覆盖掉的
+  useEffect(() => {
+    if (!prefilled) return
+    if (categories.length === 0) return
+    if (!catCode || !categories.find((c) => c.code === catCode)) {
+      setCatCode(categories[0].code)
+      // 同上面onSelectCat：默认落到第一个分类时也要默认选中它的第一个子分类
+      setSubCode(categories[0].subs[0]?.code ?? null)
+    }
+  }, [categories, catCode, prefilled])
+
+  // 标签不属于当前收支类型时清空(比如编辑数据切了类型这种边界情况)
+  useEffect(() => {
+    if (tagCode && !tags.find((tg) => tg.code === tagCode)) setTagCode(null)
+  }, [tags, tagCode])
+
+  // 同上一个分类兜底effect的道理——!prefilled时跳过，避免编辑/复制模式下用没更新前的
+  // 旧payCode(初始值null)误判成"没选支付方式"，把预填的src.paymentMethod覆盖掉
+  useEffect(() => {
+    if (!prefilled) return
+    if (payCode || paymentMethods.length === 0) return
+    setPayCode(paymentMethods[0].code)
+  }, [paymentMethods, payCode, prefilled])
+
+  // 收入没有积分这个概念，切收入时清空——照旧App updatePointsFieldVisibility()
+  useEffect(() => {
+    if (type === 'income') setPoints('')
+  }, [type])
+
+  // R-32：レシート只针对支出——新建模式下(编辑/复制typeLocked=true，切不了类型，
+  // 不会走到这里)如果先在支出页签扫描存了凭证，又切到収入页签，不能让这些隐藏起来
+  // 的receiptPaths被悄悄带着存进收入记录里；不去删Storage里已经传上去的文件(留成
+  // 孤儿文件，跟放弃整个新建流程不保存时是同一种可接受的取舍)，只清本地状态
+  useEffect(() => {
+    if (mode === 'add' && type !== 'expense' && receiptPaths.length > 0) {
+      if (receiptsByIdRef.current.size && !amountWasManuallyEditedRef.current) setAmount('')
+      receiptsByIdRef.current.clear()
+      setReceiptDetails([])
+      setReceiptPaths([])
+    }
+  }, [type, mode, receiptPaths])
+
+  useEffect(() => {
+    if (!pointsArmed.current) return
+    if (type !== 'expense' || !payCode || !catalog) return
+    const amt = parseFloat(amount)
+    const rate = resolvePointRate(catalog.pointRules, catalog.paymentMethods, payCode, date || todayStr())
+    const receiptEarned = receiptDetails.reduce((sum, receipt) => sum + (receipt.pointsEarned ?? 0), 0)
+    const totals = earnedPointsTotal(receiptEarned, amt, rate)
+    setPoints(rate == null && !receiptEarned || !Number.isFinite(amt) && !receiptEarned ? '' : String(totals.total))
+    const hasPointInfo = receiptDetails.some(r => r.pointsEarned != null || r.pointsUsed != null || r.pointsUsedAmount != null)
+    const next = receiptDetails.length && (hasPointInfo || rate != null) ? `${t('receiptRulePoints')}: ${totals.payment}P\n${t('receiptPointsTotal')}: ${totals.total}P` : null
+    const previous = receiptPointsNoteRef.current
+    setNote(current => syncReceiptRuleNote(current, previous, next).note)
+    // Marker ownership is checked again on the next synchronization/save, so manual edits win.
+    if (previous !== null) receiptPointsNoteRef.current = next ?? undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount, payCode, date, type, receiptDetails])
+
+  function touchAmount(v: string) {
+    pointsArmed.current = true
+    const hasManualValue = v.trim().length > 0
+    amountWasManuallyEditedRef.current = hasManualValue
+    setAmount(v)
+  }
+  function updateReceiptAmount() {
+    if (amountWasManuallyEditedRef.current) return
+    const amounts = Array.from(receiptsByIdRef.current.values(), (receipt) => receipt.amount)
+    if (mode === 'edit') {
+      // 新扫描缺少任一金额，或扫描凭证已全部移除时，恢复原账目金额。
+      if (!amounts.length || amounts.some((value) => value == null)) {
+        setAmount(sourceEntry ? String(sourceEntry.amount) : '')
+        return
+      }
+    }
+    // 有任一张金额待确认时，金额栏留空，避免把部分小票的和当成整笔支出。
+    const total = amounts.length && amounts.every((value) => value != null)
+      ? String(amounts.reduce((sum, value) => sum + value, 0)) : ''
+    setAmount(total)
+  }
+  function touchPayCode(code: string) {
+    pointsArmed.current = true
+    setPayCode(code)
+  }
+
+  function previewReceiptPoints(fields: RecognizedReceiptFields): string | null {
+    if (!catalog || !payCode) return null
+    const existing = Array.from(receiptsByIdRef.current.values()).filter(r => r.receiptId !== fields.receiptId)
+    const earned = existing.reduce((sum, r) => sum + (r.pointsEarned ?? 0), 0) + (fields.pointsEarned ?? 0)
+    const hasInfo = [...existing, fields].some(r => r.pointsEarned != null || r.pointsUsed != null || r.pointsUsedAmount != null)
+    const effectiveDate = fields.reviewEdits?.date || !receiptDateLockedRef.current ? fields.date || date : date
+    const rate = resolvePointRate(catalog.pointRules, catalog.paymentMethods, payCode, effectiveDate || todayStr())
+    if (!hasInfo && rate == null) return null
+    const values = [...existing.map(r => r.amount), fields.amount]
+    const total = amountWasManuallyEditedRef.current && !fields.reviewEdits?.amount ? parseFloat(amount)
+      : values.every(v => v != null) ? values.reduce<number>((sum, v) => sum + (v ?? 0), 0)
+        : mode === 'edit' && !fields.amountNeedsReview && !fields.reviewEdits?.amount ? sourceEntry?.amount ?? NaN : NaN
+    const totals = earnedPointsTotal(earned, total, rate)
+    return `${t('receiptRulePoints')}: ${totals.payment}P\n${t('receiptPointsTotal')}: ${totals.total}P`
+  }
+  function touchDate(v: string) {
+    pointsArmed.current = true
+    receiptDateLockedRef.current = true
+    setDate(v)
+  }
+
+  async function handleSave() {
+    if (!user) return
+    const amt = parseFloat(amount)
+    if (!amt || amt <= 0) return
+    const cat = categories.find((c) => c.code === catCode) ?? categories[0]
+    if (!cat) return
+    const pointsRaw = parseInt(points, 10)
+    const finalPoints = type === 'expense' && !isNaN(pointsRaw) && pointsRaw > 0 ? pointsRaw : null
+    const base = mode === 'edit' && sourceEntry ? sourceEntry : null
+    const entry: Entry = {
+      id: entryId,
+      type,
+      amount: amt,
+      currency: base?.currency ?? settings.currency,
+      catCode: cat.code,
+      subCode,
+      paymentMethod: payCode ?? 'cash',
+      tagCode,
+      note: note.trim() || null,
+      points: finalPoints,
+      date: date || todayStr(),
+      recurringId: base?.recurringId ?? null,
+      createdAt: base?.createdAt ?? Date.now(),
+      receiptPaths,
+      receiptDetails,
+      receiptPointsNote: receiptPointsNoteRef.current && !note.split('\n\n').includes(receiptPointsNoteRef.current) ? null : receiptPointsNoteRef.current,
+    }
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
+    setSaveFailed(false)
+    let saved = false
+    try {
+      addToOutbox(user.id, entry)
+      await upsertEntry(entry, user.id)
+      upsertCachedEntry(user.id, entry)
+      removeFromOutbox(user.id, entry.id)
+      saved = true
+    } catch (e) {
+      console.error('记录保存失败', e)
+    } finally {
+      savingRef.current = false
+      setSaving(false)
+    }
+    if (!saved) {
+      setSaveFailed(true)
+      return
+    }
+    // R-XX：新建(mode==='add')保存后还是走原来R-42那套"按入口高亮/刷新"逻辑，回到
+    // 列表页定位高亮这条新记录——FAB新建没有"来源详情弹层"，这套逻辑继续保留不变。
+    // 编辑/复制则改成保存后直接回到详情弹层(不再回列表+高亮)：详情弹层一定是从
+    // 编辑/复制的来源(点进来之前就已经打开的那个)，复用跟"取消/返回"同一套
+    // detailSheetReturnMemory重新打开机制——编辑的entryId本来就对，原样留着；复制
+    // 生成的是一条全新id的记录，要把memory里的entryId换成新记录的
+    const origin = consumeAddEntryOrigin()
+    if (mode === 'add') {
+      if (origin === 'dashboard') setDashboardFocusEntryId(entry.id)
+      else if (origin === 'history') setHistoryFocusEntryId(entry.id)
+      else if (origin === 'stats') markStatsNeedsRefresh()
+      clearDetailSheetReturnMemory()
+    } else if (mode === 'copy') {
+      updateDetailSheetReturnMemoryEntryId(entry.id)
+    }
+    navigate(-1)
+  }
+
+  // 点"返回"(不保存，放弃改动)，回到进来之前那个页面。如果是从详情弹层点编辑/复制
+  // 进来的，detailSheetReturnMemory在那之前已经写好了，这里不用做任何事——原样
+  // 留给目标页面挂载后的effect去consume、重新打开详情弹层(见各复用点consume的说明)
+  function handleBack() {
+    navigate(-1)
+  }
+
+  // R-32：扫描确认后立刻传Storage(不是等整条记录save才一起传)——entryId已经在
+  // 组件挂载时就确定好了(见上面newEntryId的说明)，不需要等真正save entries才能拿到
+  // 一个id；这样用户扫完就能立刻点"查看凭证"核对是否传成功，不用等保存完这一步
+  // 三种模式共用扫描回填；本次手填的金额和日期优先。
+  // R-41：扫描确认后追加到receiptPaths末尾(不再是setReceiptPath整个覆盖)——一次
+  // 只扫一张的交互本身不变(ReceiptScanSheet职责不变)，"能扫多张"是这里的列表管理
+  // 逻辑，用户扫完一张想再加一张，自己点列表末尾的"继续扫描"再次打开这个弹层
+  async function handleReceiptConfirm(pdf: Blob, fields: RecognizedReceiptFields): Promise<boolean> {
+    if (!user) return false
+    setReceiptBusy(true)
+    try {
+      const path = await uploadReceiptPdf(user.id, entryId, pdf)
+      setReceiptPaths((prev) => [...prev, path])
+      setScanSheetOpen(false)
+      if (fields.reviewEdits?.date || fields.date && !receiptDateLockedRef.current) {
+        receiptDateLockedRef.current = true
+        setDate(fields.date ?? '')
+      }
+      const formatted = formatReceiptNote(fields)
+      receiptsByIdRef.current.set(fields.receiptId, { receiptId: fields.receiptId, path, amount: fields.amount,
+        printedAmount: fields.printedAmount ?? fields.amount, amountBasis: fields.amountBasis ?? 'before_points',
+        pointsEarned: fields.pointsEarned ?? null, pointsUsed: fields.pointsUsed ?? null, pointsUsedAmount: fields.pointsUsedAmount ?? null,
+        noteText: fields.receiptPointsNote ? syncReceiptRuleNote(formatted, fields.receiptPointsNote, null).note : formatted })
+      pointsArmed.current = true
+      setReceiptDetails(Array.from(receiptsByIdRef.current.values()))
+      if (fields.reviewEdits?.amount) amountWasManuallyEditedRef.current = false
+      if ((fields.reviewEdits?.amount || fields.amountNeedsReview && !amountWasManuallyEditedRef.current) && fields.amount == null) setAmount('')
+      else updateReceiptAmount()
+      logModule('receipt', `小票金额汇总 receiptId=${fields.receiptId}: 本张合計=${fields.amount ?? '未确认'}, 小票数=${receiptsByIdRef.current.size}`)
+      // 备注按张追加到已有内容之后。
+      const previousRule = receiptPointsNoteRef.current
+      receiptPointsNoteRef.current = fields.receiptPointsNote
+      if (formatted) {
+        setNote(prev => {
+          const base = previousRule ? syncReceiptRuleNote(prev, previousRule, null).note : prev
+          return base.trim() ? `${base.trimEnd()}\n\n${formatted}` : formatted
+        })
+        logModule('receipt', `小票备注追加: receiptId=${fields.receiptId}, ${formatted.split('\n').length}行`)
+      } else if (previousRule) {
+        setNote(prev => syncReceiptRuleNote(prev, previousRule, null).note)
+      }
+      return true
+    } catch (e) {
+      console.error('レシート凭证上传失败', e)
+      return false
+    } finally {
+      setReceiptBusy(false)
+    }
+  }
+
+  async function handleReceiptRemove(path: string) {
+    if (receiptRemovingRef.current) return
+    receiptRemovingRef.current = true
+    setReceiptBusy(true)
+    try {
+      await deleteReceiptPdf(path)
+      setReceiptPaths((prev) => prev.filter((p) => p !== path))
+      for (const [id, receipt] of receiptsByIdRef.current) {
+        if (receipt.path !== path) continue
+        receiptsByIdRef.current.delete(id)
+        setReceiptDetails(Array.from(receiptsByIdRef.current.values()))
+        if (receipt.noteText) setNote(current => syncReceiptRuleNote(current, receipt.noteText, null).note)
+        pointsArmed.current = true
+        updateReceiptAmount()
+        break
+      }
+    } catch (e) {
+      console.error('レシート凭证删除失败', e)
+    } finally {
+      receiptRemovingRef.current = false
+      setReceiptBusy(false)
+    }
+  }
+
+  async function handleReceiptView(path: string) {
+    if (receiptBusy) return
+    setReceiptBusy(true)
+    try {
+      const url = await getReceiptSignedUrl(path)
+      const openedNative = await openReceiptDocumentNative(url)
+      if (!openedNative) {
+        setReceiptPreviewUrl(url)
+        setReceiptPreviewOpen(true)
+      }
+    } catch (e) {
+      console.error('レシート凭证签名URL获取失败', e)
+    } finally {
+      setReceiptBusy(false)
+    }
+  }
+
+  const pageTitle = mode === 'edit' ? t('editTitle') : mode === 'copy' ? t('copyTitle') : t('addTitle')
+
+  return (
+    <div
+      className="app-shell fixed inset-0 mx-auto max-w-[480px] flex flex-col bg-surface overflow-hidden"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
+      <AutumnLeaves />
+      {/* B-08：paper-grid-bg只贴main(内容滚动区)，不贴根容器——不然顶部安全区(header
+          上方没被header遮住的那一小条)会透出方格纹理，跟header纯色背景不一致
+          B-XX：路由切换入场渐显(见AppLayout.tsx的RouteFade说明)——这页是独立整屏
+          子页面不走AppLayout，之前一直没有这个效果。只包header+main，不包下面
+          fixed贴底的保存条(B-XX：main内容本身有position:fixed的记一笔保存条，
+          RouteFade如果连它一起包会有containing block副作用，见RouteFade.tsx说明) */}
+      <RouteFade className="flex flex-col flex-1 min-h-0">
+      <header className="flex items-center justify-between px-md h-16 w-full shrink-0 bg-surface">
+        <button type="button" aria-label="返回" onClick={handleBack} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-app-title hover:bg-surface-variant/50 hover:-translate-y-0.5 active:bg-primary/25 active:scale-90 active:translate-y-0 transition-[background-color,transform]">
+          <ThemeIcon icon="arrow_back" effect="bare" className="papercut-text-shadow" />
+        </button>
+        <h1 className="font-serif text-headline-md text-app-title tracking-tight papercut-text-shadow">{pageTitle}</h1>
+        <div className="w-10" />
+      </header>
+
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain pb-40 paper-grid-bg">
+       {/* entries缓存优先(见useEntries.ts)比catalog先就绪，catalog没到位前渲染分类/支付方式
+           选择器会闪一下"英文图标名+统一灰色"的半成品画面——之前用if(!catalog)return null
+           整页提前返回，连header/返回按钮都出不来，真机上就是"进App白屏一段时间"；改成
+           只在main内容区域挡一个轻量的loading占位，外壳(header)立刻能看到、能点返回 */}
+       {!catalog ? (
+        <CatalogLoadState loading={catalogLoading} onRetry={reloadCatalog} />
+       ) : (
+        <>
+        {/* R-10：收支页签栏改成虚线围绕，照旧App`.segment{border:2px dashed var(--grid)}`真实值 */}
+        <div className="px-md pt-2 pb-6">
+          <div className="flex p-1 bg-surface-container-highest rounded-xl border-2 border-dashed border-outline-variant relative">
+            {(['expense', 'income'] as const).map((key) => (
+              <button
+                key={key}
+                type="button"
+                disabled={typeLocked}
+                onClick={() => setType(key)}
+                className={`flex-1 py-2 text-center rounded-lg text-label-caps font-sans font-normal transition-colors ${
+                  type === key ? 'bg-surface text-action-ink shadow-sm' : 'text-on-surface-variant'
+                } ${typeLocked ? 'opacity-60' : ''}`}
+              >
+                {key === 'expense' ? t('typeExpense').toUpperCase() : t('typeIncome').toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* R-32→R-41：レシート扫描存档入口——只在支出场景显示(小票只对应支出，切到
+            收入标签页时这个入口不该出现)，位置紧跟在支出/収入页签下面，一进页面不用
+            往下滚就能看到，不是埋在备注下面那么靠后。没有凭证时是一整行虚线框的
+            "扫描"按钮；有凭证之后换成列表——每张凭证一行，文字本身就是可点的超链接
+            (虚线下划线+高亮色，照这个App里链接一贯的视觉语言)，不单独放文件类型
+            图标(没有真实文件名，点进去才是重点，不需要图标强调"这是个文件")，右侧
+            一个小删除图标；列表最后一行"继续扫描"，不管已经有几张都能继续追加，
+            不是"有了就不能再扫"。
+
+            链接文字颜色用index.css新增的--color-link，不是直接用--color-primary——
+            实测过三套主题下--color-primary在这里实际会出现的卡片底色(surface-
+            container-lowest)上的WCAG对比度：默认3.65:1、"怀旧"仅2.14:1，都不够14px
+            正文小字号的AA标准(4.5:1)，是B-51当初踩过的同一类"没对着实际背景量过
+            对比度"问题，这次改成专门开一个token，三套主题各自调过(见index.css该
+            token定义处) */}
+        {type === 'expense' && (
+          <div className="px-md pb-6">
+            {receiptPaths.length > 0 ? (
+              <div className="flex flex-col rounded-xl border-[1.5px] border-dashed border-outline-variant bg-surface-container-lowest overflow-hidden">
+                {receiptPaths.map((path, i) => (
+                  <div key={path} className="flex items-center gap-2 px-3 py-1.5 border-b border-dashed border-outline-variant/50">
+                    <button
+                      type="button"
+                      onClick={() => handleReceiptView(path)}
+                      disabled={receiptBusy}
+                      className="flex-1 min-w-0 text-left text-body-md text-[var(--color-link)] underline decoration-dashed underline-offset-2 truncate disabled:opacity-50"
+                    >
+                      {t('receiptItemLabel')}
+                      {i + 1}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={t('receiptRemoveAria')}
+                      onClick={() => handleReceiptRemove(path)}
+                      disabled={receiptBusy}
+                      className="w-7 h-7 shrink-0 flex items-center justify-center text-on-surface-variant disabled:opacity-50"
+                    >
+                      <ThemeIcon className="material-symbols-outlined text-[16px]" icon="delete" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setScanSheetOpen(true)}
+                  disabled={receiptBusy}
+                  className="flex items-center justify-center gap-1.5 py-1.5 text-on-surface-variant text-body-md active:bg-surface-container transition-colors disabled:opacity-50"
+                >
+                  <ThemeIcon className="material-symbols-outlined text-[16px]" icon="photo_camera" />
+                  {t('receiptScanMore')}
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setScanSheetOpen(true)}
+                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border-[1.5px] border-dashed border-outline-variant text-on-surface-variant text-body-md active:bg-surface-container transition-colors"
+              >
+                <ThemeIcon className="material-symbols-outlined text-[18px]" icon="photo_camera" />
+                {t('receiptScanEntry')}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* R-10："金额"字样去掉(照旧App没有单独的金额字段标题)；货币符号改成symbolFor()，
+            日元/人民币都显示"JP¥"/"CN¥"这种带国别前缀的完整写法，不能只显示裸的"¥"
+            (两种货币符号本来就长得一样，裸符号分不清是哪种货币) */}
+        <div className="px-md pb-8 flex flex-col items-center">
+          <div className="flex items-baseline justify-center border-b-2 border-primary pb-2 w-3/4 max-w-[240px]">
+            <span className="font-serif text-hero-balance text-action-ink mr-2">{symbolFor(settings.currency)}</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={amount}
+              onChange={(e) => touchAmount(e.target.value)}
+              placeholder="0"
+              className="bg-transparent border-none outline-none font-serif text-hero-balance text-on-surface w-full text-left p-0 focus:ring-0 leading-none"
+            />
+          </div>
+        </div>
+
+        <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
+
+        <CategoryPicker
+          categories={categories}
+          selectedCatCode={catCode}
+          selectedSubCode={subCode}
+          onSelectCat={(code) => {
+            if (code !== catCode) {
+              setCatCode(code)
+              // 切换分类后默认选中新分类下的第一个子分类，不是清空成"不选"——
+              // 没有子分类的分类(subs为空数组)才落回null
+              const newCat = categories.find((c) => c.code === code)
+              setSubCode(newCat?.subs[0]?.code ?? null)
+            }
+          }}
+          onSelectSub={setSubCode}
+          userId={user?.id ?? null}
+          onCatalogChanged={reloadCatalog}
+        />
+
+        <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
+
+        <div className="py-md px-md">
+          <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm tracking-widest uppercase">
+            {t('methodLabel')}
+          </h2>
+          {/* R-11修正：grid-cols-3强制等分三列会把长一点的支付方式名字(比如"クレジットカード")
+              截断——改回照旧App`.sub-wrap`(flex flex-wrap)+`.sub-pill`真实值，每个胶囊按
+              文字内容自身宽度撑开、自动换行，短的名字自然一行能排下3个左右，长的也能完整
+              显示，不强制等宽三列 */}
+          <div className="flex flex-wrap gap-2" data-payment-picker>
+            {paymentMethods.map((pm) => {
+              const active = pm.code === payCode
+              return (
+                <button
+                  key={pm.code}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => touchPayCode(pm.code)}
+                  className={`choice-control flex items-center gap-1.5 py-2 px-3.5 rounded-full border text-[13px] font-sans transition-colors ${
+                    active
+                      ? 'border-primary bg-primary-fixed text-action-ink font-semibold'
+                      : 'border-outline-variant bg-surface-container text-on-surface-variant'
+                  }`}
+                >
+                  <PaymentMethodIcon method={pm} size={18} />
+                  {payLabel(pm, lang)}
+                </button>
+              )
+            })}
+          </div>
+
+          <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm mt-md tracking-widest uppercase">
+            {t('dateLabel')}
+          </h2>
+          {/* B-04：真机上日期框被截断的真正原因(照旧App index.html dateInput实测有效的
+              真实解法搬过来，不是猜的)——iOS Safari原生input[type=date]带自己的WebKit
+              控件外观(日/月/年分段+日历图标)，这套外观在被撑成整行宽度时会被自己内部的
+              渲染裁切。旧App的dateInput从来不是w-full，而是appearance:none去掉原生外观
+              渲染 + 限定一个较窄的固定宽度(max-width:150px)，把控件交给CSS完全接管尺寸，
+              不依赖WebKit自己去适配一个不确定的宽度 */}
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => touchDate(e.target.value)}
+            className="appearance-none bg-surface-container border border-outline-variant rounded-xl px-3.5 h-[46px] text-body-md text-on-surface max-w-[150px] focus:outline-none focus:border-primary"
+          />
+        </div>
+
+        <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
+
+        <div className="px-md py-md grid grid-cols-2 gap-md">
+          <div>
+            <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm tracking-widest uppercase">
+              {t('tagsLabel')}
+            </h2>
+            <TagPicker
+              tags={tags}
+              type={type}
+              selectedTagCode={tagCode}
+              onSelectTag={setTagCode}
+              userId={user?.id ?? null}
+              onCatalogChanged={reloadCatalog}
+            />
+          </div>
+          {type === 'expense' && (
+            <div>
+              <h2 className="text-label-caps font-sans text-on-surface-variant mb-sm tracking-widest uppercase">
+                {t('pointsLabel')}
+              </h2>
+              <div className="flex items-center border-b border-outline-variant pb-2">
+                <ThemeIcon
+                  className="material-symbols-outlined text-tertiary mr-2 text-[20px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                 icon="stars" />
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={points}
+                  onChange={(e) => setPoints(e.target.value)}
+                  placeholder="0"
+                  className="bg-transparent border-none outline-none w-full p-0 font-serif text-stat-figure font-semibold text-on-surface focus:ring-0"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="w-full border-b-[1.5px] border-dashed border-outline-variant" />
+
+        <div className="px-md py-md pb-40">
+          <h2 className="text-label-caps font-sans text-on-surface-variant mb-xs tracking-widest uppercase">
+            {t('memoLabel')}
+          </h2>
+          {/* B-64：固定h-32(128px)装不下OCR识别出的多行小票备注，看着像被截断/
+              排版乱；改成随内容自动增高(见上面的useEffect)，封顶224px后textarea
+              内部滚动(而不是让整个页面无限变高)，-webkit-overflow-scrolling保证
+              iOS WebKit下惯性滚动顺滑 */}
+          <textarea
+            ref={noteRef}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={t('memoPlaceholder')}
+            className="w-full bg-transparent border-none outline-none resize-none min-h-32 overflow-y-auto p-0 text-body-lg text-on-surface focus:ring-0"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          />
+        </div>
+        </>
+       )}
+      </main>
+      </RouteFade>
+
+      <ReceiptScanSheet
+        open={scanSheetOpen}
+        entryDate={date || todayStr()}
+        onClose={() => setScanSheetOpen(false)}
+        onConfirm={handleReceiptConfirm}
+        pointsNote={previewReceiptPoints}
+      />
+      <ReceiptPreviewSheet
+        open={receiptPreviewOpen}
+        url={receiptPreviewUrl}
+        onClose={() => setReceiptPreviewOpen(false)}
+      />
+
+      <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-md pb-6 bg-gradient-to-t from-surface via-surface to-transparent">
+        {saveFailed && <p className="text-xs text-action-ink text-center mb-2">{t('entrySaveFailed')}</p>}
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={!amount || parseFloat(amount) <= 0 || saving}
+          className="w-full h-[58px] bg-action text-on-action rounded-xl text-headline-md font-serif active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+          style={{ boxShadow: '0 4px 0 var(--color-primary-container)' }}
+        >
+          {saving ? (
+            <span className="ios-spinner text-on-action">
+              {Array.from({ length: 8 }, (_, i) => (
+                <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${i * 0.125 - 1}s` }} />
+              ))}
+            </span>
+          ) : (
+            <ThemeIcon className="material-symbols-outlined" icon="how_to_reg" />
+          )}
+          {t('saveEntry')}
+        </button>
+      </div>
+    </div>
+  )
+}

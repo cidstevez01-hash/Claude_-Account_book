@@ -2,6 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { apiClient } from '../lib/apiClient'
 import { mapCategoryIcon } from '../lib/iconMap'
+import { parseReceiptManifest, serializeReceiptManifest } from '../lib/receiptManifest'
 import type {
   Category,
   Entry,
@@ -204,17 +205,8 @@ interface EntryRow {
  * throw，这里兜底识别"不是JSON就当成旧版单路径"，包成单元素数组；这类记录只要
  * 被重新保存一次(哪怕只是编辑点了保存没改任何东西)，upsertEntry存回去的时候
  * 就会自动变成新的JSON数组格式，不需要批量迁移脚本 */
-function parseReceiptPaths(raw: string | null): string[] {
-  if (!raw) return []
-  try {
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed.filter((p) => typeof p === 'string') : [raw]
-  } catch {
-    return [raw]
-  }
-}
-
 function dbRowToEntry(row: EntryRow): Entry {
+  const receipts = parseReceiptManifest(row.receipt_path)
   return {
     id: row.id,
     type: row.type,
@@ -229,7 +221,9 @@ function dbRowToEntry(row: EntryRow): Entry {
     date: row.entry_date,
     recurringId: row.recurring_id,
     createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
-    receiptPaths: parseReceiptPaths(row.receipt_path),
+    receiptPaths: receipts.paths,
+    receiptDetails: receipts.details,
+    receiptPointsNote: receipts.pointsNote,
   }
 }
 
@@ -259,7 +253,7 @@ export function entryToDbRow(entry: Entry, userId: string): Omit<EntryRow, 'crea
     points: entry.points,
     entry_date: entry.date,
     recurring_id: entry.recurringId,
-    receipt_path: entry.receiptPaths.length > 0 ? JSON.stringify(entry.receiptPaths) : null,
+    receipt_path: serializeReceiptManifest(entry.receiptPaths, entry.receiptDetails, entry.receiptPointsNote),
   }
 }
 
